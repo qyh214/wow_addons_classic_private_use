@@ -1,0 +1,10 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file='Blizzard.lua'/>
+	<Script file='ColorPicker.lua'/>
+	<Script file='Kill.lua'/>
+	<Script file='QuestWatch.lua'/>
+	<Script file='GM.lua'/>
+	<Script file='Durability.lua'/>
+	<Script file='CaptureBar.lua'/>
+	<Script file='AlertFrame.lua'/>
+</Ui>

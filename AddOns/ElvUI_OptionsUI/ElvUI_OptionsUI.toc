@@ -1,0 +1,27 @@
+## Interface: 11302
+## Author: Elv
+## Version: 1.06
+## Title: |cfffe7b2cElvUI|r |cff1784d1Classic|r |cfffe7b2cOptionsUI|r
+## Notes: Options for ElvUI.
+## RequiredDeps: ElvUI
+## LoadOnDemand: 1
+
+Libraries\Load_Libraries.xml
+Locales\Load_Locales.xml
+Core.lua
+General.lua
+ActionBars.lua
+Auras.lua
+Bags.lua
+Chat.lua
+Cooldown.lua
+DataTexts.lua
+DataBars.lua
+Filters.lua
+Tooltip.lua
+UnitFrames.lua
+Nameplates.lua
+#Skins.lua
+Profiles.lua
+Maps.lua
+ModuleControl.lua
