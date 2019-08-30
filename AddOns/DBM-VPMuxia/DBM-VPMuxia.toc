@@ -1,0 +1,15 @@
+﻿## Interface: 80100
+## X-Min-Interface: 80100
+## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Voicepack Muxia|r
+## Title-zhCN:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0沐年之夏语音包|r
+## Title-zhTW:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0沐年之夏语音包|r
+## DefaultState: enabled
+## RequiredDeps: DBM-Core
+## Author: Muxia
+## Version: 20190813
+## Notes: https://www.douyu.com/4353635
+## X-DBM-Voice: 1
+## X-DBM-Voice-Name: 沐年之夏(斗鱼4353635)
+## X-DBM-Voice-ShortName: Muxia
+## X-DBM-Voice-Version: 9
+## X-DBM-Voice-HasCount: 1

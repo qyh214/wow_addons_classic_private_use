@@ -17,7 +17,11 @@ questExclusiveGroupFixes = {
     [1943] = {1944}, -- mage robe breadcrumb
     [526] = {322,324}, -- not 100% sure on this one but it seems lightforge ingots is optional, block it after completing subsequent steps (#587)
     [3765] = {1275}, -- corruption abroad breadcrumb
-    [164] = {95} -- deliveries to sven is a breadcrumb
+    [164] = {95}, -- deliveries to sven is a breadcrumb
+    -- this is a subquest
+    --[403] = {311}, -- completing the unguarded barrel quest prevents to do the optional guarded barrel prequest
+    [428] = {429}, -- lost deathstalkers breadcrumb
+    [308] = {311} -- distracting jarven can't be completed once you get the followup
 }
 
 questItemBlacklist = {
@@ -521,6 +525,7 @@ qHide = {
   [8759] = true,
   [8760] = true,
   --Profession quests
+  [768] = true,
   [7652] = true,
   [2771] = true,
   [6625] = true,

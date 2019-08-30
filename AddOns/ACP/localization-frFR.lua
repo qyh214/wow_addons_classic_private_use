@@ -2,9 +2,6 @@
 
 --@non-debug@
 
-if (GetLocale() == "frFR") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** Activation <%s> %s votre UI ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** Addon inconnu <%s> requis ***",
@@ -75,7 +72,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "frFR") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

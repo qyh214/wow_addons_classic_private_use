@@ -2,9 +2,6 @@
 
 --@non-debug@
 
-if (GetLocale() == "koKR") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** 애드온 <%s> %s 사용 ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** 알 수 없는 애드온 <%s>|1을;를; 요청 ***",
@@ -75,7 +72,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "koKR") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

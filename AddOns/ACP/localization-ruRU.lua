@@ -2,9 +2,6 @@
 
 --@non-debug@
 
-if (GetLocale() == "ruRU") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** Включаю <%s> %s вашего интерфейса ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** Неизвестная модификация <%s> требуется ***",
@@ -76,7 +73,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "ruRU") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

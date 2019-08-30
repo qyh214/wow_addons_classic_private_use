@@ -22,7 +22,7 @@ QuestieLocale.locale['enUS'] = {
     ['ENABLE_TURNINS'] = "Enable Completed Quest Icons",
     ['ENABLE_TURNINS_DESC'] = "When this is enabled, the quest turn-in locations will be shown on the map/minimap",
     ['ENABLE_AVAILABLE'] = "Enable Available Quest Icons",
-    ['ENABLE_AVAILABLE_DESC'] = "When this is enabled, the quest turn-in locations will be shown on the map/minimap",
+    ['ENABLE_AVAILABLE_DESC'] = "When this is enabled, the available quest locations will be shown on the map/minimap",
     ['ENABLE_TOOLTIPS'] = "Enable Tooltips",
     ['ENABLE_TOOLTIPS_DESC'] = "When this is enabled, quest info will be added to relevant mob/item tooltips",
 	
@@ -61,7 +61,7 @@ QuestieLocale.locale['enUS'] = {
     ['MAP_ALWAYS_GLOW_TOGGLE_DESC'] = "Draw a glow texture behind map icons, colored unique to each quest",
 
     ['AVAILABLE_ICON_SCALE'] = "Scale for Available/Complete Icons",
-    ['AVAILABIE_ICON_SCALE_DESC'] = "How large the available/complete icons are.  ( Default: %s )",
+    ['AVAILABLE_ICON_SCALE_DESC'] = "How large the available/complete icons are.  ( Default: %s )",
     ['LOOT_ICON_SCALE'] = "Scale for Loot Icons",
     ['LOOT_ICON_SCALE_DESC'] = "How large the loot icons are.  ( Default: %s )",
     ['MONSTER_ICON_SCALE'] = "Scale for Slay Icons",

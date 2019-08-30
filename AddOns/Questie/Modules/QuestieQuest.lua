@@ -635,6 +635,8 @@ function QuestieQuest:PopulateObjective(Quest, ObjectiveIndex, Objective, BlockI
                     for _, note in pairs(spawn.minimapRefs) do
                         note:Unload();
                     end
+                    spawn.mapRefs = {}
+                    spawn.minimapRefs = {}
                 end
             end
         end
@@ -789,6 +791,15 @@ function QuestieQuest:GetAllQuestObjectives(Quest)
                             Quest.Objectives[i].Id = v.Id
                             Quest.Objectives[i].Coordinates = v.Coordinates
                             v.ObjectiveRef = Quest.Objectives[i]
+                        end
+                    end
+                end
+                -- 2nd pass (fix for missing language data)
+                if Quest.Objectives[i].Id == nil and GetLocale() ~= "enUS" and GetLocale() ~= "enGB" then
+                    for k,v in pairs(Quest.ObjectiveData) do
+                        if objectiveType == v.Type then
+                            -- When nothing is found (other languages) fill it.
+                            Quest.Objectives[i].Id = v.Id
                         end
                     end
                 end
@@ -1018,6 +1029,11 @@ function _QuestieQuest:IsDoable(questObject) -- we need to add profession/reputa
             if Questie.db.char.complete[v] or qCurrentQuestlog[v] then
                 return false
             end
+        end
+    end
+    if questObject.MustHave then
+        if not qCurrentQuestlog[questObject.MustHave] then
+            return false
         end
     end
     if questObject.RequiredQuest == nil or questObject.RequiredQuest == 0 then

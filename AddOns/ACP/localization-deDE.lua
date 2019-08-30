@@ -3,9 +3,6 @@ if not ACP then return end
 
 --@non-debug@
 
-if (GetLocale() == "deDE") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** Aktiviere <%s> %s deiner UI ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** Unbekanntes Addon <%s> benötigt ***",
@@ -76,7 +73,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "deDE") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

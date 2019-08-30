@@ -2,9 +2,6 @@
 
 --@non-debug@
 
-if (GetLocale() == "esMX") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** Activando <%s> %s su IU ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** Addon desconocido <%s> requerido ***",
@@ -76,7 +73,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "esMX") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

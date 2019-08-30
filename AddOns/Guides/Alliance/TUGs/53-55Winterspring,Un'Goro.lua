@@ -1,0 +1,112 @@
+Guidelime.registerGuide(
+[[
+[GA Alliance]
+[N53-55冬泉谷,安戈洛环形山]
+[NX55-56燃烧平原,西瘟疫之地]
+[D 此导航由 TUGs 制作，中文由Qcat汉化，更多汉化插件请访问: https://60addons.com]
+此导航由 TUGs 制作，中文由Qcat汉化，更多汉化插件请访问: https://60addons.com
+提交: [QT3909]
+接受任务: [QA3912]
+提交: [G31.26,45.16Winterspring][QT6603]
+接受任务: [G31.26,45.16Winterspring][QA5082]
+去做: [G31.67,36.42Winterspring][QC5082]
+去做: [G31.67,36.42Winterspring][QC6241]
+去做: [G31.67,36.42Winterspring][QC6241]
+去做: [G31.67,36.42Winterspring][QC5082]
+去做: [G31.67,36.42Winterspring][QC6241]
+去做: [G31.67,36.42Winterspring][QC5082]
+接受任务: [G67.25,36.74Winterspring][QA5083]
+接受任务: [G61.34,38.97Winterspring][QA6030]
+接受任务: [G61.34,38.97Winterspring][QA6028]
+提交: [G31.26,45.16Winterspring][QT5082]
+提交: [G31.26,45.16Winterspring][QT5083]
+接受任务: [G31.26,45.16Winterspring][QA5084]
+提交: [G27.73,34.49Winterspring][QT6241]
+提交: [G60.2,5.9Felwood][QT5084]
+接受任务: [G21.17,34.3Winterspring][QA5085]
+飞到棘齿城
+提交: [QT4502]
+提交: [QT5158]
+接受任务: [QA5159]
+飞到塔纳利斯
+提交: [QT4493]
+在 [G 53.9,29.1] 处使用你的视灵药剂并呆着别动!!
+提交: [G53.9,23.4Tanaris][QT3912]
+接受任务: [G53.9,29.1Tanaris][QA3913]
+复活
+提交: [G53.9,29.1Tanaris][QT3913]
+接受任务: [G53.81,29.06Tanaris][QA3914]
+飞到安戈洛
+提交: [G15.58,74.99Thousand Needles][QT3914]
+接受任务: [G15.58,74.99Thousand Needles][QA3941]
+提交: [G13.27,70.45Thousand Needles][QT3941]
+提交: [QT3942]
+接受任务: [G14.7,75.32Thousand Needles][QA4492]
+接受任务: [G17.02,79.48Thousand Needles][QA4243]
+提交: [G90.38,53.91Silithus][QT974]
+接受任务: [G90.38,53.91Silithus][QA980]
+护送任务! (确保所有人接受任务)
+提交: [G51.9,49.84Un'Goro Crater][QT4492]
+接受任务: [G51.9,49.84Un'Goro Crater][QA4491]
+提交: [G14.7,75.32Thousand Needles][QT4491]
+提交: [G34.92,82.27Thousand Needles][QT4243]
+接受任务: [G34.92,82.27Thousand Needles][QA4244]
+提交: [G34.92,82.27Thousand Needles][QT4244]
+接受任务: [G34.92,82.27Thousand Needles][QA4245]
+提交: [G17.02,79.48Thousand Needles][QT4245]
+使用 [H] 炉石
+飞到黑海岸
+设置你的 [H] 到黑海岸 [G37,40Darkshore]
+飞到卢瑟蓝村
+提交: [G55.49,92.04Teldrassil][QT978]
+接受任务: [G55.49,92.04Teldrassil][QA979]
+去做: [G39.4,84.9Darnassus][QC4441]
+飞到灰谷
+提交: [G13.89,96.07Winterspring][QT5159]
+提交: [G14,95.58Winterspring][QT4441]
+提交: [G14,95.58Winterspring][QT4906]
+接受任务: [G14,95.58Winterspring][QA4442]
+提交: [G14,95.58Winterspring][QT4442]
+跑到 [G62.5,24.2Felwood]
+飞到冬泉谷
+接受任务: [G61.11,38.43Winterspring][QA6604]
+提交: [QT5250]
+接受任务: [G51.97,30.38Winterspring][QA5244]
+提交: [G52.13,30.42Winterspring][QT6604]
+提交: [G52.13,30.42Winterspring][QT5244]
+接受任务: [G52.13,30.42Winterspring][QA5245]
+接受任务: [G52.13,30.42Winterspring][QA4861]
+提交: [G31.26,45.16Winterspring][QT5085]
+提交: [QT980]
+接受任务: [G31.26,45.16Winterspring][QA4842]
+提交: [G31.26,45.16Winterspring][QT4842]
+去做: [G52.2,42.21Winterspring][QC5245]
+去做: [G52.2,42.21Winterspring][QC5245]
+去做: [G52.2,42.21Winterspring][QC5245]
+去做: [G52.2,42.21Winterspring][QC5245]
+提交: [G59,59.8Winterspring][QT4861]
+接受任务: [G58.99,59.78Winterspring][QA4863]
+提交: [G61.5,60.7Winterspring][QT4863]
+接受任务: [G61.44,60.67Winterspring][QA4864]
+去做: [G65.13,60.81Winterspring][QC4864]
+去做: [G65.13,60.81Winterspring][QC4864]
+提交: [G63,59Winterspring][QT979]
+接受任务: [G63.07,59.47Winterspring][QA4901]
+提交: [G52.13,30.42Winterspring][QT4864]
+使用 [H] 炉石
+飞到卢瑟蓝村
+提交: [QT4901]
+接受任务: [QA4902]
+提交: [G35,9Darnassus][QT4902]
+飞到黑海岸
+坐船去湿地
+飞到铁炉堡
+提交: [G77.54,11.82Ironforge][QT2977]
+接受任务: [G77.54,11.82Ironforge][QA2964]
+提交: [G69.92,18.55Ironforge][QT2964]
+接受任务: [G38.36,55.3Ironforge][QA3702]
+去做: [QC3702]
+提交: [G38.36,55.3Ironforge][QT3702]
+接受任务: [G38.36,55.3Ironforge][QA3701]
+飞到赤脊山
+]], "TUGs 升级宝典，中文由Qcat汉化")

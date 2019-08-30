@@ -1,7 +1,10 @@
 # Questie
 **A quest helper for World of Warcraft: Classic**
 
-## WARNING: THIS IS A WIP BUILD FOR THE BETA! 
+## CLASSIC BUILD IS STILL A WORK IN PROGRESS!
+
+# Installation Guide
+Follow the [Installation Guide](https://github.com/AeroScripts/QuestieDev/wiki/Installation-Guide) in the Wiki if you just want to get the latest version of Questie up and running.
 
 # Download:
 https://github.com/AeroScripts/QuestieDev/releases/latest
@@ -10,7 +13,7 @@ https://github.com/AeroScripts/QuestieDev/releases/latest
 
 [![Downloads](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/)
 
-[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v4.0.9/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
+[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v4.0.10/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Date Latest](https://img.shields.io/github/release-date/AeroScripts/QuestieDev.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Commits Since Latest](https://img.shields.io/github/commits-since/AeroScripts/QuestieDev/latest.svg)](https://github.com/AeroScripts/QuestieDev/commits/master)
 

@@ -2,9 +2,6 @@ if not ACP then return end
 
 --@non-debug@
 
-if (GetLocale() == "zhCN") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** 启用 <%s>，%s 你的插件 ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** 需要未知插件 <%s> ***",
@@ -75,7 +72,8 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "zhCN") then
+	ACP:UpdateLocale(L)
 end
 
 --@end-non-debug@

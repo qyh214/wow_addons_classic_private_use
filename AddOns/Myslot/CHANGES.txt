@@ -1,0 +1,34 @@
+lightweight tag 4e22f6e2042e4392cd94de51e276e0f9a4663e69 v5.2.8-classic
+Author:	Boshi Lian <farmer1992@gmail.com>
+Date:	Tue Aug 27 03:52:51 2019 -0700
+
+commit 4e22f6e2042e4392cd94de51e276e0f9a4663e69
+Author: Boshi Lian <farmer1992@gmail.com>
+Date:   Tue Aug 27 03:52:51 2019 -0700
+
+    support classic
+
+commit aee1f372a30639fcd6b8854efa92ca22026ee570
+Author: Boshi Lian <farmer1992@gmail.com>
+Date:   Mon Aug 26 14:16:21 2019 -0700
+
+    Update README.markdown
+
+commit e0022839ad048f1e124f3ee55ec057a3053e7cd7
+Author: Boshi LIAN <bolian@microsoft.com>
+Date:   Mon Aug 26 13:53:16 2019 -0700
+
+    fix typo in toc
+
+commit 1bd0642ee6c3199d4c2d1b562eefaa7306ba3f37
+Author: Boshi LIAN <bolian@microsoft.com>
+Date:   Mon Aug 26 13:50:54 2019 -0700
+
+    fix file name
+
+commit b2bed75fdee21779f2d352d806e9175f2f37e39b
+Author: Boshi LIAN <bolian@microsoft.com>
+Date:   Mon Aug 26 13:47:08 2019 -0700
+
+    fix typo
+

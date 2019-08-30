@@ -1,0 +1,69 @@
+## Title: Guidelime_Undead-Guide(Mage)
+## Author: Thacen
+## Version: 0.001-Beta
+## Interface: 11302
+## Dependencies: Guidelime
+## Notes: Leveling Guide for Undead Mage in Classic. Based on https://www.joanasworld.com/azeroth.htm
+
+Thacen_1-6.lua
+Thacen_10-12.lua
+Thacen_12-15A.lua
+Thacen_12-15B.lua
+Thacen_12-15C.lua
+Thacen_12-15D.lua
+Thacen_12-15E.lua
+Thacen_12-15M.lua
+Thacen_15-16.lua
+Thacen_15-Barrens(Undead).lua
+Thacen_16-20.lua
+Thacen_20-21.lua
+Thacen_21-21.lua
+Thacen_22-23.lua
+Thacen_23-25.lua
+Thacen_25-25.lua
+Thacen_25-26.lua
+Thacen_26-27.lua
+Thacen_27-28.lua
+Thacen_28-29.lua
+Thacen_29-30.lua
+Thacen_30-30.lua
+Thacen_30-31.lua
+Thacen_31-32.lua
+Thacen_32-34.lua
+Thacen_34-36.lua
+Thacen_36-37.lua
+Thacen_37-37.lua
+Thacen_37-38.lua
+Thacen_38-38.lua
+Thacen_38-40.lua
+Thacen_40-41.lua
+Thacen_41-42.lua
+Thacen_42-43.lua
+Thacen_43-44.lua
+Thacen_44-44.lua
+Thacen_44-45.lua
+Thacen_45-46.lua
+Thacen_46-47.lua
+Thacen_47-47H.lua
+Thacen_47-47SV.lua
+Thacen_47-48.lua
+Thacen_48-49.lua
+Thacen_49-49DW.lua
+Thacen_49-49F.lua
+Thacen_49-50.lua
+Thacen_50-50.lua
+Thacen_50-51.lua
+Thacen_51-51.lua
+Thacen_51-53.lua
+Thacen_53-53.lua
+Thacen_53-54.lua
+Thacen_54-54.lua
+Thacen_54-55.lua
+Thacen_55-56.lua
+Thacen_56-56.lua
+Thacen_56-57.lua
+Thacen_57-58.lua
+Thacen_58-59.lua
+Thacen_59-60.lua
+Thacen_6-10.lua
+Thacen_M_10-Quest.lua

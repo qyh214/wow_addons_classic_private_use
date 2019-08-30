@@ -2,9 +2,6 @@ if not ACP then return end
 
 --@non-debug@
 
-if (GetLocale() == "esES") then
-	ACP:UpdateLocale(
-
 L = {
 	["*** Enabling <%s> %s your UI ***"] = "*** Activando <%s> %s su IU ***",
 	["*** Unknown Addon <%s> Required ***"] = "*** Accesorio desconocido <%s> requerido ***",
@@ -75,6 +72,7 @@ L = {
 }
 
 
-    )
+if (GetLocale() == "esES") then
+	ACP:UpdateLocale(L)
 end
 --@end-non-debug@

@@ -1,0 +1,46 @@
+lightweight tag 05014211bdf56ea1d9cf8a3d1d1d3d98f5c6ea09 v1.0
+Author:	max-ri <51713394+max-ri@users.noreply.github.com>
+Date:	Mon Aug 26 21:52:26 2019 +0200
+
+commit 05014211bdf56ea1d9cf8a3d1d1d3d98f5c6ea09
+Author: max-ri <51713394+max-ri@users.noreply.github.com>
+Date:   Mon Aug 26 21:52:26 2019 +0200
+
+    Update Guidelime.toc
+
+commit fb0cb22cd7fb62da55fa248805e2780f8d480f76
+Author: max-ri <51713394+max-ri@users.noreply.github.com>
+Date:   Mon Aug 26 21:50:32 2019 +0200
+
+    demo guides updated
+
+commit f87a2e57fb3206d2d5deb7425f012cb818b055b0
+Author: max-ri <max_r_@web.de>
+Date:   Mon Aug 26 17:52:43 2019 +0200
+
+    Update Localization.lua
+
+commit 98055db45ed3283a82315e980863fc73c272ddf6
+Author: max-ri <max_r_@web.de>
+Date:   Mon Aug 26 17:50:19 2019 +0200
+
+    localization for flightmasters
+
+commit 649bae56232281207f05858676503e83585730ef
+Author: EKE00372 <eke00372@gmail.com>
+Date:   Mon Aug 26 20:45:52 2019 +0800
+
+    fallow locale changes
+
+commit 649bae56232281207f05858676503e83585730ef
+Author: EKE00372 <eke00372@gmail.com>
+Date:   Mon Aug 26 20:45:52 2019 +0800
+
+    fallow locale changes
+
+commit dd35fa8445e9e0633aaa73ed15f2625f04355119
+Author: max-ri <max_r_@web.de>
+Date:   Mon Aug 26 14:34:14 2019 +0200
+
+    wording "Show skipped steps" instead of "Show unavailable steps"
+
