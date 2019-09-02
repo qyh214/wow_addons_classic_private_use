@@ -173,7 +173,9 @@ end
 function M:LOOT_SLOT_CLEARED(_, slot)
 	if not lootFrame:IsShown() then return end
 
-	lootFrame.slots[slot]:Hide()
+	if lootFrame.slots[slot] then
+		lootFrame.slots[slot]:Hide()
+	end
 	anchorSlots(lootFrame)
 end
 
@@ -283,7 +285,7 @@ function M:LOOT_OPENED(_, autoloot)
 		if color then
 			slot.name:SetTextColor(color.r, color.g, color.b)
 		end
-		slot.icon:SetTexture[[Interface\Icons\INV_Misc_Herb_AncientLichen]]
+		slot.icon:SetTexture([[Interface\Icons\Inv_misc_questionmark]])
 
 		w = max(w, slot.name:GetStringWidth())
 

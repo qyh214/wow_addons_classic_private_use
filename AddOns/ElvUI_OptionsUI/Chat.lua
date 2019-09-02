@@ -184,6 +184,45 @@ E.Options.args.chat = {
 					desc = L["Number of messages you scroll for each step."],
 					min = 1, max = 10, step = 1,
 				},
+				voicechatGroup = {
+					order = 21,
+					type = 'group',
+					name = L["BINDING_HEADER_VOICE_CHAT"],
+					guiInline = true,
+					args = {
+						hideVoiceButtons = {
+							order = 1,
+							type = "toggle",
+							name = L["Hide Voice Buttons"],
+							desc = L["Completely hide the voice buttons."],
+							set = function(info, value)
+								E.db.chat[info[#info]] = value
+								E:StaticPopup_Show("CONFIG_RL")
+							end,
+						},
+						pinVoiceButtons = {
+							order = 2,
+							type = "toggle",
+							name = L["Pin Voice Buttons"],
+							desc = L["This will pin the voice buttons to the chat's tab panel. Unchecking it will create a voice button panel with a mover."],
+							disabled = function() return E.db.chat.hideVoiceButtons end,
+							set = function(info, value)
+								E.db.chat[info[#info]] = value
+								E:StaticPopup_Show("CONFIG_RL")
+							end,
+						},
+						desaturateVoiceIcons = {
+							order = 3,
+							type = "toggle",
+							name = L["Desaturate Voice Icons"],
+							disabled = function() return E.db.chat.hideVoiceButtons end,
+							set = function(info, value)
+								E.db.chat[info[#info]] = value
+								CH:UpdateVoiceChatIcons()
+							end,
+						},
+					},
+				},
 				timestampGroup = {
 					order = 22,
 					type = 'group',

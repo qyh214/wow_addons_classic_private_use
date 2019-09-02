@@ -10,6 +10,7 @@
 	<Script file='BlizzardOptions.lua'/>
 	<Script file='Channels.lua'/>
 	<Script file='Character.lua'/>
+	<Script file='Communities.lua'/>
 	<Script file='Craft.lua'/>
 	<Script file='Debug.lua'/>
 	<Script file='DressingRoom.lua'/>

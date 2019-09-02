@@ -13,7 +13,7 @@ local HBDMigrate = LibStub("HereBeDragonsQuestie-Migrate")
 
 _QuestieFramePool.addonPath = "Interface\\Addons\\Questie\\"
 
---TODO: Add all types
+--TODO: Add all types (we gotta stop using globals, needs refactoring)
 ICON_TYPE_AVAILABLE =  _QuestieFramePool.addonPath.."Icons\\available.blp"
 ICON_TYPE_SLAY =  _QuestieFramePool.addonPath.."Icons\\slay.blp"
 ICON_TYPE_COMPLETE =  _QuestieFramePool.addonPath.."Icons\\complete.blp"
@@ -23,6 +23,27 @@ ICON_TYPE_EVENT =  _QuestieFramePool.addonPath.."Icons\\event.blp"
 ICON_TYPE_OBJECT =  _QuestieFramePool.addonPath.."Icons\\object.blp"
 ICON_TYPE_GLOW = _QuestieFramePool.addonPath.."Icons\\glow.blp"
 ICON_TYPE_BLACK = _QuestieFramePool.addonPath.."Icons\\black.blp"
+
+StaticPopupDialogs["QUESTIE_CONFIRMHIDE"] = {
+    text = "", -- set before showing
+    QuestID = 0, -- set before showing
+    button1 = "Yes",
+    button2 = "No",
+    OnAccept = function()
+        QuestieQuest:HideQuest(StaticPopupDialogs["QUESTIE_CONFIRMHIDE"].QuestID)
+    end,
+    SetQuest = function(self, id)
+        self.QuestID = id
+        self.text = QuestieLocale:GetUIString("CONFIRM_HIDE_QUEST", QuestieDB:GetQuest(self.QuestID):GetColoredQuestName())
+    end,
+    OnShow = function(self)
+        self:SetFrameStrata("TOOLTIP")
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3
+}
 
 -- Global Functions --
 function QuestieFramePool:GetFrame()
@@ -187,8 +208,17 @@ function _QuestieFramePool:QuestieCreateFrame()
     f:SetScript("OnLeave", function() if(WorldMapTooltip) then WorldMapTooltip:Hide(); WorldMapTooltip._rebuild = nil; end if(GameTooltip) then GameTooltip:Hide(); GameTooltip._rebuild = nil; end end) --Script Exit Tooltip
     f:SetScript("OnClick", function(self)
         --_QuestieFramePool:Questie_Click(self)
-        if self and self.data and self.data.UiMapID and WorldMapFrame and WorldMapFrame:IsShown() and self.data.UiMapID ~= WorldMapFrame:GetMapID() then
-            WorldMapFrame:SetMapID(self.data.UiMapID);
+        if self and self.data and self.data.UiMapID and WorldMapFrame and WorldMapFrame:IsShown() then
+            if self.data.UiMapID ~= WorldMapFrame:GetMapID() then
+                WorldMapFrame:SetMapID(self.data.UiMapID);
+            end
+            if self.data.Type == "available" and IsShiftKeyDown() then
+                StaticPopupDialogs["QUESTIE_CONFIRMHIDE"]:SetQuest(self.data.QuestData.Id)
+                --WorldMapFrame:Hide()
+                --StaticPopup:SetFrameStrata("TOOLTIP")
+                StaticPopup_Show ("QUESTIE_CONFIRMHIDE")
+                
+            end
         end
     end);
     f.glowUpdate = function(self)--f:HookScript("OnUpdate", function(self)
@@ -270,6 +300,10 @@ function QuestieFramePool:euclid(x, y, i, e)
     return math.sqrt(xd * xd + yd * yd);
 end
 
+function QuestieFramePool:maxdist(x, y, i, e)
+    return math.max(math.abs(x - i), math.abs(y - e))
+end
+
 function QuestieFramePool:remap(value, low1, high1, low2, high2)
     return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 end
@@ -311,12 +345,12 @@ function _QuestieFramePool:Questie_Tooltip(self)
     Tooltip._owner = self;
     Tooltip:SetOwner(self, "ANCHOR_CURSOR"); --"ANCHOR_CURSOR" or (self, self)
 
-    local maxDistCluster = 1.5
+    local maxDistCluster = 1
     local mid = WorldMapFrame:GetMapID();
     if mid == 947 then -- world
-        maxDistCluster = 8
+        maxDistCluster = 6
     elseif mid == 1415 or mid == 1414 then -- kalimdor/ek
-        maxDistCluster = 4
+        maxDistCluster = 3
     end
     if self.miniMapIcon then
         if _QuestieFramePool:isMinimapInside() then
@@ -346,7 +380,7 @@ function _QuestieFramePool:Questie_Tooltip(self)
     if 1 then
         for _, icon in pairs(usedFrames) do -- I added "usedFrames" because I think its a bit more efficient than using _G but I might be wrong
             if icon and icon.data and icon.x and icon.AreaID == self.AreaID then
-                local dist = QuestieFramePool:euclid(icon.x, icon.y, self.x, self.y);
+                local dist = QuestieFramePool:maxdist(icon.x, icon.y, self.x, self.y);
                 if dist < maxDistCluster then
                     if icon.data.Type == "available" or icon.data.Type == "complete" then
                         if npcOrder[icon.data.Name] == nil then

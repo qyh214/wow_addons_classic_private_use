@@ -158,14 +158,17 @@ do --this can save some main file locals
 	local ElvBlue		= E:TextureString(E.Media.ChatLogos.ElvBlue,y)
 	local ElvPurple		= E:TextureString(E.Media.ChatLogos.ElvPurple,y)
 	local ElvPink		= E:TextureString(E.Media.ChatLogos.ElvPink,y)
-	local Bathrobe		= E:TextureString(E.Media.ChatLogos.Bathrobe,x)
-	local MrHankey		= E:TextureString(E.Media.ChatLogos.MrHankey,x)
-	local Rainbow		= E:TextureString(E.Media.ChatLogos.Rainbow,x)
+	--local Bathrobe		= E:TextureString(E.Media.ChatLogos.Bathrobe,x)
+	--local MrHankey		= E:TextureString(E.Media.ChatLogos.MrHankey,x)
+	--local Rainbow		= E:TextureString(E.Media.ChatLogos.Rainbow,x)
 
 	local a, b, c = 0, false, {ElvRed, ElvOrange, ElvYellow, ElvGreen, ElvBlue, ElvPurple, ElvPink}
 	local itsSimpy = function() a = a - (b and 1 or -1) if (b and a == 1 or a == 0) or a == #c then b = not b end return c[a] end
 
 	specialChatIcons = {
+		-- Simpy
+		["Simpy-Myzrael"]		= itsSimpy, -- Warlock
+		["Cutepally-Myzrael"]	= itsSimpy, -- Paladin
 	}
 end
 
@@ -1568,14 +1571,9 @@ function CH:SetupChat()
 		local _, fontSize = FCF_GetChatWindowInfo(id)
 		self:StyleChat(frame)
 		FCFTab_UpdateAlpha(frame)
+
 		frame:FontTemplate(LSM:Fetch("font", self.db.font), fontSize, self.db.fontOutline)
-		if self.db.fontOutline ~= 'NONE' then
-			frame:SetShadowColor(0, 0, 0, 0.2)
-		else
-			frame:SetShadowColor(0, 0, 0, 1)
-		end
 		frame:SetTimeVisible(100)
-		frame:SetShadowOffset(E.mult, -E.mult)
 		frame:SetFading(self.db.fade)
 
 		if not frame.scriptsSet then
@@ -1775,19 +1773,10 @@ function CH:ChatEdit_OnEnterPressed(editBox)
 end
 
 function CH:SetChatFont(dropDown, chatFrame, fontSize)
-	if ( not chatFrame ) then
-		chatFrame = FCF_GetCurrentChatFrame()
-	end
-	if ( not fontSize ) then
-		fontSize = dropDown.value
-	end
+	if not chatFrame then chatFrame = FCF_GetCurrentChatFrame() end
+	if not fontSize then fontSize = dropDown.value end
+
 	chatFrame:FontTemplate(LSM:Fetch("font", self.db.font), fontSize, self.db.fontOutline)
-	if self.db.fontOutline ~= 'NONE' then
-		chatFrame:SetShadowColor(0, 0, 0, 0.2)
-	else
-		chatFrame:SetShadowColor(0, 0, 0, 1)
-	end
-	chatFrame:SetShadowOffset(E.mult, -E.mult)
 end
 
 function CH:ChatEdit_AddHistory(_, line) -- editBox, line
@@ -2136,6 +2125,79 @@ function CH:DefaultSmileys()
 	CH:AddSmiley('</3', E:TextureString(E.Media.ChatEmojis.BrokenHeart,x))
 end
 
+local channelButtons = {
+	[1] = _G.ChatFrameChannelButton, -- Classic only have 1 Button
+}
+
+function CH:RepositionChatVoiceIcons()
+	_G.GeneralDockManagerScrollFrame:SetPoint('BOTTOMRIGHT') -- call our hook
+	_G.GeneralDockManagerOverflowButton:ClearAllPoints()
+	_G.GeneralDockManagerOverflowButton:Point('RIGHT', channelButtons[1], 'LEFT', -4, 2)
+end
+
+function CH:UpdateVoiceChatIcons()
+	for _, button in pairs(channelButtons) do
+		button.Icon:SetDesaturated(E.db.chat.desaturateVoiceIcons)
+	end
+end
+
+function CH:HandleChatVoiceIcons()
+	if CH.db.hideVoiceButtons then
+		for _, button in pairs(channelButtons) do
+			button:Hide()
+		end
+	elseif CH.db.pinVoiceButtons then
+		for index, button in pairs(channelButtons) do
+			button:ClearAllPoints()
+			button.Icon:SetDesaturated(E.db.chat.desaturateVoiceIcons)
+			Skins:HandleButton(button, nil, nil, nil, true)
+
+			if index == 1 then
+				button:SetPoint('BOTTOMRIGHT', _G.LeftChatTab, 'BOTTOMRIGHT', 3, -3) -- This also change the position for new chat tabs 0.o
+			else
+				button:SetPoint("RIGHT", channelButtons[index-1], "LEFT")
+			end
+		end
+
+		hooksecurefunc(_G.GeneralDockManagerScrollFrame, 'SetPoint', function(frame, point, anchor, attachTo, x, y, stopLoop)
+			if anchor == _G.GeneralDockManagerOverflowButton and (x == 0 and y == 0) then
+				frame:Point(point, anchor, attachTo, -3, -6)
+			elseif (not stopLoop and not _G.GeneralDockManagerOverflowButton:IsShown()) and (point == "BOTTOMRIGHT" and anchor ~= channelButtons[1] and anchor ~= channelButtons[1]) then
+				frame:Point(point, anchor, attachTo, (channelButtons[1]:IsShown() and -30) or -10, -5, true)
+			end
+		end)
+
+		CH:RepositionChatVoiceIcons()
+		channelButtons[1]:HookScript("OnShow", CH.RepositionChatVoiceIcons)
+		channelButtons[1]:HookScript("OnHide", CH.RepositionChatVoiceIcons)
+	else
+		CH:CreateChatVoicePanel()
+	end
+end
+
+function CH:CreateChatVoicePanel()
+	local Holder = CreateFrame('Frame', 'ChatButtonHolder', E.UIParent)
+	Holder:ClearAllPoints()
+	Holder:Point("BOTTOMLEFT", _G.LeftChatPanel, "TOPLEFT", 0, 1)
+	Holder:Size(30, 30)
+	Holder:SetTemplate('Transparent', nil, true)
+	Holder:SetBackdropColor(E.db.chat.panelColor.r, E.db.chat.panelColor.g, E.db.chat.panelColor.b, E.db.chat.panelColor.a)
+	E:CreateMover(Holder, "SocialMenuMover", _G.BINDING_HEADER_VOICE_CHAT, nil, nil, nil, nil, nil, 'chat')
+
+	channelButtons[1]:ClearAllPoints()
+	channelButtons[1]:Point('TOP', Holder, 'TOP', 0, -2)
+
+	for _, button in pairs(channelButtons) do
+		Skins:HandleButton(button, nil, nil, nil, true)
+		button.Icon:SetParent(button)
+		button.Icon:SetDesaturated(E.db.chat.desaturateVoiceIcons)
+		button:SetParent(Holder)
+	end
+
+	_G.ChatAlertFrame:ClearAllPoints()
+	_G.ChatAlertFrame:Point("BOTTOM", channelButtons[1], "TOP", 1, 3)
+end
+
 function CH:BuildCopyChatFrame()
 	local frame = CreateFrame("Frame", "CopyChatFrame", E.UIParent)
 	tinsert(_G.UISpecialFrames, "CopyChatFrame")
@@ -2232,6 +2294,7 @@ function CH:Initialize()
 	self:UpdateFading()
 	self:UpdateAnchors()
 	self:Panels_ColorUpdate()
+	self:HandleChatVoiceIcons()
 
 	self:SecureHook('ChatEdit_OnEnterPressed')
 	self:SecureHook('FCF_SetWindowAlpha')

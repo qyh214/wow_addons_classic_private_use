@@ -133,3 +133,68 @@ end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
 DT:RegisterDatatext('Ammo', {"PLAYER_ENTERING_WORLD", "BAG_UPDATE"}, OnEvent, nil, OnClick, nil, nil, L["Ammo"])
+
+--[[
+local E, L, V, P, G = unpack(ElvUI)
+local DT = E:GetModule("DataTexts")
+
+local select = select
+local format, join = string.format, string.join
+
+local GetItemInfo = GetItemInfo
+local GetItemCount = GetItemCount
+local GetAuctionItemSubClasses = GetAuctionItemSubClasses
+local GetInventoryItemLink = GetInventoryItemLink
+local GetInventoryItemCount = GetInventoryItemCount
+local GetInventorySlotInfo = GetInventorySlotInfo
+local ContainerIDToInventoryID = ContainerIDToInventoryID
+local GetContainerNumSlots = GetContainerNumSlots
+local GetContainerNumFreeSlots = GetContainerNumFreeSlots
+local GetItemQualityColor = GetItemQualityColor
+local NUM_BAG_SLOTS = NUM_BAG_SLOTS
+local NUM_BAG_FRAMES = NUM_BAG_FRAMES
+local INVTYPE_AMMO = INVTYPE_AMMO
+
+local quiver = select(1, GetAuctionItemSubClasses(8))
+local pouch = select(2, GetAuctionItemSubClasses(8))
+local soulBag = select(2, GetAuctionItemSubClasses(3))
+
+local iconString = "|T%s:16:16:0:0:64:64:4:55:4:55|t"
+local displayString = ""
+
+local lastPanel
+
+local function ColorizeSettingName(settingName)
+	return format("|cffff8000%s|r", settingName)
+end
+
+local function OnEvent(self)
+	local name, count, link
+for i = 0, NUM_BAG_FRAMES do
+		for j = 1, GetContainerNumSlots(i) do
+			item = GetContainerItemID(i, j)
+			if item then
+				link = GetContainerItemLink(i, j)
+				name, _, quality, _, _, _, _, _, equipLoc, texture = GetItemInfo(link)
+				count = GetItemCount(link)
+
+				if equipLoc == "INVTYPE_AMMO" then
+					self.text:SetFormattedText(displayString, name, count)
+				end
+			end
+		end
+	end
+	lastPanel = self
+end
+
+local function ValueColorUpdate(hex)
+	displayString = join("", "%s: ", hex, "%d|r")
+
+	if lastPanel ~= nil then
+		OnEvent(lastPanel)
+	end
+end
+E["valueColorUpdateFuncs"][ValueColorUpdate] = true
+
+DT:RegisterDatatext(INVTYPE_AMMO, {"PLAYER_ENTERING_WORLD", "BAG_UPDATE", "UNIT_INVENTORY_CHANGED"}, OnEvent, nil, OnClick, OnEnter, nil, ColorizeSettingName(L["Ammo/Shard Counter"]))
+]]

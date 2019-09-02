@@ -6,40 +6,41 @@ local S = E:GetModule('Skins')
 local _G = _G
 local unpack = unpack
 local pairs = pairs
-local find = string.find
+local find, strfind = string.find, strfind
 --WoW API / Variables
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetInventoryItemQuality = GetInventoryItemQuality
+local GetItemQualityColor = GetItemQualityColor
 local GetNumFactions = GetNumFactions
 local FauxScrollFrame_GetOffset = FauxScrollFrame_GetOffset
 local NUM_FACTIONS_DISPLAYED = NUM_FACTIONS_DISPLAYED
 local CHARACTERFRAME_SUBFRAMES = CHARACTERFRAME_SUBFRAMES
+local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()
 	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.character ~= true then return end
 
 	-- Character Frame
-	CharacterFrame:StripTextures(true)
+	_G.CharacterFrame:StripTextures(true)
 
-	CharacterFrame:CreateBackdrop('Transparent')
-	CharacterFrame.backdrop:Point('TOPLEFT', 11, -12)
-	CharacterFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
+	_G.CharacterFrame:CreateBackdrop('Transparent')
+	_G.CharacterFrame.backdrop:Point('TOPLEFT', 11, -12)
+	_G.CharacterFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
 
-	S:HandleCloseButton(CharacterFrameCloseButton)
+	S:HandleCloseButton(_G.CharacterFrameCloseButton)
 
 	for i = 1, #CHARACTERFRAME_SUBFRAMES do
-		local tab = _G['CharacterFrameTab'..i]
-		S:HandleTab(tab)
+		S:HandleTab(_G['CharacterFrameTab'..i])
 	end
 
-	PaperDollFrame:StripTextures()
+	_G.PaperDollFrame:StripTextures()
 
-	S:HandleRotateButton(CharacterModelFrameRotateLeftButton)
-	CharacterModelFrameRotateLeftButton:Point('TOPLEFT', 3, -3)
-	S:HandleRotateButton(CharacterModelFrameRotateRightButton)
-	CharacterModelFrameRotateRightButton:Point('TOPLEFT', CharacterModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
+	S:HandleRotateButton(_G.CharacterModelFrameRotateLeftButton)
+	_G.CharacterModelFrameRotateLeftButton:Point('TOPLEFT', 3, -3)
+	S:HandleRotateButton(_G.CharacterModelFrameRotateRightButton)
+	_G.CharacterModelFrameRotateRightButton:Point('TOPLEFT', _G.CharacterModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
 
-	CharacterAttributesFrame:StripTextures()
+	_G.CharacterAttributesFrame:StripTextures()
 
 	local function HandleResistanceFrame(frameName)
 		for i = 1, 5 do
@@ -62,30 +63,21 @@ local function LoadSkin()
 
 	HandleResistanceFrame('MagicResFrame')
 
-	MagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.8125, 0.25, 0.32421875)		--Arcane
-	MagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.8125, 0.0234375, 0.09765625)	--Fire
-	MagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.8125, 0.13671875, 0.2109375)	--Nature
-	MagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.8125, 0.36328125, 0.4375)	--Frost
-	MagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.8125, 0.4765625, 0.55078125)	--Shadow
+	_G.MagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.8125, 0.25, 0.32421875)		--Arcane
+	_G.MagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.8125, 0.0234375, 0.09765625)	--Fire
+	_G.MagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.8125, 0.13671875, 0.2109375)	--Nature
+	_G.MagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.8125, 0.36328125, 0.4375)	--Frost
+	_G.MagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.8125, 0.4765625, 0.55078125)	--Shadow
 
-	local slots = {'HeadSlot', 'NeckSlot', 'ShoulderSlot', 'BackSlot', 'ChestSlot', 'ShirtSlot', 'TabardSlot', 'WristSlot',
-		'HandsSlot', 'WaistSlot', 'LegsSlot', 'FeetSlot', 'Finger0Slot', 'Finger1Slot', 'Trinket0Slot', 'Trinket1Slot',
-		'MainHandSlot', 'SecondaryHandSlot', 'RangedSlot', 'AmmoSlot'
-	}
+	for _, slot in pairs({ PaperDollItemsFrame:GetChildren() }) do
+		local icon = _G[slot:GetName()..'IconTexture']
+		local cooldown = _G[slot:GetName()..'Cooldown']
 
-	for _, slot in pairs(slots) do
-		local icon = _G['Character'..slot..'IconTexture']
-		local cooldown = _G['Character'..slot..'Cooldown']
-
-		slot = _G['Character'..slot]
 		slot:StripTextures()
 		slot:SetTemplate('Default', true, true)
 		slot:StyleButton()
 
-		icon:SetTexCoord(unpack(E.TexCoords))
-		icon:SetInside()
-
-		slot:SetFrameLevel(PaperDollFrame:GetFrameLevel() + 2)
+		S:HandleIcon(icon)
 
 		if cooldown then
 			E:RegisterCooldown(cooldown)
@@ -98,44 +90,47 @@ local function LoadSkin()
 		local textureName = GetInventoryItemTexture('player', self:GetID())
 		if textureName then
 			local rarity = GetInventoryItemQuality('player', self:GetID())
-			self:SetBackdropBorderColor(GetItemQualityColor(rarity))
+			if rarity and rarity > 1 then
+				self:SetBackdropBorderColor(GetItemQualityColor(rarity))
+			else
+				self:SetBackdropBorderColor(unpack(E.media.bordercolor))
+			end
 		else
 			self:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
 	end)
 
 	-- PetPaperDollFrame
-	PetPaperDollFrame:StripTextures()
+	_G.PetPaperDollFrame:StripTextures()
 
-	S:HandleButton(PetPaperDollCloseButton)
+	S:HandleButton(_G.PetPaperDollCloseButton)
 
-	S:HandleRotateButton(PetModelFrameRotateLeftButton)
-	PetModelFrameRotateLeftButton:ClearAllPoints()
-	PetModelFrameRotateLeftButton:Point('TOPLEFT', 3, -3)
-	S:HandleRotateButton(PetModelFrameRotateRightButton)
-	PetModelFrameRotateRightButton:ClearAllPoints()
-	PetModelFrameRotateRightButton:Point('TOPLEFT', PetModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
+	S:HandleRotateButton(_G.PetModelFrameRotateLeftButton)
+	_G.PetModelFrameRotateLeftButton:ClearAllPoints()
+	_G.PetModelFrameRotateLeftButton:Point('TOPLEFT', 3, -3)
+	S:HandleRotateButton(_G.PetModelFrameRotateRightButton)
+	_G.PetModelFrameRotateRightButton:ClearAllPoints()
+	_G.PetModelFrameRotateRightButton:Point('TOPLEFT', _G.PetModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
 
-	PetAttributesFrame:StripTextures()
+	_G.PetAttributesFrame:StripTextures()
 
-	PetResistanceFrame:CreateBackdrop('Default')
-	PetResistanceFrame.backdrop:SetOutside(PetMagicResFrame1, nil, nil, PetMagicResFrame5)
+	_G.PetResistanceFrame:CreateBackdrop('Default')
+	_G.PetResistanceFrame.backdrop:SetOutside(_G.PetMagicResFrame1, nil, nil, _G.PetMagicResFrame5)
 
 	for i = 1, 5 do
-		local frame = _G['PetMagicResFrame'..i]
-		frame:Size(24)
+		_G['PetMagicResFrame'..i]:Size(24)
 	end
 
-	PetMagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.78125, 0.25, 0.3203125)
-	PetMagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.78125, 0.0234375, 0.09375)
-	PetMagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.78125, 0.13671875, 0.20703125)
-	PetMagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.78125, 0.36328125, 0.43359375)
-	PetMagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.78125, 0.4765625, 0.546875)
+	_G.PetMagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.78125, 0.25, 0.3203125)
+	_G.PetMagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.78125, 0.0234375, 0.09375)
+	_G.PetMagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.78125, 0.13671875, 0.20703125)
+	_G.PetMagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.78125, 0.36328125, 0.43359375)
+	_G.PetMagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.78125, 0.4765625, 0.546875)
 
-	PetPaperDollFrameExpBar:StripTextures()
-	PetPaperDollFrameExpBar:SetStatusBarTexture(E.media.normTex)
-	E:RegisterStatusBar(PetPaperDollFrameExpBar)
-	PetPaperDollFrameExpBar:CreateBackdrop('Default')
+	_G.PetPaperDollFrameExpBar:StripTextures()
+	_G.PetPaperDollFrameExpBar:SetStatusBarTexture(E.media.normTex)
+	E:RegisterStatusBar(_G.PetPaperDollFrameExpBar)
+	_G.PetPaperDollFrameExpBar:CreateBackdrop('Default')
 
 	local function updHappiness(self)
 		local happiness = GetPetHappiness()
@@ -152,9 +147,10 @@ local function LoadSkin()
 		end
 	end
 
-	PetPaperDollPetInfo:Point('TOPLEFT', PetModelFrameRotateLeftButton, 'BOTTOMLEFT', 9, -3)
+	local PetPaperDollPetInfo = _G.PetPaperDollPetInfo
+	PetPaperDollPetInfo:Point('TOPLEFT', _G.PetModelFrameRotateLeftButton, 'BOTTOMLEFT', 9, -3)
 	PetPaperDollPetInfo:GetRegions():SetTexCoord(0.04, 0.15, 0.06, 0.30)
-	PetPaperDollPetInfo:SetFrameLevel(PetModelFrame:GetFrameLevel() + 2)
+	PetPaperDollPetInfo:SetFrameLevel(_G.PetModelFrame:GetFrameLevel() + 2)
 	PetPaperDollPetInfo:CreateBackdrop('Default')
 	PetPaperDollPetInfo:Size(24)
 
@@ -163,7 +159,7 @@ local function LoadSkin()
 	PetPaperDollPetInfo:SetScript('OnShow', updHappiness)
 
 	-- Reputation Frame
-	ReputationFrame:StripTextures()
+	_G.ReputationFrame:StripTextures()
 
 	for i = 1, NUM_FACTIONS_DISPLAYED do
 		local factionBar = _G['ReputationBar'..i]
@@ -201,7 +197,7 @@ local function LoadSkin()
 	hooksecurefunc('ReputationFrame_Update', function()
 		local numFactions = GetNumFactions()
 		local factionIndex, factionHeader
-		local factionOffset = FauxScrollFrame_GetOffset(ReputationListScrollFrame)
+		local factionOffset = FauxScrollFrame_GetOffset(_G.ReputationListScrollFrame)
 
 		for i = 1, NUM_FACTIONS_DISPLAYED, 1 do
 			factionHeader = _G['ReputationHeader'..i]
@@ -216,40 +212,40 @@ local function LoadSkin()
 		end
 	end)
 
-	ReputationListScrollFrame:StripTextures()
-	S:HandleScrollBar(ReputationListScrollFrameScrollBar)
+	_G.ReputationListScrollFrame:StripTextures()
+	S:HandleScrollBar(_G.ReputationListScrollFrameScrollBar)
 
-	ReputationDetailFrame:StripTextures()
-	ReputationDetailFrame:SetTemplate('Transparent')
-	ReputationDetailFrame:Point('TOPLEFT', ReputationFrame, 'TOPRIGHT', -31, -12)
+	_G.ReputationDetailFrame:StripTextures()
+	_G.ReputationDetailFrame:SetTemplate('Transparent')
+	_G.ReputationDetailFrame:Point('TOPLEFT', _G.ReputationFrame, 'TOPRIGHT', -31, -12)
 
-	S:HandleCloseButton(ReputationDetailCloseButton)
-	ReputationDetailCloseButton:Point('TOPRIGHT', 2, 2)
+	S:HandleCloseButton(_G.ReputationDetailCloseButton)
+	_G.ReputationDetailCloseButton:Point('TOPRIGHT', 2, 2)
 
-	S:HandleCheckBox(ReputationDetailAtWarCheckBox)
-	S:HandleCheckBox(ReputationDetailInactiveCheckBox)
-	S:HandleCheckBox(ReputationDetailMainScreenCheckBox)
+	S:HandleCheckBox(_G.ReputationDetailAtWarCheckBox)
+	S:HandleCheckBox(_G.ReputationDetailInactiveCheckBox)
+	S:HandleCheckBox(_G.ReputationDetailMainScreenCheckBox)
 
 	-- Skill Frame
-	SkillFrame:StripTextures()
+	_G.SkillFrame:StripTextures()
 
-	SkillFrameExpandButtonFrame:DisableDrawLayer('BACKGROUND')
-	SkillFrameCollapseAllButton:GetNormalTexture():Size(15)
-	SkillFrameCollapseAllButton:Point('LEFT', SkillFrameExpandTabLeft, 'RIGHT', -40, -3)
+	_G.SkillFrameExpandButtonFrame:DisableDrawLayer('BACKGROUND')
+	_G.SkillFrameCollapseAllButton:GetNormalTexture():Size(15)
+	_G.SkillFrameCollapseAllButton:Point('LEFT', _G.SkillFrameExpandTabLeft, 'RIGHT', -40, -3)
 
-	SkillFrameCollapseAllButton:SetHighlightTexture(nil)
+	_G.SkillFrameCollapseAllButton:SetHighlightTexture(nil)
 
 	hooksecurefunc('SkillFrame_UpdateSkills', function()
-		if strfind(SkillFrameCollapseAllButton:GetNormalTexture():GetTexture(), 'MinusButton') then
-			SkillFrameCollapseAllButton:SetNormalTexture(E.Media.Textures.MinusButton)
+		if strfind(_G.SkillFrameCollapseAllButton:GetNormalTexture():GetTexture(), 'MinusButton') then
+			_G.SkillFrameCollapseAllButton:SetNormalTexture(E.Media.Textures.MinusButton)
 		else
-			SkillFrameCollapseAllButton:SetNormalTexture(E.Media.Textures.PlusButton)
+			_G.SkillFrameCollapseAllButton:SetNormalTexture(E.Media.Textures.PlusButton)
 		end
 	end)
 
-	S:HandleButton(SkillFrameCancelButton)
+	S:HandleButton(_G.SkillFrameCancelButton)
 
-	for i = 1, SKILLS_TO_DISPLAY do
+	for i = 1, _G.SKILLS_TO_DISPLAY do
 		local bar = _G['SkillRankFrame'..i]
 		local label = _G['SkillTypeLabel'..i]
 		local border = _G['SkillRankFrame'..i..'Border']
@@ -275,30 +271,30 @@ local function LoadSkin()
 		end
 	end)
 
-	SkillListScrollFrame:StripTextures()
-	S:HandleScrollBar(SkillListScrollFrameScrollBar)
+	_G.SkillListScrollFrame:StripTextures()
+	S:HandleScrollBar(_G.SkillListScrollFrameScrollBar)
 
-	SkillDetailScrollFrame:StripTextures()
-	S:HandleScrollBar(SkillDetailScrollFrameScrollBar)
+	_G.SkillDetailScrollFrame:StripTextures()
+	S:HandleScrollBar(_G.SkillDetailScrollFrameScrollBar)
 
-	SkillDetailStatusBar:StripTextures()
-	SkillDetailStatusBar:SetParent(SkillDetailScrollFrame)
-	SkillDetailStatusBar:CreateBackdrop('Default')
-	SkillDetailStatusBar:SetStatusBarTexture(E.media.normTex)
-	E:RegisterStatusBar(SkillDetailStatusBar)
+	_G.SkillDetailStatusBar:StripTextures()
+	_G.SkillDetailStatusBar:SetParent(_G.SkillDetailScrollFrame)
+	_G.SkillDetailStatusBar:CreateBackdrop('Default')
+	_G.SkillDetailStatusBar:SetStatusBarTexture(E.media.normTex)
+	E:RegisterStatusBar(_G.SkillDetailStatusBar)
 
-	S:HandleNextPrevButton(SkillDetailStatusBarUnlearnButton)
+	S:HandleNextPrevButton(_G.SkillDetailStatusBarUnlearnButton)
 	-- S:SquareButton_SetIcon(SkillDetailStatusBarUnlearnButton, 'DELETE')
-	SkillDetailStatusBarUnlearnButton:Size(24)
-	SkillDetailStatusBarUnlearnButton:Point('LEFT', SkillDetailStatusBarBorder, 'RIGHT', 5, 0)
-	SkillDetailStatusBarUnlearnButton:SetHitRectInsets(0, 0, 0, 0)
+	_G.SkillDetailStatusBarUnlearnButton:Size(24)
+	_G.SkillDetailStatusBarUnlearnButton:Point('LEFT', _G.SkillDetailStatusBarBorder, 'RIGHT', 5, 0)
+	_G.SkillDetailStatusBarUnlearnButton:SetHitRectInsets(0, 0, 0, 0)
 
 	-- Honor Frame
-	HonorFrame:StripTextures()
+	_G.HonorFrame:StripTextures()
 
-	HonorFrameProgressButton:CreateBackdrop()
-	HonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
-	E:RegisterStatusBar(HonorFrameProgressBar)
+	_G.HonorFrameProgressButton:CreateBackdrop()
+	_G.HonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
+	E:RegisterStatusBar(_G.HonorFrameProgressBar)
 end
 
 S:AddCallback('Character', LoadSkin)

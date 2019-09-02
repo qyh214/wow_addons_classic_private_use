@@ -7,6 +7,8 @@ local _G = _G
 local unpack, select = unpack, select
 --WoW API / Variables
 local UnitName = UnitName
+local UnitIsDead = UnitIsDead
+local UnitIsFriend = UnitIsFriend
 local IsFishingLoot = IsFishingLoot
 local GetLootRollItemInfo = GetLootRollItemInfo
 local GetItemQualityColor = GetItemQualityColor
@@ -14,40 +16,41 @@ local GetLootSlotInfo = GetLootSlotInfo
 local LOOTFRAME_NUMBUTTONS = LOOTFRAME_NUMBUTTONS
 local NUM_GROUP_LOOT_FRAMES = NUM_GROUP_LOOT_FRAMES
 local LOOT, ITEMS = LOOT, ITEMS
+local CreateFrame = CreateFrame
+local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()
-	if E.private.general.loot then return end
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.loot ~= true then return end
+	if E.private.general.loot or E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.loot ~= true then return end
 
 	local LootFrame = _G.LootFrame
 	LootFrame:StripTextures()
 	LootFrame:CreateBackdrop('Transparent')
 
-	LootFramePortraitOverlay:SetParent(E.HiddenFrame)
+	_G.LootFramePortraitOverlay:SetParent(E.HiddenFrame)
 
-	S:HandleNextPrevButton(LootFrameUpButton)
-	LootFrameUpButton:Point('BOTTOMLEFT', 25, 20)
-	LootFrameUpButton:Size(24)
+	S:HandleNextPrevButton(_G.LootFrameUpButton)
+	_G.LootFrameUpButton:Point('BOTTOMLEFT', 25, 20)
+	_G.LootFrameUpButton:Size(24)
 
-	S:HandleNextPrevButton(LootFrameDownButton)
-	LootFrameDownButton:Point('BOTTOMLEFT', 145, 20)
-	LootFrameDownButton:Size(24)
+	S:HandleNextPrevButton(_G.LootFrameDownButton)
+	_G.LootFrameDownButton:Point('BOTTOMLEFT', 145, 20)
+	_G.LootFrameDownButton:Size(24)
 
 	LootFrame:EnableMouseWheel(true)
 	LootFrame:SetScript('OnMouseWheel', function(_, value)
 		if value > 0 then
-			if LootFrameUpButton:IsShown() and LootFrameUpButton:IsEnabled() == 1 then
+			if _G.LootFrameUpButton:IsShown() and _G.LootFrameUpButton:IsEnabled() == 1 then
 				LootFrame_PageUp()
 			end
 		else
-			if LootFrameDownButton:IsShown() and LootFrameDownButton:IsEnabled() == 1 then
+			if _G.LootFrameDownButton:IsShown() and _G.LootFrameDownButton:IsEnabled() == 1 then
 				LootFrame_PageDown()
 			end
 		end
 	end)
 
-	S:HandleCloseButton(LootFrameCloseButton)
-	LootFrameCloseButton:Point('CENTER', LootFrame, 'TOPRIGHT', -87, -26)
+	S:HandleCloseButton(_G.LootFrameCloseButton)
+	_G.LootFrameCloseButton:Point('CENTER', LootFrame, 'TOPRIGHT', -87, -26)
 
 	for i = 1, LootFrame:GetNumRegions() do
 		local region = select(i, LootFrame:GetRegions())
@@ -151,7 +154,7 @@ local function LoadRollSkin()
 		frame:ClearAllPoints()
 
 		if i == 1 then
-			frame:Point('TOP', AlertFrameHolder, 'BOTTOM', 0, -4)
+			frame:Point('TOP', _G.AlertFrameHolder, 'BOTTOM', 0, -4)
 		else
 			frame:Point('TOP', _G['GroupLootFrame'..i - 1], 'BOTTOM', 0, -4)
 		end

@@ -21,7 +21,7 @@ Filters.lua
 Tooltip.lua
 UnitFrames.lua
 Nameplates.lua
-#Skins.lua
+Skins.lua
 Profiles.lua
 Maps.lua
 ModuleControl.lua

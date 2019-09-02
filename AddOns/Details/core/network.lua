@@ -175,7 +175,12 @@
 		if (not _detalhes.build_counter or not _detalhes.lastUpdateWarning or not build_number) then
 			return
 		end
-	
+		
+		--retail sending version, just ignore
+		if (build_number > 6000) then
+			return
+		end
+
 		if (build_number > _detalhes.build_counter) then
 			if (time() > _detalhes.lastUpdateWarning + 72000) then
 				local lower_instance = _detalhes:GetLowerInstanceNumber()

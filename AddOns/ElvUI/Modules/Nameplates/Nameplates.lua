@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule("NamePlates")
 local oUF = E.oUF
 
@@ -105,7 +105,6 @@ function NP:SetCVars()
 		SetCVar("nameplateOtherBottomInset", -1)
 	end
 
-	SetCVar("nameplateMaxDistance", NP.db.loadDistance)
 	SetCVar("nameplateMotion", NP.db.motionType == "STACKED" and 1 or 0)
 
 	SetCVar("NameplatePersonalShowAlways", NP.db.units.PLAYER.visibility.showAlways and 1 or 0)

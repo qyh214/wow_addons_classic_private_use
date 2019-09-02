@@ -36,6 +36,9 @@ function UF:Construct_PlayerFrame(frame)
 	frame.ClassBar = 'ClassPower'
 
 	--Some classes need another set of different classbars.
+	if E.myclass == "DRUID" then
+		frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
+	end
 
 	--frame.PowerPrediction = self:Construct_PowerPrediction(frame) -- must be AFTER Power & AdditionalPower
 	frame.MouseGlow = self:Construct_MouseGlow(frame)
@@ -44,8 +47,11 @@ function UF:Construct_PlayerFrame(frame)
 	frame.RestingIndicator = self:Construct_RestingIndicator(frame)
 	frame.CombatIndicator = self:Construct_CombatIndicator(frame)
 	--frame.HealthPrediction = self:Construct_HealComm(frame)
+	frame.PvPText = self:Construct_PvPIndicator(frame)
 	frame.AuraBars = self:Construct_AuraBarHeader(frame)
 	frame.InfoPanel = self:Construct_InfoPanel(frame)
+	frame.PvPIndicator = self:Construct_PvPIcon(frame)
+	frame.Cutaway = self:Construct_Cutaway(frame)
 	--frame.Fader = self:Construct_Fader()
 	frame.customTexts = {}
 
@@ -120,6 +126,9 @@ function UF:Update_PlayerFrame(frame, db)
 	--Name
 	UF:UpdateNameSettings(frame)
 
+	--PvP
+	UF:Configure_PVPIndicator(frame)
+
 	--Power
 	UF:Configure_Power(frame)
 
@@ -159,6 +168,12 @@ function UF:Update_PlayerFrame(frame, db)
 	if E.db.unitframe.units.target.aurabar.attachTo == "PLAYER_AURABARS" and ElvUF_Target then
 		UF:Configure_AuraBars(ElvUF_Target)
 	end
+
+	--PvP & Prestige Icon
+	UF:Configure_PVPIcon(frame)
+
+	--Cutaway
+	UF:Configure_Cutaway(frame)
 
 	--CustomTexts
 	UF:Configure_CustomTexts(frame)

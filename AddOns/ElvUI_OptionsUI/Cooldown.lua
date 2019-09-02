@@ -251,7 +251,6 @@ E.Options.args.cooldown = {
 	childGroups = "tab",
 	get = function(info) return E.db.cooldown[info[#info]] end,
 	set = function(info, value) E.db.cooldown[info[#info]] = value; E:UpdateCooldownSettings('global'); end,
-	disabled = true,
 	args = {
 		intro = {
 			order = 1,

@@ -1,11 +1,11 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---> global name declaration
+--global name declaration
 		
 		_ = nil
 		_detalhes = LibStub("AceAddon-3.0"):NewAddon("_detalhes", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0", "NickTag-1.0")
 		
-		_detalhes.build_counter = 7176
-		_detalhes.alpha_build_counter = 7176 --if this is higher than the regular counter, use it instead
+		_detalhes.build_counter = 103
+		_detalhes.alpha_build_counter = 76 --if this is higher than the regular counter, use it instead
 		_detalhes.game_version = "v1.13.2"
 		_detalhes.userversion = "v1.13.2." .. _detalhes.build_counter
 		_detalhes.realversion = 140 --core version, this is used to check API version for scripts and plugins (see alias below)
@@ -44,14 +44,36 @@ do
 	
 	local _, _, defaultSpellIcon = GetSpellInfo (6603)
 	
+	--Translit (discord)
+	local AllSpellNames = {}
+	local GSI = GetSpellInfo
+	for i = 1, 30000 do
+		local name, _, icon = GSI(i)
+		if name and icon and icon ~= 136235 and not AllSpellNames [name] then
+			AllSpellNames[name] = icon
+		end
+	end
+
 	function Details.GetSpellInfoC  (spell)
-		local spellName, _, spellIcon = GetSpellInfo (spell)
-		
-		if (not spellName) then
-			return spell, _, defaultSpellIcon
+		local spellName, _, spellIcon
+
+		if (spell == "!Melee") then
+			spellName = ATTACK or "It's Blizzard Fault!"
+			spellIcon = [[Interface\ICONS\INV_Sword_04]]
+
+		elseif (spell == "!Autoshot") then
+			spellName = Loc ["STRING_AUTOSHOT"]
+			spellIcon = [[Interface\ICONS\INV_Weapon_Bow_07]]
+
+		else
+			spellName, _, spellIcon = GetSpellInfo (spell)
 		end
 		
-		return spellName, _, spellIcon
+		if (not spellName) then
+			return spell, _, AllSpellNames [spell] or defaultSpellIcon
+		end
+		
+		return spellName, _, AllSpellNames [spell] or spellIcon
 	end
 	
 	--> startup

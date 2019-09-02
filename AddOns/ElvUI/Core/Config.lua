@@ -139,10 +139,10 @@ function E:Grid_Create()
 	for i = 0, E.db.gridSize do
 		local tx = E:Grid_GetRegion()
 		if i == E.db.gridSize / 2 then
-			tx:SetTexture(1, 0, 0)
+			tx:SetColorTexture(1, 0, 0)
 			tx:SetDrawLayer('BACKGROUND', 1)
 		else
-			tx:SetTexture(0, 0, 0)
+			tx:SetColorTexture(0, 0, 0)
 			tx:SetDrawLayer('BACKGROUND', 0)
 		end
 		tx:ClearAllPoints()
@@ -152,7 +152,7 @@ function E:Grid_Create()
 
 	do
 		local tx = E:Grid_GetRegion()
-		tx:SetTexture(1, 0, 0)
+		tx:SetColorTexture(1, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 1)
 		tx:ClearAllPoints()
 		tx:Point("TOPLEFT", grid, "TOPLEFT", 0, -(height/2) + (size/2))
@@ -161,14 +161,14 @@ function E:Grid_Create()
 
 	for i = 1, floor((height/2)/hStep) do
 		local tx = E:Grid_GetRegion()
-		tx:SetTexture(0, 0, 0)
+		tx:SetColorTexture(0, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 0)
 		tx:ClearAllPoints()
 		tx:Point("TOPLEFT", grid, "TOPLEFT", 0, -(height/2+i*hStep) + (size/2))
 		tx:Point('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2+i*hStep + size/2))
 
 		tx = E:Grid_GetRegion()
-		tx:SetTexture(0, 0, 0)
+		tx:SetColorTexture(0, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 0)
 		tx:ClearAllPoints()
 		tx:Point("TOPLEFT", grid, "TOPLEFT", 0, -(height/2-i*hStep) + (size/2))

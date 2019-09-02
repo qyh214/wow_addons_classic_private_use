@@ -95,7 +95,10 @@ TMW.BE = {
 			   -116, -- Frostbolt                           (mage, frost)
 			  -1715, -- Hamstring                           (warrior, arms)
 			   2120, -- Flamestrike                         (mage, fire)
-			  -3409, -- Crippling Poison                    (rogue, assassination)
+			   
+			   -- Crippling Poison intentionally not by name -
+			   -- 3408 is the buff that goes on the rogue who has applied it to their weapons.
+			   3409, -- Crippling Poison                    (rogue, assassination)
 			  -3600, -- Earthbind                           (shaman, general)
 			  -5116, -- Concussive Shot                     (hunter, beast mastery/marksman)
 			  -6343, -- Thunder Clap                        (warrior, protection)
@@ -153,7 +156,8 @@ TMW.BE = {
 		},
 		DamageShield = {
 			    -17, -- Power Word: Shield                  (priest, disc/shadow)
-			 -11426, -- Ice Barrier                         (mage, frost)
+			 -11426, -- Ice Barrier                         (mage)
+			  -1463, -- Mana Shield                         (mage)
 		},
 		ImmuneToMagicCC = {
 			    642, -- Divine Shield                       (paladin, general)

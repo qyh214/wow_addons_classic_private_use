@@ -13,7 +13,6 @@ local GetMinimapZoneText = GetMinimapZoneText
 local GetZonePVPInfo = GetZonePVPInfo
 local InCombatLockdown = InCombatLockdown
 local IsAddOnLoaded = IsAddOnLoaded
-local IsShiftKeyDown = IsShiftKeyDown
 local MainMenuMicroButton_SetNormal = MainMenuMicroButton_SetNormal
 local PlaySound = PlaySound
 local ShowUIPanel, HideUIPanel = ShowUIPanel, HideUIPanel
@@ -21,14 +20,6 @@ local ToggleCharacter = ToggleCharacter
 local ToggleFriendsFrame = ToggleFriendsFrame
 local ToggleGuildFrame = ToggleGuildFrame
 -- GLOBALS: GetMinimapShape
-
---Create the new minimap tracking dropdown frame and initialize it
--- local ElvUIMiniMapTrackingDropDown = CreateFrame("Frame", "ElvUIMiniMapTrackingDropDown", _G.UIParent, "UIDropDownMenuTemplate")
--- ElvUIMiniMapTrackingDropDown:SetID(1)
--- ElvUIMiniMapTrackingDropDown:SetClampedToScreen(true)
--- ElvUIMiniMapTrackingDropDown:Hide()
--- _G.UIDropDownMenu_Initialize(ElvUIMiniMapTrackingDropDown, _G.MiniMapTrackingDropDown_Initialize, "MENU");
--- ElvUIMiniMapTrackingDropDown.noResize = true
 
 --Create the minimap micro menu
 local menuFrame = CreateFrame("Frame", "MinimapRightClickMenu", E.UIParent)
@@ -100,18 +91,15 @@ function M:ADDON_LOADED(_, addon)
 end
 
 function M:Minimap_OnMouseDown(btn)
-	_G.HideDropDownMenu(1, nil, ElvUIMiniMapTrackingDropDown)
 	menuFrame:Hide()
 	local position = self:GetPoint()
-	if btn == "MiddleButton" or (btn == "RightButton" and IsShiftKeyDown()) then
+	if btn == "MiddleButton" or btn == "RightButton" then
 		if InCombatLockdown() then _G.UIErrorsFrame:AddMessage(E.InfoColor.._G.ERR_NOT_IN_COMBAT) return end
 		if position:match("LEFT") then
 			E:DropDown(menuList, menuFrame)
 		else
 			E:DropDown(menuList, menuFrame, -160, 0)
 		end
-	elseif btn == "RightButton" then
-		_G.ToggleDropDownMenu(1, nil, ElvUIMiniMapTrackingDropDown, "cursor");
 	else
 		_G.Minimap_OnClick(self)
 	end

@@ -3514,12 +3514,6 @@ local function GetUnitSettings(unit, name)
 						name = L["Enable"],
 						type = "toggle",
 					},
-					showBadge = {
-						order = 2,
-						name = L["Show Badge"],
-						desc = L["Show PvP Badge Indicator if available"],
-						type = "toggle",
-					},
 					size = {
 						order = 3,
 						name = L["Size"],

@@ -7,6 +7,7 @@ local floor, huge, min = math.floor, math.huge, math.min
 local tsort = table.sort
 local tremove = table.remove
 local random = math.random
+local LCD = LibStub('LibClassicDurations', true)
 
 local function Round(number, decimalPlaces)
 	if decimalPlaces and decimalPlaces > 0 then
@@ -236,6 +237,12 @@ local function Update(self, event, unit)
 			local name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellID, canApply, isBossDebuff, casterIsPlayer = UnitAura(unit, index, helpOrHarm)
 			if not name then break end
 
+			local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, unitCaster, name)
+			if durationNew and durationNew > 0 then
+				duration = durationNew
+				expirationTime = expirationTimeNew
+			end
+
 			if (auraBars.filter or DefaultFilter)(self, unit, name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellID, canApply, isBossDebuff, casterIsPlayer) then
 				lastAuraIndex = lastAuraIndex + 1
 				auras[lastAuraIndex] = {}
@@ -246,10 +253,10 @@ local function Update(self, event, unit)
 				auras[lastAuraIndex].count = count
 				auras[lastAuraIndex].debuffType = debuffType
 				auras[lastAuraIndex].duration = duration
-				auras[lastAuraIndex].expirationTime = expirationTime
+				auras[lastAuraIndex].expirationTime = expirationTime or 1
 				auras[lastAuraIndex].unitCaster = unitCaster
 				auras[lastAuraIndex].isStealable = isStealable
-				auras[lastAuraIndex].noTime = (duration == 0 and expirationTime == 0)
+				auras[lastAuraIndex].noTime = (duration == 0 and expirationTime == 0) or (not duration and not expirationTime)
 				auras[lastAuraIndex].filter = helpOrHarm
 				auras[lastAuraIndex].shouldConsolidate = shouldConsolidate
 			end

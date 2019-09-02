@@ -39,13 +39,14 @@ E.Options.args.skins = {
 					get = function(info) return E.private.skins.checkBoxSkin end,
 					set = function(info, value) E.private.skins.checkBoxSkin = value; E:StaticPopup_Show('PRIVATE_RL') end
 				},
+				--[[
 				parchmentRemover = {
 					order = 4,
 					type = 'toggle',
 					name = L['Parchment Remover'],
 					get = function(info) return E.private.skins.parchmentRemover.enable end,
 					set = function(info, value) E.private.skins.parchmentRemover.enable = value; E:StaticPopup_Show('PRIVATE_RL') end,
-				},
+				},]]
 			},
 		},
 		blizzard = {
@@ -57,11 +58,6 @@ E.Options.args.skins = {
 			disabled = function() return not E.private.skins.blizzard.enable end,
 			guiInline = true,
 			args = {
-				alertframes = {
-					type = 'toggle',
-					name = L['Alert Frames'],
-					desc = L['TOGGLESKIN_DESC']
-				},
 				auctionhouse = {
 					type = 'toggle',
 					name = L['Auctions'],
@@ -101,6 +97,11 @@ E.Options.args.skins = {
 				character = {
 					type = 'toggle',
 					name = L['Character Frame'],
+					desc = L['TOGGLESKIN_DESC']
+				},
+				craft = {
+					type = 'toggle',
+					name = L['Craft'],
 					desc = L['TOGGLESKIN_DESC']
 				},
 				debug = {
@@ -152,13 +153,13 @@ E.Options.args.skins = {
 					type = 'toggle',
 					name = L['Loot Frames'],
 					desc = L['TOGGLESKIN_DESC'],
-					disabled = function() return E.private.general.loot end
+					disabled = function() return not E.private.general.loot end
 				},
 				lootRoll = {
 					type = 'toggle',
 					name = L['Loot Roll'],
 					desc = L['TOGGLESKIN_DESC'],
-					disabled = function() return E.private.general.lootRoll end
+					disabled = function() return not E.private.general.lootRoll end
 				},
 				macro = {
 					type = 'toggle',

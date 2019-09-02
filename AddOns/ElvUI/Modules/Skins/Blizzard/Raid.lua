@@ -73,8 +73,10 @@ local function LoadSkin()
 			icon:SetTexCoord(unpack(E.TexCoords))
 		else
 			local coords = CLASS_ICON_TCOORDS[CLASS_SORT_ORDER[index]]
-			icon:SetTexture('Interface\\WorldStateFrame\\Icons-Classes')
-			icon:SetTexCoord(coords[1] + 0.015, coords[2] - 0.02, coords[3] + 0.018, coords[4] - 0.02)
+			if coords then
+				icon:SetTexture('Interface\\WorldStateFrame\\Icons-Classes')
+				icon:SetTexCoord(coords[1] + 0.015, coords[2] - 0.02, coords[3] + 0.018, coords[4] - 0.02)
+			end
 		end
 
 		count:FontTemplate(nil, 12, 'OUTLINE')

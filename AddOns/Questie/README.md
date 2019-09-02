@@ -6,6 +6,10 @@
 # Installation Guide
 Follow the [Installation Guide](https://github.com/AeroScripts/QuestieDev/wiki/Installation-Guide) in the Wiki if you just want to get the latest version of Questie up and running.
 
+## FAQ for Classic (1.13)
+
+You can find the FAQ for Classic [here](https://github.com/AeroScripts/QuestieDev/wiki/FAQ-for-Classic-(1.13))!
+
 # Download:
 https://github.com/AeroScripts/QuestieDev/releases/latest
 
@@ -13,7 +17,7 @@ https://github.com/AeroScripts/QuestieDev/releases/latest
 
 [![Downloads](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/)
 
-[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v4.0.10/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
+[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v4.0.13/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Date Latest](https://img.shields.io/github/release-date/AeroScripts/QuestieDev.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Commits Since Latest](https://img.shields.io/github/commits-since/AeroScripts/QuestieDev/latest.svg)](https://github.com/AeroScripts/QuestieDev/commits/master)
 

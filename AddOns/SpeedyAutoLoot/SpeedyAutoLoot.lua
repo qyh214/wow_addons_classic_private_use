@@ -68,11 +68,7 @@ function AutoLoot:CalculateFreeSlots()
 end
 
 function AutoLoot:ProcessLoot(itemLink, quantity, slotType)
-	if slotType == LOOT_SLOT_MONEY then
-		return true
-	elseif slotType == LOOT_SLOT_CURRENCY then
-		return true
-	elseif slotType == LOOT_SLOT_ITEM then
+	if slotType == LOOT_SLOT_ITEM then
 		if self:CalculateFreeSlots() > 0 then
 			return true
 		end
@@ -89,6 +85,9 @@ function AutoLoot:ProcessLoot(itemLink, quantity, slotType)
 				end
 			end
 		end
+		return false
+	else
+		return true
 	end
 end
 
@@ -149,11 +148,8 @@ end
 
 function AutoLoot:OnEvent(e, ...)
 	if e == 'PLAYER_LOGIN' then
-		if XLootFrame then
-			self.XLoot = true
-		elseif ElvUI and ElvUI[1].private.general.loot then
-			self.ElvUI = true
-		end
+		if XLootFrame then self.XLoot = true end
+		if (ElvUI and ElvUI[1].private.general.loot) then self.ElvUI = true end
 
 		if SpeedyAutoLootDB.global.alwaysEnableAutoLoot then
 			SetCVar('autoLootDefault',1)

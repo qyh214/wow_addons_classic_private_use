@@ -405,10 +405,8 @@ P.nameplates = {
 		},
 	},
 	filters = {
-		ElvUI_Boss = {triggers = {enable = false}},
 		ElvUI_Target = {triggers = {enable = true}},
 		ElvUI_NonTarget = {triggers = {enable = true}},
-		ElvUI_Explosives = {triggers = {enable = true}},
 	},
 	font = 'PT Sans Narrow',
 	fontOutline = 'OUTLINE',
@@ -659,8 +657,8 @@ P.nameplates = {
 				durationPosition = 'CENTER',
 				filters = {
 					minDuration = 0,
-					maxDuration = 300,
-					priority = 'Blacklist,blockNoDuration,Personal,TurtleBuffs,PlayerBuffs' --NamePlate Player Buffs
+					maxDuration = 0,
+					priority = '' --NamePlate Player Buffs
 				},
 			},
 			debuffs = {
@@ -687,7 +685,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,blockNoDuration,Personal,Boss,CCDebuffs,RaidDebuffs,Dispellable' --NamePlate Player Debuffs
+					priority = '' --NamePlate Player Debuffs
 				},
 			},
 		},
@@ -886,7 +884,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,blockNoDuration,Personal,TurtleBuffs' --NamePlate FriendlyPlayer Buffs
+					priority = '' --NamePlate FriendlyPlayer Buffs
 				},
 			},
 			debuffs = {
@@ -913,7 +911,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,Dispellable,blockNoDuration,Personal,Boss,CCDebuffs' --NamePlate FriendlyPlayer Debuffs
+					priority = '' --NamePlate FriendlyPlayer Debuffs
 				},
 			},
 		},
@@ -1098,8 +1096,8 @@ P.nameplates = {
 				durationPosition = 'CENTER',
 				filters = {
 					minDuration = 0,
-					maxDuration = 300,
-					priority = 'Blacklist,Dispellable,PlayerBuffs,TurtleBuffs' --NamePlate EnemyPlayer Buffs
+					maxDuration = 0,
+					priority = '' --NamePlate EnemyPlayer Buffs
 				},
 			},
 			debuffs = {
@@ -1126,7 +1124,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,blockNoDuration,Personal,Boss,CCDebuffs,RaidDebuffs' --NamePlate EnemyPlayer Debuffs
+					priority = '' --NamePlate EnemyPlayer Debuffs
 				},
 			},
 		},
@@ -1287,7 +1285,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,blockNoDuration,Personal,TurtleBuffs' --NamePlate FriendlyNPC Buffs
+					priority = '' --NamePlate FriendlyNPC Buffs
 				},
 			},
 			debuffs = {
@@ -1314,7 +1312,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,Boss,CCDebuffs,RaidDebuffs,Dispellable' --NamePlate FriendlyNPC Debuffs
+					priority = '' --NamePlate FriendlyNPC Debuffs
 				},
 			},
 			eliteIcon = {
@@ -1510,7 +1508,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,RaidBuffsElvUI,Dispellable,blockNoDuration,PlayerBuffs,TurtleBuffs,CastByUnit' --NamePlate EnemyNPC Buffs
+					priority = '' --NamePlate EnemyNPC Buffs
 				},
 			},
 			debuffs = {
@@ -1536,7 +1534,7 @@ P.nameplates = {
 				filters = {
 					minDuration = 0,
 					maxDuration = 0,
-					priority = 'Blacklist,Personal,CCDebuffs' --NamePlate EnemyNPC Debuffs
+					priority = '' --NamePlate EnemyNPC Debuffs
 				},
 			},
 			eliteIcon = {
@@ -2114,7 +2112,7 @@ P.unitframe = {
 				clickThrough = false,
 				minDuration = 0,
 				maxDuration = 0,
-				priority = 'Blacklist,Personal,PlayerBuffs,Whitelist,blockNoDuration,nonPersonal', --Player Buffs
+				priority = '', --Player Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2133,7 +2131,7 @@ P.unitframe = {
 				clickThrough = false,
 				minDuration = 0,
 				maxDuration = 0,
-				priority = 'Blacklist,Personal,nonPersonal', --Player Debuffs
+				priority = '', --Player Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2191,7 +2189,7 @@ P.unitframe = {
 				maxBars = 6,
 				minDuration = 0,
 				maxDuration = 120,
-				priority = 'Blacklist,blockNoDuration,Personal,Boss,RaidDebuffs,PlayerBuffs', --Player AuraBars
+				priority = '', --Player AuraBars
 				friendlyAuraType = 'HELPFUL',
 				enemyAuraType = 'HARMFUL',
 				height = 20,
@@ -2296,7 +2294,7 @@ P.unitframe = {
 			},
 			name = {
 				position = 'CENTER',
-				text_format = '[namecolor][name:medium] [difficultycolor][smartlevel] [shortclassification]',
+				text_format = '[namecolor][name:medium] [difficultycolor][level] [shortclassification]',
 				xOffset = 0,
 				yOffset = 0,
 				attachTextTo = 'Health',
@@ -2340,7 +2338,7 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
 				maxDuration = 0,
-				priority = 'Blacklist,Personal,nonPersonal', --Target Buffs
+				priority = '', --Target Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2358,8 +2356,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,RaidDebuffs,CCDebuffs,Friendly:Dispellable', --Target Debuffs
+				maxDuration = 0,
+				priority = '', --Target Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2392,7 +2390,7 @@ P.unitframe = {
 				maxBars = 6,
 				minDuration = 0,
 				maxDuration = 120,
-				priority = 'Blacklist,Personal,blockNoDuration,PlayerBuffs,Boss,RaidDebuffs', --Target AuraBars
+				priority = '', --Target AuraBars
 				friendlyAuraType = 'HELPFUL',
 				enemyAuraType = 'HARMFUL',
 				height = 20,
@@ -2505,8 +2503,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,PlayerBuffs,Dispellable', --TargetTarget Buffs
+				maxDuration = 0,
+				priority = '', --TargetTarget Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2524,8 +2522,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,Boss,RaidDebuffs,CCDebuffs,Dispellable,Whitelist', --TargetTarget Debuffs
+				maxDuration = 0,
+				priority = '', --TargetTarget Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2632,8 +2630,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,nonPersonal', --TargetTargetTarget Buffs
+				maxDuration = 0,
+				priority = '', --TargetTargetTarget Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2651,8 +2649,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,nonPersonal', --TargetTargetTarget Debuffs
+				maxDuration = 0,
+				priority = '', --TargetTargetTarget Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2764,8 +2762,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,PlayerBuffs', --Pet Buffs
+				maxDuration = 0,
+				priority = '', --Pet Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2783,8 +2781,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Boss,RaidDebuffs,Dispellable,Whitelist', --Pet Debuffs
+				maxDuration = 0,
+				priority = '', --Pet Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2926,8 +2924,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,PlayerBuffs,CastByUnit,Whitelist,RaidBuffsElvUI', --PetTarget Buffs
+				maxDuration = 0,
+				priority = '', --PetTarget Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -2945,8 +2943,8 @@ P.unitframe = {
 				sortMethod = 'TIME_REMAINING',
 				sortDirection = 'DESCENDING',
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Personal,Boss,RaidDebuffs', --PetTarget Debuffs
+				maxDuration = 0,
+				priority = '', --PetTarget Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3039,7 +3037,7 @@ P.unitframe = {
 			name = {
 				position = 'CENTER',
 				attachTextTo = 'Health',
-				text_format = '[namecolor][name:medium] [difficultycolor][smartlevel]',
+				text_format = '[namecolor][name:medium] [difficultycolor][level]',
 				yOffset = 0,
 				xOffset = 0,
 			},
@@ -3074,8 +3072,8 @@ P.unitframe = {
 				durationPosition = 'CENTER',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,TurtleBuffs', --Party Buffs
+				maxDuration = 0,
+				priority = '', --Party Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3093,8 +3091,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Boss,RaidDebuffs,CCDebuffs,Dispellable,Whitelist', --Party Debuffs
+				maxDuration = 0,
+				priority = '', --Party Debuffs
 				xOffset = 0,
 				yOffset = 0,
 				sizeOverride = 52,
@@ -3347,8 +3345,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,TurtleBuffs', --Raid Buffs
+				maxDuration = 0,
+				priority = '', --Raid Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3366,8 +3364,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Boss,RaidDebuffs,CCDebuffs,Dispellable', --Raid Debuffs
+				maxDuration = 0,
+				priority = '', --Raid Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3568,8 +3566,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,TurtleBuffs', --Raid40 Buffs
+				maxDuration = 0,
+				priority = '', --Raid40 Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3587,8 +3585,8 @@ P.unitframe = {
 				sortDirection = 'DESCENDING',
 				clickThrough = false,
 				minDuration = 0,
-				maxDuration = 300,
-				priority = 'Blacklist,Boss,RaidDebuffs,CCDebuffs,Dispellable,Whitelist', --Raid40 Debuffs
+				maxDuration = 0,
+				priority = '', --Raid40 Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3774,7 +3772,7 @@ P.unitframe = {
 				clickThrough = false,
 				minDuration = 0,
 				maxDuration = 0,
-				priority = 'Blacklist,Personal,Boss,PlayerBuffs,blockNoDuration,nonPersonal', --RaidPet Buffs
+				priority = '', --RaidPet Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},
@@ -3793,7 +3791,7 @@ P.unitframe = {
 				clickThrough = false,
 				minDuration = 0,
 				maxDuration = 0,
-				priority = 'Blacklist,Personal,Boss,Whitelist,RaidDebuffs,blockNoDuration,nonPersonal', --RaidPet Debuffs
+				priority = '', --RaidPet Debuffs
 				xOffset = 0,
 				yOffset = 0,
 			},

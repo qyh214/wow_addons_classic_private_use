@@ -21,6 +21,7 @@ function UF:Construct_TargetTargetTargetFrame(frame)
 	frame.InfoPanel = self:Construct_InfoPanel(frame)
 	frame.MouseGlow = self:Construct_MouseGlow(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
+	frame.Cutaway = self:Construct_Cutaway(frame)
 	--frame.Fader = self:Construct_Fader()
 	frame.customTexts = {}
 
@@ -91,6 +92,9 @@ function UF:Update_TargetTargetTargetFrame(frame, db)
 
 	--Raid Icon
 	UF:Configure_RaidIcon(frame)
+
+	--Cutaway
+	UF:Configure_Cutaway(frame)
 
 	UF:Configure_CustomTexts(frame)
 

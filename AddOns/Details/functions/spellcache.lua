@@ -342,3 +342,22 @@ do
 
 	
 end
+
+
+--[=[
+function (...)
+    
+    local F = CreateFrame ("frame", UIParent)
+    F:SetSize (64, 64)
+    F:SetPoint ("center")
+    
+    local T = F:CreateTexture (nil, "overlay")
+    T:SetPoint ("center")
+    T:SetSize (224, 224)
+    
+    local _, _, icon = GetSpellInfo (1)
+    T:SetTexture ([[Interface\ICONS\INV_Sword_04]])
+    T:SetTexture (    [[Interface\ICONS\INV_Weapon_Bow_07]])
+    
+end
+--]=]

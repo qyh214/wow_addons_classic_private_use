@@ -2049,7 +2049,10 @@ local can_start_loop = function()
 	if ((_detalhes:GetZoneType() ~= "raid" and _detalhes:GetZoneType() ~= "party") or ilvl_core.loop_process or _detalhes.in_combat or not _detalhes.track_item_level) then
 		return false
 	end
-	return true
+
+	--looks like data feed is getting some issues, disabling for further investigating
+	return false
+	--return true
 end
 
 function ilvl_core:LeaveCombat()
@@ -2086,9 +2089,20 @@ end
 
 --> ilvl API
 function _detalhes.ilevel:IsTrackerEnabled()
+	--looks like data feed is getting some issues, disabling for further investigating
+	if (true) then
+		return false
+	end
+	
 	return _detalhes.track_item_level
 end
 function _detalhes.ilevel:TrackItemLevel (bool)
+
+	--looks like data feed is getting some issues, disabling for further investigating
+	if (true) then
+		return false
+	end
+
 	if (type (bool) == "boolean") then
 		if (bool) then
 			_detalhes.track_item_level = true
@@ -2231,4 +2245,3 @@ function Details:DecompressData (data, dataType)
 		return data
 	end
 end
-

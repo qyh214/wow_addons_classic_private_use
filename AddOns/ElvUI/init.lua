@@ -87,12 +87,18 @@ do
 	AddOn:AddLib('Base64', 'LibBase64-1.0-ElvUI')
 	AddOn:AddLib('Masque', 'Masque', true)
 	AddOn:AddLib('Translit', 'LibTranslit-1.0')
+	AddOn:AddLib('LCD', 'LibClassicDurations')
+	AddOn:AddLib('LCC', 'LibClassicCasterino')
+
 	-- added on ElvUI_OptionsUI load: AceGUI, AceConfig, AceConfigDialog, AceConfigRegistry, AceDBOptions
 
 	-- backwards compatible for plugins
 	AddOn.LSM = AddOn.Libs.LSM
 	AddOn.Masque = AddOn.Libs.Masque
 end
+
+-- Register LibClassicDurations
+AddOn.Libs.LCD:Register(AddOnName)
 
 AddOn.oUF = Engine.oUF
 AddOn.ActionBars = AddOn:NewModule('ActionBars','AceHook-3.0','AceEvent-3.0')

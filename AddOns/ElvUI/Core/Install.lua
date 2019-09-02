@@ -275,7 +275,7 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.databars.experience.height = 10
 		E.db.databars.experience.orientation = "HORIZONTAL"
 		E.db.databars.experience.textSize = 12
-		E.db.databars.experience.width = 348
+		E.db.databars.experience.width = 350
 		E.db.databars.honor.height = 10
 		E.db.databars.honor.orientation = "HORIZONTAL"
 		E.db.databars.honor.width = 222
@@ -319,7 +319,7 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.movers.LossControlMover = "BOTTOM,ElvUIParent,BOTTOM,-1,507"
 		E.db.movers.MirrorTimer1Mover = "TOP,ElvUIParent,TOP,-1,-96"
 		E.db.movers.ObjectiveFrameMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-163,-325"
-		E.db.movers.ReputationBarMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-3,-264"
+		E.db.movers.ReputationBarMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-3,-246"
 		E.db.movers.ShiftAB = "TOPLEFT,ElvUIParent,BOTTOMLEFT,4,769"
 		E.db.movers.SocialMenuMover = "TOPLEFT,ElvUIParent,TOPLEFT,4,-187"
 		E.db.movers.TalkingHeadFrameMover = "BOTTOM,ElvUIParent,BOTTOM,-1,373"

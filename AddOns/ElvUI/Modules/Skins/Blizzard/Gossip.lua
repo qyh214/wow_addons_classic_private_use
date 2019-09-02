@@ -60,7 +60,8 @@ local function LoadSkin()
 	GossipNpcNameFrame:Point("TOPLEFT", GossipFrame.backdrop, "TOPLEFT", 18, -10)
 
 	for i = 1, _G.NUMGOSSIPBUTTONS do
-		_G['GossipTitleButton'..i]:GetFontString():SetTextColor(1, 1, 0)
+		_G['GossipTitleButton'..i..'GossipIcon']:SetSize(16, 16)
+		_G['GossipTitleButton'..i..'GossipIcon']:SetPoint('TOPLEFT', 3, 1)
 	end
 
 	_G.GossipGreetingText:SetTextColor(1, 1, 1)
@@ -68,10 +69,35 @@ local function LoadSkin()
 	hooksecurefunc('GossipFrameUpdate', function()
 		for i = 1, _G.NUMGOSSIPBUTTONS do
 			local button = _G['GossipTitleButton'..i]
-			if button:GetFontString() then
-				local Text = button:GetFontString():GetText()
-				if Text and strfind(Text, '|cff000000') then
-					button:GetFontString():SetText(gsub(Text, '|cff000000', '|cffffe519'))
+			local icon = _G['GossipTitleButton'..i..'GossipIcon']
+			local text = button:GetFontString()
+
+			if text and text:GetText() then
+				local textString = gsub(text:GetText(), "|c[Ff][Ff]%x%x%x%x%x%x(.+)|r", "%1")
+
+				button:SetText(textString)
+				text:SetTextColor(1, 1, 1)
+
+				if button.type == 'Available' or button.type == 'Active' then
+					if button.type == 'Active' then
+						icon:SetDesaturation(1)
+						text:SetTextColor(.6, .6, .6)
+					else
+						icon:SetDesaturation(0)
+						text:SetTextColor(1, .8, .1)
+					end
+
+					local numEntries = GetNumQuestLogEntries()
+					for k = 1, numEntries, 1 do
+						local questLogTitleText, _, _, _, _, isComplete, _, questId = GetQuestLogTitle(k)
+						if strmatch(questLogTitleText, textString) then
+							if (isComplete == 1 or IsQuestComplete(questId)) then
+								icon:SetDesaturation(0)
+								button:GetFontString():SetTextColor(1, .8, .1)
+								break
+							end
+						end
+					end
 				end
 			end
 		end

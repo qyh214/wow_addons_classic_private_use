@@ -15,8 +15,12 @@
 	<Script file='Portrait.lua'/>
 	<Script file='Power.lua'/>
 	<Script file='PowerPrediction.lua'/>
+	<Script file='PhaseIndicator.lua'/>
+	<Script file='PVPIcon.lua'/>
+	<Script file='PVPIndicator.lua'/>
 	<Script file='RaidDebuffs.lua'/>
 	<Script file='RaidIcon.lua'/>
+	<Script file='RaidRoleIcons.lua'/>
 	<Script file='Range.lua'/>
 	<Script file='ReadyCheckIcon.lua'/>
 	<Script file='RestingIndicator.lua'/>

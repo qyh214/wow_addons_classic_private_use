@@ -82,6 +82,8 @@ local GetSpellInfo = GetSpellInfo
 local UnitAura = UnitAura
 local UnitIsUnit = UnitIsUnit
 local floor, min = math.floor, math.min
+local LCD = LibStub('LibClassicDurations', true)
+
 -- GLOBALS: GameTooltip
 -- end block
 
@@ -222,6 +224,11 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 			-- We might want to consider delaying the creation of an actual cooldown
 			-- object to this point, but I think that will just make things needlessly
 			-- complicated.
+			local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
+			if durationNew and durationNew > 0 then
+				duration, expiration = durationNew, expirationTimeNew
+			end
+
 			if(button.cd and not element.disableCooldown) then
 				if(duration and duration > 0) then
 					button.cd:SetCooldown(expiration - duration, duration)

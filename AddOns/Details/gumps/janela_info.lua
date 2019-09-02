@@ -4896,14 +4896,14 @@ function gump:CriaJanelaInfo()
 					local buttonTemplate = gump:GetTemplate ("button", "DETAILS_TAB_BUTTON_TEMPLATE")
 					local buttonWidth = buttonTemplate.width + 1
 					
-					--pixelutil might not be compatible with classic wow
-					if (PixelUtil) then
-						PixelUtil.SetSize (tab, buttonTemplate.width, buttonTemplate.height)
+					--DFPixelUtil might not be compatible with classic wow
+					if (DFPixelUtil) then
+						DFPixelUtil.SetSize (tab, buttonTemplate.width, buttonTemplate.height)
 						if (tabsShown >= breakLine) then --next row of icons
-							PixelUtil.SetPoint (tab, "bottomright", info, "topright",  -514 + (buttonWidth * (secondRowIndex)), -50)
+							DFPixelUtil.SetPoint (tab, "bottomright", info, "topright",  -514 + (buttonWidth * (secondRowIndex)), -50)
 							secondRowIndex = secondRowIndex + 1
 						else
-							PixelUtil.SetPoint (tab, "bottomright", info, "topright",  -514 + (buttonWidth * tabsShown), -72)
+							DFPixelUtil.SetPoint (tab, "bottomright", info, "topright",  -514 + (buttonWidth * tabsShown), -72)
 						end
 					else
 						tab:SetSize (buttonTemplate.width, buttonTemplate.height)

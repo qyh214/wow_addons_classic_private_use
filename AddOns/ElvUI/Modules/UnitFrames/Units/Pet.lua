@@ -20,9 +20,9 @@ function UF:Construct_PetFrame(frame)
 	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
 	frame.Buffs = self:Construct_Buffs(frame)
 	frame.Debuffs = self:Construct_Debuffs(frame)
-	--frame.Castbar = self:Construct_Castbar(frame, L["Pet Castbar"])
-	--frame.Castbar.SafeZone = nil
-	--frame.Castbar.LatencyTexture:Hide()
+	frame.Castbar = self:Construct_Castbar(frame, L["Pet Castbar"])
+	frame.Castbar.SafeZone = nil
+	frame.Castbar.LatencyTexture:Hide()
 	--frame.HealthPrediction = self:Construct_HealComm(frame)
 	frame.AuraWatch = self:Construct_AuraWatch(frame)
 	frame.AuraBars = self:Construct_AuraBarHeader(frame)
@@ -30,6 +30,7 @@ function UF:Construct_PetFrame(frame)
 	frame.MouseGlow = self:Construct_MouseGlow(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 	--frame.Fader = self:Construct_Fader()
+	frame.Cutaway = self:Construct_Cutaway(frame)
 	frame.customTexts = {}
 
 	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 118)
@@ -100,13 +101,16 @@ function UF:Update_PetFrame(frame, db)
 	--UF:Configure_Fader(frame)
 
 	--Castbar
-	--UF:Configure_Castbar(frame)
+	UF:Configure_Castbar(frame)
 
 	--OverHealing
 	--UF:Configure_HealComm(frame)
 
 	--AuraBars
 	UF:Configure_AuraBars(frame)
+
+	--Cutaway
+	UF:Configure_Cutaway(frame)
 
 	--CustomTexts
 	UF:Configure_CustomTexts(frame)

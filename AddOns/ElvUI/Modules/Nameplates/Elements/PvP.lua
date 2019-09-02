@@ -6,23 +6,8 @@ local NP = E:GetModule('NamePlates')
 local strlower = strlower
 -- WoW API / Variables
 
-function NP:PvPIndicator_PostUpdate(unit, status)
-	if not status then return end
-
-	if (not self.Badge) or (self.Badge and not self.Badge:IsShown()) then
-		if status ~= 'FFA' then
-			self:SetAtlas('bfa-landingbutton-'..strlower(status)..'-up')
-			self:SetTexCoord(0, 1, 0, 1)
-		end
-	end
-end
-
 function NP:Construct_PvPIndicator(nameplate)
 	local PvPIndicator = nameplate:CreateTexture(nil, 'OVERLAY')
-	PvPIndicator.Badge_ = nameplate:CreateTexture(nil, 'ARTWORK')
-
-	PvPIndicator.PostUpdate = NP.PvPIndicator_PostUpdate
-
 	return PvPIndicator
 end
 
@@ -35,13 +20,6 @@ function NP:Update_PvPIndicator(nameplate)
 		end
 
 		nameplate.PvPIndicator:Size(db.pvpindicator.size, db.pvpindicator.size)
-		nameplate.PvPIndicator.Badge_:Size(db.pvpindicator.size + 14, db.pvpindicator.size + 16)
-
-		nameplate.PvPIndicator.Badge = nil
-
-		if db.pvpindicator.showBadge then
-			nameplate.PvPIndicator.Badge = nameplate.PvPIndicator.Badge_
-		end
 
 		nameplate.PvPIndicator:ClearAllPoints()
 		nameplate.PvPIndicator:Point(E.InversePoints[db.pvpindicator.position], nameplate, db.pvpindicator.position, db.pvpindicator.xOffset, db.pvpindicator.yOffset)

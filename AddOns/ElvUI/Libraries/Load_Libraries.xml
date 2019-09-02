@@ -10,6 +10,10 @@
 	<Include file="Ace3\AceSerializer-3.0\AceSerializer-3.0.xml"/>
 	<Include file="Ace3\AceTimer-3.0\AceTimer-3.0.xml"/>
 	<Include file="Ace3\AceHook-3.0\AceHook-3.0.xml"/>
+
+	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
+	<Script file="LibClassicCasterino-1.0\LibClassicCasterino.lua"/>
+
 	<Include file="LibSpellRange-1.0\lib.xml"/>
 	<Include file="LibSharedMedia-3.0\lib.xml"/>
 	<Script file="LibSimpleSticky\LibSimpleSticky.lua"/>

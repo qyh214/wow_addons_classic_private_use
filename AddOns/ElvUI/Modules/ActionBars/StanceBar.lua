@@ -67,10 +67,10 @@ function AB:StyleShapeShift()
 				if isActive then
 					_G.StanceBarFrame.lastSelected = button:GetID()
 					if numForms == 1 then
-						button.checked:SetTexture(1, 1, 1, 0.5)
+						button.checked:SetColorTexture(1, 1, 1, 0.5)
 						button:SetChecked(true)
 					else
-						button.checked:SetTexture(1, 1, 1, 0.5)
+						button.checked:SetColorTexture(1, 1, 1, 0.5)
 						button:SetChecked(self.db.stanceBar.style ~= 'darkenInactive')
 					end
 				else
@@ -80,9 +80,9 @@ function AB:StyleShapeShift()
 						button:SetChecked(self.db.stanceBar.style == 'darkenInactive')
 						button.checked:SetAlpha(1)
 						if self.db.stanceBar.style == 'darkenInactive' then
-							button.checked:SetTexture(0, 0, 0, 0.5)
+							button.checked:SetColorTexture(0, 0, 0, 0.5)
 						else
-							button.checked:SetTexture(1, 1, 1, 0.5)
+							button.checked:SetColorTexture(1, 1, 1, 0.5)
 						end
 					end
 				end

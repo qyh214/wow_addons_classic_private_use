@@ -107,6 +107,7 @@ V.skins = {
 		friends = true,
 		spellbook = true,
 		character = true,
+		craft = true,
 		misc = true,
 		tabard = true,
 		guildregistrar = true,

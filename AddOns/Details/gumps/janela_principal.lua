@@ -4284,6 +4284,9 @@ end
 -- ~spec ~icons
 function _detalhes:SetBarSpecIconSettings (enabled, iconfile, fulltrack)
 	
+	--> disabled at the moment 
+	--enabled =  false
+
 	if (type (enabled) ~= "boolean") then
 		enabled = self.row_info.use_spec_icons
 	end

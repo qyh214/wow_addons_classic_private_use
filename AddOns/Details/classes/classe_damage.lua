@@ -2782,7 +2782,7 @@ end
 		texture:SetVertexColor (actor_class_color_r, actor_class_color_g, actor_class_color_b)
 	else
 		if (instance and instance.row_info.use_spec_icons) then
-			if (self.spec) then
+			if (self.spec and type (self.spec) == "number" and self.spec > 20) then
 				texture:SetTexture (instance.row_info.spec_file)
 				texture:SetTexCoord (_unpack (_detalhes.class_specs_coords [self.spec]))
 				texture:SetVertexColor (1, 1, 1)
@@ -2960,7 +2960,7 @@ function atributo_damage:ToolTip_DamageDone (instancia, numero, barra, keydown)
 					local petName = SkillTable [4]
 					
 					local nome_magia, _, icone_magia = Details.GetSpellInfoC(spellID)
-					
+
 					if (petName) then
 						nome_magia = nome_magia .. " (|cFFCCBBBB" .. petName .. "|r)"
 					end
@@ -5148,9 +5148,9 @@ end
 				_detalhes.refresh:r_atributo_damage (actor, shadow)
 			end
 			
-			--a referência do .owner pode ter sido apagada?
-			--os 2 segmentos foram juntados porém a referência do owner de um pet criado ali em cima deve ser nula?
-			--teria que analisar se o novo objecto é de um pet e colocar a referência do owner no pet novamente, ou pelo menos verificar se a referência é valida
+			--a referï¿½ncia do .owner pode ter sido apagada?
+			--os 2 segmentos foram juntados porï¿½m a referï¿½ncia do owner de um pet criado ali em cima deve ser nula?
+			--teria que analisar se o novo objecto ï¿½ de um pet e colocar a referï¿½ncia do owner no pet novamente, ou pelo menos verificar se a referï¿½ncia ï¿½ valida
 			
 			--> tempo decorrido (captura de dados)
 				local end_time = actor.end_time
