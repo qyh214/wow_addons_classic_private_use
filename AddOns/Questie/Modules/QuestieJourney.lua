@@ -80,9 +80,13 @@ local function splitJourneyByDate()
                     else
                         state = "ERROR!!";
                     end
-
-                    local qName = QuestieDB:GetQuest(entry.Quest).Name;
-                    entryText = QuestieLocale:GetUIString('JOURNEY_TABLE_QUEST', state, qName);
+                    local quest = QuestieDB:GetQuest(entry.Quest)
+                    if quest then
+                        local qName = quest.Name;
+                        entryText = QuestieLocale:GetUIString('JOURNEY_TABLE_QUEST', state, qName);
+                    else
+                        entryText = QuestieLocale:GetUIString('JOURNEY_MISSING_QUEST');
+                    end
                 end
 
 
@@ -265,14 +269,16 @@ local function DrawJourneyTab(container)
         -- if it's a quest event
         if Questie.db.char.journey[i].Event == "Quest" then
             local quest = QuestieDB:GetQuest(Questie.db.char.journey[i].Quest);
-            local qName = Questie:Colorize(quest.Name, 'gray');
+            if quest then
+                local qName = Questie:Colorize(quest.Name, 'gray');
 
-            if Questie.db.char.journey[i].SubType == "Accept" then
-                recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_ACCEPT', qName) , 'yellow')  );
-            elseif Questie.db.char.journey[i].SubType == "Abandon" then
-                recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_ABANDON', qName) , 'yellow')  );
-            elseif Questie.db.char.journey[i].SubType == "Complete" then
-                recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_COMPLETE', qName) , 'yellow')  );
+                if Questie.db.char.journey[i].SubType == "Accept" then
+                    recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_ACCEPT', qName) , 'yellow')  );
+                elseif Questie.db.char.journey[i].SubType == "Abandon" then
+                    recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_ABANDON', qName) , 'yellow')  );
+                elseif Questie.db.char.journey[i].SubType == "Complete" then
+                    recentEvents[i]:SetText( timestamp .. Questie:Colorize( QuestieLocale:GetUIString('JOURNEY_QUEST_COMPLETE', qName) , 'yellow')  );
+                end
             end
         elseif Questie.db.char.journey[i].Event == "Level" then
             local level = Questie:Colorize(QuestieLocale:GetUIString('JOURNEY_LEVELNUM', Questie.db.char.journey[i].NewLevel), 'gray');
@@ -456,7 +462,7 @@ local zoneTable = {
         [51] = "Searing Gorge",
         [130] = "Silverpine Forest",
         [1519] = "Stormwind City",
-        [33] = "Strangelthorn Vale",
+        [33] = "Stranglethorn Vale",
         [8] = "Swamp of Sorrows",
         [47] = "The Hinterlands",
         [85] = "Tirisfal Glade",
@@ -553,8 +559,12 @@ function createObjectiveText(desc)
     local objText = "";
 
     if desc then
-        for i, v in ipairs(desc) do
-            objText = objText .. v .. "\n";
+        if type(desc) == "table" then
+            for i, v in ipairs(desc) do
+                objText = objText .. v .. "\n";
+            end
+        else
+            objText = objText .. tostring(desc) .. "\n"
         end
     else
         objText = Questie:Colorize(QuestieLocale:GetUIString('JOURNEY_AUTO_QUEST'), 'yellow');
@@ -1150,10 +1160,10 @@ function CollectZoneQuests(container, zoneid)
         if not Questie.db.char.complete[qid] and not q.Hidden then
 
             -- see if it's supposed to be a hidden quest
-            if qHide and not qHide[qid] then
+            if QuestieCorrections.hiddenQuests and not QuestieCorrections.hiddenQuests[qid] then
 
                 -- remove any breadcrumb quests too
-                if questExclusiveGroupFixes and not questExclusiveGroupFixes[qid] then
+                if QuestieCorrections.questExclusiveGroupFixes and not QuestieCorrections.questExclusiveGroupFixes[qid] then
                     temp.value = qid;
                     temp.text = q:GetColoredQuestName();
                     table.insert(zoneTree[1].children, temp);
@@ -1323,6 +1333,7 @@ end
 
 local yellow = "|cFFFFFF00"
 
+-- TODO move to QuestieDB
 local function getRacesString(raceMask)
     if not raceMask then return "" end
     if (raceMask == 0) or (raceMask == 255) then
@@ -1377,37 +1388,37 @@ local function addParagraph(frame, lookupObject, firstKey, secondKey, header, lo
 end
 
 local function fillQuestDetailsFrame(details, id)
-    local quest = qData[id]
+    local quest = QuestieDB.questData[id]
     -- header
     title = AceGUI:Create("Heading")
     title:SetFullWidth(true);
-    title:SetText(quest[qKeys.name])
+    title:SetText(quest[QuestieDB.questKeys.name])
     details:AddChild(title)
     -- general info
     addLine(details, yellow .. "Quest ID:|r " .. id)
-    addLine(details,  yellow .. "Quest Level:|r " .. quest[qKeys.questLevel])
-    addLine(details,  yellow .. "Required Level:|r " .. quest[qKeys.requiredLevel])
-    reqRaces = getRacesString(quest[qKeys.requiredRaces])
+    addLine(details,  yellow .. "Quest Level:|r " .. quest[QuestieDB.questKeys.questLevel])
+    addLine(details,  yellow .. "Required Level:|r " .. quest[QuestieDB.questKeys.requiredLevel])
+    reqRaces = getRacesString(quest[QuestieDB.questKeys.requiredRaces])
     if (reqRaces ~= "None") then
         addLine(details, yellow .. "Required Races:|r " .. reqRaces)
     end
     -- objectives text
-    if quest[qKeys.objectivesText] then
+    if quest[QuestieDB.questKeys.objectivesText] then
         addLine(details, "")
         addLine(details,  yellow .. "Quest Objectives:|r")
-        for k,v in pairs(quest[qKeys.objectivesText]) do
+        for k,v in pairs(quest[QuestieDB.questKeys.objectivesText]) do
             addLine(details, v)
         end
     end
     -- quest starters
     addLine(details, "")
-    addParagraph(details, quest, qKeys.startedBy, qKeys.creatureStart, "Creatures starting this quest:", npcData, npcKeys.name)
-    addParagraph(details, quest, qKeys.startedBy, qKeys.objectStart, "Objects starting this quest:", objData, objKeys.name)
-    addParagraph(details, quest, qKeys.startedBy, qKeys.itemStart, "Items starting this quest:", itemLookup, itemKeys.name)
+    addParagraph(details, quest, QuestieDB.questKeys.startedBy, QuestieDB.questKeys.creatureStart, "Creatures starting this quest:", QuestieDB.npcData, QuestieDB.npcKeys.name)
+    addParagraph(details, quest, QuestieDB.questKeys.startedBy, QuestieDB.questKeys.objectStart, "Objects starting this quest:", QuestieDB.objectData, QuestieDB.objectKeys.name)
+    addParagraph(details, quest, QuestieDB.questKeys.startedBy, QuestieDB.questKeys.itemStart, "Items starting this quest:", QuestieDB.itemData, QuestieDB.itemKeys.name)
     -- quest finishers
     addLine(details, "")
-    addParagraph(details, quest, qKeys.finishedBy, qKeys.creatureEnd, "Creatures finishing this quest:", npcData, npcKeys.name)
-    addParagraph(details, quest, qKeys.finishedBy, qKeys.objectEnd, "Objects finishing this quest:", objData, objKeys.name)
+    addParagraph(details, quest, QuestieDB.questKeys.finishedBy, QuestieDB.questKeys.creatureEnd, "Creatures finishing this quest:", QuestieDB.npcData, QuestieDB.npcKeys.name)
+    addParagraph(details, quest, QuestieDB.questKeys.finishedBy, QuestieDB.questKeys.objectEnd, "Objects finishing this quest:", QuestieDB.objectData, QuestieDB.objectKeys.name)
     addLine(details, "")
 end
 
@@ -1421,17 +1432,17 @@ function DrawResultTab(container, group)
     local database
     local key
     if group == "quest" then
-        database = qData
-        key = qKeys.name
+        database = QuestieDB.questData
+        key = QuestieDB.questKeys.name
     elseif group == "npc" then
-        database = npcData
+        database = QuestieDB.npcData
         key = DB_NAME
     elseif group == "object" then
-        database = objData
-        key = objKeys.name
+        database = QuestieDB.objectData
+        key = QuestieDB.objectKeys.name
     elseif group == "item" then
-        database = itemLookup
-        key = itemKeys.name
+        database = QuestieDB.itemData
+        key = QuestieDB.itemKeys.name
     else
         return
     end

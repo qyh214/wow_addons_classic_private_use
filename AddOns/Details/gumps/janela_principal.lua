@@ -2171,7 +2171,7 @@ local icon_frame_on_enter = function (self)
 			local serial = actor.serial
 			local name = actor:name()
 			local class = actor:class()
-			local spec = _detalhes.cached_specs [serial] or actor.spec
+			local spec = _detalhes.cached_specs [serial] or actor.spec or 0
 			local talents = _detalhes.cached_talents [serial]
 			local ilvl = _detalhes.ilevel:GetIlvl (serial)
 			
@@ -2206,8 +2206,13 @@ local icon_frame_on_enter = function (self)
 			local talent_string = ""
 			if (talents) then
 				for i = 1, #talents do
-					local talentID, name, texture, selected, available = GetTalentInfoByID (talents [i])
-					talent_string = talent_string ..  " |T" .. texture .. ":" .. 24 .. ":" .. 24 ..":0:0:64:64:4:60:4:60|t"
+
+					local iconTexture, rank, tier, column = unpack (talents [i])
+					--local talentID, name, texture, selected, available = GetTalentInfoByID (talents [i])
+					if (rank and rank > 0) then
+						talent_string = talent_string ..  " |T" .. iconTexture .. ":" .. 24 .. ":" .. 24 ..":0:0:64:64:4:60:4:60|t " .. rank .. " "
+					end
+
 				end
 			end
 			
@@ -4312,7 +4317,7 @@ function _detalhes:SetBarSpecIconSettings (enabled, iconfile, fulltrack)
 		end
 		if (not have_enabled) then
 			_detalhes.track_specs = false
-			_detalhes:ResetSpecCache (true) --> for�ar
+			--_detalhes:ResetSpecCache (true) --> 
 		end
 	end
 	

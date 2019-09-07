@@ -2781,7 +2781,7 @@ end
 		texture:SetTexCoord (0.25, 0.49609375, 0.75, 1)
 		texture:SetVertexColor (actor_class_color_r, actor_class_color_g, actor_class_color_b)
 	else
-		if (instance and instance.row_info.use_spec_icons) then
+		if (instance and instance.row_info.use_spec_icons or Details.IsValidSpecId (self.spec)) then
 			if (self.spec and type (self.spec) == "number" and self.spec > 20) then
 				texture:SetTexture (instance.row_info.spec_file)
 				texture:SetTexCoord (_unpack (_detalhes.class_specs_coords [self.spec]))

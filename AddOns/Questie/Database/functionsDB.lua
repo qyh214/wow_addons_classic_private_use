@@ -18,36 +18,6 @@ local DB_SUB_QUESTS = 14;
 local DB_QUEST_GROUP = 15;
 local DB_EXCLUSIVE_QUEST_GROUP = 16;
 
--- for quest keys see questDB.lua
-
--- for object keys see objectDB.lua
-
-local npcKeys = {
-    ['name'] = 1, -- string
-    ['minLevelHealth'] = 2, -- int
-    ['maxLevelHealth'] = 3, -- int
-    ['minLevel'] = 4, -- int
-    ['maxLevel'] = 5, -- int
-    ['rank'] = 6, -- int, see https://github.com/cmangos/issues/wiki/creature_template#rank
-    ['spawns'] = 7, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
-    ['waypoints'] = 8, -- table {[zoneID(int)] = {coordPair(floatVector2D),...},...}
-    ['zoneID'] = 9, -- guess as to where this NPC is most common
-    ['startQuests'] = 10, -- table {questID(int),...}
-    ['endQuests'] = 11, -- table {questID(int),...}
-    ['factionID'] = 12, -- int, see https://github.com/cmangos/issues/wiki/FactionTemplate.dbc
-    ['friendlyToFaction'] = 13, -- string, Contains "A" and/or "H" depending on NPC being friendly towards those factions. nil if hostile to both.
-}
-
-local itemKeys = {
-    ['npc_drops'] = 1, -- table {{npcID(int), dropChance(float)},...}
-    ['object_drops'] = 2, -- table {{objectID(int), dropChance(float)},...}
-    ['item_drops'] = 3, -- table {{itemID(int), dropChance(float)},...}
-    ['vendors'] = 4, -- table {{npcID(int), maxcount(int), incrtime(int)},...}
-    ['quests'] = 5, -- table {quesID(int),...}
-    ['name'] = 6,
-}
-
-
 local ClassBitIndexTable = {
     ['warrior'] = 1,
     ['paladin'] = 2,
@@ -74,20 +44,32 @@ local RaceBitIndexTable = {
     ['goblin'] = 9
 };
 
+QuestieDB._QuestCache = {}; -- stores quest objects so they dont need to be regenerated
+QuestieDB._ItemCache = {};
+QuestieDB._NPCCache = {};
+QuestieDB._ObjectCache = {};
+QuestieDB._ZoneCache = {};
+
 function QuestieDB:Initialize()
     QuestieDBZone:zoneCreateConvertion()
-    QuestieDB:deleteFaction()
     QuestieDB:deleteClasses()
     QuestieDB:deleteGatheringNodes()
 
     -- populate mustHave (subquests) this is sorta a hack, maybe Muehe can integrate this logic into the converter tool
-    for k,v in pairs(qData) do
+    for k,v in pairs(QuestieDB.questData) do
         if v and v[14] then
             for _,v2 in ipairs(v[14]) do
-                qData[v2].mustHave = k;
+                QuestieDB.questData[v2].mustHave = k;
             end
         end
     end
+	
+    -- data has been corrected, ensure cache is empty (something might have accessed the api before questie initialized)
+    QuestieDB._QuestCache = {};
+    QuestieDB._ItemCache = {};
+    QuestieDB._NPCCache = {};
+    QuestieDB._ObjectCache = {};
+    QuestieDB._ZoneCache = {};
 end
 
 function QuestieDB:ItemLookup(ItemId)
@@ -98,11 +80,6 @@ function QuestieDB:ItemLookup(ItemId)
     return Item
 end
 
-QuestieDB._QuestCache = {}; -- stores quest objects so they dont need to be regenerated
-QuestieDB._ItemCache = {};
-QuestieDB._NPCCache = {};
-QuestieDB._ObjectCache = {};
-QuestieDB._ZoneCache = {};
 
 function QuestieDB:GetObject(ObjectID)
     if ObjectID == nil then
@@ -111,7 +88,7 @@ function QuestieDB:GetObject(ObjectID)
     if QuestieDB._ObjectCache[ObjectID] ~= nil then
         return QuestieDB._ObjectCache[ObjectID];
     end
-    local raw = questObjectFixes[ObjectID] or objData[ObjectID];
+    local raw = QuestieCorrections.objectFixes[ObjectID] or QuestieDB.objectData[ObjectID];
     if raw ~= nil then
         local obj = {};
         obj.Id = ObjectID;
@@ -139,7 +116,7 @@ function QuestieDB:GetItem(ItemID)
         item.Id = ItemID;
         item.Name = raw[1];
         item.Sources = {};
-        if not questItemBlacklist[ItemID] then
+        if not QuestieCorrections.questItemBlacklist[ItemID] then
             for k,v in pairs(raw[3]) do -- droppedBy = 3, relatedQuests=2, containedIn=4
                 local source = {};
                 source.Type = "monster";
@@ -195,9 +172,9 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
     -- 14 DB_SUB_QUESTS
     -- 15 DB_QUEST_GROUP
     -- 16 DB_EXCLUSIVE_QUEST_GROUP]]--
-    rawdata = qData[QuestID] -- shouldnt rawdata be local
+    local rawdata = QuestieCorrections.questFixes[QuestID] or QuestieDB.questData[QuestID];
     if(rawdata)then
-        QO = {}
+        local QO = {}
         QO.GetColoredQuestName = _GetColoredQuestName
         QO.Id = QuestID --Key
         QO.Name = rawdata[1] --Name - 1
@@ -233,7 +210,7 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
                     obj.Id = v
 
                     -- this speeds up lookup
-                    obj.Name = npcData[v]
+                    obj.Name = QuestieDB.npcData[v]
                     if obj.Name ~= nil then
                         local name = LangNameLookup[v] or obj.Name[1]
                         obj.Name = string.lower(name);
@@ -255,7 +232,7 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
                     obj.Id = v
 
                     -- this speeds up lookup
-                    obj.Name = objData[v]
+                    obj.Name = QuestieDB.objectData[v]
                     if obj.Name ~= nil then
                         obj.Name = string.lower(obj.Name[1]);
                     end
@@ -296,7 +273,7 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
                     obj.Text = _v[2];
 
                     -- this speeds up lookup
-                    obj.Name = npcData[obj.Id]
+                    obj.Name = QuestieDB.npcData[obj.Id]
                     if obj.Name ~= nil then
                         local name = LangNameLookup[obj.Id] or obj.Name[1]
                         obj.Name = string.lower(name);
@@ -316,7 +293,7 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
                     obj.Id = _v[1]
                     obj.Text = _v[2]
 
-                    obj.Name = objData[obj.Id]
+                    obj.Name = QuestieDB.objectData[obj.Id]
                     if obj.Name ~= nil then
                         obj.Name = string.lower(obj.Name[1]);
                     end
@@ -355,17 +332,17 @@ function QuestieDB:GetQuest(QuestID) -- /dump QuestieDB:GetQuest(867)
         else
             QO.RequiredQuest = rawdata[13]
         end
-        if questRequirementFixes[QuestID] ~= nil then
-            QO.RequiredQuest = questRequirementFixes[QuestID]
+        if QuestieCorrections.questRequirementFixes[QuestID] ~= nil then
+            QO.RequiredQuest = QuestieCorrections.questRequirementFixes[QuestID]
         end
         QO.SubQuests = rawdata[14] --Quests that give questitems that are used in later quests (See STV manual)
         QO.QuestGroup = rawdata[15] --Quests that are part of the same group, example complete this group of quests to open the next one.
-        QO.ExclusiveQuestGroup = questExclusiveGroupFixes[QuestID] or rawdata[16]
+        QO.ExclusiveQuestGroup = QuestieCorrections.questExclusiveGroupFixes[QuestID] or rawdata[16]
         QO.NextQuestInChain = rawdata[22]
 
         QO.HiddenObjectiveData = {}
 
-        local hidden = questHiddenFixes[QuestID] or rawdata[21]
+        local hidden = QuestieCorrections.questHiddenFixes[QuestID] or rawdata[21]
 
         if hidden ~= nil then --required source items
             for _,Id in pairs(hidden) do
@@ -403,6 +380,39 @@ end
 
 QuestieDB.FactionGroup = UnitFactionGroup("player")
 
+function QuestieDB:_GetSpecialNPC(NPCID)
+    if NPCID == nil then
+        return nil
+    end
+    local rawdata = Questie_SpecialNPCs[NPCID]
+    if rawdata then
+        NPC = {}
+        NPC.Id = NPCID
+        QuestieStreamLib:load(rawdata)
+        NPC.Name = QuestieStreamLib:readTinyString()
+        NPC.Type = "NPC" --This can be used to look at which type it is, Gameobject and Items will have the same! (should be monster to match wow api)
+        NPC.NewFormatSpawns = {}; -- spawns should be stored like this: {{x, y, uimapid}, ...} so im creating a 2nd var to aid with moving to the new format
+        NPC.Spawns = {};
+        local count = QuestieStreamLib:readByte()
+        for i=1,count do
+            local x = QuestieStreamLib:readShort() / 655.35
+            local y = QuestieStreamLib:readShort() / 655.35
+            local m = QuestieStreamLib:readByte() + 1400
+            table.insert(NPC.NewFormatSpawns, {x, y, m});
+            local om = m;
+            m = zoneDataUiMapIDToAreaID[m];
+            if m then
+                if not NPC.Spawns[m] then
+                    NPC.Spawns[m] = {};
+                end
+                table.insert(NPC.Spawns[m], {x, y});
+            end
+        end
+        return NPC
+    end
+    return nil
+end
+
 function QuestieDB:GetNPC(NPCID)
     if NPCID == nil then
         return nil
@@ -412,7 +422,7 @@ function QuestieDB:GetNPC(NPCID)
     if(QuestieDB._NPCCache[NPCID]) then
         return QuestieDB._NPCCache[NPCID]
     end
-    rawdata = questMobFixes[NPCID] or npcData[NPCID]
+    local rawdata = QuestieCorrections.npcFixes[NPCID] or QuestieDB.npcData[NPCID]
     if(rawdata)then
         NPC = {}
         NPC.Type = "NPC" --This can be used to look at which type it is, Gameobject and Items will have the same! (should be monster to match wow api)
@@ -424,6 +434,11 @@ function QuestieDB:GetNPC(NPCID)
         NPC.MaxLevel = rawdata[DB_LEVEL]
         NPC.Rank = rawdata[DB_RANK]
         NPC.Spawns = rawdata[DB_NPC_SPAWNS]
+
+        if NPC.Spawns == nil and Questie_SpecialNPCs[NPCID] then -- get spawns from script spawns list
+            NPC.Spawns = QuestieDB:_GetSpecialNPC(NPCID).Spawns
+        end
+
         NPC.Waypoints = rawdata[DB_NPC_WAYPOINTS]
         NPC.Starts = rawdata[DB_NPC_STARTS]
         NPC.Ends = rawdata[DB_NPC_ENDS]
@@ -443,32 +458,7 @@ function QuestieDB:GetNPC(NPCID)
         QuestieDB._NPCCache[NPCID] = NPC
         return NPC
     else
-        rawdata = Questie_SpecialNPCs[NPCID]
-        if rawdata then
-            NPC = {}
-            NPC.Id = NPCID
-            QuestieStreamLib:load(rawdata)
-            NPC.Name = QuestieStreamLib:readTinyString()
-            NPC.NewFormatSpawns = {}; -- spawns should be stored like this: {{x, y, uimapid}, ...} so im creating a 2nd var to aid with moving to the new format
-            NPC.Spawns = {};
-            local count = QuestieStreamLib:readByte()
-            for i=1,count do
-                local x = QuestieStreamLib:readShort() / 655.35
-                local y = QuestieStreamLib:readShort() / 655.35
-                local m = QuestieStreamLib:readByte() + 1400
-                table.insert(NPC.NewFormatSpawns, {x, y, m});
-                local om = m;
-                m = zoneDataUiMapIDToAreaID[m];
-                if m then
-                    if not NPC.Spawns[m] then
-                        NPC.Spawns[m] = {};
-                    end
-                    table.insert(NPC.Spawns[m], {x, y});
-                end
-            end
-            return NPC
-        end
-        return nil
+        return QuestieDB:_GetSpecialNPC(NPCID)
     end
 end
 
@@ -479,7 +469,7 @@ function QuestieDB:GetQuestsByName(questName)
 
     local returnTable = {};
 
-    for index, quest in pairs(qData) do
+    for index, quest in pairs(QuestieDB.questData) do
         local needle = string.lower(questName);
         local haystack = quest[1]
         local localizedQuest = LangQuestLookup[index]
@@ -502,7 +492,7 @@ function QuestieDB:GetNPCsByName(npcName)
 
     local returnTable = {};
 
-    for index, npc in pairs(npcData) do
+    for index, npc in pairs(QuestieDB.npcData) do
         local needle = string.lower(npcName);
         local haystack =  LangNameLookup[index] or npc[1]
         local lowerHaystack = string.lower(haystack);
@@ -528,7 +518,7 @@ function QuestieDB:GetQuestsByZoneId(zoneid)
 
     local zoneTable = {};
     -- loop over all quests to populate a zone
-    for qid, _ in pairs(qData) do
+    for qid, _ in pairs(QuestieDB.questData) do
         local quest = QuestieDB:GetQuest(qid);
 
         if quest and quest.Starts then
@@ -564,8 +554,6 @@ function QuestieDB:GetQuestsByZoneId(zoneid)
     return zoneTable;
 
 end
-
-
 
 ---------------------------------------------------------------------------------------------------
 -- Returns the Levenshtein distance between the two given strings
@@ -615,7 +603,7 @@ function QuestieDB:deleteGatheringNodes()
         1731,1732,1733,1734,1735,123848,150082,175404,176643,177388,324,150079,176645,2040,123310 -- mining
     };
     for k,v in pairs(prune) do
-        objData[v] = nil
+        QuestieDB.objectData[v] = nil
     end
 end
 
@@ -623,7 +611,7 @@ end
 -- Modifications to questDB
 
 function unpackBinary(val)
-    ret = {};
+    local ret = {};
     for q=0,16 do
         if bit.band(bit.rshift(val,q), 1) == 1 then
             table.insert(ret, true);
@@ -653,38 +641,22 @@ function checkClass(class, dbClass)
     return valid;
 end
 
---Deletes opposite factions quests, saves time!
-function QuestieDB:deleteFaction() -- deleteClasses also deletes races, so it only needs to iterate once. Should probably be renamed to deleteInvalid or something
-    --englishFaction, _ = UnitFactionGroup("player")
-    --local fac = ""
-    --if(englishFaction == "Alliance") then
-    --  fac = "A"
-    --else
-    --  fac = "H"
-    --end
-    --for key, data in pairs(qData) do
-    --    if (data[DB_REQ_RACE] ~= "AH") and (data[DB_REQ_RACE] ~= fac) then
-    --        qData[key] = nil;
-    --    end
-    --end
-    --Questie:Debug(DEBUG_DEVELOP, "Opposite factions quests deleted");
-end
-
 function QuestieDB:deleteClasses() -- handles races too
-    localizedClass, englishClass, classIndex = UnitClass("player");
-    localizedRace, playerRace = UnitRace("player");
+    local localizedClass, englishClass, classIndex = UnitClass("player");
+    local localizedRace, playerRace = UnitRace("player");
     if englishClass and playerRace then
         local playerClass = string.lower(englishClass);
         playerRace = string.lower(playerRace);
-        for key, data in pairs(qData) do
+        for key, entry in pairs(QuestieDB.questData) do
+            local data = QuestieCorrections.questFixes[key] or entry
             if data[7] and data[7] ~= 0 then
                 if not checkClass(playerClass, data[7]) then
-                    qData[key].hidden = true
+                    data.hidden = true
                 end
             end
             if data[6] and data[6] ~= 0 and data[6] ~= 255 then
                 if not checkRace(playerRace, data[6]) then
-                    qData[key].hidden = true
+                    data.hidden = true
                 end
             end
         end
