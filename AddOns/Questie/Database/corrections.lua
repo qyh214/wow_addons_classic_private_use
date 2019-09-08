@@ -4,6 +4,7 @@ QuestieCorrections.questFixes = {
     -- add quest 3375 in field 14 (subQuests)
     -- TODO add parentQuest field to database so 3375 knows when not to show as available
     [2201] = {"Find the Gems",{{6912,},nil,nil,},{nil,{112877,},},40,43,77,nil,{"Find the ruby, sapphire, and topaz that are scattered throughout Uldaman.","Once acquired, contact Talvash del Kissel remotely by using the Phial of Scrying he previously gave you.","From the journal, you know...","* The ruby has been stashed in a barricaded Shadowforge area.","* The topaz has been hidden in an urn in one of the Trogg areas, near some Alliance dwarves.","* The sapphire has been claimed by Grimlok, the trogg leader.",},nil,{nil,nil,{{7669,nil},{7670,nil},{7671,nil},},nil,},7668,nil,{2200,},{3375},nil,nil,1517,nil,nil,nil,nil,2204,},
+    -- Add 12347 to the sourceItemIds so the objective is shown on the map #798
     [4763] = {"The Blackwood Corrupted",{{3649,},nil,nil,},{{3649,},nil,},15,18,77,nil,{"Fill the Empty Cleansing Bowl at the Auberdine Moonwell.","Gather a sample of fruit, nut, and grain from the northern Blackwood furbolg camps.","Mix the bowl and place it near the bonfire closest to the Cliffspring River at the northern camp, thus summoning the satyr corruptor.","Take the Talisman of Corruption and bring it to Thundris Windweaver in Auberdine.",},nil,{nil,nil,{{12355,nil},},nil,},12346,nil,{4762,},nil,nil,nil,148,nil,nil,nil,{12347,12341,12342,12343,},nil,},
 
     -- please label what you changed in the entry so its easier to figure out
@@ -51,17 +52,38 @@ QuestieCorrections.itemFixes = {
     [12347] = {"Filled Cleansing Bowl",{},{},{174795}},
     [2886] = {"Crag Boar Rib",{384},{1125,1126,1127,1689},{}},
     [5051] = {"Dig Rat",{862},{3444},{}},
+    [2449] = {"Earthroot",{6123,6128},{},{1619,3726}},
+    [2447] = {"Peacebloom",{8549,8550},{},{1618,3724}},
+    [5056] = {"Root Sample",{866},{},{1619,3726,1618,3724,1620,3727}},
+    [12349] = {"Cliffspring River Sample",{4762},{},{175371}},
+    [12350] = {"Empty Sampling Tube",{4762},{},{}},
+    [5184] = {"Filled Crystal Phial",{921},{},{19549}},
+    [5185] = {"Crystal Phial",{921},{},{}},
+    [5186] = {"Partially Filled Vessel",{928},{},{}},
+    [5639] = {"Filled Jade Phial",{929},{},{19550}},
+    [5619] = {"Jade Phial",{929},{},{}},
+    [5645] = {"Filled Tourmaline Phial",{933},{},{19551}},
+    [5621] = {"Tourmaline Phial",{933},{},{}},
+    [18151] = {"Filled Amethyst Phial",{7383},{},{19552}},
+    [18152] = {"Amethyst Phial",{7383},{},{}},
+    [5188] = {"Filled Vessel",{935},{},{}},
+    [11184]={"Blue Power Crystal",{4284,4382,4384,4386},{},{164658,164778}},
+    [11185]={"Green Power Crystal",{4284,4381,4382,4383},{},{164659,164779}},
+    [11186]={"Red Power Crystal",{4284,4383,4384,4385},{},{164660,164780}},
+    [11188]={"Yellow Power Crystal",{4284,4381,4385,4386},{},{164661,164781}},
 }
 
 -- some quest items are shared across factions but require different sources for each faction (not sure if there is a better way to implement this)
 QuestieCorrections.itemFixesHorde = {
     [15882]={"Half Pendant of Aquatic Endurance",{30,272},{},{177790}},
     [15883]={"Half Pendant of Aquatic Agility",{30,272},{},{177794}},
+    [3713]={"Soothing Spices",{},{2381,4897},{}},
 }
 
 QuestieCorrections.itemFixesAlliance = {
     [15882]={"Half Pendant of Aquatic Endurance",{30,272},{},{177844}},
     [15883]={"Half Pendant of Aquatic Agility",{30,272},{},{177792}},
+    [3713]={"Soothing Spices",{},{2397,8307},{}},
 }
 
 if UnitFactionGroup("Player") == "Horde" then
@@ -97,17 +119,20 @@ QuestieCorrections.questExclusiveGroupFixes = {
     --[403] = {311}, -- completing the unguarded barrel quest prevents to do the optional guarded barrel prequest
     [428] = {429}, -- lost deathstalkers breadcrumb
     [308] = {311}, -- distracting jarven can't be completed once you get the followup
-    -- Tome of Divinity starting quests for dwarfs
-    [1645] = {1646,2997,2999,3000},
-    [1646] = {2997,2999,3000},
-    [2997] = {1646,2999,3000},
-    [2999] = {1646,2997,3000},
-    [3000] = {1646,2997,2999},
-    -- Tome of Divinity starting quests for humans
-    [1641] = {1642,2998,3861},
-    [1642] = {2998,3861},
-    [2998] = {1642,3861},
-    [3861] = {1642,2998},
+    -- Tome of Divinity starting quests for dwarfs #703
+    [1645] = {1642,1646,2997,2998,2999,3000,3681}, -- This is repeatable giving an item starting 1646
+    [1646] = {1642,2997,2998,2999,3000,3681},
+    [2997] = {1642,1646,2998,2999,3000,3681},
+    [2999] = {1642,1646,2997,2998,3000,3681},
+    [3000] = {1642,1646,2997,2998,2999,3681},
+    -- Tome of Divinity starting quests for humans #703
+    [1641] = {1642,1646,2997,2998,2999,3000,3861}, -- This is repeatable giving an item starting 1642
+    [1642] = {1646,2997,2998,2999,3000,3861},
+    [2998] = {1642,1646,2997,2998,3000,3861},
+    [3861] = {1642,1646,2997,2998,2999,3000},
+    -- Tome of Valor repeatable starting quests #742
+    [1793] = {1649},
+    [1794] = {1649},
     [431] = {411}, -- candles of beckoning
     [410] = {411}, -- the dormant shade
     -- Voidwalker questline for horde
@@ -213,7 +238,8 @@ QuestieCorrections.questHiddenFixes = {
 
 QuestieCorrections.hiddenQuests = {
   [1878] = true, -- Repeatable version of 1707 - Fixing #775
-  [2281] = true, -- Repeatable version of 2280
+  [2881] = true, -- Repeatable version of 2880
+  [5663] = true, -- Touch of Weakness of Dark Cleric Beryl - Fixing #730
   --Stray quests
   [3861] = true, --CLUCK!
   --World event quests
@@ -541,6 +567,8 @@ QuestieCorrections.hiddenQuests = {
   [8228] = true,
   [8229] = true,
   --love is in the air
+  [8981] = true,
+  [8993] = true,
   [8982] = true,
   [9026] = true,
   [8983] = true,
@@ -573,6 +601,21 @@ QuestieCorrections.hiddenQuests = {
   [8918] = true,
   [8919] = true,
   [8920] = true,
+
+  -- plaguelands quests that arent in phase 1
+  [5403] = true,
+  [5407] = true,
+  [5509] = true,
+  [5510] = true,
+  [5408] = true,
+  [5402] = true,
+  [5401] = true,
+  [5405] = true,
+  [5503] = true,
+  [5404] = true,
+  [5508] = true,
+  [5406] = true,
+  
   --PvP Warsong Gulch. Slay alliance/ slay horde shown for both alliance and horde
   [8290] = true,
   [7788] = true,

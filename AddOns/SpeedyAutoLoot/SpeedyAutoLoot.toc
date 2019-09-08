@@ -2,7 +2,7 @@
 ## Title: |cffEEE4AESpeedy AutoLoot|r
 ## Notes: |cff58C6FALoot at ludicrous speed!|r
 ## Author: Yuyuli
-## Version: 2.0.10
+## Version: 2.0.11
 ## SavedVariables: SpeedyAutoLootDB
 
 SpeedyAutoLoot.lua
