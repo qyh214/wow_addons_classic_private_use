@@ -4,7 +4,9 @@ local COUNT_TEXT = " |cffAAAAFFx%d|r"
 local function ShouldShowPrice(tt)
 	if MerchantFrame:IsShown() then
 		local name = tt:GetOwner():GetName()
-		return name:find("Character") or name:find("TradeSkill")
+		if name then -- bagnon sanity check
+			return name:find("Character") or name:find("TradeSkill")
+		end
 	end
 	return true
 end
@@ -14,13 +16,22 @@ local function GetAmountString(count, isShift)
 	return (count > 1 or isShift) and COUNT_TEXT:format(count)..spacing or ""
 end
 
-local function SetPrice(tt, count, item)
+-- OnTooltipSetItem fires twice for recipes
+local function CheckRecipe(tt, classID, isBagItem)
+	if classID == LE_ITEM_CLASS_RECIPE and not isBagItem then
+		tt.isFirstMoneyLine = not tt.isFirstMoneyLine
+		return not tt.isFirstMoneyLine
+	end
+	return true
+end
+
+local function SetPrice(tt, count, item, isBagItem)
 	if ShouldShowPrice(tt) then
 		count = count or 1
 		item = item or select(2, tt:GetItem())
 		if item then
-			local sellPrice = select(11, GetItemInfo(item))
-			if sellPrice and sellPrice > 0 then
+			local sellPrice, classID = select(11, GetItemInfo(item))
+			if sellPrice and sellPrice > 0 and CheckRecipe(tt, classID, isBagItem) then
 				if IsShiftKeyDown() and count > 1 then
 					SetTooltipMoney(tt, sellPrice, nil, SELL_PRICE_TEXT..GetAmountString(1, true))
 				else
@@ -48,7 +59,7 @@ local SetItem = {
 	end,
 	SetBagItem = function(tt, bag, slot)
 		local _, count = GetContainerItemInfo(bag, slot)
-		SetPrice(tt, count)
+		SetPrice(tt, count, nil, true)
 	end,
 	--SetBagItemChild
 	--SetBuybackItem -- already shown
@@ -59,7 +70,10 @@ local SetItem = {
 		local itemLink = GetCraftReagentItemLink(index, reagent)
 		SetPrice(tt, count, itemLink)
 	end,
-	--SetHyperlink -- used by most addons but cant get count this way
+	SetCraftSpell = function(tt)
+		SetPrice(tt)
+	end,
+	--SetHyperlink -- item information is not readily available
 	SetInboxItem = function(tt, messageIndex, attachIndex)
 		local count, itemID
 		if attachIndex then
@@ -116,17 +130,15 @@ local SetItem = {
 	end,
 }
 
-for name, func in pairs(SetItem) do
-	hooksecurefunc(GameTooltip, name, func)
+for method, func in pairs(SetItem) do
+	hooksecurefunc(GameTooltip, method, func)
 end
 
--- item information is not readily available on tt:SetHyperlink()
 ItemRefTooltip:HookScript("OnTooltipSetItem", function(tt)
 	local item = select(2, tt:GetItem())
 	if item then
-		local sellPrice = select(11, GetItemInfo(item))
-		if sellPrice and sellPrice > 0 then
-			tt.shownMoneyFrames = nil -- OnTooltipSetItem fires twice for recipes
+		local sellPrice, classID = select(11, GetItemInfo(item))
+		if sellPrice and sellPrice > 0 and CheckRecipe(tt, classID) then
 			SetTooltipMoney(tt, sellPrice, nil, SELL_PRICE_TEXT)
 		end
 	end
@@ -164,13 +176,20 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tt)
 				break
 			end
 		end
+	elseif AuctionFaster and IsShown(AuctionFrame) and AuctionFrame.selectedTab >= 4 then
+		local count
+		if AuctionFrame.selectedTab == 4 then
+			count = tt:GetOwner().item.count
+		elseif AuctionFrame.selectedTab == 5 then
+			count = AuctionFaster.hoverRowData.count -- provided by AuctionFaster
+		end
+		SetPrice(tt, count)
 	elseif Bagnon and IsShown(BagnonFramebank) then
 		local info = tt:GetOwner():GetParent().info
 		if info then -- /bagnon bank
-			tt.shownMoneyFrames = nil
 			SetPrice(tt, info.count)
 		end
-	-- do a lazy check for any chat windows that are docked to ChatFrame1
+	-- lazy check for any chat windows that are docked to ChatFrame1
 	elseif DEFAULT_CHAT_FRAME:IsMouseOver() then -- Chatter, Prat
 		SetPrice(tt)
 	end

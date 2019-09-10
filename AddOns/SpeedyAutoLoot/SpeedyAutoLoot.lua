@@ -6,38 +6,34 @@ SpeedyAutoLootDB.global = SpeedyAutoLootDB.global or {}
 local SetCVar = SetCVar or C_CVar.SetCVar
 local GetCVarBool = GetCVarBool or C_CVar.GetCVarBool
 local BACKPACK_CONTAINER, LOOT_SLOT_ITEM, NUM_BAG_SLOTS = BACKPACK_CONTAINER, LOOT_SLOT_ITEM, NUM_BAG_SLOTS
-local GetContainerNumFreeSlots, GetItemCount, GetItemInfo, GetLootSlotInfo, GetLootSlotLink, GetLootSlotType, GetNumLootItems, GetCursorPosition, IsFishingLoot, IsModifiedClick, LootSlot, PlaySound, select, tContains = GetContainerNumFreeSlots, GetItemCount, GetItemInfo, GetLootSlotInfo, GetLootSlotLink, GetLootSlotType, GetNumLootItems, GetCursorPosition, IsFishingLoot, IsModifiedClick, LootSlot, PlaySound, select, tContains
+local GetContainerNumFreeSlots, GetItemCount, GetItemInfo, GetLootSlotInfo, GetLootSlotLink, GetLootSlotType, GetNumLootItems, GetCursorPosition, IsFishingLoot, IsModifiedClick, LootSlot, PlaySound, select, tContains, GetCursorInfo = GetContainerNumFreeSlots, GetItemCount, GetItemInfo, GetLootSlotInfo, GetLootSlotLink, GetLootSlotType, GetNumLootItems, GetCursorPosition, IsFishingLoot, IsModifiedClick, LootSlot, PlaySound, select, tContains, GetCursorInfo
 local fishingChannel = 'Master'
 
-function AutoLoot:ProcessLoot(item, q, typ)
-	if typ == LOOT_SLOT_ITEM then
-		local total, free, bagFamily = 0
-		for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
-			free, bagFamily = GetContainerNumFreeSlots(i)
-			if bagFamily == 0 then
-				total = total + free
-			end
+function AutoLoot:ProcessLoot(item, q)
+	local total, free, bagFamily = 0
+	for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
+		free, bagFamily = GetContainerNumFreeSlots(i)
+		if bagFamily == 0 then
+			total = total + free
 		end
-		if total > 0 then
-			return true
-		end
-		local have = (GetItemCount(item) or 0)
-		if have > 0 then
-			local itemStackCount = (select(8,GetItemInfo(item)) or 0)
-			if itemStackCount > 1 then
-				while have > itemStackCount do
-					have = have - itemStackCount
-				end
-				local remain = itemStackCount - have
-				if remain >= q then
-					return true
-				end
-			end
-		end
-		return false
-	else
+	end
+	if total > 0 then
 		return true
 	end
+	local have = (GetItemCount(item) or 0)
+	if have > 0 then
+		local itemStackCount = (select(8,GetItemInfo(item)) or 0)
+		if itemStackCount > 1 then
+			while have > itemStackCount do
+				have = have - itemStackCount
+			end
+			local remain = itemStackCount - have
+			if remain >= q then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 function AutoLoot:ShowLootFrame(show)
@@ -83,7 +79,7 @@ function AutoLoot:LootItems()
 			local quantity, _, _, locked, isQuestItem = select(3, GetLootSlotInfo(i))
 			if locked then
 				self.isItemLocked = locked
-			elseif isQuestItem or self:ProcessLoot(itemLink, quantity, slotType) then
+			elseif slotType ~= LOOT_SLOT_ITEM or isQuestItem or self:ProcessLoot(itemLink, quantity) then
 				numItems = numItems - 1
 				LootSlot(i)
 			end
@@ -119,10 +115,12 @@ function AutoLoot:OnEvent(e, ...)
 		self.isHidden = false
 		self.isItemLocked = false
 		self:ShowLootFrame(false)
-	elseif e == 'UI_ERROR_MESSAGE' and tContains(({ERR_INV_FULL,ERR_ITEM_MAX_COUNT}), select(2,...)) then
+	elseif (e == 'UI_ERROR_MESSAGE' and tContains(({ERR_INV_FULL,ERR_ITEM_MAX_COUNT}), select(2,...))) or e == 'LOOT_BIND_CONFIRM' then
 		if self.isLooting and self.isHidden then
 			self:ShowLootFrame(true)
-			self:PlayInventoryFullSound()
+			if e == 'UI_ERROR_MESSAGE' then
+				self:PlayInventoryFullSound()
+			end
 		end
 	end
 end
@@ -220,6 +218,11 @@ function AutoLoot:OnLoad()
 						'UI_ERROR_MESSAGE' }) do
 		self:RegisterEvent(e)
 	end
+
 	self.isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
+
+	if self.isClassic then
+		self:RegisterEvent('LOOT_BIND_CONFIRM')
+	end
 end
 AutoLoot:OnLoad()
