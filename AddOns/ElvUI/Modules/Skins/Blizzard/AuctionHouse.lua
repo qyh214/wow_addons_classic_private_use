@@ -120,6 +120,8 @@ local function LoadSkin()
 		_G[Filter..'NormalTexture'].SetAlpha = E.noop
 	end
 
+	_G.BrowseLevelHyphen:Point('RIGHT', 13, 0)
+
 	S:HandleCloseButton(_G.AuctionFrameCloseButton, AuctionFrame.backdrop)
 
 	_G.AuctionFrameMoneyFrame:Point('BOTTOMRIGHT', AuctionFrame, 'BOTTOMLEFT', 181, 11)
@@ -131,6 +133,15 @@ local function LoadSkin()
 	_G.BrowseScrollFrame:StripTextures()
 
 	_G.BrowseFilterScrollFrame:StripTextures()
+
+	_G.BrowseBidText:ClearAllPoints()
+	_G.BrowseBidText:Point('RIGHT', _G.BrowseBidButton, 'LEFT', -270, 2)
+
+	_G.BrowseCloseButton:Point('BOTTOMRIGHT', 66, 6)
+	_G.BrowseBuyoutButton:Point('RIGHT', _G.BrowseCloseButton, 'LEFT', -4, 0)
+	_G.BrowseBidButton:Point('RIGHT', _G.BrowseBuyoutButton, 'LEFT', -4, 0)
+
+	_G.BrowseBidPrice:Point('BOTTOM', 25, 10)
 
 	S:HandleScrollBar(_G.BrowseFilterScrollFrameScrollBar)
 	S:HandleScrollBar(_G.BrowseScrollFrameScrollBar)
@@ -184,7 +195,7 @@ local function LoadSkin()
 			self:GetNormalTexture():SetInside()
 
 			local quality = select(4, GetAuctionSellItemInfo())
-			if quality then
+			if quality and quality > 1 then
 				self:SetBackdropBorderColor(GetItemQualityColor(quality))
 			else
 				self:SetBackdropBorderColor(unpack(E.media.bordercolor))
@@ -193,6 +204,10 @@ local function LoadSkin()
 			self:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
 	end)
+
+	S:HandleRadioButton(_G.AuctionsShortAuctionButton)
+	S:HandleRadioButton(_G.AuctionsMediumAuctionButton)
+	S:HandleRadioButton(_G.AuctionsLongAuctionButton)
 
 	S:HandleDropDownBox(_G.BrowseDropDown, 155)
 	S:HandleDropDownBox(_G.PriceDropDown)
@@ -231,6 +246,16 @@ local function LoadSkin()
 
 			S:HandleIcon(Texture)
 			Texture:SetInside()
+
+			hooksecurefunc(Name, "SetVertexColor", function(_, r, g, b)
+				if not (r == g) then
+					ItemButton:SetBackdropBorderColor(r, g, b)
+				else
+					ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
+				end
+			end)
+
+			hooksecurefunc(Name, "Hide", function() ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor)) end)
 		end
 	end
 

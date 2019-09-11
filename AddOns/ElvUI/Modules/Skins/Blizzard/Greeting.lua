@@ -17,7 +17,7 @@ local function LoadSkin()
 	_G.QuestGreetingScrollFrameBottom:StripTextures()
 
 	S:HandleButton(_G.QuestFrameGreetingGoodbyeButton, true)
-	_G.QuestFrameGreetingGoodbyeButton:Point('BOTTOMRIGHT', -37, 4)
+	_G.QuestFrameGreetingGoodbyeButton:Point('BOTTOMRIGHT', -38, 7)
 
 	_G.QuestGreetingFrameHorizontalBreak:Kill()
 

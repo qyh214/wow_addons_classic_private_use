@@ -8,7 +8,6 @@ local unpack, select, ipairs = unpack, select, ipairs
 local wipe, tinsert, tconcat = wipe, tinsert, table.concat
 local floor, tonumber = floor, tonumber
 local strfind, format, strsub = strfind, format, strsub
-local strmatch, gmatch = strmatch, gmatch
 --WoW API / Variables
 local CanInspect = CanInspect
 local CreateFrame = CreateFrame
@@ -29,19 +28,13 @@ local IsShiftKeyDown = IsShiftKeyDown
 local NotifyInspect = NotifyInspect
 local SetTooltipMoney = SetTooltipMoney
 local UnitAura = UnitAura
-local UnitBuff = UnitBuff
 local UnitClass = UnitClass
-local UnitClassification = UnitClassification
-local UnitCreatureType = UnitCreatureType
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
-local UnitInParty = UnitInParty
-local UnitInRaid = UnitInRaid
 local UnitIsAFK = UnitIsAFK
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsDND = UnitIsDND
 local UnitIsPlayer = UnitIsPlayer
-local UnitIsPVP = UnitIsPVP
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitIsUnit = UnitIsUnit
 local UnitLevel = UnitLevel
@@ -49,7 +42,7 @@ local UnitName = UnitName
 local UnitPVPName = UnitPVPName
 local UnitRace = UnitRace
 local UnitReaction = UnitReaction
-local UnitRealmRelationship = UnitRealmRelationship
+local UnitPlayerControlled = UnitPlayerControlled
 
 -- GLOBALS: ElvUI_KeyBinder, ElvUI_ContainerFrame
 
@@ -185,7 +178,7 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 		if not localeClass or not class then return end
 
 		local name = UnitName(unit)
-		local guildName, guildRankName, _, guildRealm = GetGuildInfo(unit)
+		local guildName, guildRankName = GetGuildInfo(unit)
 		local pvpName = UnitPVPName(unit)
 
 		color = _G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[class] or _G.RAID_CLASS_COLORS[class]
@@ -208,10 +201,6 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 
 		local lineOffset = 2
 		if guildName then
-			if guildRealm and isShiftKeyDown then
-				guildName = guildName.."-"..guildRealm
-			end
-
 			if self.db.guildRanks then
 				_G.GameTooltipTextLeft2:SetFormattedText("<|cff00ff10%s|r> [|cff00ff10%s|r]", guildName, guildRankName)
 			else
@@ -457,7 +446,12 @@ function TT:GameTooltipStatusBar_OnValueChanged(tt, value)
 	elseif(value == 0 or (unit and UnitIsDeadOrGhost(unit))) then
 		tt.text:SetText(_G.DEAD)
 	else
-		tt.text:SetText(E:ShortValue(value).." / "..E:ShortValue(max))
+		if unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) and _G.RealMobHealth then
+			local c, m, _, _ = _G.RealMobHealth.GetUnitHealth(unit);
+			tt.text:SetText(c.." / "..m)
+		else
+			tt.text:SetText(value.." / "..max)
+		end
 	end
 end
 

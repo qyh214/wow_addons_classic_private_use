@@ -4637,7 +4637,6 @@ E.Options.args.nameplate = {
 								},
 							},
 						},
---[=[
 						healPrediction = {
 							order = 6,
 							name = L["Heal Prediction"],
@@ -4680,7 +4679,6 @@ E.Options.args.nameplate = {
 								},
 							},
 						},
-]=]
 						power = {
 							order = 7,
 							name = L["Power Color"],

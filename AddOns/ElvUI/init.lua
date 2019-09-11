@@ -80,7 +80,6 @@ do
 	AddOn:AddLib('LAB', 'LibActionButton-1.0-ElvUI')
 	AddOn:AddLib('LDB', 'LibDataBroker-1.1')
 	AddOn:AddLib('SimpleSticky', 'LibSimpleSticky-1.0')
-	AddOn:AddLib('SpellRange', 'SpellRange-1.0')
 	AddOn:AddLib('ButtonGlow', 'LibButtonGlow-1.0', true)
 	AddOn:AddLib('ItemSearch', 'LibItemSearch-1.2-ElvUI')
 	AddOn:AddLib('Compress', 'LibCompress')

@@ -1,0 +1,12 @@
+------------------------------------------------------------------------
+r17 | Caliaha | 2019-09-10 03:53:07 +0000 (Tue, 10 Sep 2019) | 2 lines
+Changed paths:
+   M /trunk/HandyNotes_DungeonLocations (Classic).lua
+   M /trunk/locales/Locales.xml
+   M /trunk/locales/deDE.lua
+   M /trunk/locales/itIT.lua
+
+Added recommened level range, localization update
+
+------------------------------------------------------------------------
+

@@ -5,13 +5,11 @@ local DT = E:GetModule('DataTexts')
 local strjoin = strjoin
 local format = format
 --WoW API / Variables
+local GetBagName = GetBagName
 local GetContainerNumFreeSlots = GetContainerNumFreeSlots
 local GetContainerNumSlots = GetContainerNumSlots
 local ToggleAllBags = ToggleAllBags
-local GetBackpackCurrencyInfo = GetBackpackCurrencyInfo
-local CURRENCY = CURRENCY
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
-local MAX_WATCHED_TOKENS = MAX_WATCHED_TOKENS
 
 local BAG_TYPES = {
 	[0x0001]  = 'Quiver',
@@ -44,7 +42,7 @@ local function OnEvent(self)
 			free, total = free + bagFreeSlots, total + GetContainerNumSlots(i)
 		end
 	end
-	self.text:SetFormattedText(displayString, L["Bags"]..': ', total - free, total)
+	self.text:SetFormattedText(displayString, L["Bags"]..': ', free, total)
 end
 
 local function OnClick()
@@ -59,12 +57,11 @@ local function OnEnter(self)
 		local bagTypeName = BAG_TYPES[bagType]
 
 		if bagTypeName then
-			local bagSlots = GetContainerNumSlots(i)
 			local bagName = GetBagName(i)
-			DT.tooltip:AddDoubleLine(bagName, format('%d/%d', bagSlots - bagFreeSlots, GetContainerNumSlots(i)))
+			local bagSlots = GetContainerNumSlots(i)
+			DT.tooltip:AddDoubleLine(bagName, format('%d/%d', bagFreeSlots, bagSlots))
 		end
-		
-	 end
+	end
 
 	DT.tooltip:Show()
 end

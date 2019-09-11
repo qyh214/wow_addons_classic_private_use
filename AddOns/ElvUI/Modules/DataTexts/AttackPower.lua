@@ -3,7 +3,7 @@ local DT = E:GetModule('DataTexts')
 
 --Lua functions
 local max = math.max
-local format, join = string.format, string.join
+local format, strjoin = format, strjoin
 --WoW API / Variables
 local ComputePetBonus = ComputePetBonus
 local UnitAttackPower = UnitAttackPower
@@ -66,7 +66,7 @@ local function OnEnter(self)
 end
 
 local function ValueColorUpdate(hex)
-	displayNumberString = join('', '%s: ', hex, '%d|r')
+	displayNumberString = strjoin('', '%s: ', hex, '%d|r')
 
 	if lastPanel ~= nil then
 		OnEvent(lastPanel)

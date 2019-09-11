@@ -18,6 +18,7 @@ local invDurability = {}
 local slots = {
 	["SecondaryHandSlot"] = L["Offhand"],
 	["MainHandSlot"] = L["Main Hand"],
+	["RangedSlot"] = L["Ranged"],
 	["FeetSlot"] = L["Feet"],
 	["LegsSlot"] = L["Legs"],
 	["HandsSlot"] = L["Hands"],

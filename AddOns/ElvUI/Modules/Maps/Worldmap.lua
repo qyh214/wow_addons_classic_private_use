@@ -7,7 +7,9 @@ local strfind = strfind
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local SetCVar = SetCVar
-local SetUIPanelAttribute = SetUIPanelAttribute
+local GetCVarBool = GetCVarBool
+local InCombatLockdown = InCombatLockdown
+local ShowUIPanel, HideUIPanel = ShowUIPanel, HideUIPanel
 local MOUSE_LABEL = MOUSE_LABEL:gsub('|T.-|t','')
 local PLAYER = PLAYER
 -- GLOBALS: WORLD_MAP_MIN_ALPHA, CoordsHolder
@@ -28,45 +30,28 @@ function M:SetLargeWorldMap()
 	local WorldMapFrame = _G.WorldMapFrame
 	WorldMapFrame:SetParent(E.UIParent)
 	WorldMapFrame:SetScale(1)
-	WorldMapFrame.ScrollContainer.Child:SetScale(smallerMapScale)
-
-	if WorldMapFrame:GetAttribute('UIPanelLayout-area') ~= 'center' then
-		SetUIPanelAttribute(WorldMapFrame, 'area', 'center');
-	end
-
-	if WorldMapFrame:GetAttribute('UIPanelLayout-allowOtherPanels') ~= true then
-		SetUIPanelAttribute(WorldMapFrame, 'allowOtherPanels', true)
-	end
-
 	WorldMapFrame:OnFrameSizeChanged()
+	WorldMapFrame.ScrollContainer.Child:SetScale(smallerMapScale)
+end
+
+function M:SetSmallWorldMap(smallerScale)
+	local WorldMapFrame = _G.WorldMapFrame
+	WorldMapFrame:SetParent(E.UIParent)
+	WorldMapFrame:SetScale(smallerScale)
+	WorldMapFrame:EnableKeyboard(false)
+	WorldMapFrame:EnableMouse(false)
+	WorldMapFrame:SetFrameStrata('HIGH')
+
+	_G.WorldMapTooltip:SetFrameLevel(WorldMapFrame.ScrollContainer:GetFrameLevel() + 110)
 end
 
 function M:GetCursorPosition()
+	local WorldMapFrame = _G.WorldMapFrame
 	local x,y = self.hooks[WorldMapFrame.ScrollContainer].GetCursorPosition(WorldMapFrame.ScrollContainer)
 	local s = WorldMapFrame:GetScale()
 
 	return x / s, y / s
 end
-
-function M:SetSmallWorldMap(smallerMapScale)
-	local WorldMapFrame = _G.WorldMapFrame
-	WorldMapFrame:SetParent(E.UIParent)
-	WorldMapFrame:SetScale(smallerMapScale)
-	WorldMapFrame:EnableKeyboard(false)
-	WorldMapFrame:EnableMouse(false)
-	WorldMapFrame:SetFrameStrata('HIGH')
-
-	if WorldMapFrame:GetAttribute('UIPanelLayout-area') ~= 'center' then
-		SetUIPanelAttribute(WorldMapFrame, 'area', 'center')
-	end
-
-	if WorldMapFrame:GetAttribute('UIPanelLayout-allowOtherPanels') ~= true then
-		SetUIPanelAttribute(WorldMapFrame, 'allowOtherPanels', true)
-	end
-
-	WorldMapTooltip:SetFrameLevel(WorldMapFrame.ScrollContainer:GetFrameLevel() + 110)
-end
-
 
 local inRestrictedArea = false
 function M:UpdateRestrictedArea()
@@ -119,6 +104,27 @@ function M:PositionCoords()
 	CoordsHolder.mouseCoords:Point(position, CoordsHolder.playerCoords, INVERTED_POINTS[position], 0, y)
 end
 
+function M:AllowMapFade()
+	return GetCVarBool('mapFade') and not _G.WorldMapFrame:IsMouseOver()
+end
+
+function M:SetMovementAlpha()
+	local WorldMapFrame = _G.WorldMapFrame
+	_G.PlayerMovementFrameFader.RemoveFrame(WorldMapFrame)
+	_G.PlayerMovementFrameFader.AddDeferredFrame(WorldMapFrame, E.global.general.mapAlphaWhenMoving, 1, .5, M.AllowMapFade)
+end
+
+function M:ToggleMapFix(event)
+	local WorldMapFrame = _G.WorldMapFrame
+	ShowUIPanel(WorldMapFrame)
+	WorldMapFrame:SetAttribute('UIPanelLayout-area', 'center')
+	WorldMapFrame:SetAttribute('UIPanelLayout-allowOtherPanels', true)
+	HideUIPanel(WorldMapFrame)
+
+	if event then
+		self:UnregisterEvent(event)
+	end
+end
 
 function M:Initialize()
 	self.Initialized = true
@@ -162,6 +168,12 @@ function M:Initialize()
 		WorldMapFrame.BlackoutFrame.Blackout:SetTexture()
 		WorldMapFrame.BlackoutFrame:EnableMouse(false)
 
+		if InCombatLockdown() then
+			self:RegisterEvent("PLAYER_REGEN_ENABLED", "ToggleMapFix")
+		else
+			self:ToggleMapFix()
+		end
+
 		self:SecureHookScript(WorldMapFrame, 'OnShow', function()
 			self:SetSmallWorldMap(smallerMapScale)
 
@@ -181,6 +193,8 @@ function M:Initialize()
 
 	--Enable/Disable map fading when moving
 	SetCVar('mapFade', (E.global.general.fadeMapWhenMoving == true and 1 or 0))
+
+	self:SetMovementAlpha()
 end
 
 E:RegisterInitialModule(M:GetName())

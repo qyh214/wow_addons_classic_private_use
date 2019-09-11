@@ -8,6 +8,7 @@ local tsort = table.sort
 local tremove = table.remove
 local random = math.random
 local LCD = LibStub('LibClassicDurations', true)
+local myClass = select(2, UnitClass("player"))
 
 local function Round(number, decimalPlaces)
 	if decimalPlaces and decimalPlaces > 0 then
@@ -241,6 +242,16 @@ local function Update(self, event, unit)
 			if durationNew and durationNew > 0 then
 				duration = durationNew
 				expirationTime = expirationTimeNew
+			end
+
+			if myClass == "SHAMAN" then
+				for slot = 1, 4 do
+					local _, _, start, durationTime, texture = GetTotemInfo(slot)
+					if icon == texture then
+						duration = durationTime
+						expirationTime = start + duration
+					end
+				end
 			end
 
 			if (auraBars.filter or DefaultFilter)(self, unit, name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellID, canApply, isBossDebuff, casterIsPlayer) then

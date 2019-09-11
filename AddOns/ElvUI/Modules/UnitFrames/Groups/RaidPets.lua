@@ -29,12 +29,12 @@ function UF:Construct_RaidpetFrames()
 	self.Debuffs = UF:Construct_Debuffs(self)
 	self.AuraWatch = UF:Construct_AuraWatch(self)
 	self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
-	--self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
+	self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
 	self.TargetGlow = UF:Construct_TargetGlow(self)
 	self.MouseGlow = UF:Construct_MouseGlow(self)
 	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
-	--self.HealthPrediction = UF:Construct_HealComm(self)
-	--self.Fader = UF:Construct_Fader()
+	self.HealthPrediction = UF:Construct_HealComm(self)
+	self.Fader = UF:Construct_Fader()
 	self.Cutaway = UF:Construct_Cutaway(self)
 
 	self.customTexts = {}
@@ -150,13 +150,13 @@ function UF:Update_RaidpetFrames(frame, db)
 	UF:Configure_RaidIcon(frame)
 
 	--Debuff Highlight
-	--UF:Configure_DebuffHighlight(frame)
+	UF:Configure_DebuffHighlight(frame)
 
 	--OverHealing
-	--UF:Configure_HealComm(frame)
+	UF:Configure_HealComm(frame)
 
 	--Fader
-	--UF:Configure_Fader(frame)
+	UF:Configure_Fader(frame)
 
 	--BuffIndicator
 	UF:UpdateAuraWatch(frame, true) --2nd argument is the petOverride

@@ -38,6 +38,10 @@ local function LoadSkin()
 	CommunitiesFrame.CommunitiesList.InsetFrame:StripTextures()
 
 	S:HandlePortraitFrame(CommunitiesFrame, true)
+	CommunitiesFrame.backdrop:SetPoint("TOPLEFT", -5, 0)
+	CommunitiesFrame.backdrop:SetPoint("BOTTOMRIGHT", -1, 0)
+
+	_G.CommunitiesFrameCloseButton:Point('TOPRIGHT', 2, 3)
 
 	local CommunitiesFrameCommunitiesList = _G.CommunitiesFrameCommunitiesList
 	CommunitiesFrameCommunitiesList.FilligreeOverlay:Hide()

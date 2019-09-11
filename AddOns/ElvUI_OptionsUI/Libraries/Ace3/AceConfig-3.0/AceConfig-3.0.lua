@@ -3,7 +3,7 @@
 -- as well as associate it with a slash command.
 -- @class file
 -- @name AceConfig-3.0
--- @release $Id: AceConfig-3.0.lua 1161 2017-08-12 14:30:16Z funkydude $
+-- @release $Id$
 
 --[[
 AceConfig-3.0

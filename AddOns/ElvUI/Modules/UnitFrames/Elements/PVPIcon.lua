@@ -9,12 +9,6 @@ function UF:Construct_PvPIcon(frame)
 	PvPIndicator:Size(30, 30)
 	PvPIndicator:Point('CENTER', frame, 'CENTER')
 
-	local Badge = frame.RaisedElementParent.TextureParent:CreateTexture(nil, 'ARTWORK')
-	Badge:Size(50, 52)
-	Badge:Point('CENTER', PvPIndicator, 'CENTER')
-
-	PvPIndicator.Badge = Badge
-
 	return PvPIndicator
 end
 
@@ -25,7 +19,6 @@ function UF:Configure_PVPIcon(frame)
 
 	local scale = frame.db.pvpIcon.scale or 1
 	PvPIndicator:Size(30 * scale)
-	PvPIndicator.Badge:Size(50 * scale, 52 * scale)
 
 	if frame.db.pvpIcon.enable and not frame:IsElementEnabled('PvPIndicator') then
 		frame:EnableElement('PvPIndicator')

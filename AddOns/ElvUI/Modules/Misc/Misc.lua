@@ -17,7 +17,6 @@ local GetNumGroupMembers = GetNumGroupMembers
 local GetRaidRosterInfo = GetRaidRosterInfo
 local GetRepairAllCost = GetRepairAllCost
 local InCombatLockdown = InCombatLockdown
-local IsAddOnLoaded = IsAddOnLoaded
 local IsGuildMember = IsGuildMember
 local IsCharacterFriend = C_FriendList.IsFriend
 local IsInGroup = IsInGroup
@@ -40,7 +39,7 @@ local LE_GAME_ERR_NOT_ENOUGH_MONEY = LE_GAME_ERR_NOT_ENOUGH_MONEY
 local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS
 local UIErrorsFrame = UIErrorsFrame
 
-local INTERRUPT_MSG = INTERRUPTED.." %s's \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r!"
+local INTERRUPT_MSG = INTERRUPTED.." %s's [%s]!"
 
 function M:ErrorFrameToggle(event)
 	if not E.db.general.hideErrorFrame then return end
@@ -52,13 +51,14 @@ function M:ErrorFrameToggle(event)
 end
 
 function M:COMBAT_LOG_EVENT_UNFILTERED()
+	if E.db.general.interruptAnnounce == 'NONE' then return end
 	local inGroup, inRaid = IsInGroup(), IsInRaid()
 	if not inGroup then return end -- not in group, exit.
 
-	local _, event, _, sourceGUID, _, _, _, _, destName, _, _, _, _, _, spellID, spellName = CombatLogGetCurrentEventInfo()
+	local _, event, _, sourceGUID, _, _, _, _, destName, _, _, _, _, _, _, spellName = CombatLogGetCurrentEventInfo()
 	if not (event == "SPELL_INTERRUPT" and (sourceGUID == E.myguid or sourceGUID == UnitGUID('pet'))) then return end -- No announce-able interrupt from player or pet, exit.
 
-	local interruptAnnounce, msg = E.db.general.interruptAnnounce, format(INTERRUPT_MSG, destName, spellID, spellName)
+	local interruptAnnounce, msg = E.db.general.interruptAnnounce, format(INTERRUPT_MSG, destName or UNKNOWN, spellName or UNKNOWN)
 	if interruptAnnounce == "PARTY" then
 		SendChatMessage(msg, "PARTY")
 	elseif interruptAnnounce == "RAID" then
@@ -184,50 +184,9 @@ function M:PLAYER_ENTERING_WORLD()
 	self:ToggleChatBubbleScript()
 end
 
---[[local function OnValueChanged(self, value)
-	local bar = _G.ElvUI_ChallengeModeTimer
-	bar.text:SetText(self:GetParent().TimeLeft:GetText())
-	bar:SetValue(value)
-
-	local r, g, b = E:ColorGradient(value / self:GetParent().timeLimit, 1, 0, 0, 1, 1, 0, 0, 1, 0)
-	bar:SetStatusBarColor(r, g, b)
-end
-
-local function ChallengeModeTimer_Update(timerID, elapsedTime, timeLimit)
-	local block = _G.ScenarioChallengeModeBlock;
-
-	_G.ElvUI_ChallengeModeTimer:SetMinMaxValues(0, block.timeLimit)
-	_G.ElvUI_ChallengeModeTimer:Show()
-	OnValueChanged(_G.ScenarioChallengeModeBlock.StatusBar, _G.ScenarioChallengeModeBlock.StatusBar:GetValue())
-end
-
-function M:SetupChallengeTimer()
-	local bar = CreateFrame("StatusBar", "ElvUI_ChallengeModeTimer", E.UIParent)
-	bar:Size(250, 20)
-	bar:Point("TOPLEFT", E.UIParent, "TOPLEFT", 10, -10)
-	bar:CreateBackdrop("Transparent")
-	bar:SetStatusBarTexture(E.media.normTex)
-	bar.text = bar:CreateFontString(nil, "OVERLAY")
-	bar.text:Point("CENTER")
-	bar.text:FontTemplate()
-
-	_G.ScenarioChallengeModeBlock.StatusBar:HookScript("OnValueChanged", OnValueChanged)
-	hooksecurefunc("Scenario_ChallengeMode_ShowBlock", ChallengeModeTimer_Update)
-end]]
-
 function M:ADDON_LOADED(_, addon)
 	if addon == "Blizzard_InspectUI" then
 		M:SetupInspectPageInfo()
-
-		--[[if IsAddOnLoaded("Blizzard_ObjectiveTracker") then
-			self:UnregisterEvent("ADDON_LOADED")
-		end]]
-	--[[elseif addon == "Blizzard_ObjectiveTracker" then
-		M:SetupChallengeTimer()
-
-		if IsAddOnLoaded("Blizzard_InspectUI") then
-			self:UnregisterEvent("ADDON_LOADED")
-		end	]]
 	end
 end
 
@@ -241,7 +200,7 @@ function M:Initialize()
 	self:RegisterEvent('MERCHANT_SHOW')
 	self:RegisterEvent('PLAYER_REGEN_DISABLED', 'ErrorFrameToggle')
 	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'ErrorFrameToggle')
-	if E.db.general.interruptAnnounce ~= "NONE" then self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED") end
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent('CHAT_MSG_BG_SYSTEM_HORDE', 'PVPMessageEnhancement')
 	self:RegisterEvent('CHAT_MSG_BG_SYSTEM_ALLIANCE', 'PVPMessageEnhancement')
 	self:RegisterEvent('CHAT_MSG_BG_SYSTEM_NEUTRAL', 'PVPMessageEnhancement')
@@ -249,25 +208,13 @@ function M:Initialize()
 	self:RegisterEvent('GROUP_ROSTER_UPDATE', 'AutoInvite')
 	self:RegisterEvent('CVAR_UPDATE', 'ForceCVars')
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-
-	--local blizzTracker = IsAddOnLoaded("Blizzard_ObjectiveTracker")
-	--local inspectUI = IsAddOnLoaded("Blizzard_InspectUI")
-
-	--if inspectUI then
-	--	M:SetupInspectPageInfo()
-	--end
-
-	--[[if blizzTracker then
-		M:SetupChallengeTimer()
-	end
-
-	if not blizzTracker or not inspectUI then
+--[[
+	if IsAddOnLoaded("Blizzard_InspectUI") then
+		M:SetupInspectPageInfo()
+	else
 		self:RegisterEvent("ADDON_LOADED")
-	end]]
-
-	--if not inspectUI then
-	--	self:RegisterEvent("ADDON_LOADED")
-	--end
+	end
+]]
 end
 
 E:RegisterModule(M:GetName())

@@ -394,7 +394,7 @@ local function Click(self, btn)
 	elseif InCombatLockdown() then
 		_G.UIErrorsFrame:AddMessage(E.InfoColor.._G.ERR_NOT_IN_COMBAT)
 	else
-		ToggleFriendsFrame()
+		ToggleFriendsFrame(1) -- Only open the FriendsTab here. Cause stupid Blizz
 	end
 end
 

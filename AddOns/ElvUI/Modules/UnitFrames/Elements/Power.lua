@@ -51,6 +51,13 @@ function UF:Construct_PowerBar(frame, bg, text, textPos)
 		power.value:Point(textPos, frame.Health, textPos, x, 0)
 	end
 
+	local clipFrame = CreateFrame('Frame', nil, power)
+	clipFrame:SetClipsChildren(true)
+	clipFrame:SetAllPoints()
+	clipFrame:EnableMouse(false)
+	clipFrame.__frame = frame
+	power.ClipFrame = clipFrame
+
 	power.useAtlas = false
 	power.colorDisconnected = false
 	power.colorTapping = false

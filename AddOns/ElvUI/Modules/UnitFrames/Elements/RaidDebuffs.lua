@@ -10,6 +10,7 @@ function UF:Construct_RaidDebuffs(frame)
 	local rdebuff = CreateFrame('Frame', nil, frame.RaisedElementParent)
 	rdebuff:SetTemplate(nil, nil, nil, UF.thinBorders, true)
 	rdebuff:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 20) --Make them appear above regular buffs or debuffs
+	rdebuff:Hide()
 
 	local offset = UF.thinBorders and E.mult or E.Border
 	rdebuff.icon = rdebuff:CreateTexture(nil, 'OVERLAY')

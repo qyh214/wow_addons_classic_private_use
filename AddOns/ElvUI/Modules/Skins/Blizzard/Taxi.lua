@@ -10,16 +10,19 @@ local function LoadSkin()
 
 	local TaxiFrame = _G.TaxiFrame
 	S:HandlePortraitFrame(TaxiFrame, true)
-	TaxiFrame.backdrop:Point('TOPLEFT', 15, -11)
-	TaxiFrame.backdrop:Point('BOTTOMRIGHT', -30, 76)
+	TaxiFrame.backdrop:Point('TOPLEFT', 11, -12)
+	TaxiFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
 
 	_G.TaxiMap:CreateBackdrop('Default')
-	_G.TaxiMap:Point('TOPLEFT', TaxiFrame, 'TOPLEFT', 27, -73)
-	_G.TaxiRouteMap:Point('TOPLEFT', TaxiFrame, 'TOPLEFT', 27, -73)
+	_G.TaxiMap:Point('TOPLEFT', 23, -70)
+	_G.TaxiRouteMap:Point('TOPLEFT', 23, -70)
 
 	_G.TaxiPortrait:Kill()
 
+	_G.TaxiMerchant:SetTextColor(1, 1, 1)
+
 	S:HandleCloseButton(_G.TaxiCloseButton, TaxiFrame.backdrop)
+	_G.TaxiCloseButton:Point('TOPRIGHT', -28, -9)
 end
 
 S:AddCallback('Taxi', LoadSkin)

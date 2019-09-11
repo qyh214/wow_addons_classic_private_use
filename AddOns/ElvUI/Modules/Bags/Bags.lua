@@ -39,8 +39,6 @@ local IsInventoryItemProfessionBag = IsInventoryItemProfessionBag
 local IsShiftKeyDown, IsControlKeyDown = IsShiftKeyDown, IsControlKeyDown
 local PickupContainerItem = PickupContainerItem
 local PlaySound = PlaySound
-local PutItemInBackpack = PutItemInBackpack
-local PutItemInBag = PutItemInBag
 local SetBagSlotFlag = SetBagSlotFlag
 local SetBankBagSlotFlag = SetBankBagSlotFlag
 local SetInsertItemsLeftToRight = SetInsertItemsLeftToRight
@@ -74,12 +72,13 @@ local NUM_BAG_SLOTS = NUM_BAG_SLOTS
 local NUM_BANKGENERIC_SLOTS = NUM_BANKGENERIC_SLOTS
 local NUM_CONTAINER_FRAMES = NUM_CONTAINER_FRAMES
 local NUM_LE_BAG_FILTER_FLAGS = NUM_LE_BAG_FILTER_FLAGS
+local LE_ITEM_CLASS_QUESTITEM = LE_ITEM_CLASS_QUESTITEM
+local BAG_FILTER_LABELS = BAG_FILTER_LABELS
 local SEARCH = SEARCH
 -- GLOBALS: ElvUIBags, ElvUIBagMover, ElvUIBankMover
 
-local MATCH_ITEM_LEVEL = ITEM_LEVEL:gsub('%%d', '(%%d+)')
-
 local ElvUIAssignBagDropdown
+local MATCH_ITEM_LEVEL = ITEM_LEVEL:gsub('%%d', '(%%d+)')
 local SEARCH_STRING = ""
 local BAG_FILTER_ICONS = {
 	[_G.LE_BAG_FILTER_FLAG_EQUIPMENT] = "Interface\\ICONS\\INV_Chest_Plate10",
@@ -814,6 +813,7 @@ function B:Layout(isBank)
 				if isBank then
 					f.ContainerHolder[i] = CreateFrame("CheckButton", "ElvUIBankBag" .. (bagID-4), f.ContainerHolder, "BankItemButtonBagTemplate")
 					B:CreateFilterIcon(f.ContainerHolder[i])
+					--[[
 					f.ContainerHolder[i]:SetScript('OnClick', function(holder, button)
 						if button == "RightButton" and holder.id then
 							ElvUIAssignBagDropdown.holder = holder
@@ -822,12 +822,13 @@ function B:Layout(isBank)
 							local inventoryID = holder:GetInventorySlot()
 							PutItemInBag(inventoryID);--Put bag on empty slot, or drop item in this bag
 						end
-					end)
+					end)]]
 				else
 					if bagID == 0 then --Backpack needs different setup
 						f.ContainerHolder[i] = CreateFrame("CheckButton", "ElvUIMainBagBackpack", f.ContainerHolder, "ItemButtonTemplate, ItemAnimTemplate")
 						B:CreateFilterIcon(f.ContainerHolder[i])
 						f.ContainerHolder[i]:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+						--[[
 						f.ContainerHolder[i]:SetScript('OnClick', function(holder, button)
 							if button == "RightButton" and holder.id then
 								ElvUIAssignBagDropdown.holder = holder
@@ -838,10 +839,11 @@ function B:Layout(isBank)
 						end)
 						f.ContainerHolder[i]:SetScript('OnReceiveDrag', function()
 							PutItemInBackpack();--Put bag on empty slot, or drop item in this bag
-						end)
+						end)]]
 					else
 						f.ContainerHolder[i] = CreateFrame("CheckButton", "ElvUIMainBag" .. (bagID-1) .. "Slot", f.ContainerHolder, "BagSlotButtonTemplate")
 						B:CreateFilterIcon(f.ContainerHolder[i])
+						--[[
 						f.ContainerHolder[i]:SetScript('OnClick', function(holder, button)
 							if button == "RightButton" and holder.id then
 								ElvUIAssignBagDropdown.holder = holder
@@ -850,11 +852,11 @@ function B:Layout(isBank)
 								local id = holder:GetID()
 								PutItemInBag(id);--Put bag on empty slot, or drop item in this bag
 							end
-						end)
+						end)]]
 					end
 				end
 
-				f.ContainerHolder[i]:SetTemplate(nil, true)
+				f.ContainerHolder[i]:SetTemplate(E.db.bags.transparent and 'Transparent', true)
 				f.ContainerHolder[i]:StyleButton()
 				f.ContainerHolder[i]:SetNormalTexture("")
 				f.ContainerHolder[i]:SetPushedTexture("")
@@ -922,7 +924,7 @@ function B:Layout(isBank)
 				if not f.Bags[bagID][slotID] then
 					f.Bags[bagID][slotID] = CreateFrame("CheckButton", f.Bags[bagID]:GetName()..'Slot'..slotID, f.Bags[bagID], bagID == -1 and 'BankItemButtonGenericTemplate' or 'ContainerFrameItemButtonTemplate');
 					f.Bags[bagID][slotID]:StyleButton()
-					f.Bags[bagID][slotID]:SetTemplate(nil, true)
+					f.Bags[bagID][slotID]:SetTemplate(E.db.bags.transparent and 'Transparent', true)
 					f.Bags[bagID][slotID]:SetNormalTexture(nil)
 					f.Bags[bagID][slotID]:SetCheckedTexture(nil)
 
@@ -1257,11 +1259,38 @@ function B:ContructContainerFrame(name, isBank)
 	f.ContainerHolder:Hide()
 
 	if isBank then
+		--Sort Button
+		f.sortButton = CreateFrame("Button", name..'SortButton', f)
+		f.sortButton:Size(16 + E.Border, 16 + E.Border)
+		f.sortButton:SetTemplate()
+		f.sortButton:Point('BOTTOMRIGHT', f.holderFrame, 'TOPRIGHT', -2, 4)
+		f.sortButton:SetNormalTexture("Interface\\AddOns\\ElvUI\\Media\\Textures\\INV_Pet_Broom")
+		f.sortButton:GetNormalTexture():SetTexCoord(unpack(E.TexCoords))
+		f.sortButton:GetNormalTexture():SetInside()
+		f.sortButton:SetPushedTexture("Interface\\AddOns\\ElvUI\\Media\\Textures\\INV_Pet_Broom")
+		f.sortButton:GetPushedTexture():SetTexCoord(unpack(E.TexCoords))
+		f.sortButton:GetPushedTexture():SetInside()
+		f.sortButton:SetDisabledTexture("Interface\\AddOns\\ElvUI\\Media\\Textures\\INV_Pet_Broom")
+		f.sortButton:GetDisabledTexture():SetTexCoord(unpack(E.TexCoords))
+		f.sortButton:GetDisabledTexture():SetInside()
+		f.sortButton:GetDisabledTexture():SetDesaturated(1)
+		f.sortButton:StyleButton(nil, true)
+		f.sortButton:SetScript('OnClick', function()
+			if f.holderFrame:IsShown() then
+				f:UnregisterAllEvents() --Unregister to prevent unnecessary updates
+				if not f.registerUpdate then B:SortingFadeBags(f, true) end
+				B:CommandDecorator(B.SortBags, 'bank')()
+			end
+		end)
+		if E.db.bags.disableBankSort then
+			f.sortButton:Disable()
+		end
+
 		--Toggle Bags Button
 		f.bagsButton = CreateFrame("Button", name..'BagsButton', f.holderFrame)
 		f.bagsButton:Size(16 + E.Border, 16 + E.Border)
 		f.bagsButton:SetTemplate()
-		f.bagsButton:Point('BOTTOMRIGHT', f.holderFrame, 'TOPRIGHT', -2, 4)
+		f.bagsButton:Point("RIGHT", f.sortButton, "LEFT", -5, 0)
 		f.bagsButton:SetNormalTexture("Interface\\Buttons\\Button-Backpack-Up")
 		f.bagsButton:GetNormalTexture():SetTexCoord(unpack(E.TexCoords))
 		f.bagsButton:GetNormalTexture():SetInside()

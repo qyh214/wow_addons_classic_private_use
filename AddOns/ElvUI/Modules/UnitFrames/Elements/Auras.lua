@@ -350,23 +350,6 @@ function UF:SortAuras()
 end
 
 function UF:PostUpdateAura(unit, button, index)
-	local Name, _, _, _, Duration, ExpirationTime, UnitCaster, _, _, SpellID = UnitAura(unit, index, button.filter)
-
-	if Duration == 0 and ExpirationTime == 0 then
-		Duration, ExpirationTime = E.Libs.LCD:GetAuraDurationByUnit(unit, SpellID, UnitCaster, Name)
-
-		button.IsLibClassicDuration = true
-	end
-
-	if (button.cd) and (button.IsLibClassicDuration) then
-		if (Duration and Duration > 0) then
-			button.cd:SetCooldown(ExpirationTime - Duration, Duration)
-			button.cd:Show()
-		else
-			button.cd:Hide()
-		end
-	end
-
 	if button.isDebuff then
 		if(not button.isFriend and not button.isPlayer) then --[[and (not E.isDebuffWhiteList[name])]]
 			button:SetBackdropBorderColor(0.9, 0.1, 0.1)

@@ -199,7 +199,7 @@ function AB:SetupMicroBar()
 	self:SecureHook('MainMenuMicroButton_SetNormal')
 	self:SecureHook('UpdateMicroButtonsParent')
 	self:SecureHook('MoveMicroButtons', 'UpdateMicroPositionDimensions')
-	UpdateMicroButtonsParent(microBar)
+	_G.UpdateMicroButtonsParent(microBar)
 	self:MainMenuMicroButton_SetNormal()
 	self:UpdateMicroPositionDimensions()
 

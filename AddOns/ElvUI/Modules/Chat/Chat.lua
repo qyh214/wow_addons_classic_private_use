@@ -79,7 +79,6 @@ local UnitRealmRelationship = UnitRealmRelationship
 
 local BNET_CLIENT_WOW = BNET_CLIENT_WOW
 local C_Club_GetInfoFromLastCommunityChatLine = C_Club.GetInfoFromLastCommunityChatLine
-local Chat_ShouldColorChatByClass = Chat_ShouldColorChatByClass
 local ChatFrame_ResolvePrefixedChannelName = ChatFrame_ResolvePrefixedChannelName
 local GetBNPlayerCommunityLink = GetBNPlayerCommunityLink
 local GetPlayerCommunityLink = GetPlayerCommunityLink

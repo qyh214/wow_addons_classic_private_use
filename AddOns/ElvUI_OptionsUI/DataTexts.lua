@@ -318,6 +318,41 @@ E.Options.args.datatexts = {
 				},
 			},
 		},
+		currencies = {
+			order = 5,
+			type = "group",
+			name = L["CURRENCY"],
+			args = {
+				header = {
+					order = 1,
+					type = "header",
+					name = L["CURRENCY"],
+				},
+				goldFormat = {
+					order = 2,
+					type = 'select',
+					name = L["Gold Format"],
+					desc = L["The display format of the money text that is shown in the gold datatext and its tooltip."],
+					hidden = function() return (E.db.datatexts.currencies.displayedCurrency ~= "GOLD") end,
+					values = {
+						['SMART'] = L["Smart"],
+						['FULL'] = L["Full"],
+						['SHORT'] = L["SHORT"],
+						['SHORTINT'] = L["Short (Whole Numbers)"],
+						['CONDENSED'] = L["Condensed"],
+						['BLIZZARD'] = L["Blizzard Style"],
+						['BLIZZARD2'] = L["Blizzard Style"].." 2",
+					},
+				},
+				goldCoins = {
+					order = 3,
+					type = 'toggle',
+					name = L["Show Coins"],
+					desc = L["Use coin icons instead of colored text."],
+					hidden = function() return (E.db.datatexts.currencies.displayedCurrency ~= "GOLD") end,
+				},
+			},
+		},
 		time = {
 			order = 6,
 			type = "group",

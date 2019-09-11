@@ -17,7 +17,6 @@ local AutoCastShine_AutoCastStart = AutoCastShine_AutoCastStart
 local AutoCastShine_AutoCastStop = AutoCastShine_AutoCastStop
 local GetPetActionSlotUsable = GetPetActionSlotUsable
 local SetDesaturation = SetDesaturation
-local PetActionBar_ShowGrid = PetActionBar_ShowGrid
 local PetActionBar_UpdateCooldowns = PetActionBar_UpdateCooldowns
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
 -- GLOBALS: ElvUI_Bar4
@@ -29,9 +28,9 @@ local bar = CreateFrame('Frame', 'ElvUI_BarPet', E.UIParent, 'SecureHandlerState
 bar:SetFrameStrata("LOW")
 
 function AB:UpdatePet(event, unit)
-	if(event == "UNIT_AURA" and unit ~= "pet") then return end
+	if (event == "UNIT_AURA" and unit ~= "pet") then return end
 
-	for i=1, NUM_PET_ACTION_SLOTS, 1 do
+	for i = 1, NUM_PET_ACTION_SLOTS, 1 do
 		local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID = GetPetActionInfo(i)
 		local buttonName = "PetActionButton"..i
 		local autoCast = _G[buttonName.."AutoCastable"]
@@ -56,7 +55,7 @@ function AB:UpdatePet(event, unit)
 			end)
 		end
 
-		if isActive and name ~= "PET_ACTION_FOLLOW" then
+		if isActive then
 			button:SetChecked(true)
 
 			if IsPetAttackAction(i) then
@@ -94,7 +93,7 @@ function AB:UpdatePet(event, unit)
 			button.ICON:Hide()
 		end
 
-		if not PetHasActionBar() and texture and name ~= "PET_ACTION_FOLLOW" then
+		if not PetHasActionBar() and texture then
 			PetActionButton_StopFlash(button)
 			SetDesaturation(button.ICON, 1)
 			button:SetChecked(0)
@@ -168,13 +167,13 @@ function AB:PositionAndSizeBarPet()
 	end
 
 	bar.mouseover = self.db.barPet.mouseover
-	if(bar.mouseover) then
+	if bar.mouseover then
 		bar:SetAlpha(0)
 	else
 		bar:SetAlpha(bar.db.alpha)
 	end
 
-	if(self.db.barPet.inheritGlobalFade) then
+	if self.db.barPet.inheritGlobalFade then
 		bar:SetParent(self.fadeParent)
 	else
 		bar:SetParent(E.UIParent)
@@ -182,7 +181,7 @@ function AB:PositionAndSizeBarPet()
 
 	local button, lastButton, lastColumnButton, autoCast
 	local firstButtonSpacing = (self.db.barPet.backdrop == true and (E.Border + backdropSpacing) or E.Spacing)
-	for i=1, NUM_PET_ACTION_SLOTS do
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		button = _G["PetActionButton"..i]
 		lastButton = _G["PetActionButton"..i-1]
 		autoCast = _G["PetActionButton"..i..'AutoCastable']
@@ -190,7 +189,6 @@ function AB:PositionAndSizeBarPet()
 
 		button:SetParent(bar)
 		button:ClearAllPoints()
-		button:SetAttribute("showgrid", 1)
 		button:Size(size)
 
 		autoCast:SetOutside(button, autoCastSize, autoCastSize)
@@ -251,7 +249,7 @@ function AB:PositionAndSizeBarPet()
 end
 
 function AB:UpdatePetCooldownSettings()
-	for i=1, NUM_PET_ACTION_SLOTS do
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = _G["PetActionButton"..i]
 		if button and button.cooldown then
 			button.cooldown:SetDrawBling(not self.db.hideCooldownBling)
@@ -260,7 +258,7 @@ function AB:UpdatePetCooldownSettings()
 end
 
 function AB:UpdatePetBindings()
-	for i=1, NUM_PET_ACTION_SLOTS do
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		if self.db.hotkeytext then
 			local key = GetBindingKey("BONUSACTIONBUTTON"..i)
 			_G["PetActionButton"..i.."HotKey"]:Show()
@@ -290,7 +288,7 @@ function AB:CreateBarPet()
 	]])
 
 	bar:SetScript("OnHide", function()
-		for i=1, NUM_PET_ACTION_SLOTS, 1 do
+		for i = 1, NUM_PET_ACTION_SLOTS, 1 do
 			local button = _G["PetActionButton"..i]
 			if button.spellDataLoadedCancelFunc then
 				button.spellDataLoadedCancelFunc()
@@ -298,9 +296,6 @@ function AB:CreateBarPet()
 			end
 		end
 	end)
-
-	_G.PetActionBarFrame.showgrid = 1
-	PetActionBar_ShowGrid()
 
 	self:RegisterEvent('PET_BAR_UPDATE', 'UpdatePet')
 	self:RegisterEvent('PLAYER_CONTROL_GAINED', 'UpdatePet')
@@ -313,12 +308,14 @@ function AB:CreateBarPet()
 	self:RegisterEvent('PET_BAR_UPDATE_COOLDOWN', PetActionBar_UpdateCooldowns)
 
 	E:CreateMover(bar, 'PetAB', L["Pet Bar"], nil, nil, nil, 'ALL,ACTIONBARS', nil, 'actionbar,barPet')
+
 	self:PositionAndSizeBarPet()
 	self:UpdatePetBindings()
 
 	self:HookScript(bar, 'OnEnter', 'Bar_OnEnter')
 	self:HookScript(bar, 'OnLeave', 'Bar_OnLeave')
-	for i=1, NUM_PET_ACTION_SLOTS do
+
+	for i = 1, NUM_PET_ACTION_SLOTS do
 		local button = _G["PetActionButton"..i]
 		if not button.ICON then
 			button.ICON = button:CreateTexture("PetActionButton"..i..'ICON')

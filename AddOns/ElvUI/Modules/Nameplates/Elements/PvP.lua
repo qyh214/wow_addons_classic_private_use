@@ -3,7 +3,6 @@ local NP = E:GetModule('NamePlates')
 
 -- Cache global variables
 -- Lua functions
-local strlower = strlower
 -- WoW API / Variables
 
 function NP:Construct_PvPIndicator(nameplate)

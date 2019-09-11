@@ -95,6 +95,7 @@ V.skins = {
 		greeting = true,
 		worldmap = true,
 		taxi = true,
+		timemanger = true,
 		tooltip = true,
 		quest = true,
 		questChoice = true,

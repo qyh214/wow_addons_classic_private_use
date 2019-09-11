@@ -13,6 +13,7 @@ local GetItemQualityColor = GetItemQualityColor
 local GetCraftItemLink = GetCraftItemLink
 local GetCraftReagentInfo = GetCraftReagentInfo
 local GetCraftReagentItemLink = GetCraftReagentItemLink
+
 local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()

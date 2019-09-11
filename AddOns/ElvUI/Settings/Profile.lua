@@ -208,6 +208,7 @@ P.bags = {
 	strata = 'HIGH',
 	qualityColors = true,
 	showBindType = false,
+	transparent = false,
 	colors = {
 		profession = {
 			leatherworking = { r = .88, g = .73, b = .29 },
@@ -284,7 +285,7 @@ P.bags = {
 		backdropSpacing = 4,
 		showBackdrop = false,
 		mouseover = false,
-		visibility = '[petbattle] hide; show',
+		visibility = 'show',
 	},
 };
 
@@ -483,6 +484,7 @@ P.nameplates = {
 				width = 28,
 				xOffset = 3,
 				yOffset = -5,
+				overlayAlpha = 0.35,
 			},
 			visibility = {
 				hideDelay = 3,
@@ -714,6 +716,7 @@ P.nameplates = {
 				width = 28,
 				xOffset = 3,
 				yOffset = -5,
+				overlayAlpha = 0.35,
 			},
 			markHealers = true,
 			health = {
@@ -927,6 +930,7 @@ P.nameplates = {
 				width = 28,
 				xOffset = 3,
 				yOffset = -5,
+				overlayAlpha = 0.35,
 			},
 			markHealers = true,
 			health = {
@@ -1139,6 +1143,7 @@ P.nameplates = {
 				width = 28,
 				xOffset = 3,
 				yOffset = -5,
+				overlayAlpha = 0.35,
 			},
 			health = {
 				enable = true,
@@ -1356,6 +1361,7 @@ P.nameplates = {
 				width = 28,
 				xOffset = 3,
 				yOffset = -5,
+				overlayAlpha = 0.35,
 			},
 			health = {
 				enable = true,
@@ -2096,6 +2102,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -2322,6 +2329,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = true,
@@ -2488,6 +2496,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -2615,6 +2624,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -2747,6 +2757,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -2909,6 +2920,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -3057,6 +3069,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -3330,6 +3343,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -3551,6 +3565,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -3756,6 +3771,7 @@ P.unitframe = {
 				style = '3D',
 				xOffset = 0,
 				yOffset = 0,
+				overlayAlpha = 0.35,
 			},
 			buffs = {
 				enable = false,
@@ -4176,6 +4192,7 @@ P.actionbar = {
 
 	keyDown = true,
 	movementModifier = 'SHIFT',
+	transparent = false,
 	cooldown = {
 		threshold = 4,
 		override = false,
@@ -4204,7 +4221,7 @@ P.actionbar = {
 	microbar = {
 		enabled = false,
 		mouseover = false,
-		buttonsPerRow = 11,
+		buttonsPerRow = 8,
 		buttonSize = 20,
 		buttonSpacing = 2,
 		alpha = 1,
@@ -4241,9 +4258,9 @@ P.actionbar = {
 			PRIEST = '[bonusbar:1] 7;',
 			ROGUE = '[stance:1] 7;  [stance:2] 7; [stance:3] 7;', -- set to '[stance:1] 7; [stance:3] 10;' if you want a shadow dance bar
 			MONK = '[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;',
-			WARRIOR = '[bonusbar:1] 7; [bonusbar:2] 8;'
+			WARRIOR = '[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3]9;'
 		},
-		visibility = '[petbattle] hide; show',
+		visibility = 'show',
 	},
 	bar2 = {
 		enabled = false,
@@ -4262,7 +4279,7 @@ P.actionbar = {
 		showGrid = true,
 		flyoutDirection = 'AUTOMATIC',
 		paging = {},
-		visibility = '[overridebar] hide; [petbattle] hide; show',
+		visibility = 'show',
 	},
 	bar3 = {
 		enabled = true,
@@ -4281,7 +4298,7 @@ P.actionbar = {
 		showGrid = true,
 		flyoutDirection = 'AUTOMATIC',
 		paging = {},
-		visibility = '[overridebar] hide; [petbattle] hide; show',
+		visibility = 'show',
 	},
 	bar4 = {
 		enabled = true,
@@ -4300,7 +4317,7 @@ P.actionbar = {
 		showGrid = true,
 		flyoutDirection = 'AUTOMATIC',
 		paging = {},
-		visibility = '[overridebar] hide; [petbattle] hide; show',
+		visibility = 'show',
 	},
 	bar5 = {
 		enabled = true,
@@ -4319,7 +4336,7 @@ P.actionbar = {
 		showGrid = true,
 		flyoutDirection = 'AUTOMATIC',
 		paging = {},
-		visibility = '[overridebar] hide; [petbattle] hide; show',
+		visibility = 'show',
 	},
 	bar6 = {
 		enabled = false,
@@ -4338,7 +4355,7 @@ P.actionbar = {
 		showGrid = true,
 		flyoutDirection = 'AUTOMATIC',
 		paging = {},
-		visibility = '[overridebar] hide; [petbattle] hide; show',
+		visibility = 'show',
 	},
 	barPet = {
 		enabled = true,

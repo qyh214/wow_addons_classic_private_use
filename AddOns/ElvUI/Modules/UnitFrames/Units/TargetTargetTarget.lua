@@ -11,7 +11,7 @@ local tinsert = tinsert
 function UF:Construct_TargetTargetTargetFrame(frame)
 	frame.Health = self:Construct_HealthBar(frame, true, true, 'RIGHT')
 	frame.Power = self:Construct_PowerBar(frame, true, true, 'LEFT')
-	--frame.PowerPrediction = self:Construct_PowerPrediction(frame)
+	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
 	frame.Name = self:Construct_NameText(frame)
 	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
 	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
@@ -22,7 +22,7 @@ function UF:Construct_TargetTargetTargetFrame(frame)
 	frame.MouseGlow = self:Construct_MouseGlow(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 	frame.Cutaway = self:Construct_Cutaway(frame)
-	--frame.Fader = self:Construct_Fader()
+	frame.Fader = self:Construct_Fader()
 	frame.customTexts = {}
 
 	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 160) --Set to default position
@@ -77,7 +77,7 @@ function UF:Update_TargetTargetTargetFrame(frame, db)
 	UF:Configure_Power(frame)
 
 	--Power Predicition
-	--UF:Configure_PowerPrediction(frame)
+	UF:Configure_PowerPrediction(frame)
 
 	--Portrait
 	UF:Configure_Portrait(frame)
@@ -88,7 +88,7 @@ function UF:Update_TargetTargetTargetFrame(frame, db)
 	UF:Configure_Auras(frame, 'Debuffs')
 
 	--Fader
-	--UF:Configure_Fader(frame)
+	UF:Configure_Fader(frame)
 
 	--Raid Icon
 	UF:Configure_RaidIcon(frame)

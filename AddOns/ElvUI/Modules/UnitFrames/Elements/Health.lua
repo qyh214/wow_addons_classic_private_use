@@ -216,7 +216,7 @@ function UF:Configure_HealthBar(frame)
 	UF:UpdatePredictionStatusBar(frame.HealthPrediction, frame.Health, "Health")
 
 	--Highlight Texture
-	UF:Configure_HighlightGlow(frame)
+	UF:Configure_FrameGlow(frame)
 
 	if frame:IsElementEnabled("Health") then
 	    frame.Health:ForceUpdate()

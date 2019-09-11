@@ -14,12 +14,11 @@ local CompactRaidFrameManager_GetSetting = CompactRaidFrameManager_GetSetting
 local CompactRaidFrameManager_SetSetting = CompactRaidFrameManager_SetSetting
 local CompactRaidFrameManager_UpdateShown = CompactRaidFrameManager_UpdateShown
 local CreateFrame = CreateFrame
+local IsInInstance = IsInInstance
 local GetInstanceInfo = GetInstanceInfo
 local hooksecurefunc = hooksecurefunc
 local InCombatLockdown = InCombatLockdown
-local IsAddOnLoaded = IsAddOnLoaded
 local RegisterStateDriver = RegisterStateDriver
-local SetCVar = SetCVar
 local UnitFrame_OnEnter = UnitFrame_OnEnter
 local UnitFrame_OnLeave = UnitFrame_OnLeave
 local UnregisterAttributeDriver = UnregisterAttributeDriver
@@ -476,7 +475,6 @@ function UF:Configure_Fader(frame)
 		frame.Fader:SetOption('Focus', frame.db.fader.focus)
 		frame.Fader:SetOption('Health', frame.db.fader.health)
 		frame.Fader:SetOption('Power', frame.db.fader.power)
-		frame.Fader:SetOption('Vehicle', frame.db.fader.vehicle)
 		frame.Fader:SetOption('Casting', frame.db.fader.casting)
 		frame.Fader:SetOption('MinAlpha', frame.db.fader.minAlpha)
 		frame.Fader:SetOption('MaxAlpha', frame.db.fader.maxAlpha)
@@ -1387,7 +1385,7 @@ function UF:Initialize()
 
 	local ElvUF_Parent = CreateFrame('Frame', 'ElvUF_Parent', E.UIParent, 'SecureHandlerStateTemplate');
 	ElvUF_Parent:SetFrameStrata("LOW")
-	RegisterStateDriver(ElvUF_Parent, "visibility", "[petbattle] hide; show")
+	RegisterStateDriver(ElvUF_Parent, "visibility", "show")
 
 	self:UpdateColors()
 	ElvUF:RegisterStyle('ElvUF', function(frame, unit)
@@ -1420,8 +1418,6 @@ function UF:Initialize()
 	if (not E.private.unitframe.disabledBlizzardFrames.party) and (not E.private.unitframe.disabledBlizzardFrames.raid) then
 		E.RaidUtility.Initialize = E.noop
 	end
-
-	self:UpdateRangeCheckSpells()
 
 	local ORD = ns.oUF_RaidDebuffs or _G.oUF_RaidDebuffs
 	if ORD then

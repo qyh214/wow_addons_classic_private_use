@@ -238,17 +238,12 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.actionbar.bar2.buttonsize = 38
 		E.db.actionbar.bar2.buttonspacing = 1
 		E.db.actionbar.bar2.enabled = true
-		E.db.actionbar.bar2.visibility = "[petbattle] hide; show"
 		E.db.actionbar.bar3.buttons = 8
 		E.db.actionbar.bar3.buttonsize = 50
 		E.db.actionbar.bar3.buttonspacing = 1
 		E.db.actionbar.bar3.buttonsPerRow = 10
-		E.db.actionbar.bar3.visibility = "[petbattle] hide; show"
 		E.db.actionbar.bar4.enabled = false
-		E.db.actionbar.bar4.visibility = "[petbattle] hide; show"
 		E.db.actionbar.bar5.enabled = false
-		E.db.actionbar.bar5.visibility = "[petbattle] hide; show"
-		E.db.actionbar.bar6.visibility = "[petbattle] hide; show"
 		--Auras
 		E.db.auras.buffs.countFontSize = 10
 		E.db.auras.buffs.size = 40

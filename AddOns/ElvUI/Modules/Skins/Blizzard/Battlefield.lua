@@ -12,7 +12,7 @@ local function LoadSkin()
 	BattlefieldFrame:StripTextures()
 	BattlefieldFrame:CreateBackdrop('Transparent')
 	BattlefieldFrame.backdrop:Point('TOPLEFT', 11, -12)
-	BattlefieldFrame.backdrop:Point('BOTTOMRIGHT', -34, 74)
+	BattlefieldFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
 
 	_G.BattlefieldListScrollFrame:StripTextures()
 	S:HandleScrollBar(_G.BattlefieldListScrollFrameScrollBar)

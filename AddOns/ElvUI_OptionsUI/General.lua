@@ -527,6 +527,7 @@ E.Options.args.general = {
 					get = function(info) return E.private.general.raidUtility end,
 					set = function(info, value) E.private.general.raidUtility = value; E:StaticPopup_Show("PRIVATE_RL") end
 				},
+--[=[
 				itemLevelInfo = {
 					order = 11,
 					name = L["Item Level"],
@@ -589,6 +590,7 @@ E.Options.args.general = {
 						},
 					},
 				},
+]=]
 			},
 		},
 		misc = {

@@ -36,13 +36,7 @@ function NP:Update_QuestIcons(nameplate)
 		end
 
 		nameplate.QuestIcons:ClearAllPoints()
-		nameplate.QuestIcons:Point(
-			E.InversePoints[db.questIcon.position],
-			nameplate,
-			db.questIcon.position,
-			db.questIcon.xOffset,
-			db.questIcon.yOffset
-		)
+		nameplate.QuestIcons:Point(E.InversePoints[db.questIcon.position], nameplate, db.questIcon.position, db.questIcon.xOffset, db.questIcon.yOffset)
 
 		nameplate.QuestIcons:Size(db.questIcon.size + 4, db.questIcon.size + 4)
 		nameplate.QuestIcons.Item:Size(db.questIcon.size, db.questIcon.size)
@@ -57,10 +51,7 @@ function NP:Update_QuestIcons(nameplate)
 end
 
 function NP:Construct_ClassificationIndicator(nameplate)
-	local ClassificationIndicator =
-		nameplate:CreateTexture(nameplate:GetDebugName() .. "ClassificationIndicator", "OVERLAY")
-
-	return ClassificationIndicator
+	return nameplate:CreateTexture(nameplate:GetDebugName() .. "ClassificationIndicator", "OVERLAY")
 end
 
 function NP:Update_ClassificationIndicator(nameplate)
@@ -74,13 +65,7 @@ function NP:Update_ClassificationIndicator(nameplate)
 		nameplate.ClassificationIndicator:ClearAllPoints()
 		nameplate.ClassificationIndicator:Size(db.eliteIcon.size, db.eliteIcon.size)
 
-		nameplate.ClassificationIndicator:Point(
-			E.InversePoints[db.eliteIcon.position],
-			nameplate,
-			db.eliteIcon.position,
-			db.eliteIcon.xOffset,
-			db.eliteIcon.yOffset
-		)
+		nameplate.ClassificationIndicator:Point(E.InversePoints[db.eliteIcon.position], nameplate, db.eliteIcon.position, db.eliteIcon.xOffset, db.eliteIcon.yOffset)
 	else
 		if nameplate:IsElementEnabled("ClassificationIndicator") then
 			nameplate:DisableElement("ClassificationIndicator")
@@ -134,32 +119,20 @@ function NP:Update_TargetIndicator(nameplate)
 			nameplate.TargetIndicator.style = "style2"
 		end
 
-		if
-			nameplate.TargetIndicator.TopIndicator and (GlowStyle == "style3" or GlowStyle == "style5" or GlowStyle == "style6")
-		 then
+		if nameplate.TargetIndicator.TopIndicator and (GlowStyle == "style3" or GlowStyle == "style5" or GlowStyle == "style6") then
 			nameplate.TargetIndicator.TopIndicator:Point("BOTTOM", nameplate.Health, "TOP", 0, -6)
-
 			nameplate.TargetIndicator.TopIndicator:SetVertexColor(Color.r, Color.g, Color.b, Color.a)
 		end
 
-		if
-			(nameplate.TargetIndicator.LeftIndicator and nameplate.TargetIndicator.RightIndicator) and
-				(GlowStyle == "style4" or GlowStyle == "style7" or GlowStyle == "style8")
-		 then
+		if (nameplate.TargetIndicator.LeftIndicator and nameplate.TargetIndicator.RightIndicator) and (GlowStyle == "style4" or GlowStyle == "style7" or GlowStyle == "style8") then
 			nameplate.TargetIndicator.LeftIndicator:Point("LEFT", nameplate.Health, "RIGHT", -3, 0)
 			nameplate.TargetIndicator.RightIndicator:Point("RIGHT", nameplate.Health, "LEFT", 3, 0)
-
 			nameplate.TargetIndicator.LeftIndicator:SetVertexColor(Color.r, Color.g, Color.b, Color.a)
 			nameplate.TargetIndicator.RightIndicator:SetVertexColor(Color.r, Color.g, Color.b, Color.a)
 		end
 
 		if nameplate.TargetIndicator.Shadow and (GlowStyle == "style1" or GlowStyle == "style5" or GlowStyle == "style7") then
-			nameplate.TargetIndicator.Shadow:SetOutside(
-				nameplate.Health,
-				E:Scale(E.PixelMode and 6 or 8),
-				E:Scale(E.PixelMode and 6 or 8)
-			)
-
+			nameplate.TargetIndicator.Shadow:SetOutside(nameplate.Health, E:Scale(E.PixelMode and 6 or 8), E:Scale(E.PixelMode and 6 or 8))
 			nameplate.TargetIndicator.Shadow:SetBackdropBorderColor(Color.r, Color.g, Color.b)
 			nameplate.TargetIndicator.Shadow:SetAlpha(Color.a)
 		end
@@ -169,7 +142,6 @@ function NP:Update_TargetIndicator(nameplate)
 
 			nameplate.TargetIndicator.Spark:Point("TOPLEFT", nameplate.Health, "TOPLEFT", -(size * 2), size)
 			nameplate.TargetIndicator.Spark:Point("BOTTOMRIGHT", nameplate.Health, "BOTTOMRIGHT", (size * 2), -size)
-
 			nameplate.TargetIndicator.Spark:SetVertexColor(Color.r, Color.g, Color.b, Color.a)
 		end
 	end
@@ -210,31 +182,6 @@ function NP:Update_Highlight(nameplate)
 	end
 end
 
-function NP:Construct_HealerSpecs(nameplate)
-	local texture = nameplate:CreateTexture(nameplate:GetDebugName() .. "HealerSpecs", "OVERLAY")
-	texture:Size(40, 40)
-	texture:SetTexture(E.Media.Textures.Healer)
-	texture:Hide()
-
-	return texture
-end
-
-function NP:Update_HealerSpecs(nameplate)
-	local db = NP.db.units[nameplate.frameType]
-
-	if (nameplate.frameType == "FRIENDLY_PLAYER" or nameplate.frameType == "ENEMY_PLAYER") and db.markHealers then
-		if not nameplate:IsElementEnabled("HealerSpecs") then
-			nameplate:EnableElement("HealerSpecs")
-		end
-
-		nameplate.HealerSpecs:Point("RIGHT", nameplate.Health, "LEFT", -6, 0)
-	else
-		if nameplate:IsElementEnabled("HealerSpecs") then
-			nameplate:DisableElement("HealerSpecs")
-		end
-	end
-end
-
 function NP:Update_Fader(nameplate)
 	local db = NP.db.units[nameplate.frameType]
 
@@ -271,29 +218,27 @@ end
 function NP:Construct_Cutaway(nameplate)
 	local Cutaway = {}
 
-	Cutaway.Health = CreateFrame("StatusBar", nameplate:GetDebugName() .. "CutawayHealth", nameplate.Health.ClipFrame)
+	Cutaway.Health = nameplate.Health.ClipFrame:CreateTexture(nameplate:GetDebugName() .. "CutawayHealth")
 	if NP.db.cutaway.health.forceBlankTexture then
-		Cutaway.Health:SetStatusBarTexture(E.media.blankTex)
+		Cutaway.Health:SetTexture(E.media.blankTex)
 	else
-		Cutaway.Health:SetStatusBarTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
+		Cutaway.Health:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
 		NP.StatusBars[Cutaway.Health] = true
 	end
 
 	local healthTexture = nameplate.Health:GetStatusBarTexture()
-	Cutaway.Health:SetFrameLevel(5)
 	Cutaway.Health:SetPoint("TOPLEFT", healthTexture, "TOPRIGHT")
 	Cutaway.Health:SetPoint("BOTTOMLEFT", healthTexture, "BOTTOMRIGHT")
 
-	Cutaway.Power = CreateFrame("StatusBar", nameplate:GetDebugName() .. "CutawayPower", nameplate.Power)
+	Cutaway.Power = nameplate.Power.ClipFrame:CreateTexture(nameplate:GetDebugName() .. "CutawayPower")
 	if NP.db.cutaway.power.forceBlankTexture then
-		Cutaway.Power:SetStatusBarTexture(E.media.blankTex)
+		Cutaway.Power:SetTexture(E.media.blankTex)
 	else
-		Cutaway.Power:SetStatusBarTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
+		Cutaway.Power:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
 		NP.StatusBars[Cutaway.Power] = true
 	end
 
 	local powerTexture = nameplate.Power:GetStatusBarTexture()
-	Cutaway.Power:SetFrameLevel(5)
 	Cutaway.Power:SetPoint("TOPLEFT", powerTexture, "TOPRIGHT")
 	Cutaway.Power:SetPoint("BOTTOMLEFT", powerTexture, "BOTTOMRIGHT")
 
@@ -314,38 +259,16 @@ function NP:Update_Cutaway(nameplate)
 	end
 end
 
-function NP:Construct_NazjatarFollowerXP(nameplate)
-	local NazjatarFollowerXP = CreateFrame("StatusBar", nameplate:GetDebugName() .. "NazjatarFollowerXP", nameplate)
-
-	NazjatarFollowerXP:SetFrameStrata(nameplate:GetFrameStrata())
-	NazjatarFollowerXP:SetFrameLevel(5)
-	NazjatarFollowerXP:CreateBackdrop("Transparent")
-	NazjatarFollowerXP:SetStatusBarTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
-
-	NP.StatusBars[NazjatarFollowerXP] = true
-
-	return NazjatarFollowerXP
-end
-
-function NP:Update_NazjatarFollowerXP(nameplate)
-	local db = NP.db.units[nameplate.frameType]
-	if not db.nazjatarFollowerXP or not db.nazjatarFollowerXP.enable then
-		if nameplate:IsElementEnabled("NazjatarFollowerXP") then
-			nameplate:DisableElement("NazjatarFollowerXP")
+function NP:Update_Cutaway(nameplate)
+	local eitherEnabled = NP.db.cutaway.health.enabled or NP.db.cutaway.power.enabled
+	if not eitherEnabled then
+		if nameplate:IsElementEnabled("Cutaway") then
+			nameplate:DisableElement("Cutaway")
 		end
 	else
-		if not nameplate:IsElementEnabled("NazjatarFollowerXP") then
-			nameplate:EnableElement("NazjatarFollowerXP")
+		if not nameplate:IsElementEnabled("Cutaway") then
+			nameplate:EnableElement("Cutaway")
 		end
-		nameplate.NazjatarFollowerXP:SetHeight(10)
-		nameplate.NazjatarFollowerXP:SetPoint("TOPLEFT", nameplate.Castbar, "BOTTOMLEFT", 0, db.nazjatarFollowerXP.yOffset)
-		nameplate.NazjatarFollowerXP:SetPoint("TOPRIGHT", nameplate.Castbar, "BOTTOMRIGHT", 0, db.nazjatarFollowerXP.yOffset)
-		local color = db.nazjatarFollowerXP.color
-		nameplate.NazjatarFollowerXP:SetStatusBarColor(color.r, color.g, color.b)
-
-		nameplate.NazjatarFollowerXP.Rank:SetPoint("RIGHT", nameplate.NazjatarFollowerXP, "LEFT", -4, 0)
-		nameplate.NazjatarFollowerXP.ProgressText:SetPoint("CENTER", nameplate.NazjatarFollowerXP, "CENTER")
-
-		nameplate.NazjatarFollowerXP:ForceUpdate()
+		nameplate.Cutaway:UpdateConfigurationValues(NP.db.cutaway)
 	end
 end

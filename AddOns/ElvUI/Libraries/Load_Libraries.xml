@@ -13,8 +13,7 @@
 
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
 	<Script file="LibClassicCasterino-1.0\LibClassicCasterino.lua"/>
-
-	<Include file="LibSpellRange-1.0\lib.xml"/>
+	<Script file="LibClassicHealComm\LibClassicHealComm.lua"/>
 	<Include file="LibSharedMedia-3.0\lib.xml"/>
 	<Script file="LibSimpleSticky\LibSimpleSticky.lua"/>
 	<Include file='oUF\oUF.xml'/>

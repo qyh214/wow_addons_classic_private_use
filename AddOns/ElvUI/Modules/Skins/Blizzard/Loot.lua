@@ -1,191 +1,196 @@
 local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
+local LBG = E.Libs.ButtonGlow
 
---Cache global variables
 --Lua functions
 local _G = _G
 local unpack, select = unpack, select
 --WoW API / Variables
-local UnitName = UnitName
+local hooksecurefunc = hooksecurefunc
+local CreateFrame = CreateFrame
+local GetLootSlotInfo = GetLootSlotInfo
 local UnitIsDead = UnitIsDead
 local UnitIsFriend = UnitIsFriend
+local UnitName = UnitName
 local IsFishingLoot = IsFishingLoot
-local GetLootRollItemInfo = GetLootRollItemInfo
-local GetItemQualityColor = GetItemQualityColor
-local GetLootSlotInfo = GetLootSlotInfo
-local LOOTFRAME_NUMBUTTONS = LOOTFRAME_NUMBUTTONS
-local NUM_GROUP_LOOT_FRAMES = NUM_GROUP_LOOT_FRAMES
+local C_LootHistory_GetNumItems = C_LootHistory.GetNumItems
+local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
 local LOOT, ITEMS = LOOT, ITEMS
-local CreateFrame = CreateFrame
-local hooksecurefunc = hooksecurefunc
+
+local function UpdateLoots()
+	local numItems = C_LootHistory_GetNumItems()
+	for i=1, numItems do
+		local frame = _G.LootHistoryFrame.itemFrames[i]
+		if frame and not frame.isSkinned then
+			local Icon = frame.Icon:GetTexture()
+			frame:StripTextures()
+			frame.Icon:SetTexture(Icon)
+			frame.Icon:SetTexCoord(unpack(E.TexCoords))
+
+			-- create a backdrop around the icon
+			frame:CreateBackdrop()
+			frame.backdrop:SetOutside(frame.Icon)
+			frame.Icon:SetParent(frame.backdrop)
+
+			frame.isSkinned = true
+		end
+	end
+end
 
 local function LoadSkin()
-	if E.private.general.loot or E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.loot ~= true then return end
+	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.loot ~= true then return end
 
-	local LootFrame = _G.LootFrame
-	LootFrame:StripTextures()
-	LootFrame:CreateBackdrop('Transparent')
+	-- Loot history frame
+	local LootHistoryFrame = _G.LootHistoryFrame
+	LootHistoryFrame:StripTextures()
+	S:HandleCloseButton(LootHistoryFrame.CloseButton)
+	LootHistoryFrame:StripTextures()
+	LootHistoryFrame:SetTemplate('Transparent')
+	LootHistoryFrame.ResizeButton:StripTextures()
+	LootHistoryFrame.ResizeButton.text = LootHistoryFrame.ResizeButton:CreateFontString(nil, 'OVERLAY')
+	LootHistoryFrame.ResizeButton.text:FontTemplate(nil, 16, 'OUTLINE')
+	LootHistoryFrame.ResizeButton.text:SetJustifyH('CENTER')
+	LootHistoryFrame.ResizeButton.text:Point('CENTER', LootHistoryFrame.ResizeButton)
+	LootHistoryFrame.ResizeButton.text:SetText("v v v v")
+	LootHistoryFrame.ResizeButton:SetTemplate()
+	LootHistoryFrame.ResizeButton:Width(LootHistoryFrame:GetWidth())
+	LootHistoryFrame.ResizeButton:Height(19)
+	LootHistoryFrame.ResizeButton:ClearAllPoints()
+	LootHistoryFrame.ResizeButton:Point("TOP", LootHistoryFrame, "BOTTOM", 0, -2)
+	_G.LootHistoryFrameScrollFrame:StripTextures()
+	S:HandleScrollBar(_G.LootHistoryFrameScrollFrameScrollBar)
 
-	_G.LootFramePortraitOverlay:SetParent(E.HiddenFrame)
+	hooksecurefunc("LootHistoryFrame_FullUpdate", UpdateLoots)
 
-	S:HandleNextPrevButton(_G.LootFrameUpButton)
-	_G.LootFrameUpButton:Point('BOTTOMLEFT', 25, 20)
-	_G.LootFrameUpButton:Size(24)
+	-- Master Loot
+	local MasterLooterFrame = _G.MasterLooterFrame
+	MasterLooterFrame:StripTextures()
+	MasterLooterFrame:SetTemplate()
 
-	S:HandleNextPrevButton(_G.LootFrameDownButton)
-	_G.LootFrameDownButton:Point('BOTTOMLEFT', 145, 20)
-	_G.LootFrameDownButton:Size(24)
+	hooksecurefunc("MasterLooterFrame_Show", function()
+		local b = MasterLooterFrame.Item
+		if b then
+			local i = b.Icon
+			local icon = i:GetTexture()
+			local c = ITEM_QUALITY_COLORS[_G.LootFrame.selectedQuality]
 
-	LootFrame:EnableMouseWheel(true)
-	LootFrame:SetScript('OnMouseWheel', function(_, value)
-		if value > 0 then
-			if _G.LootFrameUpButton:IsShown() and _G.LootFrameUpButton:IsEnabled() == 1 then
-				LootFrame_PageUp()
-			end
-		else
-			if _G.LootFrameDownButton:IsShown() and _G.LootFrameDownButton:IsEnabled() == 1 then
-				LootFrame_PageDown()
+			b:StripTextures()
+			i:SetTexture(icon)
+			i:SetTexCoord(unpack(E.TexCoords))
+			b:CreateBackdrop()
+			b.backdrop:SetOutside(i)
+			b.backdrop:SetBackdropBorderColor(c.r, c.g, c.b)
+		end
+
+		for i=1, MasterLooterFrame:GetNumChildren() do
+			local child = select(i, MasterLooterFrame:GetChildren())
+			if child and not child.isSkinned and not child:GetName() then
+				if child:IsObjectType('Button') then
+					if child:GetPushedTexture() then
+						S:HandleCloseButton(child)
+					else
+						child:SetTemplate()
+						child:StyleButton()
+					end
+					child.isSkinned = true
+				end
 			end
 		end
 	end)
 
-	S:HandleCloseButton(_G.LootFrameCloseButton)
-	_G.LootFrameCloseButton:Point('CENTER', LootFrame, 'TOPRIGHT', -87, -26)
+	local LootFrame = _G.LootFrame
+	S:HandlePortraitFrame(LootFrame, true)
+	LootFrame:Height(LootFrame:GetHeight() - 30)
+	_G.LootFramePortraitOverlay:SetParent(E.HiddenFrame)
 
-	for i = 1, LootFrame:GetNumRegions() do
-		local region = select(i, LootFrame:GetRegions())
-		if region:GetObjectType() == 'FontString' then
-			if region:GetText() == ITEMS then
+	for i=1, LootFrame:GetNumRegions() do
+		local region = select(i, LootFrame:GetRegions());
+		if(region:IsObjectType('FontString')) then
+			if(region:GetText() == ITEMS) then
 				LootFrame.Title = region
 			end
 		end
 	end
 
 	LootFrame.Title:ClearAllPoints()
-	LootFrame.Title:Point('TOPLEFT', LootFrame.backdrop, 'TOPLEFT', 4, -4)
-	LootFrame.Title:SetJustifyH('LEFT')
+	LootFrame.Title:Point("TOPLEFT", LootFrame, "TOPLEFT", 4, -4)
+	LootFrame.Title:SetJustifyH("LEFT")
 
-	LootFrame:HookScript('OnShow', function(self)
-		if IsFishingLoot() then
-			self.Title:SetText(L['Fishy Loot'])
-		elseif not UnitIsFriend('player', 'target') and UnitIsDead('target') then
-			self.Title:SetText(UnitName('target'))
+	for i=1, _G.LOOTFRAME_NUMBUTTONS do
+		local button = _G["LootButton"..i]
+		_G["LootButton"..i.."NameFrame"]:Hide()
+		--_G["LootButton"..i.."IconQuestTexture"]:SetParent(E.HiddenFrame)
+		S:HandleItemButton(button, true)
+
+		button.IconBorder:SetTexture()
+		hooksecurefunc(button.IconBorder, 'SetVertexColor', function(self, r, g, b)
+			self:GetParent().backdrop:SetBackdropBorderColor(r, g, b)
+			self:SetTexture()
+		end)
+		hooksecurefunc(button.IconBorder, 'Hide', function(self)
+			self:GetParent().backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		end)
+
+		local point, attachTo, point2, x, y = button:GetPoint()
+		button:ClearAllPoints()
+		button:Point(point, attachTo, point2, x, y+30)
+	end
+
+	hooksecurefunc("LootFrame_UpdateButton", function(index)
+		local numLootItems = LootFrame.numLootItems;
+		--Logic to determine how many items to show per page
+		local numLootToShow = _G.LOOTFRAME_NUMBUTTONS;
+		local self = LootFrame;
+		if self.AutoLootTable then
+			numLootItems = #self.AutoLootTable;
+		end
+		if numLootItems > _G.LOOTFRAME_NUMBUTTONS then
+			numLootToShow = numLootToShow - 1; -- make space for the page buttons
+		end
+
+		local button = _G["LootButton"..index];
+		local slot = (numLootToShow * (LootFrame.page - 1)) + index;
+		if(button and button:IsShown()) then
+			local texture, _, isQuestItem, questId, isActive;
+			if (LootFrame.AutoLootTable) then
+				local entry = LootFrame.AutoLootTable[slot];
+				if( entry.hide ) then
+					button:Hide();
+					return;
+				else
+					texture = entry.texture;
+					isQuestItem = entry.isQuestItem;
+					questId = entry.questId;
+					isActive = entry.isActive;
+				end
+			else
+				texture, _, _, _, _, isQuestItem, questId, isActive = GetLootSlotInfo(slot);
+			end
+
+			if(texture) then
+				if ( questId and not isActive ) then
+					LBG.ShowOverlayGlow(button)
+				elseif ( questId or isQuestItem ) then
+					LBG.ShowOverlayGlow(button)
+				else
+					LBG.HideOverlayGlow(button)
+				end
+			end
+		end
+	end)
+
+	LootFrame:HookScript("OnShow", function(self)
+		if(IsFishingLoot()) then
+			self.Title:SetText(L["Fishy Loot"])
+		elseif(not UnitIsFriend("player", "target") and UnitIsDead"target") then
+			self.Title:SetText(UnitName("target"))
 		else
 			self.Title:SetText(LOOT)
 		end
 	end)
 
-	for i = 1, LOOTFRAME_NUMBUTTONS do
-		local button = _G['LootButton'..i]
-		local nameFrame = _G['LootButton'..i..'NameFrame']
-		-- local questTexture = _G['LootButton'..i..'IconQuestTexture']
-
-		S:HandleItemButton(button, true)
-
-		button.bg = CreateFrame('Frame', nil, button)
-		button.bg:SetTemplate('Default')
-		button.bg:Point('TOPLEFT', 40, 0)
-		button.bg:Point('BOTTOMRIGHT', 110, 0)
-		button.bg:SetFrameLevel(button.bg:GetFrameLevel() - 1)
-
-		-- questTexture:SetTexture(E.Media.Textures.BagQuestIcon)
-		-- questTexture.SetTexture = E.noop
-		-- questTexture:SetTexCoord(0, 1, 0, 1)
-		-- questTexture:SetInside()
-
-		nameFrame:Hide()
-	end
-
-	hooksecurefunc('LootFrame_UpdateButton', function(index)
-		local numLootItems = LootFrame.numLootItems
-		local numLootToShow = LOOTFRAME_NUMBUTTONS
-		if numLootItems > LOOTFRAME_NUMBUTTONS then
-			numLootToShow = numLootToShow - 1
-		end
-
-		local button = _G['LootButton'..index]
-		local slot = (numLootToShow * (LootFrame.page - 1)) + index
-
-		if slot <= numLootItems then
-			if (LootSlotIsItem(slot) or LootSlotIsCoin(slot)) and index <= numLootToShow then
-				local texture, _, _, quality, _, isQuestItem, questId, isActive = GetLootSlotInfo(slot)
-				if texture then
-					local questTexture = _G['LootButton'..index..'IconQuestTexture']
-
-					questTexture:Hide()
-
-					if questId and not isActive then
-						button.backdrop:SetBackdropBorderColor(1.0, 1.0, 0.0)
-						questTexture:Show()
-					elseif questId or isQuestItem then
-						button.backdrop:SetBackdropBorderColor(1.0, 0.3, 0.3)
-					elseif quality then
-						button.backdrop:SetBackdropBorderColor(GetItemQualityColor(quality))
-					else
-						button.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-					end
-				end
-			end
-		end
-	end)
+	S:HandleNextPrevButton(_G.LootFrameDownButton)
+	S:HandleNextPrevButton(_G.LootFrameUpButton)
 end
 
-local function LoadRollSkin()
-	if E.private.general.lootRoll then return end
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.lootRoll then return end
-
-	local function OnShow(self)
-		local cornerTexture = _G[self:GetName()..'Corner']
-		local iconFrame = _G[self:GetName()..'IconFrame']
-		local statusBar = _G[self:GetName()..'Timer']
-		local _, _, _, quality = GetLootRollItemInfo(self.rollID)
-
-		self:SetTemplate('Transparent')
-
-		cornerTexture:SetTexture()
-
-		iconFrame:SetBackdropBorderColor(GetItemQualityColor(quality))
-		statusBar:SetStatusBarColor(GetItemQualityColor(quality))
-	end
-
-	for i = 1, NUM_GROUP_LOOT_FRAMES do
-		local frame = _G['GroupLootFrame'..i]
-		frame:StripTextures()
-		frame:ClearAllPoints()
-
-		if i == 1 then
-			frame:Point('TOP', _G.AlertFrameHolder, 'BOTTOM', 0, -4)
-		else
-			frame:Point('TOP', _G['GroupLootFrame'..i - 1], 'BOTTOM', 0, -4)
-		end
-
-		local frameName = frame:GetName()
-
-		local iconFrame = _G[frameName..'IconFrame']
-		iconFrame:SetTemplate('Default')
-		iconFrame:StyleButton()
-
-		local icon = _G[frameName..'IconFrameIcon']
-		icon:SetInside()
-		icon:SetTexCoord(unpack(E.TexCoords))
-
-		local statusBar = _G[frameName..'Timer']
-		statusBar:StripTextures()
-		statusBar:CreateBackdrop('Default')
-		statusBar:SetStatusBarTexture(E.media.normTex)
-		E:RegisterStatusBar(statusBar)
-
-		local decoration = _G[frameName..'Decoration']
-		decoration:SetTexture('Interface\\DialogFrame\\UI-DialogBox-Gold-Dragon')
-		decoration:Size(130)
-		decoration:Point('TOPLEFT', -37, 20)
-
-		local pass = _G[frameName..'PassButton']
-		S:HandleCloseButton(pass, frame)
-
-		_G['GroupLootFrame'..i]:HookScript('OnShow', OnShow)
-	end
-end
-
-S:AddCallback('Loot', LoadSkin)
-S:AddCallback('LootRoll', LoadRollSkin)
+S:AddCallback("Loot", LoadSkin)

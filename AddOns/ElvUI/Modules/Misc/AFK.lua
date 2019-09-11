@@ -33,7 +33,6 @@ local MovieFrame = _G.MovieFrame
 local DNDstr = _G.DND
 local AFKstr = _G.AFK
 local CastingInfo = CastingInfo
-local ChannelInfo = ChannelInfo
 
 local CAMERA_SPEED = 0.035
 local ignoreKeys = {

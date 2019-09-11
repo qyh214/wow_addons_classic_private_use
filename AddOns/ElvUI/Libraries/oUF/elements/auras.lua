@@ -83,6 +83,7 @@ local UnitAura = UnitAura
 local UnitIsUnit = UnitIsUnit
 local floor, min = math.floor, math.min
 local LCD = LibStub('LibClassicDurations', true)
+local myClass = select(2, UnitClass('player'))
 
 -- GLOBALS: GameTooltip
 -- end block
@@ -158,9 +159,24 @@ local function customFilter(element, unit, button, name)
 end
 
 local function updateIcon(element, unit, index, offset, filter, isDebuff, visible)
-	local name, texture, count, debuffType, duration, expiration, caster, isStealable,
-		nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,
-		timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
+	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
+
+	if LCD and spellID then
+		local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
+		if durationNew and durationNew > 0 then
+			duration, expiration = durationNew, expirationTimeNew
+		end
+	end
+
+	if myClass == "SHAMAN" then
+		for slot = 1, 4 do
+			local _, _, start, durationTime, icon = GetTotemInfo(slot)
+			if icon == texture then
+				duration = durationTime
+				expiration = start + duration
+			end
+		end
+	end
 
 	-- ElvUI block
 	if element.forceShow or element.forceCreate then
@@ -224,11 +240,6 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 			-- We might want to consider delaying the creation of an actual cooldown
 			-- object to this point, but I think that will just make things needlessly
 			-- complicated.
-			local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
-			if durationNew and durationNew > 0 then
-				duration, expiration = durationNew, expirationTimeNew
-			end
-
 			if(button.cd and not element.disableCooldown) then
 				if(duration and duration > 0) then
 					button.cd:SetCooldown(expiration - duration, duration)

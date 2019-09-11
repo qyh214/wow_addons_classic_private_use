@@ -12,14 +12,14 @@ local function LoadSkin()
 	WorldMapFrame:StripTextures()
 	WorldMapFrame.BorderFrame:CreateBackdrop('Transparent')
 
-	S:HandleDropDownBox(_G.WorldMapContinentDropDown, 170)
-	S:HandleDropDownBox(_G.WorldMapZoneDropDown, 170)
+	S:HandleDropDownBox(_G.WorldMapContinentDropDown)
+	S:HandleDropDownBox(_G.WorldMapZoneDropDown)
 
-	_G.WorldMapContinentDropDown:Point('TOPLEFT', WorldMapFrame, 'TOPLEFT', 296, -40)
-	_G.WorldMapZoneDropDown:Point('LEFT', _G.WorldMapContinentDropDown, 'RIGHT', -20, 0)
-	_G.WorldMapZoomOutButton:Point('LEFT', _G.WorldMapZoneDropDown, 'RIGHT', -9, 0)
+	_G.WorldMapContinentDropDown:Point('TOPLEFT', WorldMapFrame, 'TOPLEFT', 289, -40)
+	_G.WorldMapZoneDropDown:Point('LEFT', _G.WorldMapContinentDropDown, 'RIGHT', -32, 0)
 
-	_G.WorldMapZoomOutButton:Height(21)
+	_G.WorldMapZoomOutButton:Point('LEFT', _G.WorldMapZoneDropDown, 'RIGHT', -12, 2)
+	_G.WorldMapZoomOutButton:Height(20)
 
 	S:HandleButton(_G.WorldMapZoomOutButton)
 

@@ -42,32 +42,38 @@ local function LoadSkin()
 
 	_G.CharacterAttributesFrame:StripTextures()
 
+	local ResistanceCoords = {
+		[1] = { 0.21875, 0.8125, 0.25, 0.32421875 },		--Arcane
+		[2] = { 0.21875, 0.8125, 0.0234375, 0.09765625 },	--Fire
+		[3] = { 0.21875, 0.8125, 0.13671875, 0.2109375 },	--Nature
+		[4] = { 0.21875, 0.8125, 0.36328125, 0.4375},		--Frost
+		[5] = { 0.21875, 0.8125, 0.4765625, 0.55078125},	--Shadow
+	}
+
 	local function HandleResistanceFrame(frameName)
 		for i = 1, 5 do
-			local frame = _G[frameName..i]
+			local frame, icon, text = _G[frameName..i], _G[frameName..i]:GetRegions()
 			frame:Size(24)
-
-			local icon, text = _G[frameName..i]:GetRegions()
-			icon:SetInside()
-			icon:SetDrawLayer('ARTWORK')
-			text:SetDrawLayer('OVERLAY')
-
 			frame:SetTemplate('Default')
 
 			if i ~= 1 then
 				frame:ClearAllPoints()
-				frame:Point('TOP', _G[frameName..i - 1], 'BOTTOM', 0, -(E.Border + E.Spacing))
+				frame:Point('TOP', _G[frameName..i - 1], 'BOTTOM', 0, -1)
+			end
+
+			if icon then
+				icon:SetInside()
+				icon:SetTexCoord(unpack(ResistanceCoords[i]))
+				icon:SetDrawLayer('ARTWORK')
+			end
+
+			if text then
+				text:SetDrawLayer('OVERLAY')
 			end
 		end
 	end
 
 	HandleResistanceFrame('MagicResFrame')
-
-	_G.MagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.8125, 0.25, 0.32421875)		--Arcane
-	_G.MagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.8125, 0.0234375, 0.09765625)	--Fire
-	_G.MagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.8125, 0.13671875, 0.2109375)	--Nature
-	_G.MagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.8125, 0.36328125, 0.4375)	--Frost
-	_G.MagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.8125, 0.4765625, 0.55078125)	--Shadow
 
 	for _, slot in pairs({ PaperDollItemsFrame:GetChildren() }) do
 		local icon = _G[slot:GetName()..'IconTexture']
@@ -117,15 +123,7 @@ local function LoadSkin()
 	_G.PetResistanceFrame:CreateBackdrop('Default')
 	_G.PetResistanceFrame.backdrop:SetOutside(_G.PetMagicResFrame1, nil, nil, _G.PetMagicResFrame5)
 
-	for i = 1, 5 do
-		_G['PetMagicResFrame'..i]:Size(24)
-	end
-
-	_G.PetMagicResFrame1:GetRegions():SetTexCoord(0.21875, 0.78125, 0.25, 0.3203125)
-	_G.PetMagicResFrame2:GetRegions():SetTexCoord(0.21875, 0.78125, 0.0234375, 0.09375)
-	_G.PetMagicResFrame3:GetRegions():SetTexCoord(0.21875, 0.78125, 0.13671875, 0.20703125)
-	_G.PetMagicResFrame4:GetRegions():SetTexCoord(0.21875, 0.78125, 0.36328125, 0.43359375)
-	_G.PetMagicResFrame5:GetRegions():SetTexCoord(0.21875, 0.78125, 0.4765625, 0.546875)
+	HandleResistanceFrame('PetMagicResFrame')
 
 	_G.PetPaperDollFrameExpBar:StripTextures()
 	_G.PetPaperDollFrameExpBar:SetStatusBarTexture(E.media.normTex)

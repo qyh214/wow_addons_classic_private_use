@@ -379,7 +379,9 @@ function S:Ace3_SkinTooltip(lib, minor) -- lib: AceConfigDialog or AceGUI
 
 	if lib.popup and not lib.popup.template then -- StaticPopup
 		lib.popup:SetTemplate('Transparent')
-		lib.popup:GetChildren():StripTextures()
+		if lib.popup:GetChildren() then
+			lib.popup:GetChildren():StripTextures()
+		end
 		S:HandleButton(lib.popup.accept, true)
 		S:HandleButton(lib.popup.cancel, true)
 	end

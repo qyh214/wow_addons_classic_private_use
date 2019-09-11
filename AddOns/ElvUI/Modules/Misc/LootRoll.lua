@@ -308,6 +308,7 @@ end
 M.LOOT_ROLLS_COMPLETE = M.LOOT_HISTORY_ROLL_COMPLETE
 
 function M:LoadLootRoll()
+	--[[
 	if not E.private.general.lootRoll then return end
 
 	self:RegisterEvent('LOOT_HISTORY_ROLL_CHANGED')
@@ -317,4 +318,5 @@ function M:LoadLootRoll()
 
 	_G.UIParent:UnregisterEvent("START_LOOT_ROLL")
 	_G.UIParent:UnregisterEvent("CANCEL_LOOT_ROLL")
+	]]
 end

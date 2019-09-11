@@ -74,6 +74,12 @@ E.Options.args.bags = {
 					desc = L["Use coin icons instead of colored text."],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateGoldText(); end,
 				},
+				transparent = {
+					order = 4,
+					type = 'toggle',
+					name = L["Transparent Buttons"],
+					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
+				},
 				newItemGlow = {
 					order = 8,
 					type = 'toggle',
@@ -193,6 +199,7 @@ E.Options.args.bags = {
 						},
 					},
 				},
+--[=[
 				itemLevelGroup = {
 					order = 35,
 					type = "group",
@@ -264,6 +271,7 @@ E.Options.args.bags = {
 						},
 					},
 				},
+]=]
 			},
 		},
 		sizeGroup = {

@@ -15,18 +15,21 @@ local function LoadSkin()
 
 	local SpellBookFrame = _G.SpellBookFrame
 	S:HandlePortraitFrame(SpellBookFrame, true)
-	SpellBookFrame.backdrop:Point('TOPLEFT', 10, -12)
-	SpellBookFrame.backdrop:Point('BOTTOMRIGHT', -31, 75)
+	SpellBookFrame.backdrop:Point('TOPLEFT', 11, -12)
+	SpellBookFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
+
+	_G.SpellBookTitleText:Point('TOP', -10, -17)
+	_G.SpellBookTitleText:SetTextColor(1, 1, 1)
 
 	_G.SpellBookSpellIconsFrame:StripTextures(true)
 	_G.SpellBookSideTabsFrame:StripTextures(true)
 	_G.SpellBookPageNavigationFrame:StripTextures(true)
 
 	_G.SpellBookPageText:SetTextColor(1, 1, 1)
-	_G.SpellBookPageText:Point('BOTTOM', _G.SpellBookFrame, 'BOTTOM', -4, 88)
+	_G.SpellBookPageText:Point('BOTTOM', -10, 92)
 
 	S:HandleNextPrevButton(_G.SpellBookPrevPageButton)
-	_G.SpellBookPrevPageButton:Point('BOTTOMRIGHT', _G.SpellBookFrame, 'BOTTOMRIGHT', -68, 80)
+	_G.SpellBookPrevPageButton:Point('BOTTOMRIGHT', _G.SpellBookFrame, 'BOTTOMRIGHT', -73, 87)
 	_G.SpellBookPrevPageButton:Size(24)
 
 	S:HandleNextPrevButton(_G.SpellBookNextPageButton)
@@ -43,7 +46,7 @@ local function LoadSkin()
 
 		S:HandleTab(tab)
 
-		tab.backdrop:Point('TOPLEFT', 14, E.PixelMode and -17 or -19)
+		tab.backdrop:Point('TOPLEFT', 14, E.PixelMode and -16 or -19)
 		tab.backdrop:Point('BOTTOMRIGHT', -14, 19)
 	end
 
@@ -70,8 +73,8 @@ local function LoadSkin()
 
 		button.bg = CreateFrame('Frame', nil, button)
 		button.bg:CreateBackdrop('Transparent', true)
-		button.bg:Point('TOPLEFT', -7, 9)
-		button.bg:Point('BOTTOMRIGHT', 116, -10)
+		button.bg:Point('TOPLEFT', -6, 6)
+		button.bg:Point('BOTTOMRIGHT', 112, -6)
 		button.bg:SetFrameLevel(button.bg:GetFrameLevel() - 2)
 
 		icon:SetTexCoord(unpack(E.TexCoords))
@@ -86,18 +89,18 @@ local function LoadSkin()
 		E:RegisterCooldown(cooldown)
 	end
 
-	_G.SpellButton1:Point('TOPLEFT', _G.SpellBookSpellIconsFrame, 'TOPLEFT', 24, -55)
-	_G.SpellButton2:Point('TOPLEFT', _G.SpellButton1, 'TOPLEFT', 168, 0)
-	_G.SpellButton3:Point('TOPLEFT', _G.SpellButton1, 'BOTTOMLEFT', 0, -23)
-	_G.SpellButton4:Point('TOPLEFT', _G.SpellButton3, 'TOPLEFT', 168, 0)
-	_G.SpellButton5:Point('TOPLEFT', _G.SpellButton3, 'BOTTOMLEFT', 0, -23)
-	_G.SpellButton6:Point('TOPLEFT', _G.SpellButton5, 'TOPLEFT', 168, 0)
-	_G.SpellButton7:Point('TOPLEFT', _G.SpellButton5, 'BOTTOMLEFT', 0, -23)
-	_G.SpellButton8:Point('TOPLEFT', _G.SpellButton7, 'TOPLEFT', 168, 0)
-	_G.SpellButton9:Point('TOPLEFT', _G.SpellButton7, 'BOTTOMLEFT', 0, -23)
-	_G.SpellButton10:Point('TOPLEFT', _G.SpellButton9, 'TOPLEFT', 168, 0)
-	_G.SpellButton11:Point('TOPLEFT', _G.SpellButton9, 'BOTTOMLEFT', 0, -23)
-	_G.SpellButton12:Point('TOPLEFT', _G.SpellButton11, 'TOPLEFT', 168, 0)
+	_G.SpellButton1:Point('TOPLEFT', _G.SpellBookSpellIconsFrame, 'TOPLEFT', 28, -55)
+	_G.SpellButton2:Point('TOPLEFT', _G.SpellButton1, 'TOPLEFT', 163, 0)
+	_G.SpellButton3:Point('TOPLEFT', _G.SpellButton1, 'BOTTOMLEFT', 0, -20)
+	_G.SpellButton4:Point('TOPLEFT', _G.SpellButton3, 'TOPLEFT', 163, 0)
+	_G.SpellButton5:Point('TOPLEFT', _G.SpellButton3, 'BOTTOMLEFT', 0, -20)
+	_G.SpellButton6:Point('TOPLEFT', _G.SpellButton5, 'TOPLEFT', 163, 0)
+	_G.SpellButton7:Point('TOPLEFT', _G.SpellButton5, 'BOTTOMLEFT', 0, -20)
+	_G.SpellButton8:Point('TOPLEFT', _G.SpellButton7, 'TOPLEFT', 163, 0)
+	_G.SpellButton9:Point('TOPLEFT', _G.SpellButton7, 'BOTTOMLEFT', 0, -20)
+	_G.SpellButton10:Point('TOPLEFT', _G.SpellButton9, 'TOPLEFT', 163, 0)
+	_G.SpellButton11:Point('TOPLEFT', _G.SpellButton9, 'BOTTOMLEFT', 0, -20)
+	_G.SpellButton12:Point('TOPLEFT', _G.SpellButton11, 'TOPLEFT', 163, 0)
 
 	hooksecurefunc('SpellButton_UpdateButton', function(self)
 		local spellName = _G[self:GetName()..'SpellName']

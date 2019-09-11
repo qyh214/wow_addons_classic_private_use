@@ -9,7 +9,6 @@ local ipairs = ipairs
 local strjoin = strjoin
 local tinsert = tinsert
 --WoW API / Variables
-local GetBackpackCurrencyInfo = GetBackpackCurrencyInfo
 local GetMoney = GetMoney
 local IsControlKeyDown = IsControlKeyDown
 local IsLoggedIn = IsLoggedIn
@@ -19,8 +18,6 @@ local C_Timer_NewTicker = C_Timer.NewTicker
 -- GLOBALS: ElvDB
 
 local Ticker
-local CURRENCY = CURRENCY
-local MAX_WATCHED_TOKENS = MAX_WATCHED_TOKENS
 local Profit, Spent = 0, 0
 local resetCountersFormatter = strjoin("", "|cffaaaaaa", L["Reset Counters: Hold Shift + Left Click"], "|r")
 local resetInfoFormatter = strjoin("", "|cffaaaaaa", L["Reset Data: Hold Shift + Right Click"], "|r")

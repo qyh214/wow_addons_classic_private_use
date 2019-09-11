@@ -7,7 +7,6 @@ local _G = _G
 local wipe, date = wipe, date
 local format, select, type, ipairs, pairs = format, select, type, ipairs, pairs
 local strmatch, strfind, tonumber, tostring = strmatch, strfind, tonumber, tostring
-local CreateFrame = CreateFrame
 local GetAddOnEnableState = GetAddOnEnableState
 local GetCVar, SetCVar = GetCVar, SetCVar
 local GetCVarBool = GetCVarBool
@@ -15,19 +14,10 @@ local GetFunctionCPUUsage = GetFunctionCPUUsage
 local GetInstanceInfo = GetInstanceInfo
 local InCombatLockdown = InCombatLockdown
 local IsAddOnLoaded = IsAddOnLoaded
-local IsRatedBattleground = IsRatedBattleground
-local IsWargame = IsWargame
-local PLAYER_FACTION_GROUP = PLAYER_FACTION_GROUP
 local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 local UIParentLoadAddOn = UIParentLoadAddOn
-local UnitAttackPower = UnitAttackPower
-local UnitFactionGroup = UnitFactionGroup
 local UnitHasVehicleUI = UnitHasVehicleUI
-local UnitIsMercenary = UnitIsMercenary
-local UnitStat = UnitStat
 local C_UIWidgetManager_GetStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo
-local FACTION_HORDE = FACTION_HORDE
-local FACTION_ALLIANCE = FACTION_ALLIANCE
 
 do -- other non-english locales require this
 	E.UnlocalizedClasses = {}
@@ -290,52 +280,6 @@ function E:RemoveNonPetBattleFrames()
 	end
 
 	self:RegisterEvent('PLAYER_REGEN_DISABLED', 'AddNonPetBattleFrames')
-end
-
-function E:RegisterPetBattleHideFrames(object, originalParent, originalStrata)
-	if not object or not originalParent then
-		E:Print('Error. Usage: RegisterPetBattleHideFrames(object, originalParent, originalStrata)')
-		return
-	end
-
-	object = _G[object] or object
-
-	--If already doing pokemon
-	if C_PetBattles_IsInBattle() then
-		object:SetParent(E.HiddenFrame)
-	end
-
-	E.FrameLocks[object] = {
-		parent = originalParent,
-		strata = originalStrata or nil,
-	}
-end
-
-function E:UnregisterPetBattleHideFrames(object)
-	if not object then
-		E:Print('Error. Usage: UnregisterPetBattleHideFrames(object)')
-		return
-	end
-
-	object = _G[object] or object
-
-	--Check if object was registered to begin with
-	if not E.FrameLocks[object] then return end
-
-	--Change parent of object back to original parent
-	local originalParent = E.FrameLocks[object].parent
-	if originalParent then
-		object:SetParent(originalParent)
-	end
-
-	--Change strata of object back to original
-	local originalStrata = E.FrameLocks[object].strata
-	if originalStrata then
-		object:SetFrameStrata(originalStrata)
-	end
-
-	--Remove object from table
-	E.FrameLocks[object] = nil
 end
 
 function E:RegisterObjectForVehicleLock(object, originalParent)

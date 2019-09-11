@@ -3,43 +3,20 @@ local DT = E:GetModule('DataTexts')
 
 --Lua functions
 local _G = _G
-local next, unpack = next, unpack
 local format, strjoin = format, strjoin
-local sort, tinsert = sort, tinsert
-local date, utf8sub = date, string.utf8sub
+local date = date
 
 --WoW API / Variables
-local EJ_GetCurrentTier = EJ_GetCurrentTier
-local EJ_GetInstanceByIndex = EJ_GetInstanceByIndex
-local EJ_GetNumTiers = EJ_GetNumTiers
-local EJ_SelectTier = EJ_SelectTier
-local GetAchievementInfo = GetAchievementInfo
-local GetDifficultyInfo = GetDifficultyInfo
 local GetGameTime = GetGameTime
-local GetNumSavedInstances = GetNumSavedInstances
-local GetNumSavedWorldBosses = GetNumSavedWorldBosses
-local GetNumWorldPVPAreas = GetNumWorldPVPAreas
-local GetSavedInstanceInfo = GetSavedInstanceInfo
-local GetSavedWorldBossInfo = GetSavedWorldBossInfo
-local GetWorldPVPAreaInfo = GetWorldPVPAreaInfo
 local RequestRaidInfo = RequestRaidInfo
-local SecondsToTime = SecondsToTime
-local InCombatLockdown = InCombatLockdown
-local QUEUE_TIME_UNAVAILABLE = QUEUE_TIME_UNAVAILABLE
 local TIMEMANAGER_TOOLTIP_LOCALTIME = TIMEMANAGER_TOOLTIP_LOCALTIME
 local TIMEMANAGER_TOOLTIP_REALMTIME = TIMEMANAGER_TOOLTIP_REALMTIME
-local VOICE_CHAT_BATTLEGROUND = VOICE_CHAT_BATTLEGROUND
-local WINTERGRASP_IN_PROGRESS = WINTERGRASP_IN_PROGRESS
 
-local WORLD_BOSSES_TEXT = RAID_INFO_WORLD_BOSS.."(s)"
 local APM = { TIMEMANAGER_PM, TIMEMANAGER_AM }
 local ukDisplayFormat, europeDisplayFormat = '', ''
 local europeDisplayFormat_nocolor = strjoin("", "%02d", ":|r%02d")
 local ukDisplayFormat_nocolor = strjoin("", "", "%d", ":|r%02d", " %s|r")
-local lockoutInfoFormat = "%s%s %s |cffaaaaaa(%s, %s/%s)"
-local lockoutInfoFormatNoEnc = "%s%s %s |cffaaaaaa(%s)"
-local formatBattleGroundInfo = "%s: "
-local lockoutColorExtended, lockoutColorNormal = { r=0.3,g=1,b=0.3 }, { r=.8,g=.8,b=.8 }
+local lockoutColorNormal = { r=.8,g=.8,b=.8 }
 local enteredFrame, curHr, curMin, curAmPm = false
 
 local Update, lastPanel
@@ -79,46 +56,17 @@ local function CalculateTimeValues(tooltip)
 	end
 end
 
-local function Click()
-	if InCombatLockdown() then _G.UIErrorsFrame:AddMessage(E.InfoColor.._G.ERR_NOT_IN_COMBAT) return end
-	_G.GameTimeFrame:Click()
-end
-
 local function OnLeave()
 	DT.tooltip:Hide()
 	enteredFrame = false
 end
 
-local function sortFunc(a,b) return a[1] < b[1] end
-
-local collectedInstanceImages = false
 local function OnEnter(self)
 	DT:SetupTooltip(self)
 
 	if(not enteredFrame) then
 		enteredFrame = true
 		RequestRaidInfo()
-	end
-
-	local addedHeader = false
-
-	local lockedInstances = {raids = {}, dungeons = {}}
-
-	for i = 1, GetNumSavedInstances() do
-		local name, _, _, difficulty, locked, extended, _, isRaid = GetSavedInstanceInfo(i)
-		if (locked or extended) and name then
-			local isLFR, isHeroicOrMythicDungeon = (difficulty == 7 or difficulty == 17), (difficulty == 2 or difficulty == 23)
-			local _, _, isHeroic, _, displayHeroic, displayMythic = GetDifficultyInfo(difficulty)
-			local sortName = name .. (displayMythic and 4 or (isHeroic or displayHeroic) and 3 or isLFR and 1 or 2)
-			local difficultyLetter = (displayMythic and difficultyTag[4] or (isHeroic or displayHeroic) and difficultyTag[3] or isLFR and difficultyTag[1] or difficultyTag[2])
-			local buttonImg = instanceIconByName[name] and format("|T%s:16:16:0:0:96:96:0:64:0:64|t ", instanceIconByName[name]) or ""
-
-			if isRaid then
-				tinsert(lockedInstances.raids, {sortName, difficultyLetter, buttonImg, {GetSavedInstanceInfo(i)}})
-			elseif isHeroicOrMythicDungeon then
-				tinsert(lockedInstances.dungeons, {sortName, difficultyLetter, buttonImg, {GetSavedInstanceInfo(i)}})
-			end
-		end
 	end
 
 	local Hr, Min, AmPm = CalculateTimeValues(true)

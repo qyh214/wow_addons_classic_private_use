@@ -1,15 +1,16 @@
 local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local _, ns = ...
 local ElvUF = ns.oUF
-assert(ElvUF, "ElvUI was unable to locate oUF.")
+assert(ElvUF, "ElvUI was unable to locate ElvUF.")
 local Translit = E.Libs.Translit
 local translitMark = "!"
 
 --Lua functions
 local _G = _G
+local select = select
 local wipe = wipe
 local floor = floor
-local unpack, pairs = unpack, pairs
+local pairs = pairs
 local gmatch, gsub, format = gmatch, gsub, format
 local strfind, strmatch, utf8lower, utf8sub = strfind, strmatch, string.utf8lower, string.utf8sub
 --WoW API / Variables
@@ -21,8 +22,6 @@ local GetTime = GetTime
 local GetUnitSpeed = GetUnitSpeed
 local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
-local QuestDifficultyColors = QuestDifficultyColors
-local UnitAlternatePowerTextureInfo = UnitAlternatePowerTextureInfo
 local UnitClass = UnitClass
 local UnitClassification = UnitClassification
 local UnitGUID = UnitGUID
@@ -43,24 +42,39 @@ local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
 local UnitReaction = UnitReaction
-local UnitStagger = UnitStagger
+local UnitPlayerControlled = UnitPlayerControlled
 
-local ALTERNATE_POWER_INDEX = ALTERNATE_POWER_INDEX
 local DEFAULT_AFK_MESSAGE = DEFAULT_AFK_MESSAGE
 local PVP = PVP
-local SPEC_MONK_BREWMASTER = SPEC_MONK_BREWMASTER
-local SPEC_PALADIN_RETRIBUTION = SPEC_PALADIN_RETRIBUTION
-local SPELL_POWER_CHI = Enum.PowerType.Chi
-local SPELL_POWER_HOLY_POWER = Enum.PowerType.HolyPower
-local SPELL_POWER_MANA = Enum.PowerType.Mana
-local SPELL_POWER_SOUL_SHARDS = Enum.PowerType.SoulShards
 local UNITNAME_SUMMON_TITLE17 = UNITNAME_SUMMON_TITLE17
 local UNKNOWN = UNKNOWN
--- GLOBALS: Hex, PowerBarColor, _TAGS
+
+local GetCVarBool = GetCVarBool
+local GetNumQuestLogEntries = GetNumQuestLogEntries
+local GetQuestDifficultyColor = GetQuestDifficultyColor
+local GetQuestLogTitle = GetQuestLogTitle
+local UnitPVPName = UnitPVPName
+local LEVEL = LEVEL
+
+local HasPetUI = HasPetUI
+local GetPetHappiness = GetPetHappiness
+local CreateTextureMarkup = CreateTextureMarkup
+local CreateAtlasMarkup = CreateAtlasMarkup
+-- GLOBALS: Hex, PowerBarColor, _TAGS, _COLORS
+-- GLOBALS: SPELL_POWER_MANA
 
 ------------------------------------------------------------------------
 --	Tags
 ------------------------------------------------------------------------
+
+local function UnitHealthValues(unit)
+	if unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) and _G.RealMobHealth then
+		local c, m, _, _ = _G.RealMobHealth.GetUnitHealth(unit);
+		return c, m
+	else
+		return UnitHealth(unit), UnitHealthMax(unit)
+	end
+end
 
 local function UnitName(unit)
 	local name, realm = _G.UnitName(unit)
@@ -91,7 +105,8 @@ ElvUF.Tags.Methods['healthcolor'] = function(unit)
 	if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
 		return Hex(0.84, 0.75, 0.65)
 	else
-		local r, g, b = ElvUF:ColorGradient(UnitHealth(unit), UnitHealthMax(unit), 0.69, 0.31, 0.31, 0.65, 0.63, 0.35, 0.33, 0.59, 0.33)
+		local cur, max = UnitHealthValues(unit)
+		local r, g, b = ElvUF:ColorGradient(cur, max, 0.69, 0.31, 0.31, 0.65, 0.63, 0.35, 0.33, 0.59, 0.33)
 		return Hex(r, g, b)
 	end
 end
@@ -102,7 +117,7 @@ ElvUF.Tags.Methods['health:current'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('CURRENT', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('CURRENT', UnitHealthValues(unit))
 	end
 end
 
@@ -113,7 +128,7 @@ ElvUF.Tags.Methods['health:deficit'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('DEFICIT', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('DEFICIT', UnitHealthValues(unit))
 	end
 end
 
@@ -124,7 +139,7 @@ ElvUF.Tags.Methods['health:current-percent'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('CURRENT_PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('CURRENT_PERCENT', UnitHealthValues(unit))
 	end
 end
 
@@ -135,7 +150,7 @@ ElvUF.Tags.Methods['health:current-max'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('CURRENT_MAX', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('CURRENT_MAX', UnitHealthValues(unit))
 	end
 end
 
@@ -146,13 +161,13 @@ ElvUF.Tags.Methods['health:current-max-percent'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('CURRENT_MAX_PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('CURRENT_MAX_PERCENT', UnitHealthValues(unit))
 	end
 end
 
 ElvUF.Tags.Events['health:max'] = 'UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:max'] = function(unit)
-	local max = UnitHealthMax(unit)
+	local _, max = UnitHealthValues(unit)
 
 	return E:GetFormattedText('CURRENT', max, max)
 end
@@ -164,46 +179,46 @@ ElvUF.Tags.Methods['health:percent'] = function(unit)
 	if (status) then
 		return status
 	else
-		return E:GetFormattedText('PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+		return E:GetFormattedText('PERCENT', UnitHealthValues(unit))
 	end
 end
 
 ElvUF.Tags.Events['health:current-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:current-nostatus'] = function(unit)
-	return E:GetFormattedText('CURRENT', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('CURRENT', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:deficit-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:deficit-nostatus'] = function(unit)
-	return E:GetFormattedText('DEFICIT', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('DEFICIT', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:current-percent-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:current-percent-nostatus'] = function(unit)
-	return E:GetFormattedText('CURRENT_PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('CURRENT_PERCENT', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:current-max-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:current-max-nostatus'] = function(unit)
-	return E:GetFormattedText('CURRENT_MAX', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('CURRENT_MAX', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:current-max-percent-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:current-max-percent-nostatus'] = function(unit)
-	return E:GetFormattedText('CURRENT_MAX_PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('CURRENT_MAX_PERCENT', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:percent-nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:percent-nostatus'] = function(unit)
-	return E:GetFormattedText('PERCENT', UnitHealth(unit), UnitHealthMax(unit))
+	return E:GetFormattedText('PERCENT', UnitHealthValues(unit))
 end
 
 ElvUF.Tags.Events['health:deficit-percent:name'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name'] = function(unit)
-	local currentHealth = UnitHealth(unit)
-	local deficit = UnitHealthMax(unit) - currentHealth
+	local cur, max = UnitHealthValues(unit)
+	local deficit = max - cur
 
-	if (deficit > 0 and currentHealth > 0) then
+	if (deficit > 0 and cur > 0) then
 		return _TAGS["health:percent-nostatus"](unit)
 	else
 		return _TAGS.name(unit)
@@ -212,10 +227,10 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:name-long'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name-long'] = function(unit)
-	local currentHealth = UnitHealth(unit)
-	local deficit = UnitHealthMax(unit) - currentHealth
+	local cur, max = UnitHealthValues(unit)
+	local deficit = max - cur
 
-	if (deficit > 0 and currentHealth > 0) then
+	if (deficit > 0 and cur > 0) then
 		return _TAGS["health:percent-nostatus"](unit)
 	else
 		return _TAGS["name:long"](unit)
@@ -224,10 +239,10 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:name-medium'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name-medium'] = function(unit)
-	local currentHealth = UnitHealth(unit)
-	local deficit = UnitHealthMax(unit) - currentHealth
+	local cur, max = UnitHealthValues(unit)
+	local deficit = max - cur
 
-	if (deficit > 0 and currentHealth > 0) then
+	if (deficit > 0 and cur > 0) then
 		return _TAGS["health:percent-nostatus"](unit)
 	else
 		return _TAGS["name:medium"](unit)
@@ -236,10 +251,10 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:name-short'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name-short'] = function(unit)
-	local currentHealth = UnitHealth(unit)
-	local deficit = UnitHealthMax(unit) - currentHealth
+	local cur, max = UnitHealthValues(unit)
+	local deficit = max - cur
 
-	if (deficit > 0 and currentHealth > 0) then
+	if (deficit > 0 and cur > 0) then
 		return _TAGS["health:percent-nostatus"](unit)
 	else
 		return _TAGS["name:short"](unit)
@@ -248,10 +263,10 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:name-veryshort'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name-veryshort'] = function(unit)
-	local currentHealth = UnitHealth(unit)
-	local deficit = UnitHealthMax(unit) - currentHealth
+	local cur, max = UnitHealthValues(unit)
+	local deficit = max - cur
 
-	if (deficit > 0 and currentHealth > 0) then
+	if (deficit > 0 and cur > 0) then
 		return _TAGS["health:percent-nostatus"](unit)
 	else
 		return _TAGS["name:veryshort"](unit)
@@ -417,9 +432,9 @@ ElvUF.Tags.Methods['difficultycolor'] = function(unit)
 	elseif (DiffColor >= -2) then
 		r, g, b = 1.0, 0.96, 0.41
 	elseif (-DiffColor <= GetQuestGreenRange()) then
-		r, g, b = .1, 1, .1
+		r, g, b = 0.251, 0.753, 0.251
 	else
-		r, g, b = 0.19, 0.19, 0.19
+		r, g, b = 0.6, 0.6, 0.6
 	end
 
 	return Hex(r, g, b)
@@ -896,6 +911,20 @@ ElvUF.Tags.Methods['classificationcolor'] = function(unit)
 	end
 end
 
+ElvUF.Tags.Events['classification:icon'] = 'UNIT_NAME_UPDATE'
+ElvUF.Tags.Methods['classification:icon'] = function(unit)
+    if UnitIsPlayer(unit) then
+        return
+    end
+
+    local classification = UnitClassification(unit)
+    if classification == "elite" or classification == "worldboss" then
+        return CreateAtlasMarkup("nameplates-icon-elite-gold", 32, 32)
+    elseif classification == "rareelite" or classification == 'rare' then
+        return CreateAtlasMarkup("nameplates-icon-elite-silver", 32, 32)
+    end
+end
+
 ElvUF.Tags.SharedEvents.PLAYER_GUILD_UPDATE = true
 
 ElvUF.Tags.Events['guild'] = 'UNIT_NAME_UPDATE PLAYER_GUILD_UPDATE'
@@ -984,4 +1013,122 @@ ElvUF.Tags.Events['target:translit'] = 'UNIT_TARGET'
 ElvUF.Tags.Methods['target:translit'] = function(unit)
 	local targetName = Translit:Transliterate(UnitName(unit.."target"), translitMark)
 	return targetName or nil
+end
+
+ElvUF.Tags.Events['npctitle'] = 'UNIT_NAME_UPDATE'
+ElvUF.Tags.Methods['npctitle'] = function(unit)
+	if (UnitIsPlayer(unit)) then
+		return
+	end
+
+	E.ScanTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
+	E.ScanTooltip:SetUnit(unit)
+	E.ScanTooltip:Show()
+
+	local Title = _G[format('ElvUI_ScanTooltipTextLeft%d', GetCVarBool('colorblindmode') and 3 or 2)]:GetText()
+
+	if (Title and not Title:find('^'..LEVEL)) then
+		return Title
+	end
+end
+
+ElvUF.Tags.Events['guild:rank'] = 'UNIT_NAME_UPDATE'
+ElvUF.Tags.Methods['guild:rank'] = function(unit)
+	if (UnitIsPlayer(unit)) then
+		return select(2, GetGuildInfo(unit)) or ''
+	end
+end
+
+ElvUF.Tags.Events['class'] = 'UNIT_NAME_UPDATE'
+ElvUF.Tags.Methods['class'] = function(unit)
+	return UnitClass(unit)
+end
+
+ElvUF.Tags.Events['name:title'] = 'UNIT_NAME_UPDATE'
+ElvUF.Tags.Methods['name:title'] = function(unit)
+	if (UnitIsPlayer(unit)) then
+		return UnitPVPName(unit)
+	end
+end
+
+ElvUF.Tags.SharedEvents.QUEST_LOG_UPDATE = true
+
+ElvUF.Tags.Events['quest:title'] = 'QUEST_LOG_UPDATE'
+ElvUF.Tags.Methods['quest:title'] = function(unit)
+	if UnitIsPlayer(unit) then
+		return
+	end
+
+	E.ScanTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
+	E.ScanTooltip:SetUnit(unit)
+	E.ScanTooltip:Show()
+
+	local QuestName
+
+	if E.ScanTooltip:NumLines() >= 3 then
+		for i = 3, E.ScanTooltip:NumLines() do
+			local QuestLine = _G['ElvUI_ScanTooltipTextLeft' .. i]
+			local QuestLineText = QuestLine and QuestLine:GetText()
+
+			local PlayerName, ProgressText = strmatch(QuestLineText, '^ ([^ ]-) ?%- (.+)$')
+
+			if not ( PlayerName and PlayerName ~= '' and PlayerName ~= UnitName('player') ) then
+				if ProgressText then
+					QuestName = _G['ElvUI_ScanTooltipTextLeft' .. i - 1]:GetText()
+				end
+			end
+		end
+		for i = 1, GetNumQuestLogEntries() do
+			local title, level, _, isHeader = GetQuestLogTitle(i)
+			if not isHeader and title == QuestName then
+				local colors = GetQuestDifficultyColor(level)
+				return Hex(colors.r, colors.g, colors.b)..QuestName..'|r'
+			end
+		end
+	end
+end
+
+ElvUF.Tags.Events['quest:info'] = 'QUEST_LOG_UPDATE'
+ElvUF.Tags.Methods['quest:info'] = function(unit)
+	if UnitIsPlayer(unit) then
+		return
+	end
+
+	E.ScanTooltip:SetOwner(_G.UIParent, "ANCHOR_NONE")
+	E.ScanTooltip:SetUnit(unit)
+	E.ScanTooltip:Show()
+
+	local ObjectiveCount = 0
+	local QuestName
+
+	if E.ScanTooltip:NumLines() >= 3 then
+		for i = 3, E.ScanTooltip:NumLines() do
+			local QuestLine = _G['ElvUI_ScanTooltipTextLeft' .. i]
+			local QuestLineText = QuestLine and QuestLine:GetText()
+
+			local PlayerName, ProgressText = strmatch(QuestLineText, '^ ([^ ]-) ?%- (.+)$')
+			if (not PlayerName or PlayerName == '' or PlayerName == UnitName('player')) and ProgressText then
+				local x, y
+				if not QuestName and ProgressText then
+					QuestName = _G['ElvUI_ScanTooltipTextLeft' .. i - 1]:GetText()
+				end
+				if ProgressText then
+					x, y = strmatch(ProgressText, '(%d+)/(%d+)')
+					if x and y then
+						local NumLeft = y - x
+						if NumLeft > ObjectiveCount then -- track highest number of objectives
+							ObjectiveCount = NumLeft
+							if ProgressText then
+								return ProgressText
+							end
+						end
+					else
+						if ProgressText then
+							return QuestName .. ': ' .. ProgressText
+						end
+					end
+				end
+			end
+		end
+	end
 end

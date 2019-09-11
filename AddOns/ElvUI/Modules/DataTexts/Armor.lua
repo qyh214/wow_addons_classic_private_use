@@ -5,9 +5,7 @@ local DT = E:GetModule('DataTexts')
 local format = format
 local strjoin = strjoin
 --WoW API / Variables
-local UnitLevel = UnitLevel
 local UnitArmor = UnitArmor
-local PaperDollFrame_GetArmorReduction = PaperDollFrame_GetArmorReduction
 
 local armorString = ARMOR..": "
 local chanceString = "%.2f%%"
