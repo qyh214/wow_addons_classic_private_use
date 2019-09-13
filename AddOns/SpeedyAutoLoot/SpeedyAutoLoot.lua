@@ -51,9 +51,9 @@ end
 function AutoLoot:ShowLootFrame(show)
 	if self.ElvUI then
 		if show then
-			self:LootUnderMouse(ElvLootFrame, ElvLootFrameHolder)
 			ElvLootFrame:SetParent(ElvLootFrameHolder)
 			ElvLootFrame:SetFrameStrata("HIGH")
+			self:LootUnderMouse(ElvLootFrame, ElvLootFrameHolder)
 			self.isHidden = false
 		else
 			ElvLootFrame:SetParent(self)
@@ -98,14 +98,13 @@ end
 
 function AutoLoot:OnEvent(e, ...)
 	if e == "PLAYER_LOGIN" then
-		self:ShowLootFrame(false)
 
 		if SpeedyAutoLootDB.global.alwaysEnableAutoLoot then
 			SetCVar("autoLootDefault",1)
 		end
 
 		self.ElvUI = (ElvUI and ElvUI[1].private.general.loot)
-
+		self:ShowLootFrame(false)
 	elseif (e == "LOOT_READY" or e == "LOOT_OPENED") and not self.isLooting then
 		local aL = ...
 		self.isLooting = true
@@ -220,7 +219,7 @@ function AutoLoot:OnLoad()
 	end
 
 	self.audioChannel = "master"
-	self.isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
+	self.isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 
 	if self.isClassic then
 		self:RegisterEvent("LOOT_BIND_CONFIRM")
