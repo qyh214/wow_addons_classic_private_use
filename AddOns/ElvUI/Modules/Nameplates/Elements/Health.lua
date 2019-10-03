@@ -127,6 +127,8 @@ function NP:Update_Health(nameplate)
 
 	nameplate:Tag(nameplate.Health.Text, db.health.text.format)
 
+	nameplate.Health.Text.frequentUpdates = .1
+
 	nameplate.Health.width = db.health.width
 	nameplate.Health.height = db.health.height
 	nameplate.Health:Height(db.health.height)
@@ -134,22 +136,30 @@ end
 
 function NP:Construct_HealthPrediction(nameplate)
 	local HealthPrediction = CreateFrame('Frame', nameplate:GetDebugName()..'HealthPrediction', nameplate)
+	local healthTexture = nameplate.Health:GetStatusBarTexture()
+	local healthFrameLevel = nameplate.Health:GetFrameLevel()
 
 	HealthPrediction.myBar = CreateFrame('StatusBar', nil, nameplate.Health.ClipFrame)
 	HealthPrediction.myBar:SetFrameStrata(nameplate:GetFrameStrata())
 	HealthPrediction.myBar:SetStatusBarTexture(E.LSM:Fetch('statusbar', NP.db.statusbar))
-	HealthPrediction.myBar:Point('TOP')
-	HealthPrediction.myBar:Point('BOTTOM')
-	HealthPrediction.myBar:Width(150)
+	HealthPrediction.myBar:SetFrameLevel(healthFrameLevel + 2)
+	HealthPrediction.myBar:SetMinMaxValues(0, 1)
+	HealthPrediction.myBar:SetWidth(150)
+	HealthPrediction.myBar:SetPoint('TOP')
+	HealthPrediction.myBar:SetPoint('BOTTOM')
+	HealthPrediction.myBar:SetPoint('LEFT', healthTexture, 'RIGHT')
+
+	HealthPrediction.otherBar = CreateFrame('StatusBar', nil, nameplate.Health.ClipFrame)
+	HealthPrediction.otherBar:SetFrameStrata(nameplate:GetFrameStrata())
+	HealthPrediction.otherBar:SetFrameLevel(healthFrameLevel + 3)
+	HealthPrediction.otherBar:SetStatusBarTexture(E.LSM:Fetch('statusbar', NP.db.statusbar))
+	HealthPrediction.otherBar:SetPoint('TOP')
+	HealthPrediction.otherBar:SetPoint('BOTTOM')
+	HealthPrediction.otherBar:SetPoint('LEFT', healthTexture, 'RIGHT')
+	HealthPrediction.otherBar:SetWidth(150)
 
 	NP.StatusBars[HealthPrediction.myBar] = true
-
-	local healthTexture = nameplate.Health:GetStatusBarTexture()
-	local healthFrameLevel = nameplate.Health:GetFrameLevel()
-	HealthPrediction.myBar:Point('LEFT', healthTexture, 'RIGHT')
-	HealthPrediction.myBar:SetFrameLevel(healthFrameLevel + 2)
-	HealthPrediction.myBar:SetStatusBarColor(NP.db.colors.healPrediction.personal.r, NP.db.colors.healPrediction.personal.g, NP.db.colors.healPrediction.personal.b)
-	HealthPrediction.myBar:SetMinMaxValues(0, 1)
+	NP.StatusBars[HealthPrediction.otherBar] = true
 
 	HealthPrediction.maxOverflow = 1
 	HealthPrediction.frequentUpdates = true
@@ -166,6 +176,7 @@ function NP:Update_HealthPrediction(nameplate)
 		end
 
 		nameplate.HealthPrediction.myBar:SetStatusBarColor(NP.db.colors.healPrediction.personal.r, NP.db.colors.healPrediction.personal.g, NP.db.colors.healPrediction.personal.b)
+		nameplate.HealthPrediction.otherBar:SetStatusBarColor(NP.db.colors.healPrediction.others.r, NP.db.colors.healPrediction.others.g, NP.db.colors.healPrediction.others.b)
 	else
 		if nameplate:IsElementEnabled('HealthPrediction') then
 			nameplate:DisableElement('HealthPrediction')

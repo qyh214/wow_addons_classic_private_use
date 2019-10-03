@@ -1,14 +1,16 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local S = E:GetModule('Skins');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local S = E:GetModule('Skins')
 
 --Cache global variables
 --Lua functions
 local _G = _G
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.tutorial ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.tutorial then return end
 
-	for i = 1, MAX_TUTORIAL_ALERTS do
+	S:HandleFrame(_G.TutorialFrame, false)
+
+	for i = 1, _G.MAX_TUTORIAL_ALERTS do
 		local button = _G['TutorialFrameAlertButton'..i]
 		local icon = button:GetNormalTexture()
 
@@ -20,11 +22,9 @@ local function LoadSkin()
 		icon:SetTexCoord(0.09, 0.40, 0.11, 0.56)
 	end
 
-	TutorialFrame:SetTemplate('Transparent')
+	S:HandleCheckBox(_G.TutorialFrameCheckButton)
 
-	S:HandleCheckBox(TutorialFrameCheckButton)
-
-	S:HandleButton(TutorialFrameOkayButton)
+	S:HandleButton(_G.TutorialFrameOkayButton)
 end
 
-S:AddCallback('Tutorial', LoadSkin)
+S:AddCallback('Skin_Tutorial', LoadSkin)

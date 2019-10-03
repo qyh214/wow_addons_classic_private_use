@@ -21,7 +21,7 @@ AB.customTaxiButton = {
 
 function AB:MoveTaxiButton()
 	TaxiButtonHolder = CreateFrame('Frame', nil, E.UIParent)
-	TaxiButtonHolder:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 150)
+	TaxiButtonHolder:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 300)
 	TaxiButtonHolder:Size(_G.MainMenuBarVehicleLeaveButton:GetSize())
 
 	local Button = _G.MainMenuBarVehicleLeaveButton

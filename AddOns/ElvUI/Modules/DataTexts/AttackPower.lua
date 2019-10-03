@@ -5,15 +5,12 @@ local DT = E:GetModule('DataTexts')
 local max = math.max
 local format, strjoin = format, strjoin
 --WoW API / Variables
-local ComputePetBonus = ComputePetBonus
 local UnitAttackPower = UnitAttackPower
 local UnitRangedAttackPower = UnitRangedAttackPower
 local ATTACK_POWER = ATTACK_POWER
 local ATTACK_POWER_MAGIC_NUMBER = ATTACK_POWER_MAGIC_NUMBER
 local MELEE_ATTACK_POWER = MELEE_ATTACK_POWER
 local MELEE_ATTACK_POWER_TOOLTIP = MELEE_ATTACK_POWER_TOOLTIP
-local PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER = PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER
-local PET_BONUS_TOOLTIP_SPELLDAMAGE = PET_BONUS_TOOLTIP_SPELLDAMAGE
 local RANGED_ATTACK_POWER = RANGED_ATTACK_POWER
 local RANGED_ATTACK_POWER_TOOLTIP = RANGED_ATTACK_POWER_TOOLTIP
 local ATTACK_POWER_TOOLTIP = ATTACK_POWER_TOOLTIP
@@ -45,16 +42,6 @@ local function OnEnter(self)
 		DT.tooltip:AddDoubleLine(RANGED_ATTACK_POWER, pwr, 1, 1, 1)
 
 		local line = format(RANGED_ATTACK_POWER_TOOLTIP, max((pwr), 0) / ATTACK_POWER_MAGIC_NUMBER)
-		local petAPBonus = ComputePetBonus('PET_BONUS_RAP_TO_AP', pwr)
-		local petSpellDmgBonus = ComputePetBonus('PET_BONUS_RAP_TO_SPELLDMG', pwr)
-
-		if petAPBonus > 0 then
-			line = line..'\n'..format(PET_BONUS_TOOLTIP_RANGED_ATTACK_POWER, petAPBonus)
-		end
-
-		if petSpellDmgBonus > 0 then
-			line = line..'\n'..format(PET_BONUS_TOOLTIP_SPELLDAMAGE, petSpellDmgBonus)
-		end
 
 		DT.tooltip:AddLine(line, nil, nil, nil, true)
 	else

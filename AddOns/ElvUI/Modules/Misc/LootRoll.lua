@@ -28,7 +28,6 @@ local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
 local MAX_PLAYER_LEVEL = MAX_PLAYER_LEVEL
 local NEED = NEED
 local PASS = PASS
-local ROLL_DISENCHANT = ROLL_DISENCHANT
 
 local pos = 'TOP';
 local cancelled_rolls = {}
@@ -44,12 +43,11 @@ end
 local function HideTip() _G.GameTooltip:Hide() end
 local function HideTip2() _G.GameTooltip:Hide(); ResetCursor() end
 
-local rolltypes = {[1] = "need", [2] = "greed", [3] = "disenchant", [0] = "pass"}
+local rolltypes = {[1] = "need", [2] = "greed", [0] = "pass"}
 local function SetTip(frame)
 	local GameTooltip = _G.GameTooltip
 	GameTooltip:SetOwner(frame, "ANCHOR_RIGHT")
 	GameTooltip:SetText(frame.tiptext)
-	if frame:IsEnabled() == 0 then GameTooltip:AddLine("|cffff3333"..L["Can't Roll"]) end
 	for name, tbl in pairs(frame.parent.rolls) do
 		if rolltypes[tbl[1]] == rolltypes[frame.rolltype] then
 			local classColor = _G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[tbl[2]] or _G.RAID_CLASS_COLORS[tbl[2]]
@@ -172,11 +170,9 @@ function M:CreateRollFrame()
 
 	local need, needtext = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Dice-Up", "Interface\\Buttons\\UI-GroupLoot-Dice-Highlight", "Interface\\Buttons\\UI-GroupLoot-Dice-Down", 1, NEED, "LEFT", frame.button, "RIGHT", 5, -1)
 	local greed, greedtext = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Coin-Up", "Interface\\Buttons\\UI-GroupLoot-Coin-Highlight", "Interface\\Buttons\\UI-GroupLoot-Coin-Down", 2, GREED, "LEFT", need, "RIGHT", 0, -1)
-	local de, detext
-	de, detext = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-DE-Up", "Interface\\Buttons\\UI-GroupLoot-DE-Highlight", "Interface\\Buttons\\UI-GroupLoot-DE-Down", 3, ROLL_DISENCHANT, "LEFT", greed, "RIGHT", 0, -1)
-	local pass, passtext = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Pass-Up", nil, "Interface\\Buttons\\UI-GroupLoot-Pass-Down", 0, PASS, "LEFT", de or greed, "RIGHT", 0, 2)
-	frame.needbutt, frame.greedbutt, frame.disenchantbutt = need, greed, de
-	frame.need, frame.greed, frame.pass, frame.disenchant = needtext, greedtext, passtext, detext
+	local pass, passtext = CreateRollButton(frame, "Interface\\Buttons\\UI-GroupLoot-Pass-Up", nil, "Interface\\Buttons\\UI-GroupLoot-Pass-Down", 0, PASS, "LEFT", greed, "RIGHT", 0, 2)
+	frame.needbutt, frame.greedbutt = need, greed
+	frame.need, frame.greed, frame.pass = needtext, greedtext, passtext
 
 	local bind = frame:CreateFontString()
 	bind:Point("LEFT", pass, "RIGHT", 3, 1)
@@ -220,21 +216,33 @@ function M:START_LOOT_ROLL(_, rollID, time)
 	f.need:SetText(0)
 	f.greed:SetText(0)
 	f.pass:SetText(0)
-	f.disenchant:SetText(0)
 
-	local texture, name, _, quality, bop, canNeed, canGreed, canDisenchant = GetLootRollItemInfo(rollID)
+	local texture, name, _, quality, bop, canNeed, canGreed, _, reasonNeed, reasonGreed = GetLootRollItemInfo(rollID)
+
 	f.button.icon:SetTexture(texture)
 	f.button.link = GetLootRollItemLink(rollID)
 
-	if canNeed then f.needbutt:Enable() else f.needbutt:Disable() end
-	if canGreed then f.greedbutt:Enable() else f.greedbutt:Disable() end
-	if canDisenchant then f.disenchantbutt:Enable() else f.disenchantbutt:Disable() end
 	SetDesaturation(f.needbutt:GetNormalTexture(), not canNeed)
 	SetDesaturation(f.greedbutt:GetNormalTexture(), not canGreed)
-	SetDesaturation(f.disenchantbutt:GetNormalTexture(), not canDisenchant)
-	if canNeed then f.needbutt:SetAlpha(1) else f.needbutt:SetAlpha(0.2) end
-	if canGreed then f.greedbutt:SetAlpha(1) else f.greedbutt:SetAlpha(0.2) end
-	if canDisenchant then f.disenchantbutt:SetAlpha(1) else f.disenchantbutt:SetAlpha(0.2) end
+
+	if canNeed then
+		f.needbutt:Enable()
+		f.needbutt:SetAlpha(1)
+		f.needbutt.tiptext = NEED
+	else
+		f.needbutt:Disable()
+		f.needbutt:SetAlpha(0.2)
+		f.needbutt.tiptext = _G["LOOT_ROLL_INELIGIBLE_REASON"..reasonNeed]
+	end
+	if canGreed then
+		f.greedbutt:Enable()
+		f.greedbutt:SetAlpha(1)
+		f.greedbutt.tiptext = GREED
+	else
+		f.greedbutt:Disable()
+		f.greedbutt:SetAlpha(0.2)
+		f.greedbutt.tiptext = _G["LOOT_ROLL_INELIGIBLE_REASON"..reasonGreed]
+	end
 
 	f.fsbind:SetText(bop and "BoP" or "BoE")
 	f.fsbind:SetVertexColor(bop and 1 or .3, bop and .3 or 1, bop and .1 or .3)
@@ -265,11 +273,7 @@ function M:START_LOOT_ROLL(_, rollID, time)
 	end
 
 	if E.db.general.autoRoll and E.mylevel == MAX_PLAYER_LEVEL and quality == 2 and not bop then
-		if canDisenchant then
-			RollOnLoot(rollID, 3)
-		else
-			RollOnLoot(rollID, 2)
-		end
+		RollOnLoot(rollID, 2)
 	end
 end
 
@@ -308,7 +312,6 @@ end
 M.LOOT_ROLLS_COMPLETE = M.LOOT_HISTORY_ROLL_COMPLETE
 
 function M:LoadLootRoll()
-	--[[
 	if not E.private.general.lootRoll then return end
 
 	self:RegisterEvent('LOOT_HISTORY_ROLL_CHANGED')
@@ -318,5 +321,4 @@ function M:LoadLootRoll()
 
 	_G.UIParent:UnregisterEvent("START_LOOT_ROLL")
 	_G.UIParent:UnregisterEvent("CANCEL_LOOT_ROLL")
-	]]
 end

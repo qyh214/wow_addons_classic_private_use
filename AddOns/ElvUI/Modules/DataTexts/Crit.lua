@@ -13,14 +13,11 @@ local displayString, lastPanel = ''
 
 local function OnEvent(self)
 	local critRating
-	if E.role == "Caster" then
-		critRating = GetSpellCritChance(1)
+
+	if E.myclass == "HUNTER" then
+		critRating = GetRangedCritChance()
 	else
-		if E.myclass == "HUNTER" then
-			critRating = GetRangedCritChance()
-		else
-			critRating = GetCritChance()
-		end
+		critRating = GetCritChance()
 	end
 
 	self.text:SetFormattedText(displayString, CRIT_ABBR, critRating)

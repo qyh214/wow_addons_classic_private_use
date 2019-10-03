@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -11,12 +11,9 @@ local BOOKTYPE_SPELL = BOOKTYPE_SPELL
 local MAX_SKILLLINE_TABS = MAX_SKILLLINE_TABS
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.spellbook ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.spellbook then return end
 
-	local SpellBookFrame = _G.SpellBookFrame
-	S:HandlePortraitFrame(SpellBookFrame, true)
-	SpellBookFrame.backdrop:Point('TOPLEFT', 11, -12)
-	SpellBookFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
+	S:HandleFrame(_G.SpellBookFrame, true, nil, 11, -12, -32, 76)
 
 	_G.SpellBookTitleText:Point('TOP', -10, -17)
 	_G.SpellBookTitleText:SetTextColor(1, 1, 1)
@@ -26,7 +23,7 @@ local function LoadSkin()
 	_G.SpellBookPageNavigationFrame:StripTextures(true)
 
 	_G.SpellBookPageText:SetTextColor(1, 1, 1)
-	_G.SpellBookPageText:Point('BOTTOM', -10, 92)
+	_G.SpellBookPageText:Point('BOTTOM', -10, 87)
 
 	S:HandleNextPrevButton(_G.SpellBookPrevPageButton)
 	_G.SpellBookPrevPageButton:Point('BOTTOMRIGHT', _G.SpellBookFrame, 'BOTTOMRIGHT', -73, 87)
@@ -36,7 +33,7 @@ local function LoadSkin()
 	_G.SpellBookNextPageButton:Point('TOPLEFT', _G.SpellBookPrevPageButton, 'TOPLEFT', 30, 0)
 	_G.SpellBookNextPageButton:Size(24)
 
-	S:HandleCloseButton(_G.SpellBookCloseButton)
+	S:HandleCloseButton(_G.SpellBookCloseButton, SpellBookFrame.backdrop)
 
 	for i = 1, 3 do
 		local tab = _G['SpellBookFrameTabButton'..i]
@@ -51,7 +48,7 @@ local function LoadSkin()
 	end
 
 	-- Spell Buttons
-	for i = 1, SPELLS_PER_PAGE do
+	for i = 1, _G.SPELLS_PER_PAGE do
 		local button = _G['SpellButton'..i]
 		local icon = _G['SpellButton'..i..'IconTexture']
 		local cooldown = _G['SpellButton'..i..'Cooldown']
@@ -75,6 +72,7 @@ local function LoadSkin()
 		button.bg:CreateBackdrop('Transparent', true)
 		button.bg:Point('TOPLEFT', -6, 6)
 		button.bg:Point('BOTTOMRIGHT', 112, -6)
+		button.bg:Height(46)
 		button.bg:SetFrameLevel(button.bg:GetFrameLevel() - 2)
 
 		icon:SetTexCoord(unpack(E.TexCoords))
@@ -89,18 +87,16 @@ local function LoadSkin()
 		E:RegisterCooldown(cooldown)
 	end
 
-	_G.SpellButton1:Point('TOPLEFT', _G.SpellBookSpellIconsFrame, 'TOPLEFT', 28, -55)
-	_G.SpellButton2:Point('TOPLEFT', _G.SpellButton1, 'TOPLEFT', 163, 0)
-	_G.SpellButton3:Point('TOPLEFT', _G.SpellButton1, 'BOTTOMLEFT', 0, -20)
-	_G.SpellButton4:Point('TOPLEFT', _G.SpellButton3, 'TOPLEFT', 163, 0)
-	_G.SpellButton5:Point('TOPLEFT', _G.SpellButton3, 'BOTTOMLEFT', 0, -20)
-	_G.SpellButton6:Point('TOPLEFT', _G.SpellButton5, 'TOPLEFT', 163, 0)
-	_G.SpellButton7:Point('TOPLEFT', _G.SpellButton5, 'BOTTOMLEFT', 0, -20)
-	_G.SpellButton8:Point('TOPLEFT', _G.SpellButton7, 'TOPLEFT', 163, 0)
-	_G.SpellButton9:Point('TOPLEFT', _G.SpellButton7, 'BOTTOMLEFT', 0, -20)
-	_G.SpellButton10:Point('TOPLEFT', _G.SpellButton9, 'TOPLEFT', 163, 0)
-	_G.SpellButton11:Point('TOPLEFT', _G.SpellButton9, 'BOTTOMLEFT', 0, -20)
-	_G.SpellButton12:Point('TOPLEFT', _G.SpellButton11, 'TOPLEFT', 163, 0)
+	S:HandlePointXY(_G.SpellButton1, 28, -55)
+
+	-- evens
+	for i = 2, _G.SPELLS_PER_PAGE, 2 do
+		S:HandlePointXY(_G['SpellButton'..i], 163, 0)
+	end
+	-- odds
+	for i = 3, _G.SPELLS_PER_PAGE, 2 do
+		S:HandlePointXY(_G['SpellButton'..i], 0, -20)
+	end
 
 	hooksecurefunc('SpellButton_UpdateButton', function(self)
 		local spellName = _G[self:GetName()..'SpellName']
@@ -111,7 +107,7 @@ local function LoadSkin()
 		end
 	end)
 
-	for i = 1, MAX_SKILLLINE_TABS do
+	for i = 1, _G.MAX_SKILLLINE_TABS do
 		local tab = _G['SpellBookSkillLineTab'..i]
 		local flash = _G['SpellBookSkillLineTab'..i..'Flash']
 
@@ -144,4 +140,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallback('Spellbook', LoadSkin)
+S:AddCallback('Skin_Spellbook', LoadSkin)

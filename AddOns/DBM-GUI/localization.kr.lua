@@ -71,9 +71,6 @@ L.Button_InfoFrame			= "정보 창 표시/숨기기"
 L.Button_TestBars			= "테스트 바 시작"
 L.Button_ResetInfoRange		= "정보/거리 창 위치 초기화"
 
-L.ClassicOptions			= "클래식 설정"
-L.UseRetailShamanColor		= "WoW 클래식 주술사 직업 색상을 최신 확장팩 색상으로 변경 (게임 전체에 적용)"
-
 -- Tab: Raidwarning
 L.Tab_RaidWarning 			= "공격대 경보"
 L.RaidWarning_Header		= "공격대 경보 설정"
@@ -114,7 +111,6 @@ L.ShowDefeatMessage 		= "대화창에 처치/전멸 메시지 표시"
 L.ShowGuildMessages 		= "대화창에 길드 레이드 전투 시작/보스 처치/전멸 메시지 표시"
 L.WhisperMessages			= "귓속말 메시지 설정"
 L.AutoRespond 				= "전투중 귓속말 자동 응답"
-L.EnableStatus 				= "'status' 라는 귓속말을 받으면 자동 응답"
 L.WhisperStats 				= "귓속말 응답에 처치/전멸 통계 포함"
 L.DisableStatusWhisper 		= "전체 파티/공격대의 귓속말 응답을 끕니다. (파티/공대장 권한 필요) 일반/영웅/신화 레이드 및 신화+ 던전에만 적용됩니다"
 L.DisableGuildStatus 		= "길드에 진행 상황 알림 메시지를 전송하지 않습니다. (파티/공대장 권한 필요)"
@@ -221,7 +217,7 @@ L.SpecialWarnSound5			= "메모에 이름이 있을때 특수 경고의 기본 �
 
 -- Tab: Spoken Alerts Frame
 L.Panel_SpokenAlerts		= "음성 경보"
-L.Area_VoiceSelection		= "음성 선택 (마우스 휠로 메뉴 스크롤)"
+L.Area_VoiceSelection		= "음성 선택"
 L.CountdownVoice			= "1순위 초읽기 음성 설정"
 L.CountdownVoice2			= "2순위 초읽기 음성 설정"
 L.CountdownVoice3			= "3순위 초읽기 음성 설정"

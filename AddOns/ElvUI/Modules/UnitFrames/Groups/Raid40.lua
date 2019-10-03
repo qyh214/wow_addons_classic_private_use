@@ -45,6 +45,7 @@ function UF:Construct_Raid40Frames()
 	self.InfoPanel = UF:Construct_InfoPanel(self)
 	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
 	self.ReadyCheckIndicator = UF:Construct_ReadyCheckIcon(self)
+	self.ResurrectIndicator = UF:Construct_ResurrectionIcon(self)
 	self.Fader = UF:Construct_Fader()
 	self.Cutaway = UF:Construct_Cutaway(self)
 	self.HealthPrediction = UF:Construct_HealComm(self)
@@ -195,6 +196,8 @@ function UF:Update_Raid40Frames(frame, db)
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, 'Buffs')
 	UF:Configure_Auras(frame, 'Debuffs')
+
+	UF:Configure_ResurrectionIcon(frame)
 
 	--RaidDebuffs
 	UF:Configure_RaidDebuffs(frame)

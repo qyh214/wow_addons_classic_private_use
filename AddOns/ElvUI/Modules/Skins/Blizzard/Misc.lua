@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -36,7 +36,7 @@ local function SkinNavBarButtons(self)
 end
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.misc ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.misc then return end
 
 	-- Blizzard frame we want to reskin
 	local skins = {
@@ -203,9 +203,9 @@ local function LoadSkin()
 
 	--DropDownMenu
 	hooksecurefunc('UIDropDownMenu_CreateFrames', function(level, index)
-		local listFrame = _G['DropDownList'..level];
-		local listFrameName = listFrame:GetName();
-		local expandArrow = _G[listFrameName..'Button'..index..'ExpandArrow'];
+		local listFrame = _G['DropDownList'..level]
+		local listFrameName = listFrame:GetName()
+		local expandArrow = _G[listFrameName..'Button'..index..'ExpandArrow']
 		if expandArrow then
 			local normTex = expandArrow:GetNormalTexture()
 			expandArrow:SetNormalTexture(E.Media.Textures.ArrowUp)
@@ -233,7 +233,7 @@ local function LoadSkin()
 
 	hooksecurefunc('ToggleDropDownMenu', function(level)
 		if ( not level ) then
-			level = 1;
+			level = 1
 		end
 
 		local r, g, b = unpack(E.media.rgbvaluecolor)
@@ -243,6 +243,9 @@ local function LoadSkin()
 			local check = _G['DropDownList'..level..'Button'..i..'Check']
 			local uncheck = _G['DropDownList'..level..'Button'..i..'UnCheck']
 			local highlight = _G['DropDownList'..level..'Button'..i..'Highlight']
+			local text = _G['DropDownList'..level..'Button'..i..'NormalText']
+
+			S:HandlePointXY(text, 5)
 
 			highlight:SetTexture(E.Media.Textures.Highlight)
 			highlight:SetBlendMode('BLEND')
@@ -273,7 +276,7 @@ local function LoadSkin()
 				end
 
 				button.backdrop:Show()
-				check:SetTexCoord(0, 1, 0, 1);
+				check:SetTexCoord(0, 1, 0, 1)
 			else
 				check:Size(16, 16)
 			end
@@ -326,4 +329,4 @@ local function LoadSkin()
 	hooksecurefunc('NavBar_AddButton', SkinNavBarButtons)
 end
 
-S:AddCallback('SkinMisc', LoadSkin)
+S:AddCallback('Skin_Misc', LoadSkin)

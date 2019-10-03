@@ -37,7 +37,6 @@ L["Auras"] = true
 L["Auto Scale"] = "Escalado Automático"
 L["AVD: "] = "EVA: "
 L["Avoidance Breakdown"] = "Desglose de Evasión"
-L["Azerite Bar"] = true
 L["Bag Mover (Grow Down)"] = "Fijador de Bolsa (Crecer hacia abajo)"
 L["Bag Mover (Grow Up)"] = "Fijador de Bolsa (Crecer hacia arriba)"
 L["Bag Mover"] = "Fijador de Bolsa"

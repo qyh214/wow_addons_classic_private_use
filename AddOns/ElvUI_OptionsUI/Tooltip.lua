@@ -80,15 +80,25 @@ E.Options.args.tooltip = {
 						["NONE"] = L["NONE"],
 					},
 				},
-				colorAlpha = {
+				itemQualityBorderColor = {
 					order = 6,
+					type = "toggle",
+					name = L["Item Border Color"],
+					desc = L["Colorize the tooltip border based on item quality."],
+					set = function(info, value)
+						E.db.tooltip.itemQualityBorderColor = value
+						E:GetModule("Tooltip"):ToggleItemQualityBorderColor()
+					end
+				},
+				colorAlpha = {
+					order = 7,
 					type = "range",
 					name = L["OPACITY"],
 					isPercent = true,
 					min = 0, max = 1, step = 0.01,
 				},
 				targetInfo = {
-					order = 7,
+					order = 8,
 					type = 'toggle',
 					name = L["Target Info"],
 					desc = L["When in a raid group display if anyone in your raid is targeting the current tooltip unit."],

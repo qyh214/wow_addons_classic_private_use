@@ -59,9 +59,8 @@ local S = E:GetModule('Skins')
 
 --Lua functions
 local _G = _G
-local pairs, unpack = pairs, unpack
+local pairs, unpack, format = pairs, unpack, format
 local tinsert, tremove = tinsert, tremove
-local format = string.format
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local PlaySound = PlaySound

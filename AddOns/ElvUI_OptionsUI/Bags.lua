@@ -3,8 +3,8 @@ local C, L = unpack(select(2, ...))
 local B = E:GetModule('Bags')
 
 local _G = _G
-local gsub = string.gsub
-local match = string.match
+local gsub = gsub
+local strmatch = strmatch
 local SetInsertItemsLeftToRight = SetInsertItemsLeftToRight
 local GameTooltip = _G.GameTooltip
 
@@ -79,6 +79,26 @@ E.Options.args.bags = {
 					type = 'toggle',
 					name = L["Transparent Buttons"],
 					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
+				},
+				questIcon = {
+					order = 5,
+					type = "toggle",
+					name = L["Show Quest Icon"],
+					desc = L["Display an exclamation mark on items that starts a quest."],
+					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end
+				},
+				junkIcon = {
+					order = 6,
+					type = "toggle",
+					name = L["Show Junk Icon"],
+					desc = L["Display the junk icon on all grey items that can be vendored."],
+					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end
+				},
+				junkDesaturate = {
+					order = 7,
+					type = "toggle",
+					name = L["Desaturate Junk Items"],
+					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end,
 				},
 				newItemGlow = {
 					order = 8,
@@ -199,7 +219,6 @@ E.Options.args.bags = {
 						},
 					},
 				},
---[=[
 				itemLevelGroup = {
 					order = 35,
 					type = "group",
@@ -240,7 +259,7 @@ E.Options.args.bags = {
 							name = L["Item Level Threshold"],
 							desc = L["The minimum item level required for it to be shown."],
 							type = 'range',
-							min = 1, max = 1000, step = 1,
+							min = 1, max = 200, step = 1,
 							disabled = function() return not E.db.bags.itemLevel end,
 							set = function(info, value) E.db.bags.itemLevelThreshold = value; B:UpdateItemLevelDisplay() end,
 						},
@@ -271,7 +290,6 @@ E.Options.args.bags = {
 						},
 					},
 				},
-]=]
 			},
 		},
 		sizeGroup = {
@@ -323,7 +341,6 @@ E.Options.args.bags = {
 			order = 5,
 			type = "group",
 			name = L["COLORS"],
-			disabled = function() return not E.Bags.Initialized end,
 			args = {
 				header = {
 					order = 1,
@@ -349,54 +366,35 @@ E.Options.args.bags = {
 							set = function(info, r, g, b)
 								local t = E.db.bags.colors.profession[info[#info]]
 								t.r, t.g, t.b = r, g, b
+								if not E.Bags.Initialized then return end
 								B:UpdateBagColors('ProfessionColors', info[#info], r, g, b)
 								B:UpdateAllBagSlots()
 							end,
 							args = {
-								leatherworking = {
-									order = 1,
+								quiver = {
+									order = 5,
 									type = 'color',
-									name = L["Leatherworking"],
+									name = L["Quiver"],
 								},
-								inscription = {
-									order = 2,
+								ammoPouch = {
+									order = 3,
 									type = 'color',
-									name = L["INSCRIPTION"],
+									name = L["Ammo Pouch"],
 								},
 								herbs = {
-									order = 3,
+									order = 1,
 									type = 'color',
 									name = L["Herbalism"],
 								},
 								enchanting = {
-									order = 4,
+									order = 2,
 									type = 'color',
 									name = L["Enchanting"],
 								},
-								engineering = {
-									order = 5,
+								soulBag = {
+									order = 4,
 									type = 'color',
-									name = L["Engineering"],
-								},
-								gems = {
-									order = 6,
-									type = 'color',
-									name = L["Gems"],
-								},
-								mining = {
-									order = 7,
-									type = 'color',
-									name = L["Mining"],
-								},
-								fishing = {
-									order = 8,
-									type = 'color',
-									name = L["PROFESSIONS_FISHING"],
-								},
-								cooking = {
-									order = 9,
-									type = 'color',
-									name = L["PROFESSIONS_COOKING"],
+									name = L["Soul Bag"],
 								},
 							},
 						},
@@ -748,7 +746,7 @@ E.Options.args.bags = {
 								if value == "" or gsub(value, "%s+", "") == "" then return; end --Don't allow empty entries
 
 								--Store by itemID if possible
-								local itemID = match(value, "item:(%d+)")
+								local itemID = strmatch(value, "item:(%d+)")
 								E.db.bags.ignoredItems[(itemID or value)] = value
 							end,
 						},
@@ -768,7 +766,7 @@ E.Options.args.bags = {
 								if value == "" or gsub(value, "%s+", "") == "" then return; end --Don't allow empty entries
 
 								--Store by itemID if possible
-								local itemID = match(value, "item:(%d+)")
+								local itemID = strmatch(value, "item:(%d+)")
 								E.global.bags.ignoredItems[(itemID or value)] = value
 
 								--Remove from profile list if we just added the same item to global list

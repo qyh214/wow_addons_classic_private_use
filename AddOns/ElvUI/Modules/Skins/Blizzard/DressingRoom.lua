@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -8,38 +8,31 @@ local _G = _G
 local SetDressUpBackground = SetDressUpBackground
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.dressingroom ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.dressingroom then return end
 
 	local DressUpFrame = _G.DressUpFrame
-	DressUpFrame:StripTextures()
-	DressUpFrame:CreateBackdrop('Transparent')
-	DressUpFrame.backdrop:Point('TOPLEFT', 10, -12)
-	DressUpFrame.backdrop:Point('BOTTOMRIGHT', -33, 73)
+	S:HandleFrame(DressUpFrame, true, nil, 11, -12, -32, 76)
 
-	DressUpFramePortrait:Kill()
+	DressUpFrame.BGBottomLeft:SetDesaturated(true)
+	DressUpFrame.BGBottomRight:SetDesaturated(true)
+	DressUpFrame.BGTopLeft:SetDesaturated(true)
+	DressUpFrame.BGTopRight:SetDesaturated(true)
 
-	-- SetDressUpBackground()
-	DressUpFrameBackgroundTopLeft:SetDesaturated(true)
-	DressUpFrameBackgroundTopRight:SetDesaturated(true)
-	DressUpFrameBackgroundBot:SetDesaturated(true)
+	_G.DressUpFrameDescriptionText:Point('CENTER', _G.DressUpFrameTitleText, 'BOTTOM', -5, -22)
 
-	DressUpFrameDescriptionText:Point('CENTER', DressUpFrameTitleText, 'BOTTOM', -5, -22)
+	S:HandleCloseButton(_G.DressUpFrameCloseButton, DressUpFrame.backdrop)
 
-	S:HandleCloseButton(DressUpFrameCloseButton)
+	S:HandleRotateButton(_G.DressUpModelFrameRotateLeftButton)
+	_G.DressUpModelFrameRotateLeftButton:Point('TOPLEFT', DressUpFrame, 25, -79)
+	S:HandleRotateButton(_G.DressUpModelFrameRotateRightButton)
+	_G.DressUpModelFrameRotateRightButton:Point('TOPLEFT', _G.DressUpModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
 
-	S:HandleRotateButton(DressUpModelFrameRotateLeftButton)
-	DressUpModelFrameRotateLeftButton:Point('TOPLEFT', DressUpFrame, 25, -79)
-	S:HandleRotateButton(DressUpModelFrameRotateRightButton)
-	DressUpModelFrameRotateRightButton:Point('TOPLEFT', DressUpModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
+	S:HandleButton(_G.DressUpFrameCancelButton)
+	_G.DressUpFrameCancelButton:Point('BOTTOMRIGHT', -35, 80)
+	S:HandleButton(_G.DressUpFrameResetButton)
+	_G.DressUpFrameResetButton:Point('RIGHT', _G.DressUpFrameCancelButton, 'LEFT', -3, 0)
 
-	S:HandleButton(DressUpFrameCancelButton)
-	DressUpFrameCancelButton:Point('CENTER', DressUpFrame, 'TOPLEFT', 306, -423)
-	S:HandleButton(DressUpFrameResetButton)
-	DressUpFrameResetButton:Point('RIGHT', DressUpFrameCancelButton, 'LEFT', -3, 0)
-
-	DressUpModelFrame:CreateBackdrop('Default')
-	DressUpModelFrame.backdrop:Point('TOPLEFT', -2, 1)
-	DressUpModelFrame.backdrop:Point('BOTTOMRIGHT', 0, 19)
+	S:HandleFrame(_G.DressUpModelFrame, true, nil, -2, 1, 0, 19)
 end
 
-S:AddCallback('DressingRoom', LoadSkin)
+S:AddCallback('Skin_DressingRoom', LoadSkin)

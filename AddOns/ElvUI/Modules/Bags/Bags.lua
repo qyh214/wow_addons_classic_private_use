@@ -270,8 +270,7 @@ function B:UpdateAllBagSlots()
 end
 
 function B:IsItemEligibleForItemLevelDisplay(classID, subClassID, equipLoc, rarity)
-	if ((classID == 3 and subClassID == 11) --Artifact Relics
-	or (equipLoc ~= nil and equipLoc ~= "" and equipLoc ~= "INVTYPE_BAG"
+	if ((equipLoc ~= nil and equipLoc ~= "" and equipLoc ~= "INVTYPE_BAG"
 		and equipLoc ~= "INVTYPE_QUIVER" and equipLoc ~= "INVTYPE_TABARD"))
 	and (rarity and rarity > 1) then
 		return true
@@ -364,10 +363,6 @@ function B:UpdateSlot(frame, bagID, slotID)
 		slot.questIcon:Hide()
 	end
 
-	if slot.Azerite then
-		slot.Azerite:Hide()
-	end
-
 	slot.isJunk = (slot.rarity and slot.rarity == LE_ITEM_QUALITY_POOR) and not noValue
 	slot.junkDesaturate = slot.isJunk and E.db.bags.junkDesaturate
 
@@ -401,7 +396,7 @@ function B:UpdateSlot(frame, bagID, slotID)
 		slot:SetBackdropBorderColor(r, g, b)
 		slot.ignoreBorderColors = true
 	elseif clink then
-		local name, _, itemRarity, _, _, _, _, _, itemEquipLoc, _, _, itemClassID, itemSubClassID = GetItemInfo(clink)
+		local name, _, itemRarity, itemLevel, _, _, _, _, itemEquipLoc, _, _, itemClassID, itemSubClassID = GetItemInfo(clink)
 		slot.name = name
 
 		local r, g, b
@@ -413,22 +408,18 @@ function B:UpdateSlot(frame, bagID, slotID)
 		if showBindType or showItemLevel then
 			local colorblind = GetCVarBool('colorblindmode')
 			local canShowItemLevel = showItemLevel and B:IsItemEligibleForItemLevelDisplay(itemClassID, itemSubClassID, itemEquipLoc, slot.rarity)
-			local itemLevelLines, bindTypeLines = colorblind and 4 or 3, colorblind and 8 or 7
-			local iLvl, BoE, BoU --GetDetailedItemLevelInfo this api dont work for some time correctly for ilvl
+			local bindTypeLines = colorblind and 4 or 3
+			local BoE, BoU --GetDetailedItemLevelInfo this api dont work for some time correctly for ilvl
 
 			for i = 2, bindTypeLines do
 				local line = _G["ElvUI_ScanTooltipTextLeft"..i]:GetText()
 				if not line or line == "" then break end
-				if canShowItemLevel and (i <= itemLevelLines) then
-					local itemLevel = line:match(MATCH_ITEM_LEVEL)
-					if itemLevel then iLvl = tonumber(itemLevel) end
-				end
 				if showBindType then
 					-- as long as we check the ilvl first, we can savely break on these because they fall after ilvl
 					if line == _G.ITEM_SOULBOUND or line == _G.ITEM_ACCOUNTBOUND or line == _G.ITEM_BNETACCOUNTBOUND then break end
 					BoE, BoU = line == _G.ITEM_BIND_ON_EQUIP, line == _G.ITEM_BIND_ON_USE
 				end
-				if ((not showBindType) or (BoE or BoU)) and ((not canShowItemLevel) or iLvl) then
+				if ((not showBindType) or (BoE or BoU)) then
 					break
 				end
 			end
@@ -438,8 +429,8 @@ function B:UpdateSlot(frame, bagID, slotID)
 				slot.bindType:SetVertexColor(r, g, b)
 			end
 
-			if iLvl and iLvl >= B.db.itemLevelThreshold then
-				slot.itemLevel:SetText(iLvl)
+			if canShowItemLevel and itemLevel and itemLevel >= B.db.itemLevelThreshold then
+				slot.itemLevel:SetText(itemLevel)
 				if B.db.itemLevelCustomColorEnable then
 					slot.itemLevel:SetTextColor(B.db.itemLevelCustomColor.r, B.db.itemLevelCustomColor.g, B.db.itemLevelCustomColor.b)
 				else
@@ -452,7 +443,7 @@ function B:UpdateSlot(frame, bagID, slotID)
 		if itemClassID == LE_ITEM_CLASS_QUESTITEM then
 			slot.newItemGlow:SetVertexColor(unpack(B.QuestColors.questItem))
 			slot:SetBackdropBorderColor(unpack(B.QuestColors.questItem))
-			if(slot.questIcon) then
+			if slot.questIcon and B.db.questIcon then
 				slot.questIcon:Show()
 			end
 			slot.ignoreBorderColors = true
@@ -1835,15 +1826,11 @@ function B:UpdateSellFrameSettings()
 end
 
 B.BagIndice = {
-	leatherworking = 0x0008,
-	inscription = 0x0010,
+	quiver = 0x0001,
+	ammoPouch = 0x0002,
 	herbs = 0x0020,
 	enchanting = 0x0040,
 	engineering = 0x0080,
-	gems = 0x0200,
-	mining = 0x0400,
-	fishing = 0x8000,
-	cooking = 0x010000,
 	equipment = 2,
 	consumables = 3,
 	tradegoods = 4,
@@ -1884,27 +1871,14 @@ function B:Initialize()
 	_G.UIDropDownMenu_Initialize(ElvUIAssignBagDropdown, B.AssignBagFlagMenu, "MENU")
 ]=]
 
-	if not E.private.bags.enable then
-		-- Set a different default anchor
-		BagFrameHolder:Point("BOTTOMRIGHT", _G.RightChatPanel, "BOTTOMRIGHT", -(E.Border*2), 22 + E.Border*4 - E.Spacing*2)
-		E:CreateMover(BagFrameHolder, 'ElvUIBagMover', L["Bag Mover"], nil, nil, B.PostBagMove, nil, nil, 'bags,general')
-		B:SecureHook('UpdateContainerFrameAnchors')
-		return
-	end
-
-	B.Initialized = true
 	B.db = E.db.bags
-	B.BagFrames = {}
+
 	B.ProfessionColors = {
-		[0x0008]   = { B.db.colors.profession.leatherworking.r, B.db.colors.profession.leatherworking.g, B.db.colors.profession.leatherworking.b },
-		[0x0010]   = { B.db.colors.profession.inscription.r, B.db.colors.profession.inscription.g, B.db.colors.profession.inscription.b },
+		[0x0001]   = { B.db.colors.profession.quiver.r, B.db.colors.profession.quiver.g, B.db.colors.profession.quiver.b},
+		[0x0002]   = { B.db.colors.profession.ammoPouch.r, B.db.colors.profession.ammoPouch.g, B.db.colors.profession.ammoPouch.b},
+		[0x0004]   = { B.db.colors.profession.soulBag.r, B.db.colors.profession.soulBag.g, B.db.colors.profession.soulBag.b},
 		[0x0020]   = { B.db.colors.profession.herbs.r, B.db.colors.profession.herbs.g, B.db.colors.profession.herbs.b },
 		[0x0040]   = { B.db.colors.profession.enchanting.r, B.db.colors.profession.enchanting.g, B.db.colors.profession.enchanting.b },
-		[0x0080]   = { B.db.colors.profession.engineering.r, B.db.colors.profession.engineering.g, B.db.colors.profession.engineering.b },
-		[0x0200]   = { B.db.colors.profession.gems.r, B.db.colors.profession.gems.g, B.db.colors.profession.gems.b },
-		[0x0400]   = { B.db.colors.profession.mining.r, B.db.colors.profession.mining.g, B.db.colors.profession.mining.b },
-		[0x8000]   = { B.db.colors.profession.fishing.r, B.db.colors.profession.fishing.g, B.db.colors.profession.fishing.b },
-		[0x010000] = { B.db.colors.profession.cooking.r, B.db.colors.profession.cooking.g, B.db.colors.profession.cooking.b },
 	}
 
 	B.AssignmentColors = {
@@ -1918,6 +1892,17 @@ function B:Initialize()
 		["questStarter"] = {B.db.colors.items.questStarter.r, B.db.colors.items.questStarter.g, B.db.colors.items.questStarter.b},
 		["questItem"] = {B.db.colors.items.questItem.r, B.db.colors.items.questItem.g, B.db.colors.items.questItem.b},
 	}
+
+	if not E.private.bags.enable then
+		-- Set a different default anchor
+		BagFrameHolder:Point("BOTTOMRIGHT", _G.RightChatPanel, "BOTTOMRIGHT", -(E.Border*2), 22 + E.Border*4 - E.Spacing*2)
+		E:CreateMover(BagFrameHolder, 'ElvUIBagMover', L["Bag Mover"], nil, nil, B.PostBagMove, nil, nil, 'bags,general')
+		B:SecureHook('UpdateContainerFrameAnchors')
+		return
+	end
+
+	B.Initialized = true
+	B.BagFrames = {}
 
 	--Bag Mover: Set default anchor point and create mover
 	BagFrameHolder:Point("BOTTOMRIGHT", _G.RightChatPanel, "BOTTOMRIGHT", 0, 22 + E.Border*4 - E.Spacing*2)

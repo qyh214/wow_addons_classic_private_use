@@ -920,6 +920,7 @@ end
 
 function E:UpdateDataBars(skipCallback)
 	DataBars:EnableDisable_ExperienceBar()
+	DataBars:EnableDisable_PetExperienceBar()
 	DataBars:EnableDisable_ReputationBar()
 	DataBars:UpdateDataBarDimensions()
 
@@ -1455,7 +1456,7 @@ function E:Initialize()
 	self:Tutorials()
 	self.initialized = true
 
-	Minimap:UpdateSettings()
+	Minimap:GetMinimapShape()
 
 	if E.db.general.smoothingAmount and (E.db.general.smoothingAmount ~= 0.33) then
 		E:SetSmoothingAmount(E.db.general.smoothingAmount)

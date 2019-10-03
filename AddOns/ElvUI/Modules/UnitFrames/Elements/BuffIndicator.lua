@@ -10,7 +10,7 @@ local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 
 function UF:Construct_AuraWatch(frame)
-	local auras = CreateFrame("Frame", nil, frame)
+	local auras = CreateFrame('Frame', nil, frame)
 	auras:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 10)
 	auras:SetInside(frame.Health)
 	auras.presentAlpha = 1
@@ -26,6 +26,7 @@ local counterOffsets = {
 	['TOPRIGHT'] = {-6, 1},
 	['BOTTOMLEFT'] = {6, 1},
 	['BOTTOMRIGHT'] = {-6, 1},
+	['CENTER'] = {0, 0},
 	['LEFT'] = {6, 1},
 	['RIGHT'] = {-6, 1},
 	['TOP'] = {0, 0},
@@ -33,18 +34,19 @@ local counterOffsets = {
 }
 
 local textCounterOffsets = {
-	['TOPLEFT'] = {"LEFT", "RIGHT", -2, 0},
-	['TOPRIGHT'] = {"RIGHT", "LEFT", 2, 0},
-	['BOTTOMLEFT'] = {"LEFT", "RIGHT", -2, 0},
-	['BOTTOMRIGHT'] = {"RIGHT", "LEFT", 2, 0},
-	['LEFT'] = {"LEFT", "RIGHT", -2, 0},
-	['RIGHT'] = {"RIGHT", "LEFT", 2, 0},
-	['TOP'] = {"RIGHT", "LEFT", 2, 0},
-	['BOTTOM'] = {"RIGHT", "LEFT", 2, 0},
+	['TOPLEFT'] = {'LEFT', 'RIGHT', -2, 0},
+	['TOPRIGHT'] = {'RIGHT', 'LEFT', 2, 0},
+	['BOTTOMLEFT'] = {'LEFT', 'RIGHT', -2, 0},
+	['BOTTOMRIGHT'] = {'RIGHT', 'LEFT', 2, 0},
+	['CENTER'] = {'CENTER', 'CENTER', 0, 0},
+	['LEFT'] = {'LEFT', 'RIGHT', -2, 0},
+	['RIGHT'] = {'RIGHT', 'LEFT', 2, 0},
+	['TOP'] = {'RIGHT', 'LEFT', 2, 0},
+	['BOTTOM'] = {'RIGHT', 'LEFT', 2, 0},
 }
 
 function UF:UpdateAuraWatchFromHeader(group, petOverride)
-	assert(self[group], "Invalid group specified.")
+	assert(self[group], 'Invalid group specified.')
 	group = self[group]
 	for i=1, group:GetNumChildren() do
 		local frame = select(i, group:GetChildren())
@@ -106,7 +108,7 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 		end
 	end
 
-	local unitframeFont = LSM:Fetch("font", E.db.unitframe.font)
+	local unitframeFont = LSM:Fetch('font', E.db.unitframe.font)
 
 	for i=1, #buffs do
 		if buffs[i].id then
@@ -114,7 +116,7 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 			if name then
 				local icon
 				if not auras.icons[buffs[i].id] then
-					icon = CreateFrame("Frame", nil, auras);
+					icon = CreateFrame('Frame', nil, auras);
 				else
 					icon = auras.icons[buffs[i].id];
 				end
@@ -134,13 +136,13 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 				icon:Width(icon.size);
 				icon:Height(icon.size);
 				--Protect against missing .point value
-				if not buffs[i].point then buffs[i].point = "TOPLEFT" end
+				if not buffs[i].point then buffs[i].point = 'TOPLEFT' end
 
 				icon:ClearAllPoints()
-				icon:Point(buffs[i].point or "TOPLEFT", frame.Health, buffs[i].point or "TOPLEFT", buffs[i].xOffset, buffs[i].yOffset);
+				icon:Point(buffs[i].point or 'TOPLEFT', frame.Health, buffs[i].point or 'TOPLEFT', buffs[i].xOffset, buffs[i].yOffset);
 
 				if not icon.icon then
-					icon.icon = icon:CreateTexture(nil, "BORDER");
+					icon.icon = icon:CreateTexture(nil, 'BORDER');
 					icon.icon:SetAllPoints(icon);
 				end
 
@@ -151,15 +153,15 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 				end
 
 				if not icon.border then
-					icon.border = icon:CreateTexture(nil, "BACKGROUND");
-					icon.border:Point("TOPLEFT", -E.mult, E.mult);
-					icon.border:Point("BOTTOMRIGHT", E.mult, -E.mult);
+					icon.border = icon:CreateTexture(nil, 'BACKGROUND');
+					icon.border:Point('TOPLEFT', -E.mult, E.mult);
+					icon.border:Point('BOTTOMRIGHT', E.mult, -E.mult);
 					icon.border:SetTexture(E.media.blankTex);
 					icon.border:SetVertexColor(0, 0, 0);
 				end
 
 				if not icon.cd then
-					icon.cd = CreateFrame("Cooldown", nil, icon, "CooldownFrameTemplate")
+					icon.cd = CreateFrame('Cooldown', nil, icon, 'CooldownFrameTemplate')
 					icon.cd:SetAllPoints(icon)
 					icon.cd:SetReverse(true)
 					icon.cd:SetHideCountdownNumbers(true)
@@ -204,7 +206,7 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 				end
 
 				if not icon.count then
-					icon.count = icon:CreateFontString(nil, "OVERLAY");
+					icon.count = icon:CreateFontString(nil, 'OVERLAY');
 				end
 
 				icon.count:ClearAllPoints()
@@ -212,7 +214,7 @@ function UF:UpdateAuraWatch(frame, petOverride, db)
 					local point, anchorPoint, x, y = unpack(textCounterOffsets[buffs[i].point])
 					icon.count:Point(point, icon.text, anchorPoint, x, y)
 				else
-					icon.count:Point("CENTER", unpack(counterOffsets[buffs[i].point]));
+					icon.count:Point('CENTER', unpack(counterOffsets[buffs[i].point]));
 				end
 
 				icon.count:FontTemplate(unitframeFont, db.fontSize, E.db.unitframe.fontOutline);

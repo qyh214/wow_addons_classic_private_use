@@ -62,6 +62,30 @@
 				end
 			end
 			
+			-- ~bossdetection ~classic
+			local libBossIds = LibStub("LibBossIDs-1.0")
+			for _, actor in _ipairs (_detalhes.tabela_vigente[class_type_dano]._ActorTable) do 
+				if (actor:IsEnemy()) then
+					local npcId = _detalhes:GetNpcIdFromGuid (actor.serial)
+					if (npcID) then
+						if (libBossIds and libBossIds.BossIDs[npcID]) then 
+							local boss_table = {
+								index = 1,
+								name = actor:GetName(),
+								encounter = actor:GetName(),
+								zone = ZoneName,
+								mapid = ZoneMapID,
+								diff = 16,
+								diff_string = "normal",
+								ej_instance_id = 0,
+								id = 0,
+							}
+							_detalhes.tabela_vigente.is_boss = boss_table
+						end
+					end
+				end
+			end
+
 			for _, actor in _ipairs (_detalhes.tabela_vigente[class_type_dano]._ActorTable) do 
 			
 				if (not actor.grupo and not actor.owner and not actor.nome:find ("[*]") and _bit_band (actor.flag_original, 0x00000060) ~= 0) then --> 0x20+0x40 neutral + enemy reaction
@@ -276,6 +300,30 @@
 									return boss_found (BossIndex, _detalhes:GetBossName (ZoneMapID, BossIndex), ZoneName, ZoneMapID, DifficultyID)
 								end
 							end
+						end
+					end
+				end
+			end
+
+			-- ~bossdetection ~classic
+			local libBossIds = LibStub("LibBossIDs-1.0")
+			for _, actor in _ipairs (_detalhes.tabela_vigente[class_type_dano]._ActorTable) do 
+				if (actor:IsEnemy()) then
+					local npcId = _detalhes:GetNpcIdFromGuid (actor.serial)
+					if (npcID) then
+						if (libBossIds and libBossIds.BossIDs[npcID]) then 
+							local boss_table = {
+								index = 1,
+								name = actor:GetName(),
+								encounter = actor:GetName(),
+								zone = ZoneName,
+								mapid = ZoneMapID,
+								diff = 16,
+								diff_string = "normal",
+								ej_instance_id = 0,
+								id = 0,
+							}
+							_detalhes.tabela_vigente.is_boss = boss_table
 						end
 					end
 				end

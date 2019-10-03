@@ -7,18 +7,18 @@ Dependencies: LibStub, ChatThrottleLib
 ]]
 
 local major = "LibClassicHealComm-1.0"
-local minor = 19
+local minor = 20
 assert(LibStub, string.format("%s requires LibStub.", major))
 
 local HealComm = LibStub:NewLibrary(major, minor)
 if( not HealComm ) then return end
 
 -- API CONSTANTS
---local ALL_DATA = 0x0f
+local ALL_DATA = 0x0f
 local DIRECT_HEALS = 0x01
 local CHANNEL_HEALS = 0x02
 local HOT_HEALS = 0x04
---local ABSORB_SHIELDS = 0x08
+local ABSORB_SHIELDS = 0x08
 local ALL_HEALS = bit.bor(DIRECT_HEALS, CHANNEL_HEALS, HOT_HEALS)
 local CASTED_HEALS = bit.bor(DIRECT_HEALS, CHANNEL_HEALS)
 local OVERTIME_HEALS = bit.bor(HOT_HEALS, CHANNEL_HEALS)
@@ -271,7 +271,7 @@ local function clearPendingHeals()
 	for casterGUID, spells in pairs(pendingHeals) do
 		for _, pending in pairs(spells) do
 			if( pending.bitType ) then
- 				table.wipe(tempPlayerList)
+				table.wipe(tempPlayerList)
 				for i=#(pending), 1, -5 do table.insert(tempPlayerList, pending[i - 4]) end
 
 				if( #(tempPlayerList) > 0 ) then
@@ -286,7 +286,7 @@ local function clearPendingHeals()
 	for casterGUID, spells in pairs(pendingHots) do
 		for _, pending in pairs(spells) do
 			if( pending.bitType ) then
- 				table.wipe(tempPlayerList)
+				table.wipe(tempPlayerList)
 				for i=#(pending), 1, -5 do table.insert(tempPlayerList, pending[i - 4]) end
 
 				if( #(tempPlayerList) > 0 ) then
@@ -432,9 +432,14 @@ end
 -- Gets healing amount using the passed filters
 function HealComm:GetHealAmount(guid, bitFlag, time, casterGUID)
 	local amount = 0
-	if( casterGUID and pendingHeals[casterGUID] ) then
-		amount = filterData(pendingHeals[casterGUID], guid, bitFlag, time) + filterData(pendingHots[casterGUID], guid, bitFlag, time)
-	elseif( not casterGUID ) then
+	if casterGUID then
+		if pendingHeals[casterGUID] then
+			amount = amount + filterData(pendingHeals[casterGUID], guid, bitFlag, time)
+		end
+		if pendingHots[casterGUID] then
+			amount = amount + filterData(pendingHots[casterGUID], guid, bitFlag, time)
+		end
+	else
 		for _, spells in pairs(pendingHeals) do
 			amount = amount + filterData(spells, guid, bitFlag, time)
 		end
@@ -447,7 +452,7 @@ function HealComm:GetHealAmount(guid, bitFlag, time, casterGUID)
 end
 
 -- Gets healing amounts for everyone except the player using the passed filters
-function HealComm:GetOthersHealAmount(guid)
+function HealComm:GetOthersHealAmount(guid, bitFlag, time)
 	local amount = 0
 	for casterGUID, spells in pairs(pendingHeals) do
 		if( casterGUID ~= playerGUID ) then
@@ -463,7 +468,7 @@ function HealComm:GetOthersHealAmount(guid)
 	return amount > 0 and amount or nil
 end
 
-function HealComm:GetCasterHealAmount(guid)
+function HealComm:GetCasterHealAmount(guid, bitFlag, time)
 	local amount = pendingHeals[guid] and filterData(pendingHeals[guid], nil, bitFlag, time, true) or 0
 	amount = amount + (pendingHots[guid] and filterData(pendingHots[guid], nil, bitFlag, time, true) or 0)
 	return amount > 0 and amount or nil
@@ -926,7 +931,7 @@ if( playerClass == "PRIEST" ) then
 			if( spellName == Renew or spellName == GreaterHealHot ) then
 				healModifier = healModifier + talentData[ImprovedRenew].current
 
-				ticks = hotData[spellID].ticks
+				local ticks = hotData[spellID].ticks
 				duration = 15
 
 				healAmount = healAmount / ticks
@@ -1184,7 +1189,7 @@ function HealComm:UNIT_AURA(unit)
 	local increase, decrease, playerIncrease, playerDecrease = 1, 1, 1, 1
 
 	-- Scan debuffs
-	id = 1
+	local id = 1
 	while( true ) do
 		local _, _, stack, _, _, _, _, _, _, spellID = UnitAura(unit, id, "HARMFUL")
 		if( not spellID ) then break end
@@ -1292,7 +1297,7 @@ local function parseDirectHeal(casterGUID, spellID, amount, castTime, ...)
 	if unit == "player" then
 		endTime = select(5, CastingInfo())
 	else
-		endTime = GetTime() + castTime
+		endTime = GetTime() + (castTime or 1.5)
 	end
 
 	pendingHeals[casterGUID] = pendingHeals[casterGUID] or {}

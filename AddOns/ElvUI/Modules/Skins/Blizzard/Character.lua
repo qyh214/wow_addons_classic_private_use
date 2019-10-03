@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -6,9 +6,10 @@ local S = E:GetModule('Skins')
 local _G = _G
 local unpack = unpack
 local pairs = pairs
-local find, strfind = string.find, strfind
+local strfind = strfind
 --WoW API / Variables
-local GetInventoryItemTexture = GetInventoryItemTexture
+local HasPetUI = HasPetUI
+local GetPetHappiness = GetPetHappiness
 local GetInventoryItemQuality = GetInventoryItemQuality
 local GetItemQualityColor = GetItemQualityColor
 local GetNumFactions = GetNumFactions
@@ -18,16 +19,13 @@ local CHARACTERFRAME_SUBFRAMES = CHARACTERFRAME_SUBFRAMES
 local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.character ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
 
 	-- Character Frame
-	_G.CharacterFrame:StripTextures(true)
+	local CharacterFrame = _G.CharacterFrame
+	S:HandleFrame(CharacterFrame, true, nil, 11, -12, -32, 76)
 
-	_G.CharacterFrame:CreateBackdrop('Transparent')
-	_G.CharacterFrame.backdrop:Point('TOPLEFT', 11, -12)
-	_G.CharacterFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
-
-	S:HandleCloseButton(_G.CharacterFrameCloseButton)
+	S:HandleCloseButton(_G.CharacterFrameCloseButton, CharacterFrame.backdrop)
 
 	for i = 1, #CHARACTERFRAME_SUBFRAMES do
 		S:HandleTab(_G['CharacterFrameTab'..i])
@@ -75,34 +73,29 @@ local function LoadSkin()
 
 	HandleResistanceFrame('MagicResFrame')
 
-	for _, slot in pairs({ PaperDollItemsFrame:GetChildren() }) do
-		local icon = _G[slot:GetName()..'IconTexture']
-		local cooldown = _G[slot:GetName()..'Cooldown']
+	for _, slot in pairs({ _G.PaperDollItemsFrame:GetChildren() }) do
+		if slot:IsObjectType('Button') then
+			local icon = _G[slot:GetName()..'IconTexture']
+			local cooldown = _G[slot:GetName()..'Cooldown']
 
-		slot:StripTextures()
-		slot:SetTemplate('Default', true, true)
-		slot:StyleButton()
+			slot:StripTextures()
+			slot:SetTemplate('Default', true, true)
+			slot:StyleButton()
 
-		S:HandleIcon(icon)
+			S:HandleIcon(icon)
 
-		if cooldown then
-			E:RegisterCooldown(cooldown)
+			if cooldown then
+				E:RegisterCooldown(cooldown)
+			end
 		end
 	end
 
-	hooksecurefunc('PaperDollItemSlotButton_Update', function(self, cooldownOnly)
-		if cooldownOnly then return end
-
-		local textureName = GetInventoryItemTexture('player', self:GetID())
-		if textureName then
-			local rarity = GetInventoryItemQuality('player', self:GetID())
-			if rarity and rarity > 1 then
-				self:SetBackdropBorderColor(GetItemQualityColor(rarity))
-			else
-				self:SetBackdropBorderColor(unpack(E.media.bordercolor))
-			end
+	hooksecurefunc('PaperDollItemSlotButton_Update', function(self)
+		local rarity = GetInventoryItemQuality('player', self:GetID())
+		if rarity and rarity > 1 then
+			E:SetBackdropBorderColor(self, GetItemQualityColor(rarity))
 		else
-			self:SetBackdropBorderColor(unpack(E.media.bordercolor))
+			E:SetBackdropBorderColor(self, unpack(E.media.bordercolor))
 		end
 	end)
 
@@ -261,7 +254,7 @@ local function LoadSkin()
 	end
 
 	hooksecurefunc('SkillFrame_SetStatusBar', function(statusBarID, skillIndex, numSkills)
-		local skillLine = _G["SkillTypeLabel"..statusBarID]
+		local skillLine = _G['SkillTypeLabel'..statusBarID]
 		if strfind(skillLine:GetNormalTexture():GetTexture(), 'MinusButton') then
 			skillLine:SetNormalTexture(E.Media.Textures.MinusButton)
 		else
@@ -281,8 +274,8 @@ local function LoadSkin()
 	_G.SkillDetailStatusBar:SetStatusBarTexture(E.media.normTex)
 	E:RegisterStatusBar(_G.SkillDetailStatusBar)
 
-	S:HandleNextPrevButton(_G.SkillDetailStatusBarUnlearnButton)
-	-- S:SquareButton_SetIcon(SkillDetailStatusBarUnlearnButton, 'DELETE')
+	S:HandleCloseButton(_G.SkillDetailStatusBarUnlearnButton)
+	S:HandleButton(_G.SkillDetailStatusBarUnlearnButton)
 	_G.SkillDetailStatusBarUnlearnButton:Size(24)
 	_G.SkillDetailStatusBarUnlearnButton:Point('LEFT', _G.SkillDetailStatusBarBorder, 'RIGHT', 5, 0)
 	_G.SkillDetailStatusBarUnlearnButton:SetHitRectInsets(0, 0, 0, 0)

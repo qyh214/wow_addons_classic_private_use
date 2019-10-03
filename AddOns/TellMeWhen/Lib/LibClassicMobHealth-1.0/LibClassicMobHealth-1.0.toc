@@ -1,0 +1,13 @@
+## Interface: 11302
+## LoadOnDemand: 1
+## Title: Lib: ClassicMobHealth-1.0
+## Notes: Estimates a mob's health
+## Author: Pneumatus
+## X-Credits: ckknight, neronix
+## Version: 1.0
+## X-Category: Library
+## SavedVariables: LibClassicMobHealth10DB, LibClassicMobHealth10Opt
+## X-License: LGPL v2.1
+
+LibStub\LibStub.lua
+lib.xml

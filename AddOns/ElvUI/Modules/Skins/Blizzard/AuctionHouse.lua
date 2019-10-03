@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -12,13 +12,11 @@ local GetAuctionSellItemInfo = GetAuctionSellItemInfo
 local GetItemQualityColor = GetItemQualityColor
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.auctionhouse ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.auctionhouse then return end
 
 	local AuctionFrame = _G.AuctionFrame
 	AuctionFrame:StripTextures(true)
-	AuctionFrame:CreateBackdrop('Transparent')
-	AuctionFrame.backdrop:Point('TOPLEFT', 10, 0)
-	AuctionFrame.backdrop:Point('BOTTOMRIGHT', 0, 0)
+	S:HandleFrame(AuctionFrame, true, nil, 10)
 
 	local Buttons = {
 		_G.BrowseSearchButton,
@@ -241,21 +239,23 @@ local function LoadSkin()
 			Button:GetHighlightTexture():SetVertexColor(1, 1, 1, .2)
 
 			ItemButton:GetNormalTexture():SetTexture()
-			Button:GetHighlightTexture():Point("TOPLEFT", ItemButton, "TOPRIGHT", 2, 0)
-			Button:GetHighlightTexture():Point("BOTTOMRIGHT", Button, "BOTTOMRIGHT", -2, 5)
+			Button:GetHighlightTexture():Point('TOPLEFT', ItemButton, 'TOPRIGHT', 2, 0)
+			Button:GetHighlightTexture():Point('BOTTOMRIGHT', Button, 'BOTTOMRIGHT', -2, 5)
 
 			S:HandleIcon(Texture)
 			Texture:SetInside()
 
-			hooksecurefunc(Name, "SetVertexColor", function(_, r, g, b)
-				if not (r == g) then
-					ItemButton:SetBackdropBorderColor(r, g, b)
-				else
-					ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
-				end
-			end)
+			if Name then
+				hooksecurefunc(Name, 'SetVertexColor', function(_, r, g, b)
+					if not (r == g) then
+						ItemButton:SetBackdropBorderColor(r, g, b)
+					else
+						ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
+					end
+				end)
 
-			hooksecurefunc(Name, "Hide", function() ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor)) end)
+				hooksecurefunc(Name, 'Hide', function() ItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor)) end)
+			end
 		end
 	end
 
@@ -286,10 +286,8 @@ local function LoadSkin()
 
 	local AuctionFrameBid = _G.AuctionFrameBid
 	AuctionFrameBid.Background = CreateFrame('Frame', nil, AuctionFrameBid)
-	AuctionFrameBid.Background:SetTemplate('Transparent')
-	AuctionFrameBid.Background:Point('TOPLEFT', 22, -72)
-	AuctionFrameBid.Background:Point('BOTTOMRIGHT', 66, 34)
+	S:HandleFrame(AuctionFrameBid.Background, true, nil, 22, -72, 66, 34)
 	AuctionFrameBid.Background:SetFrameLevel(AuctionFrameBid:GetFrameLevel() - 1)
 end
 
-S:AddCallbackForAddon('Blizzard_AuctionUI', 'AuctionHouse', LoadSkin)
+S:AddCallbackForAddon('Blizzard_AuctionUI', 'Skin_Blizzard_AuctionUI', LoadSkin)

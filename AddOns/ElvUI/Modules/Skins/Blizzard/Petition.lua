@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -6,13 +6,10 @@ local S = E:GetModule('Skins')
 local _G = _G
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.petition ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.petition then return end
 
 	local PetitionFrame = _G.PetitionFrame
-	PetitionFrame:StripTextures(true)
-	PetitionFrame:CreateBackdrop('Transparent')
-	PetitionFrame.backdrop:Point('TOPLEFT', 12, -17)
-	PetitionFrame.backdrop:Point('BOTTOMRIGHT', -28, 65)
+	S:HandleFrame(PetitionFrame, true, nil, 12, -17, -28, 65)
 
 	S:HandleButton(_G.PetitionFrameSignButton)
 	S:HandleButton(_G.PetitionFrameRequestButton)
@@ -36,4 +33,4 @@ local function LoadSkin()
 	_G.PetitionFrameRenameButton:Point('RIGHT', _G.PetitionFrameCancelButton, 'LEFT', -3, 0)
 end
 
-S:AddCallback('Petition', LoadSkin)
+S:AddCallback('Skin_Petition', LoadSkin)

@@ -281,6 +281,7 @@ function S:Ace3_RegisterAsContainer(widget)
 				local child = select(i, frame:GetChildren())
 				if child:IsObjectType('Button') and child:GetText() then
 					S:HandleButton(child)
+					child:Point('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', -16, 16)
 				else
 					child:StripTextures()
 				end

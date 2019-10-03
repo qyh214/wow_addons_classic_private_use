@@ -2,6 +2,41 @@
 
 This mod is distributed under Version 2 of the GPL.  A copy of the GPL is included in this zip file with links to non-english translations.
 
+## v1.2.1 (Oct. 01, 2019)
+
+- Add a option to show level for bosses
+- Small fixes
+
+## v1.2.0 (Sep. 30, 2019)
+
+- Add droprates for dungeons / raids
+- Add auto select for dungeons / raids
+- Update content phase items
+- Add License back into zip file
+
+## v1.1.12 (Sep. 18, 2019)
+
+- Update BRD loottables
+- Some small bugfixes
+- Translation updates. Big thanks to all the translators!!!
+- Maps: Add Uldaman map data
+
+## v1.1.11 (Sep. 14, 2019)
+
+- Fix koKR translation
+
+## v1.1.10 (Sep. 14, 2019)
+
+- Profession rank updates
+- Add most missing profession skill ranks
+- Fix useGameTooltip function
+- Maps: Add data for WorldBosses
+- Maps: Entrance map support
+
+## v1.1.9-beta (Sep. 03, 2019)
+
+- Add support for AtlasLootClassic_Maps Module
+
 ## v1.1.8-beta (Aug. 31, 2019)
 
 - Split Scarlet Monastery into wings

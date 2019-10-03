@@ -74,9 +74,6 @@ L.Button_InfoFrame			= "Show/hide info frame"
 L.Button_TestBars			= "Start test bars"
 L.Button_ResetInfoRange		= "Reset Info/Range frames"
 
-L.ClassicOptions			= "Classic Options"
-L.UseRetailShamanColor		= "Override WoW Classic Shaman class color with retail one (GLOBALLY)"
-
 -- Tab: Raidwarning
 L.Tab_RaidWarning 			= "Raid Warnings"
 L.RaidWarning_Header		= "Raid Warning Options"
@@ -115,12 +112,12 @@ L.CombatMessages			= "Combat Message Options"
 L.ShowEngageMessage 		= "Show engage messages in chat frame"
 L.ShowDefeatMessage 		= "Show kill/wipe messages in chat frame"
 L.ShowGuildMessages 		= "Show engage/kill/wipe messages for guild raids in chat frame"
-L.WhisperMessages			= "Whisper Message Options"
+L.WhisperMessages			= "Auto-Reply/Sharing Message Options"
 L.AutoRespond 				= "Auto-respond to whispers while fighting"
-L.EnableStatus 				= "Reply to 'status' whispers"
 L.WhisperStats 				= "Include kill/wipe stats in whisper responses"
 L.DisableStatusWhisper 		= "Disable status whispers for the entire group (requires Group Leader). Applies only to raids"
 L.DisableGuildStatus 		= "Disable progression messages from being sent to guild for entire group (requires Group Leader)."
+L.EnableWBSharing 			= "Share when you pull/defeat a world boss with your battle.net friends that are on same realm. (This information will always be shared with your guild)"
 
 -- Tab: Barsetup
 L.BarSetup					= "Bar Setup"
@@ -224,7 +221,7 @@ L.SpecialWarnSound5			= "Set default sound for special warnings with notes conta
 
 -- Tab: Spoken Alerts Frame
 L.Panel_SpokenAlerts		= "Spoken Alerts"
-L.Area_VoiceSelection		= "Voice Selections (scroll selection menus with mouse wheel)"
+L.Area_VoiceSelection		= "Voice Selections"
 L.CountdownVoice			= "Set primary voice for count sounds"
 L.CountdownVoice2			= "Set secondary voice for count sounds"
 L.CountdownVoice3			= "Set tertiary voice for count sounds"

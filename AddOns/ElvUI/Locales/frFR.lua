@@ -37,7 +37,6 @@ L["Auras"] = "Auras"
 L["Auto Scale"] = "Échelle automatique"
 L["AVD: "] = "Evitement : "
 L["Avoidance Breakdown"] = "Répartition de l'évitement"
-L["Azerite Bar"] = true
 L["Bag Mover (Grow Down)"] = "Orientation des sacs (ajouter vers le bas)"
 L["Bag Mover (Grow Up)"] = "Orientation des sacs (ajouter vers le haut)"
 L["Bag Mover"] = "Orientation des sacs"

@@ -1,0 +1,53 @@
+Guidelime.registerGuide(
+[[
+[N 57-58 Silithus]
+[GA Alliance]
+ONLY CHOOSE THIS GUIDE IF THE SILITHUS QUESTS/CENARION HOLD ARE AVAILABLE!!!
+Ride west into Silithus[OC]
+[G81.8,18.6Silithus]Turn in[QT1124]
+Accept[QA1125]
+[G51,38]Turn in[QT8275]
+Accept[QA8280]
+Inside the inn, accept[QA8307] - requires 285 cooking]
+Upstairs, accept[QA8277]
+Outside and up the dirt ramp to the northwest, talk to the dwarf to accept[QA8284] Geologist Larksbane
+[G59,46]Kill the spirits -- they're very tough and you may need to group for this.[OC]
+[G63,55]IF Reliquary of Purty was available to take, then go here to loot it for[QC5527][OC]
+Finish kill mobs for [QC1125]
+Head north into the Wasteland, start working on Killing Dredge Strikers, and killing spiders and scorpions for the fangs and stingers. \\ Also keep the sand worm meat for later[OC]
+[G81.8,18.6]Turn in[QT1125]
+Accept[QA1126]
+On the way back to Cenarion hold, make sure you finish [QC8280] and [QC8277]
+[G51,38]Turn in[QT8280]
+Accept[QA8281]
+Inside the building, Upstairs, turn in[QT8277]
+Accept[QA8278]
+[V]Sell trash but don't vendor the sandworm meat
+Run north out of Cenarion Hold[OC]
+[G23,14]Avoid the Elites and loot the fragments off the ground, or from the rock elementals in the area[QC8284]
+Head south and keep an eye out for Dredge Crushes and Stonelash scorpions. You don't need to finish these immediately, just start working.[OC]
+[G37,45]Turn in[QT8307] at the book under the tent, on top of the crate
+Accept[QA8313]
+Back to the Dwarf in Cenarion Hold, turn in[QT8284]
+Accept[QA8285]
+[G51.8,39]Turn in[QT8313]
+Learn the recipe and accept [QA8317]
+You should have 10 sand worm meat to finish this already[OC]
+[G50,36][V]Buy Soothing spices, then use the brazier outside the inn to cook your sandworm meat.
+[G51.8,39]Turn in[QT8317]
+Head south out of Cenarion Hold until you see a giant skeleton, then head east[OC]
+[G66.8,69.6]Finish [QC8281] and [QC8278] on the way and then turn in[QT8285]
+Once you're done with both quests, head back to Cenarion Hold.[OC]
+Turn in[QT8281]
+Upstairs in the inn, turn in[QT8278]
+From Noggle, accept[QA8282]
+[G41,91]Follow the ramp up the mountain, there's a satchel on the side of the hill at [L44,91], loot it for[QC8282]
+[G60,52]There are 3 elites stealthed downstairs, you can run up to the top and suicide, then rez at the top, or slowly kill your way to the top of the tower[OC]
+Once you spirit rez at the top of the tower, loot the item in the corner, two mobs will spawn, kill them and loot to complete [QC1126]
+Run back to Cenarion Hold/Suicide and spirit rez[OC]
+Upstairs in the inn, turn in[QT8282]
+[G81.8,18.6]Turn in[QT1126]
+Accept[QA6844]
+[H]Hearth back to Menethil Harbor where we will rejoin players in the Western Plaguelands guide.
+[NX 57-60 Western Plaguelands]
+]],"Hakurai - by Shikushiku")

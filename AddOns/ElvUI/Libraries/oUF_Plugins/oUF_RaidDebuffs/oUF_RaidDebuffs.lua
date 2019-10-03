@@ -79,7 +79,8 @@ do
 		SHAMAN = { Poison = true, Disease = true },
 		PALADIN = { Poison = true, Magic = true, Disease = true },
 		MAGE = { Curse = true },
-		DRUID = { Curse = true, Poison = true }
+		DRUID = { Curse = true, Poison = true },
+		WARLOCK = { Magic = true }
 	}
 
 	DispellFilter = dispellClasses[playerClass] or {}

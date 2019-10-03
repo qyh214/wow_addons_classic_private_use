@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local M = E:GetModule('Minimap')
 
 --Lua functions
@@ -15,10 +15,13 @@ local IsInGuild = IsInGuild
 local MainMenuMicroButton_SetNormal = MainMenuMicroButton_SetNormal
 local PlaySound = PlaySound
 local ShowUIPanel, HideUIPanel = ShowUIPanel, HideUIPanel
+local ToggleChannelFrame = ToggleChannelFrame
 local ToggleCharacter = ToggleCharacter
+local ToggleFrame = ToggleFrame
 local ToggleFriendsFrame = ToggleFriendsFrame
 local ToggleGuildFrame = ToggleGuildFrame
-local ToggleFrame = ToggleFrame
+local ToggleHelpFrame = ToggleHelpFrame
+local ToggleTalentFrame = ToggleTalentFrame
 -- GLOBALS: GetMinimapShape
 
 --Create the minimap micro menu
@@ -27,30 +30,14 @@ local menuList = {
 	{text = _G.CHARACTER_BUTTON,
 	func = function() ToggleCharacter("PaperDollFrame") end},
 	{text = _G.SPELLBOOK_ABILITIES_BUTTON,
-	func = function()
-		if not _G.SpellBookFrame:IsShown() then
-			ShowUIPanel(_G.SpellBookFrame)
-		else
-			HideUIPanel(_G.SpellBookFrame)
-		end
-	end},
+	func = function() ToggleFrame(_G.SpellBookFrame) end},
 	{text = _G.TALENTS_BUTTON,
-	func = function()
-		if not _G.TalentFrame then
-			_G.TalentFrame_LoadUI()
-		end
-
-		if not TalentFrame:IsShown() then
-			ShowUIPanel(TalentFrame)
-		else
-			HideUIPanel(TalentFrame)
-		end
-	end},
+	func = ToggleTalentFrame},
 	{text = _G.CHAT_CHANNELS,
-	func = _G.ToggleChannelFrame},
+	func = ToggleChannelFrame},
 	{text = _G.TIMEMANAGER_TITLE,
-	func = function() ToggleFrame(_G.TimeManagerFrame) end},
-	{text = _G.SOCIAL_LABEL,
+	func = function() TimeManager_Toggle() end},
+	{text = _G.SOCIAL_BUTTON,
 	func = ToggleFriendsFrame},
 	{text = _G.GUILD,
 	func = function()
@@ -64,24 +51,25 @@ local menuList = {
 	func = function()
 		if not _G.GameMenuFrame:IsShown() then
 			if _G.VideoOptionsFrame:IsShown() then
-				_G.VideoOptionsFrameCancel:Click();
+				_G.VideoOptionsFrameCancel:Click()
 			elseif _G.AudioOptionsFrame:IsShown() then
-				_G.AudioOptionsFrameCancel:Click();
+				_G.AudioOptionsFrameCancel:Click()
 			elseif _G.InterfaceOptionsFrame:IsShown() then
-				_G.InterfaceOptionsFrameCancel:Click();
+				_G.InterfaceOptionsFrameCancel:Click()
 			end
 
-			CloseMenus();
+			CloseMenus()
 			CloseAllWindows()
 			PlaySound(850) --IG_MAINMENU_OPEN
-			ShowUIPanel(_G.GameMenuFrame);
+			ShowUIPanel(_G.GameMenuFrame)
 		else
 			PlaySound(854) --IG_MAINMENU_QUIT
-			HideUIPanel(_G.GameMenuFrame);
-			MainMenuMicroButton_SetNormal();
+			HideUIPanel(_G.GameMenuFrame)
+			MainMenuMicroButton_SetNormal()
 		end
 	end},
-	{text = _G.HELP_BUTTON, func = ToggleHelpFrame}
+	{text = _G.HELP_BUTTON,
+	func = ToggleHelpFrame}
 }
 
 function M:GetLocTextColor()
@@ -104,8 +92,6 @@ end
 function M:ADDON_LOADED(_, addon)
 	if addon == "Blizzard_TimeManager" then
 		_G.TimeManagerClockButton:Kill()
-	elseif addon == "Blizzard_FeedbackUI" then
-		_G.FeedbackUIButton:Kill()
 	end
 end
 
@@ -132,7 +118,7 @@ function M:Minimap_OnMouseWheel(d)
 end
 
 function M:Update_ZoneText()
-	if E.db.general.minimap.locationText == 'HIDE' or not E.private.general.minimap.enable then return; end
+	if E.db.general.minimap.locationText == 'HIDE' or not E.private.general.minimap.enable then return end
 	_G.Minimap.location:SetText(utf8sub(GetMinimapZoneText(),1,46))
 	_G.Minimap.location:SetTextColor(M:GetLocTextColor())
 	_G.Minimap.location:FontTemplate(E.Libs.LSM:Fetch("font", E.db.general.minimap.locationFont), E.db.general.minimap.locationFontSize, E.db.general.minimap.locationFontOutline)
@@ -154,126 +140,103 @@ end
 local isResetting
 local function ResetZoom()
 	_G.Minimap:SetZoom(0)
-	_G.MinimapZoomIn:Enable(); --Reset enabled state of buttons
-	_G.MinimapZoomOut:Disable();
+	_G.MinimapZoomIn:Enable() --Reset enabled state of buttons
+	_G.MinimapZoomOut:Disable()
 	isResetting = false
 end
+
 local function SetupZoomReset()
 	if E.db.general.minimap.resetZoom.enable and not isResetting then
 		isResetting = true
 		E:Delay(E.db.general.minimap.resetZoom.time, ResetZoom)
 	end
 end
+
 hooksecurefunc(_G.Minimap, "SetZoom", SetupZoomReset)
 
 function M:UpdateSettings()
 	if InCombatLockdown() then
 		self:RegisterEvent('PLAYER_REGEN_ENABLED')
+		return
 	end
+
 	E.MinimapSize = E.private.general.minimap.enable and E.db.general.minimap.size or _G.Minimap:GetWidth() + 10
 	E.MinimapWidth, E.MinimapHeight = E.MinimapSize, E.MinimapSize
 
-	if E.private.general.minimap.enable then
-		_G.Minimap:Size(E.MinimapSize, E.MinimapSize)
-	end
+	_G.Minimap:Size(E.MinimapSize, E.MinimapSize)
 
 	local LeftMiniPanel = _G.LeftMiniPanel
 	local RightMiniPanel = _G.RightMiniPanel
-	if LeftMiniPanel and RightMiniPanel then
-		if E.db.datatexts.minimapPanels and E.private.general.minimap.enable then
-			LeftMiniPanel:Show()
-			RightMiniPanel:Show()
-		else
-			LeftMiniPanel:Hide()
-			RightMiniPanel:Hide()
-		end
-	end
-
 	local BottomMiniPanel = _G.BottomMiniPanel
-	if BottomMiniPanel then
-		if E.db.datatexts.minimapBottom and E.private.general.minimap.enable then
-			BottomMiniPanel:Show()
-		else
-			BottomMiniPanel:Hide()
-		end
-	end
-
 	local BottomLeftMiniPanel = _G.BottomLeftMiniPanel
-	if BottomLeftMiniPanel then
-		if E.db.datatexts.minimapBottomLeft and E.private.general.minimap.enable then
-			BottomLeftMiniPanel:Show()
-		else
-			BottomLeftMiniPanel:Hide()
-		end
-	end
-
 	local BottomRightMiniPanel = _G.BottomRightMiniPanel
-	if BottomRightMiniPanel then
-		if E.db.datatexts.minimapBottomRight and E.private.general.minimap.enable then
-			BottomRightMiniPanel:Show()
-		else
-			BottomRightMiniPanel:Hide()
-		end
-	end
-
 	local TopMiniPanel = _G.TopMiniPanel
-	if TopMiniPanel then
-		if E.db.datatexts.minimapTop and E.private.general.minimap.enable then
-			TopMiniPanel:Show()
-		else
-			TopMiniPanel:Hide()
-		end
-	end
-
 	local TopLeftMiniPanel = _G.TopLeftMiniPanel
-	if TopLeftMiniPanel then
-		if E.db.datatexts.minimapTopLeft and E.private.general.minimap.enable then
-			TopLeftMiniPanel:Show()
-		else
-			TopLeftMiniPanel:Hide()
-		end
-	end
-
 	local TopRightMiniPanel = _G.TopRightMiniPanel
-	if TopRightMiniPanel then
-		if E.db.datatexts.minimapTopRight and E.private.general.minimap.enable then
-			TopRightMiniPanel:Show()
-		else
-			TopRightMiniPanel:Hide()
-		end
-	end
-
 	local MMHolder = _G.MMHolder
 	local Minimap = _G.Minimap
-	if MMHolder then
-		MMHolder:Width((Minimap:GetWidth() + E.Border + E.Spacing*3))
 
-		if E.db.datatexts.minimapPanels then
-			MMHolder:Height(Minimap:GetHeight() + (LeftMiniPanel and (LeftMiniPanel:GetHeight() + E.Border) or 24) + E.Spacing*3)
-		else
-			MMHolder:Height(Minimap:GetHeight() + E.Border + E.Spacing*3)
-		end
+	if E.db.datatexts.minimapPanels then
+		LeftMiniPanel:Show()
+		RightMiniPanel:Show()
+	else
+		LeftMiniPanel:Hide()
+		RightMiniPanel:Hide()
 	end
 
-	if Minimap.location then
-		Minimap.location:Width(E.MinimapSize)
-
-		if E.db.general.minimap.locationText ~= 'SHOW' or not E.private.general.minimap.enable then
-			Minimap.location:Hide()
-		else
-			Minimap.location:Show()
-		end
+	if E.db.datatexts.minimapBottom then
+		BottomMiniPanel:Show()
+	else
+		BottomMiniPanel:Hide()
 	end
 
-	local MinimapMover = _G.MinimapMover
-	if MinimapMover then
-		MinimapMover:Size(MMHolder:GetSize())
+	if E.db.datatexts.minimapBottomLeft then
+		BottomLeftMiniPanel:Show()
+	else
+		BottomLeftMiniPanel:Hide()
 	end
 
-	--Stop here if ElvUI Minimap is disabled.
-	if not E.private.general.minimap.enable then
-		return;
+	if E.db.datatexts.minimapBottomRight then
+		BottomRightMiniPanel:Show()
+	else
+		BottomRightMiniPanel:Hide()
 	end
+
+	if E.db.datatexts.minimapTop then
+		TopMiniPanel:Show()
+	else
+		TopMiniPanel:Hide()
+	end
+
+	if E.db.datatexts.minimapTopLeft then
+		TopLeftMiniPanel:Show()
+	else
+		TopLeftMiniPanel:Hide()
+	end
+
+	if E.db.datatexts.minimapTopRight then
+		TopRightMiniPanel:Show()
+	else
+		TopRightMiniPanel:Hide()
+	end
+
+	MMHolder:Width((Minimap:GetWidth() + E.Border + E.Spacing*3))
+
+	if E.db.datatexts.minimapPanels then
+		MMHolder:Height(Minimap:GetHeight() + (LeftMiniPanel and (LeftMiniPanel:GetHeight() + E.Border) or 24) + E.Spacing*3)
+	else
+		MMHolder:Height(Minimap:GetHeight() + E.Border + E.Spacing*3)
+	end
+
+	Minimap.location:Width(E.MinimapSize)
+
+	if E.db.general.minimap.locationText ~= 'SHOW' then
+		Minimap.location:Hide()
+	else
+		Minimap.location:Show()
+	end
+
+	_G.MinimapMover:Size(MMHolder:GetSize())
 
 	local GameTimeFrame = _G.GameTimeFrame
 	if GameTimeFrame then
@@ -298,19 +261,32 @@ function M:UpdateSettings()
 		MiniMapMailFrame:SetScale(scale)
 	end
 
-	local MiniMapInstanceDifficulty = _G.MiniMapInstanceDifficulty
-	local GuildInstanceDifficulty = _G.GuildInstanceDifficulty
-	if MiniMapInstanceDifficulty and GuildInstanceDifficulty then
-		local pos = E.db.general.minimap.icons.difficulty.position or "TOPLEFT"
-		local scale = E.db.general.minimap.icons.difficulty.scale or 1
-		local x = E.db.general.minimap.icons.difficulty.xOffset or 0
-		local y = E.db.general.minimap.icons.difficulty.yOffset or 0
-		MiniMapInstanceDifficulty:ClearAllPoints()
-		MiniMapInstanceDifficulty:Point(pos, Minimap, pos, x, y)
-		MiniMapInstanceDifficulty:SetScale(scale)
-		GuildInstanceDifficulty:ClearAllPoints()
-		GuildInstanceDifficulty:Point(pos, Minimap, pos, x, y)
-		GuildInstanceDifficulty:SetScale(scale)
+	local MiniMapTrackingFrame = _G.MiniMapTrackingFrame
+	if (MiniMapTrackingFrame) then
+		if E.private.general.minimap.hideTracking then
+			MiniMapTrackingFrame:SetParent(E.HiddenFrame)
+		else
+			local pos = E.db.general.minimap.icons.tracking.position or "TOPLEFT"
+			local scale = E.db.general.minimap.icons.tracking.scale or 1
+			local x = E.db.general.minimap.icons.tracking.xOffset or 0
+			local y = E.db.general.minimap.icons.tracking.yOffset or 0
+
+			MiniMapTrackingFrame:ClearAllPoints()
+			MiniMapTrackingFrame:Point(pos, Minimap, pos, x, y)
+			MiniMapTrackingFrame:SetScale(scale)
+			MiniMapTrackingFrame:SetParent(Minimap)
+
+			if (_G.MiniMapTrackingBorder) then
+				_G.MiniMapTrackingBorder:Hide()
+			end
+
+			if (_G.MiniMapTrackingIcon) then
+				_G.MiniMapTrackingIcon:SetDrawLayer("ARTWORK")
+				_G.MiniMapTrackingIcon:SetTexCoord(unpack(E.TexCoords))
+				_G.MiniMapTrackingIcon:SetInside()
+				_G.MiniMapTrackingIcon:CreateBackdrop()
+			end
+		end
 	end
 
 	if _G.HelpOpenTicketButton and _G.HelpOpenWebTicketButton then
@@ -327,21 +303,26 @@ local function MinimapPostDrag()
 	_G.MinimapBackdrop:SetAllPoints(_G.Minimap)
 end
 
+function M:GetMinimapShape()
+	--Support for other mods
+	if E.private.general.minimap.enable then
+		function GetMinimapShape()
+			return 'SQUARE'
+		end
+
+		_G.Minimap:Size(E.db.general.minimap.size, E.db.general.minimap.size)
+	end
+end
+
 function M:Initialize()
-	menuFrame:SetTemplate("Transparent", true)
-	self:UpdateSettings()
+	self.Initialized = true
 
 	if not E.private.general.minimap.enable then
-		_G.Minimap:SetMaskTexture(186178) -- textures/minimapmask.blp
+		Minimap:SetMaskTexture([[Interface\CharacterFrame\TempPortraitAlphaMask]])
 		return
 	end
 
-	self.Initialized = true
-
-	--Support for other mods
-	function GetMinimapShape()
-		return 'SQUARE'
-	end
+	menuFrame:SetTemplate("Transparent", true)
 
 	local Minimap = _G.Minimap
 	local mmholder = CreateFrame('Frame', 'MMHolder', Minimap)
@@ -355,12 +336,12 @@ function M:Initialize()
 	Minimap:CreateBackdrop()
 	Minimap:SetFrameLevel(Minimap:GetFrameLevel() + 2)
 	Minimap:HookScript('OnEnter', function(mm)
-		if E.db.general.minimap.locationText ~= 'MOUSEOVER' or not E.private.general.minimap.enable then return; end
+		if E.db.general.minimap.locationText ~= 'MOUSEOVER' or not E.private.general.minimap.enable then return end
 		mm.location:Show()
 	end)
 
 	Minimap:HookScript('OnLeave', function(mm)
-		if E.db.general.minimap.locationText ~= 'MOUSEOVER' or not E.private.general.minimap.enable then return; end
+		if E.db.general.minimap.locationText ~= 'MOUSEOVER' or not E.private.general.minimap.enable then return end
 		mm.location:Hide()
 	end)
 
@@ -381,10 +362,8 @@ function M:Initialize()
 	_G.MinimapBorderTop:Hide()
 	_G.MinimapZoomIn:Hide()
 	_G.MinimapZoomOut:Hide()
-	-- MiniMapVoiceChatFrame:Hide()
 	_G.MinimapNorthTag:Kill()
 	_G.MinimapZoneTextButton:Hide()
-	--_G.MiniMapTracking:Hide()
 	_G.MiniMapMailBorder:Hide()
 	_G.MinimapToggleButton:Hide()
 	_G.MiniMapMailIcon:SetTexture(E.Media.Textures.Mail)
@@ -394,7 +373,7 @@ function M:Initialize()
 	if _G.TimeManagerClockButton then _G.TimeManagerClockButton:Kill() end
 	if _G.FeedbackUIButton then _G.FeedbackUIButton:Kill() end
 
-	E:CreateMover(_G.MMHolder, 'MinimapMover', L["Minimap"], nil, nil, MinimapPostDrag, nil, nil, 'maps,minimap')
+	E:CreateMover(mmholder, 'MinimapMover', L["Minimap"], nil, nil, MinimapPostDrag, nil, nil, 'maps,minimap')
 
 	_G.MinimapCluster:EnableMouse(false)
 	Minimap:EnableMouseWheel(true)
@@ -409,4 +388,4 @@ function M:Initialize()
 	self:UpdateSettings()
 end
 
-E:RegisterInitialModule(M:GetName())
+E:RegisterModule(M:GetName())

@@ -8,7 +8,6 @@ local format = format
 --WoW API / Variables
 local AcceptGroup = AcceptGroup
 local BNGetGameAccountInfoByGUID = BNGetGameAccountInfoByGUID
-local CanGuildBankRepair = CanGuildBankRepair
 local CanMerchantRepair = CanMerchantRepair
 local GetCVarBool, SetCVar = GetCVarBool, SetCVar
 local GetGuildBankWithdrawMoney = GetGuildBankWithdrawMoney
@@ -74,16 +73,11 @@ end
 
 do -- Auto Repair Functions
 	local STATUS, TYPE, COST, POSS
-	function M:AttemptAutoRepair(playerOverride)
+	function M:AttemptAutoRepair()
 		STATUS, TYPE, COST, POSS = "", E.db.general.autoRepair, GetRepairAllCost()
 
 		if POSS and COST > 0 then
-			--This check evaluates to true even if the guild bank has 0 gold, so we add an override
-			if TYPE == 'GUILD' and (playerOverride or (IsInGuild() and (not CanGuildBankRepair() or COST > GetGuildBankWithdrawMoney()))) then
-				TYPE = 'PLAYER'
-			end
-
-			RepairAllItems(TYPE == 'GUILD')
+			RepairAllItems()
 
 			--Delay this a bit so we have time to catch the outcome of first repair attempt
 			E:Delay(0.5, M.AutoRepairOutput)
@@ -91,25 +85,15 @@ do -- Auto Repair Functions
 	end
 
 	function M:AutoRepairOutput()
-		if TYPE == 'GUILD' then
-			if STATUS == "GUILD_REPAIR_FAILED" then
-				M:AttemptAutoRepair(true) --Try using player money instead
-			else
-				E:Print(L["Your items have been repaired using guild bank funds for: "]..E:FormatMoney(COST, "SMART", true)) --Amount, style, textOnly
-			end
-		elseif TYPE == "PLAYER" then
-			if STATUS == "PLAYER_REPAIR_FAILED" then
-				E:Print(L["You don't have enough money to repair."])
-			else
-				E:Print(L["Your items have been repaired for: "]..E:FormatMoney(COST, "SMART", true)) --Amount, style, textOnly
-			end
+		if STATUS == "PLAYER_REPAIR_FAILED" then
+			E:Print(L["You don't have enough money to repair."])
+		else
+			E:Print(L["Your items have been repaired for: "]..E:FormatMoney(COST, "SMART", true)) --Amount, style, textOnly
 		end
 	end
 
 	function M:UI_ERROR_MESSAGE(_, messageType)
-		if messageType == LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY then
-			STATUS = "GUILD_REPAIR_FAILED"
-		elseif messageType == LE_GAME_ERR_NOT_ENOUGH_MONEY then
+		if messageType == LE_GAME_ERR_NOT_ENOUGH_MONEY then
 			STATUS = "PLAYER_REPAIR_FAILED"
 		end
 	end

@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -36,7 +36,7 @@ function S.AudioOptionsVoicePanel_InitializeCommunicationModeUI(btn)
 end
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.BlizzardOptions ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.BlizzardOptions then return end
 
 	-- here we reskin all 'normal' buttons
 	S:HandleButton(_G.ReadyCheckFrameYesButton)
@@ -191,7 +191,7 @@ local function LoadSkin()
 	end)
 
 	hooksecurefunc('ChatConfig_UpdateCheckboxes', function(frame)
-		if ( not _G.FCF_GetCurrentChatFrame() ) then
+		if not _G.FCF_GetCurrentChatFrame() then
 			return
 		end
 		for index in ipairs(frame.checkBoxTable) do
@@ -213,10 +213,10 @@ local function LoadSkin()
 	hooksecurefunc('ChatConfig_UpdateTieredCheckboxes', function(frame, index)
 		local group = frame.checkBoxTable[index]
 		local checkBox = _G[frame:GetName()..'CheckBox'..index]
-		if ( checkBox ) then
+		if checkBox then
 			S:HandleCheckBox(checkBox)
 		end
-		if ( group.subTypes ) then
+		if group.subTypes then
 			for k in ipairs(group.subTypes) do
 				S:HandleCheckBox(_G[frame:GetName()..'CheckBox'..index..'_'..k])
 			end
@@ -224,7 +224,7 @@ local function LoadSkin()
 	end)
 
 	hooksecurefunc('ChatConfig_UpdateSwatches', function(frame)
-		if ( not _G.FCF_GetCurrentChatFrame() ) then
+		if not _G.FCF_GetCurrentChatFrame() then
 			return
 		end
 		for index in ipairs(frame.swatchTable) do
@@ -340,6 +340,12 @@ local function LoadSkin()
 	-- Toggle Test Audio Button - Wow 8.0
 	S:HandleButton(_G.AudioOptionsVoicePanel.TestInputDevice.ToggleTest)
 
+	local VUMeter = _G.AudioOptionsVoicePanelTestInputDevice.VUMeter
+	VUMeter:SetBackdrop(nil)
+	VUMeter.Status:CreateBackdrop()
+	VUMeter.Status:SetStatusBarTexture(E.media.normTex)
+	E:RegisterStatusBar(VUMeter.Status)
+
 	-- PushToTalk KeybindButton - Wow 8.0
 	hooksecurefunc('AudioOptionsVoicePanel_InitializeCommunicationModeUI', S.AudioOptionsVoicePanel_InitializeCommunicationModeUI)
 
@@ -349,4 +355,4 @@ local function LoadSkin()
 	S:HandleSliderFrame(_G.UnitPopupVoiceUserVolume.Slider)
 end
 
-S:AddCallback('SkinBlizzard', LoadSkin)
+S:AddCallback('Skin_Blizzard', LoadSkin)

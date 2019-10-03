@@ -62,15 +62,27 @@ function addon.fillOptions()
 	addon.optionsFrame.mainFrameShowing = addon.addCheckOption(content, GuidelimeDataChar, "mainFrameShowing", L.SHOW_MAINFRAME, nil, function()
 		if GuidelimeDataChar.mainFrameShowing then
 			addon.showMainFrame()
-		elseif addon.mainFrame ~= nil then
-			HBDPins:RemoveAllWorldMapIcons(Guidelime)
-			HBDPins:RemoveAllMinimapIcons(Guidelime)
-			addon.mainFrame:Hide()
+		else
+			addon.hideMainFrame()
 		end
 	end)
 	addon.optionsFrame.mainFrameShowing:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, -10)
 	prev = addon.optionsFrame.mainFrameShowing
 	
+	local button = CreateFrame("BUTTON", nil, content, "UIPanelButtonTemplate")
+	button:SetWidth(130)
+	button:SetHeight(24)
+	button:SetText(L.RESET_POSITION)
+	button:SetPoint("TOPLEFT", addon.optionsFrame.mainFrameShowing, "TOPLEFT", 180, -4)
+	button:SetScript("OnClick", function()
+		GuidelimeDataChar.mainFrameX = 0
+		GuidelimeDataChar.mainFrameY = 0
+		GuidelimeDataChar.mainFrameRelative = "RIGHT"
+		if addon.mainFrame ~= nil then
+			addon.mainFrame:SetPoint(GuidelimeDataChar.mainFrameRelative, UIParent, GuidelimeDataChar.mainFrameRelative, GuidelimeDataChar.mainFrameX, GuidelimeDataChar.mainFrameY)
+		end
+	end)
+
 	local slider = addon.addSliderOption(content, GuidelimeDataChar, "mainFrameWidth", 50, 800, 1, L.MAIN_FRAME_WIDTH, nil, function()
 		if addon.mainFrame ~= nil then 
 			addon.mainFrame:SetWidth(GuidelimeDataChar.mainFrameWidth) 
@@ -126,6 +138,16 @@ function addon.fillOptions()
 	addon.optionsFrame.mainFrameLocked:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
 	prev = addon.optionsFrame.mainFrameLocked
 	
+	addon.optionsFrame.showCompletedSteps = addon.addCheckOption(content, GuidelimeDataChar, "mainFrameShowScrollBar", L.MAIN_FRAME_SHOW_SCROLLBAR, nil, function()
+		if GuidelimeDataChar.mainFrameShowScrollBar then
+			addon.mainFrame.scrollFrame.ScrollBar:SetAlpha(1)
+		else
+			addon.mainFrame.scrollFrame.ScrollBar:SetAlpha(0)
+		end
+	end)
+	addon.optionsFrame.showCompletedSteps:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
+	prev = addon.optionsFrame.showCompletedSteps
+
 	addon.optionsFrame.showCompletedSteps = addon.addCheckOption(content, GuidelimeDataChar, "showCompletedSteps", L.SHOW_COMPLETED_STEPS, nil, function()
 		if GuidelimeDataChar.mainFrameShowing then
 			addon.updateMainFrame()
@@ -134,13 +156,13 @@ function addon.fillOptions()
 	addon.optionsFrame.showCompletedSteps:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
 	prev = addon.optionsFrame.showCompletedSteps
 	
-	local checkbox = addon.addCheckOption(content, GuidelimeDataChar, "showUnavailableSteps", L.SHOW_UNAVAILABLE_STEPS, nil, function()
+	addon.optionsFrame.showUnavailableSteps = addon.addCheckOption(content, GuidelimeDataChar, "showUnavailableSteps", L.SHOW_UNAVAILABLE_STEPS, nil, function()
 		if GuidelimeDataChar.mainFrameShowing then
 			addon.updateMainFrame()
 		end
 	end)
-	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
-	prev = checkbox
+	addon.optionsFrame.showUnavailableSteps:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
+	prev = addon.optionsFrame.showUnavailableSteps
 
 	checkbox = addon.addCheckOption(content, GuidelimeData, "showQuestLevels", L.SHOW_SUGGESTED_QUEST_LEVELS, nil, function()
 		if GuidelimeDataChar.mainFrameShowing then
@@ -163,7 +185,7 @@ function addon.fillOptions()
 	text:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 30, -8)
 	prev = text
 
-	local button = CreateFrame("BUTTON", nil, content, "UIPanelButtonTemplate")
+	button = CreateFrame("BUTTON", nil, content, "UIPanelButtonTemplate")
 	button:SetWidth(100)
 	button:SetHeight(20)
 	button:SetText(GuidelimeData.fontColorACCEPT .. L.QUEST_ACCEPT)
@@ -241,6 +263,20 @@ function addon.fillOptions()
 	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, -10)
 	prev = checkbox
 	
+	local button = CreateFrame("BUTTON", nil, content, "UIPanelButtonTemplate")
+	button:SetWidth(130)
+	button:SetHeight(24)
+	button:SetText(L.RESET_POSITION)
+	button:SetPoint("TOPLEFT", checkbox, "TOPLEFT", 180, -4)
+	button:SetScript("OnClick", function()
+		GuidelimeDataChar.arrowX = 0
+		GuidelimeDataChar.arrowY = -20
+		GuidelimeDataChar.arrowRelative = "TOP"
+		if addon.arrowFrame ~= nil then
+			addon.arrowFrame:SetPoint(GuidelimeDataChar.arrowRelative, UIParent, GuidelimeDataChar.arrowRelative, GuidelimeDataChar.arrowX, GuidelimeDataChar.arrowY)
+		end
+	end)
+
 	slider = addon.addSliderOption(content, GuidelimeData, "arrowStyle", 1, 2, 1, L.ARROW_STYLE, nil, 
 	function(self)
 		self.editbox:SetText("   " .. addon.getArrowIconText())
@@ -262,6 +298,14 @@ function addon.fillOptions()
 	end)
 	slider:SetPoint("TOPLEFT", prev, "TOPLEFT", 350, -50)
 
+	slider = addon.addSliderOption(content, GuidelimeDataChar, "arrowSize", 16, 256, 1, L.ARROW_SIZE, nil, function()
+		if addon.arrowFrame ~= nil then 
+			addon.arrowFrame:SetWidth(GuidelimeDataChar.arrowSize)
+			addon.arrowFrame:SetHeight(GuidelimeDataChar.arrowSize)
+		end
+	end)
+	slider:SetPoint("TOPLEFT", prev, "TOPLEFT", 350, -90)
+
 	checkbox = addon.addCheckOption(content, GuidelimeDataChar, "arrowLocked", L.LOCK_ARROW)
 	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
 	prev = checkbox
@@ -278,7 +322,7 @@ function addon.fillOptions()
 
 	addon.optionsFrame.titleMapMarkersGoto = content:CreateFontString(nil, content, "GameFontNormal")
 	addon.optionsFrame.titleMapMarkersGoto:SetText("|cFFFFFFFF___ " .. string.format(L.MAP_MARKERS_GOTO, addon.getMapMarkerText({t = "GOTO", mapIndex = 0}) .. "," .. addon.getMapMarkerText({t = "GOTO", mapIndex = 1}) .. "," .. addon.getMapMarkerText({t = "GOTO", mapIndex = 2}) .. "," .. addon.getMapMarkerText({t = "GOTO", mapIndex = 3})) .. " _______________________________________________________")
-	addon.optionsFrame.titleMapMarkersGoto:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, -10)
+	addon.optionsFrame.titleMapMarkersGoto:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, -20)
 	addon.optionsFrame.titleMapMarkersGoto:SetFontObject("GameFontNormalLarge")
 	prev = addon.optionsFrame.titleMapMarkersGoto
 
@@ -445,14 +489,14 @@ function addon.fillOptions()
 	addon.optionsFrame.titleDebugging:SetFontObject("GameFontNormalLarge")
 	prev = addon.optionsFrame.titleDebugging
 
-	checkbox = addon.addCheckOption(content, GuidelimeData, "debugging", L.DEBUGGING, nil, function()
+	--[[checkbox = addon.addCheckOption(content, GuidelimeData, "debugging", L.DEBUGGING, nil, function()
 		addon.debugging = GuidelimeData.debugging
 		if GuidelimeDataChar.mainFrameShowing then
 			addon.updateMainFrame()
 		end
 	end)
 	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, -10)
-	prev = checkbox
+	prev = checkbox]]
 
 	checkbox = addon.addCheckOption(content, GuidelimeData, "showLineNumbers", L.SHOW_LINE_NUMBERS, nil, function()
 		addon.debugging = GuidelimeData.debugging
@@ -463,16 +507,27 @@ function addon.fillOptions()
 	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
 	prev = checkbox
 
+	checkbox = addon.addCheckOption(content, GuidelimeData, "showQuestIds", L.SHOW_QUEST_IDS, nil, function()
+		addon.debugging = GuidelimeData.debugging
+		if GuidelimeDataChar.mainFrameShowing then
+			addon.updateStepsText()
+		end
+	end)
+	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
+	prev = checkbox
+
+	--[[
+	if QuestieDB == nil then GuidelimeData.dataSourceQuestie = false end
 	checkbox = addon.addCheckOption(content, GuidelimeData, "dataSourceQuestie", L.USE_QUESTIE_AS_DATA_SOURCE, L.USE_QUESTIE_AS_DATA_SOURCE_TOOLTIP, function()
-		addon.optionsFrame.options.dataSourceInternal:SetChecked(not GuidelimeData.dataSourceQuestie)
+		content.options.dataSourceInternal:SetChecked(not GuidelimeData.dataSourceQuestie)
 		if GuidelimeDataChar.mainFrameShowing and GuidelimeData.autoAddCoordinates then
 			addon.loadCurrentGuide()
 			addon.updateSteps()
 		end
 	end)
 	checkbox:SetPoint("TOPLEFT", prev, "BOTTOMLEFT", 0, 0)
-	checkbox:SetEnabled(Questie ~= nil)
-	if Questie == nil then checkbox.text:SetTextColor(0.4, 0.4, 0.4) end
+	checkbox:SetEnabled(QuestieDB ~= nil)
+	if QuestieDB == nil then checkbox.text:SetTextColor(0.4, 0.4, 0.4) end
 	prev = checkbox
 	
 	content.options.dataSourceInternal = addon.addCheckbox(content, L.USE_INTERNAL_DATA_SOURCE)
@@ -487,6 +542,7 @@ function addon.fillOptions()
 		end
 	end)
 	content.options.dataSourceInternal:SetPoint("TOPLEFT", prev, "TOPLEFT", 270, 0)
+	]]
 end
 
 function addon.isOptionsShowing()

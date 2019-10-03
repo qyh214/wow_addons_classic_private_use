@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Lua functions
@@ -39,16 +39,15 @@ local function refreshAlpha()
 end
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.bgmap ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.bgmap then return end
 
 	local BattlefieldMapFrame = _G.BattlefieldMapFrame
 	local BattlefieldMapTab = _G.BattlefieldMapTab
 
-	BattlefieldMapFrame:SetClampedToScreen(true)
-	BattlefieldMapFrame:StripTextures()
+	S:HandleFrame(BattlefieldMapFrame, true)
 
 	refreshAlpha() -- will need this soon
-	BattlefieldMapFrame:CreateBackdrop()
+	BattlefieldMapFrame:SetClampedToScreen(true)
 	BattlefieldMapFrame:SetFrameStrata('LOW')
 	BattlefieldMapFrame.backdrop:SetOutside(BattlefieldMapFrame.ScrollContainer)
 	BattlefieldMapFrame.backdrop:SetBackdropColor(0, 0, 0, oldAlpha)
@@ -61,13 +60,13 @@ local function LoadSkin()
 	S:HandleCloseButton(BattlefieldMapFrame.BorderFrame.CloseButton)
 	BattlefieldMapTab:Kill()
 
-	BattlefieldMapFrame.ScrollContainer:HookScript("OnMouseUp", function(_, btn)
-		if btn == "LeftButton" then
+	BattlefieldMapFrame.ScrollContainer:HookScript('OnMouseUp', function(_, btn)
+		if btn == 'LeftButton' then
 			BattlefieldMapTab:StopMovingOrSizing()
 			if not _G.BattlefieldMapOptions.position then _G.BattlefieldMapOptions.position = {} end
 			_G.BattlefieldMapOptions.position.x, _G.BattlefieldMapOptions.position.y = BattlefieldMapTab:GetCenter()
-		elseif btn == "RightButton" then
-			_G.UIDropDownMenu_Initialize(BattlefieldMapTab.OptionsDropDown, InitializeOptionsDropDown, "MENU")
+		elseif btn == 'RightButton' then
+			_G.UIDropDownMenu_Initialize(BattlefieldMapTab.OptionsDropDown, InitializeOptionsDropDown, 'MENU')
 			_G.ToggleDropDownMenu(1, nil, BattlefieldMapTab.OptionsDropDown, BattlefieldMapFrame:GetName(), 0, -4)
 		end
 
@@ -76,14 +75,14 @@ local function LoadSkin()
 		end
 	end)
 
-	BattlefieldMapFrame.ScrollContainer:HookScript("OnMouseDown", function(_, btn)
-		if btn == "LeftButton" and (_G.BattlefieldMapOptions and not _G.BattlefieldMapOptions.locked) then
+	BattlefieldMapFrame.ScrollContainer:HookScript('OnMouseDown', function(_, btn)
+		if btn == 'LeftButton' and (_G.BattlefieldMapOptions and not _G.BattlefieldMapOptions.locked) then
 			BattlefieldMapTab:StartMoving()
 		end
 	end)
 
-	hooksecurefunc(BattlefieldMapFrame, "SetGlobalAlpha", setBackdropAlpha)
-	hooksecurefunc(BattlefieldMapFrame, "RefreshAlpha", refreshAlpha)
+	hooksecurefunc(BattlefieldMapFrame, 'SetGlobalAlpha', setBackdropAlpha)
+	hooksecurefunc(BattlefieldMapFrame, 'RefreshAlpha', refreshAlpha)
 
 	BattlefieldMapFrame:HookScript('OnShow', setBackdropAlpha)
 	BattlefieldMapFrame.ScrollContainer:HookScript('OnLeave', setOldAlpha)
@@ -94,4 +93,4 @@ local function LoadSkin()
 	S:HandleSliderFrame(_G.OpacityFrameSlider)
 end
 
-S:AddCallbackForAddon("Blizzard_BattlefieldMap", "BattlefieldMap", LoadSkin)
+S:AddCallbackForAddon('Blizzard_BattlefieldMap', 'Skin_Blizzard_BattlefieldMap', LoadSkin)

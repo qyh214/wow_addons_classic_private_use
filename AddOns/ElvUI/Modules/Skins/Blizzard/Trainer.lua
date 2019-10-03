@@ -1,5 +1,5 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local S = E:GetModule('Skins');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local S = E:GetModule('Skins')
 
 --Cache global variables
 --Lua functions
@@ -10,13 +10,10 @@ local strfind = strfind
 local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.trainer ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.trainer then return end
 
 	local ClassTrainerFrame = _G.ClassTrainerFrame
-	ClassTrainerFrame:StripTextures(true)
-	ClassTrainerFrame:CreateBackdrop('Transparent')
-	ClassTrainerFrame.backdrop:Point('TOPLEFT', 10, -11)
-	ClassTrainerFrame.backdrop:Point('BOTTOMRIGHT', -32, 74)
+	S:HandleFrame(ClassTrainerFrame, true, nil, 11, -12, -32, 76)
 
 	_G.ClassTrainerExpandButtonFrame:StripTextures()
 
@@ -33,10 +30,13 @@ local function LoadSkin()
 
 	_G.ClassTrainerCancelButton:Kill()
 
-	S:HandleButton(_G.ClassTrainerTrainButton)
-	_G.ClassTrainerTrainButton:Point('BOTTOMRIGHT', -38, 80)
+	_G.ClassTrainerMoneyFrame:ClearAllPoints()
+	_G.ClassTrainerMoneyFrame:Point('BOTTOMLEFT', _G.ClassTrainerFrame, 'BOTTOMLEFT', 18, 82)
 
-	S:HandleCloseButton(_G.ClassTrainerFrameCloseButton)
+	S:HandleButton(_G.ClassTrainerTrainButton)
+	_G.ClassTrainerTrainButton:Point('BOTTOMRIGHT', -36, 80)
+
+	S:HandleCloseButton(_G.ClassTrainerFrameCloseButton, ClassTrainerFrame.backdrop)
 
 	hooksecurefunc('ClassTrainer_SetSelection', function()
 		local skillIcon = _G.ClassTrainerSkillIcon:GetNormalTexture()
@@ -99,4 +99,4 @@ local function LoadSkin()
 	end)
 end
 
-S:AddCallbackForAddon('Blizzard_TrainerUI', 'Trainer', LoadSkin)
+S:AddCallbackForAddon('Blizzard_TrainerUI', 'Skin_Blizzard_TrainerUI', LoadSkin)

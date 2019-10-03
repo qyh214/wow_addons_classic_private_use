@@ -193,8 +193,14 @@ local function CastUpdate(self, event, unit, castID, spellID)
 	if(self.unit ~= unit) then return end
 
 	local element = self.Castbar
-	if(not element:IsShown() or spellID ~= nil and element.spellID ~= spellID) then
-		return
+	if unit == 'player' then
+		if(not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if(not element:IsShown()) then
+			return
+		end
 	end
 
 	local name, startTime, endTime, _
@@ -246,8 +252,14 @@ local function CastStop(self, event, unit, castID, spellID)
 	if(self.unit ~= unit) then return end
 
 	local element = self.Castbar
-	if(not element:IsShown() or spellID ~= nil and element.spellID ~= spellID) then
-		return
+	if unit == 'player' then
+		if(not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if(not element:IsShown()) then
+			return
+		end
 	end
 
 	resetAttributes(element)
@@ -268,8 +280,14 @@ local function CastFail(self, event, unit, castID, spellID)
 	if(self.unit ~= unit) then return end
 
 	local element = self.Castbar
-	if(not element:IsShown() or spellID ~= nil and element.spellID ~= spellID) then
-		return
+	if unit == 'player' then
+		if(not element:IsShown() or element.castID ~= castID or element.spellID ~= spellID) then
+			return
+		end
+	else
+		if(not element:IsShown()) then
+			return
+		end
 	end
 
 	if(element.Text) then

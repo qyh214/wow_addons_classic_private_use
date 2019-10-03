@@ -446,7 +446,7 @@ function TT:GameTooltipStatusBar_OnValueChanged(tt, value)
 	elseif(value == 0 or (unit and UnitIsDeadOrGhost(unit))) then
 		tt.text:SetText(_G.DEAD)
 	else
-		if unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) and _G.RealMobHealth then
+		if _G.RealMobHealth and unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) then
 			local c, m, _, _ = _G.RealMobHealth.GetUnitHealth(unit);
 			tt.text:SetText(c.." / "..m)
 		else
@@ -554,6 +554,28 @@ function TT:CheckBackdropColor(tt)
 		if r ~= red or g ~= green or b ~= blue then
 			tt:SetBackdropColor(red, green, blue, self.db.colorAlpha)
 		end
+	end
+end
+
+function TT:SetBorderColor(_, tt)
+	if not tt.GetItem then return end
+
+	local _, link = tt:GetItem()
+	if link then
+		local _, _, quality = GetItemInfo(link)
+		if quality and quality > 1 then
+			tt:SetBackdropBorderColor(GetItemQualityColor(quality))
+		end
+	end
+end
+
+function TT:ToggleItemQualityBorderColor()
+	if E.db.tooltip.itemQualityBorderColor then
+		if not self:IsHooked(TT, "SetStyle", "SetBorderColor") then
+			self:SecureHook(TT, "SetStyle", "SetBorderColor")
+		end
+	else
+		self:Unhook(TT, "SetStyle", "SetBorderColor")
 	end
 end
 
@@ -728,6 +750,8 @@ function TT:Initialize()
 	GameTooltipAnchor:Size(130, 20)
 	GameTooltipAnchor:SetFrameLevel(GameTooltipAnchor:GetFrameLevel() + 400)
 	E:CreateMover(GameTooltipAnchor, 'TooltipMover', L["Tooltip"], nil, nil, nil, nil, nil, 'tooltip,general')
+
+	self:ToggleItemQualityBorderColor()
 
 	self:SecureHook('SetItemRef')
 	self:SecureHook('GameTooltip_SetDefaultAnchor')

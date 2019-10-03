@@ -37,7 +37,6 @@ L["Auras"] = "오라 설정"
 L["Auto Scale"] = "UI크기 자동조절"
 L["AVD: "] = "방어율: "
 L["Avoidance Breakdown"] = "방어율 목록"
-L["Azerite Bar"] = true
 L["Bag Mover (Grow Down)"] = "가방 조정자(아래로 성장)"
 L["Bag Mover (Grow Up)"] = "가방 조정자(위로 성장)"
 L["Bag Mover"] = "가방 조정자"

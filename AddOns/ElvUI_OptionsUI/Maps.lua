@@ -30,8 +30,16 @@ E.Options.args.maps = {
 					name = L["General"],
 					guiInline = true,
 					args = {
-						smallerWorldMap = {
+						enable = {
 							order = 1,
+							type = "toggle",
+							name = L["Enable"],
+							desc = L["Enable/Disable the World Map Enhancements."],
+							get = function(info) return E.private.general.worldMap end,
+							set = function(info, value) E.private.general.worldMap = value; E:StaticPopup_Show("PRIVATE_RL") end,
+						},
+						smallerWorldMap = {
+							order = 2,
 							type = "toggle",
 							name = L["Smaller World Map"],
 							desc = L["Make the world map smaller."],
@@ -39,7 +47,7 @@ E.Options.args.maps = {
 							set = function(info, value) E.global.general.smallerWorldMap = value; E:StaticPopup_Show("GLOBAL_RL") end,
 						},
 						smallerWorldMapScale = {
-							order = 2,
+							order = 3,
 							type = "range",
 							name = L["Smaller World Map Scale"],
 							isPercent = true,
@@ -48,12 +56,12 @@ E.Options.args.maps = {
 							set = function(info, value) E.global.general.smallerWorldMapScale = value; E:StaticPopup_Show("GLOBAL_RL") end,
 						},
 						spacer1 = {
-							order = 3,
+							order = 4,
 							type = "description",
 							name = ""
 						},
 						fadeMapWhenMoving = {
-							order = 4,
+							order = 5,
 							type = "toggle",
 							name = L["MAP_FADE_TEXT"],
 							get = function(info) return E.global.general.fadeMapWhenMoving end,
@@ -63,7 +71,7 @@ E.Options.args.maps = {
 							end,
 						},
 						mapAlphaWhenMoving = {
-							order = 5,
+							order = 6,
 							type = "range",
 							name = L["Map Opacity When Moving"],
 							isPercent = true,
@@ -253,7 +261,7 @@ E.Options.args.maps = {
 					name = L["Minimap Buttons"],
 					args = {
 						calendar = {
-							order = 2,
+							order = 1,
 							type = "group",
 							name = L["Calendar"],
 							get = function(info) return E.db.general.minimap.icons.calendar[info[#info]] end,
@@ -313,18 +321,32 @@ E.Options.args.maps = {
 
 							},
 						},
-						mail = {
-							order = 3,
+						tracking = {
+							order = 2,
 							type = "group",
-							name = L["MAIL_LABEL"],
-							get = function(info) return E.db.general.minimap.icons.mail[info[#info]] end,
-							set = function(info, value) E.db.general.minimap.icons.mail[info[#info]] = value; MM:UpdateSettings() end,
+							name = L["Tracking"],
+							get = function(info) return E.db.general.minimap.icons.tracking[info[#info]] end,
+							set = function(info, value) E.db.general.minimap.icons.tracking[info[#info]] = value; MM:UpdateSettings() end,
 							args = {
-								position = {
+								hideCalendar = {
 									order = 1,
+									type = "toggle",
+									name = L["Hide"],
+									get = function(info) return E.private.general.minimap.hideTracking end,
+									set = function(info, value) E.private.general.minimap.hideTracking = value; MM:UpdateSettings() end,
+									disabled = function() return not E.private.general.minimap.enable end,
+								},
+								spacer = {
+									order = 2,
+									type = "description",
+									name = "",
+									width = "full"
+								},
+								position = {
+									order = 3,
 									type = "select",
 									name = L["Position"],
-									disabled = function() return not E.private.general.minimap.enable end,
+									disabled = function() return (E.private.general.minimap.hideTracking or not E.private.general.minimap.enable) end,
 									values = {
 										["LEFT"] = L["Left"],
 										["RIGHT"] = L["Right"],
@@ -337,34 +359,35 @@ E.Options.args.maps = {
 									},
 								},
 								scale = {
-									order = 2,
+									order = 4,
 									type = "range",
 									name = L["Scale"],
 									min = 0.5, max = 2, step = 0.05,
-									disabled = function() return not E.private.general.minimap.enable end,
+									disabled = function() return (E.private.general.minimap.hideTracking or not E.private.general.minimap.enable) end,
 								},
 								xOffset = {
-									order = 3,
+									order = 5,
 									type = "range",
 									name = L["xOffset"],
 									min = -50, max = 50, step = 1,
-									disabled = function() return not E.private.general.minimap.enable end,
+									disabled = function() return (E.private.general.minimap.hideTracking or not E.private.general.minimap.enable) end,
 								},
 								yOffset = {
-									order = 4,
+									order = 6,
 									type = "range",
 									name = L["yOffset"],
 									min = -50, max = 50, step = 1,
-									disabled = function() return not E.private.general.minimap.enable end,
+									disabled = function() return (E.private.general.minimap.hideTracking or not E.private.general.minimap.enable) end,
 								},
+
 							},
 						},
-						difficulty = {
-							order = 5,
+						mail = {
+							order = 3,
 							type = "group",
-							name = L["Instance Difficulty"],
-							get = function(info) return E.db.general.minimap.icons.difficulty[info[#info]] end,
-							set = function(info, value) E.db.general.minimap.icons.difficulty[info[#info]] = value; MM:UpdateSettings() end,
+							name = L["MAIL_LABEL"],
+							get = function(info) return E.db.general.minimap.icons.mail[info[#info]] end,
+							set = function(info, value) E.db.general.minimap.icons.mail[info[#info]] = value; MM:UpdateSettings() end,
 							args = {
 								position = {
 									order = 1,

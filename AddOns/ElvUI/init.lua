@@ -46,7 +46,7 @@ Engine[2] = {}
 Engine[3] = AddOn.privateVars.profile
 Engine[4] = AddOn.DF.profile
 Engine[5] = AddOn.DF.global
-_G[AddOnName] = Engine
+_G.ElvUI = Engine
 
 do
 	local locale = GetLocale()
@@ -88,6 +88,7 @@ do
 	AddOn:AddLib('Translit', 'LibTranslit-1.0')
 	AddOn:AddLib('LCD', 'LibClassicDurations')
 	AddOn:AddLib('LCC', 'LibClassicCasterino')
+	AddOn:AddLib('RC', 'LibRangeCheck-2.0')
 
 	-- added on ElvUI_OptionsUI load: AceGUI, AceConfig, AceConfigDialog, AceConfigRegistry, AceDBOptions
 

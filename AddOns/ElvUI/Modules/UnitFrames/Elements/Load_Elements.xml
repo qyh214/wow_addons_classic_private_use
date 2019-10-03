@@ -8,6 +8,7 @@
 	<Script file='CustomText.lua'/>
 	<Script file='Cutaway.lua'/>
 	<Script file='DebuffHighlight.lua'/>
+	<Script file='EnergyManaRegen.lua'/>
 	<Script file='HealPrediction.lua'/>
 	<Script file='Health.lua'/>
 	<Script file='InfoPanel.lua'/>

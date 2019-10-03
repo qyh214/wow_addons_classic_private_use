@@ -1,6 +1,6 @@
 # Vendor Price
 
-## [1.2.4](https://github.com/ketho-wow/VendorPrice/tree/1.2.4) (2019-09-11)
-[Full Changelog](https://github.com/ketho-wow/VendorPrice/compare/1.2.3...1.2.4)
+## [1.2.9](https://github.com/ketho-wow/VendorPrice/tree/1.2.9) (2019-10-01)
+[Full Changelog](https://github.com/ketho-wow/VendorPrice/compare/1.2.8...1.2.9)
 
-- Fixed recipe tooltips attempting the world record for squats  
+- Reverted the streamlining with Auctionator tooltip  

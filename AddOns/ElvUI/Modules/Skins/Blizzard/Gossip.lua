@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -6,26 +6,20 @@ local S = E:GetModule('Skins')
 local _G = _G
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.gossip ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.gossip then return end
 
 	-- GossipFrame
 	local GossipFrame = _G.GossipFrame
-	S:HandlePortraitFrame(GossipFrame, true)
-	GossipFrame.backdrop:SetPoint('TOPLEFT', 11, -12)
-	GossipFrame.backdrop:SetPoint('BOTTOMRIGHT', -32, 0)
+	S:HandleFrame(GossipFrame, true, nil, 11, -12, -32, 66)
 
-	local GossipGreetingScrollFrame = _G.GossipGreetingScrollFrame
-	GossipGreetingScrollFrame:CreateBackdrop('Transparent')
-	GossipGreetingScrollFrame.backdrop:Point('TOPLEFT', -6, 2)
-	GossipGreetingScrollFrame:Size(300, 396)
+	S:HandleFrame(_G.GossipGreetingScrollFrame, true, nil, -6, 2)
 
 	S:HandleScrollBar(_G.GossipGreetingScrollFrameScrollBar)
 
+	S:HandleCloseButton(_G.GossipFrameCloseButton, GossipFrame.backdrop)
+
 	_G.GossipFrameNpcNameText:ClearAllPoints()
 	_G.GossipFrameNpcNameText:Point('CENTER', _G.GossipNpcNameFrame, 'CENTER', -1, 0)
-
-	S:HandleCloseButton(_G.GossipFrameCloseButton, GossipFrame.backdrop)
-	_G.GossipFrameCloseButton:Point('TOPRIGHT', -28, -9)
 
 	for i = 1, _G.NUMGOSSIPBUTTONS do
 		_G['GossipTitleButton'..i..'GossipIcon']:SetSize(16, 16)
@@ -41,7 +35,7 @@ local function LoadSkin()
 			local text = button:GetFontString()
 
 			if text and text:GetText() then
-				local textString = gsub(text:GetText(), "|c[Ff][Ff]%x%x%x%x%x%x(.+)|r", "%1")
+				local textString = gsub(text:GetText(), '|c[Ff][Ff]%x%x%x%x%x%x(.+)|r', '%1')
 
 				button:SetText(textString)
 				text:SetTextColor(1, 1, 1)
@@ -72,23 +66,15 @@ local function LoadSkin()
 	end)
 
 	S:HandleButton(_G.GossipFrameGreetingGoodbyeButton)
-	_G.GossipFrameGreetingGoodbyeButton:Point('BOTTOMRIGHT', -38, 7)
+	_G.GossipFrameGreetingGoodbyeButton:Point('BOTTOMRIGHT', -38, 72)
 
 	-- ItemTextFrame
-	_G.ItemTextFrame:StripTextures(true)
-	_G.ItemTextFrame:CreateBackdrop('Transparent')
-	_G.ItemTextFrame.backdrop:Point('TOPLEFT', 11, -12)
-	_G.ItemTextFrame.backdrop:Point('BOTTOMRIGHT', -32, 76)
+	S:HandleFrame(_G.ItemTextFrame, true, nil, 11, -12, -32, 76)
 
 	_G.ItemTextScrollFrame:StripTextures()
 
 	S:HandleNextPrevButton(_G.ItemTextPrevPageButton)
-	_G.ItemTextPrevPageButton:ClearAllPoints()
-	_G.ItemTextPrevPageButton:Point('TOPLEFT', _G.ItemTextFrame, 'TOPLEFT', 30, -50)
-
 	S:HandleNextPrevButton(_G.ItemTextNextPageButton)
-	_G.ItemTextNextPageButton:ClearAllPoints()
-	_G.ItemTextNextPageButton:Point('TOPRIGHT', _G.ItemTextFrame, 'TOPRIGHT', -48, -50)
 
 	_G.ItemTextPageText:SetTextColor(1, 1, 1)
 	hooksecurefunc(_G.ItemTextPageText, 'SetTextColor', function(pageText, headerType, r, g, b)
@@ -105,7 +91,7 @@ local function LoadSkin()
 
 	S:HandleScrollBar(_G.ItemTextScrollFrameScrollBar)
 
-	S:HandleCloseButton(_G.ItemTextCloseButton)
+	S:HandleCloseButton(_G.ItemTextCloseButton, ItemTextFrame.backdrop)
 
 	local NPCFriendshipStatusBar = _G.NPCFriendshipStatusBar
 	NPCFriendshipStatusBar:StripTextures()
@@ -115,4 +101,4 @@ local function LoadSkin()
 	E:RegisterStatusBar(NPCFriendshipStatusBar)
 end
 
-S:AddCallback('Gossip', LoadSkin)
+S:AddCallback('Skin_Gossip', LoadSkin)

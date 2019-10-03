@@ -110,7 +110,7 @@ local function createAuraIcon(element, index)
 	local cd = CreateFrame('Cooldown', '$parentCooldown', button, 'CooldownFrameTemplate')
 	cd:SetAllPoints()
 
-	local icon = button:CreateTexture(nil, 'BORDER')
+	local icon = button:CreateTexture(nil, 'ARTWORK')
 	icon:SetAllPoints()
 
 	local countFrame = CreateFrame('Frame', nil, button)

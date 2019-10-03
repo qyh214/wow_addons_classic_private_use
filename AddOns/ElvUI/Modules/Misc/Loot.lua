@@ -304,6 +304,14 @@ function M:LOOT_OPENED(_, autoloot)
 	lootFrame:Width(max(w, t))
 end
 
+function M:OPEN_MASTER_LOOT_LIST()
+	ToggleDropDownMenu(1, nil, GroupLootDropDown, lootFrame.slots[LootFrame.selectedSlot], 0, 0)
+end
+
+function M:UPDATE_MASTER_LOOT_LIST()
+	UIDropDownMenu_Refresh(GroupLootDropDown)
+end
+
 function M:LoadLoot()
 	if not E.private.general.loot then return end
 	lootFrameHolder = CreateFrame('Frame', 'ElvLootFrameHolder', E.UIParent)
@@ -312,6 +320,7 @@ function M:LoadLoot()
 	lootFrameHolder:Height(22)
 
 	lootFrame = CreateFrame('Button', 'ElvLootFrame', lootFrameHolder)
+	lootFrame:Hide()
 	lootFrame:SetClampedToScreen(true)
 	lootFrame:Point('TOPLEFT')
 	lootFrame:Size(256, 64)
@@ -331,10 +340,29 @@ function M:LoadLoot()
 	self:RegisterEvent('LOOT_OPENED')
 	self:RegisterEvent('LOOT_SLOT_CLEARED')
 	self:RegisterEvent('LOOT_CLOSED')
+	self:RegisterEvent("OPEN_MASTER_LOOT_LIST")
+	self:RegisterEvent("UPDATE_MASTER_LOOT_LIST")
 
 	E:CreateMover(lootFrameHolder, 'LootFrameMover', L["Loot Frame"], nil, nil, nil, nil, nil, 'general,blizzUIImprovements')
 
 	-- Fuzz
 	_G.LootFrame:UnregisterAllEvents()
 	tinsert(_G.UISpecialFrames, 'ElvLootFrame')
+
+	function _G.GroupLootDropDown_GiveLoot()
+		if LootFrame.selectedQuality >= MASTER_LOOT_THREHOLD then
+			local dialog = StaticPopup_Show("CONFIRM_LOOT_DISTRIBUTION", ITEM_QUALITY_COLORS[LootFrame.selectedQuality].hex..LootFrame.selectedItemName..FONT_COLOR_CODE_CLOSE, self:GetText())
+			if dialog then
+				dialog.data = self.value
+			end
+		else
+			GiveMasterLoot(LootFrame.selectedSlot, self.value)
+		end
+		CloseDropDownMenus()
+	end
+
+	E.PopupDialogs["CONFIRM_LOOT_DISTRIBUTION"].OnAccept = function(data)
+		GiveMasterLoot(LootFrame.selectedSlot, data)
+	end
+	StaticPopupDialogs["CONFIRM_LOOT_DISTRIBUTION"].preferredIndex = 3
 end

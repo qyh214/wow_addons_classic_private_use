@@ -1,5 +1,5 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local S = E:GetModule('Skins');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local S = E:GetModule('Skins')
 
 --Cache global variables
 --Lua functions
@@ -8,11 +8,10 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.questtimers ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.questtimers then return end
 
 	local QuestTimerFrame = _G.QuestTimerFrame
-	QuestTimerFrame:StripTextures()
-	QuestTimerFrame:SetTemplate('Transparent')
+	S:HandleFrame(QuestTimerFrame, true)
 
 	E:CreateMover(QuestTimerFrame, 'QuestTimerFrameMover', QUEST_TIMERS)
 
@@ -33,4 +32,4 @@ local function LoadSkin()
 	end)
 end
 
-S:AddCallback('QuestTimer', LoadSkin)
+S:AddCallback('Skin_QuestTimers', LoadSkin)

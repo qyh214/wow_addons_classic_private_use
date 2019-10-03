@@ -87,11 +87,6 @@ function NP:Power_PostUpdate(unit, cur, min, max)
 
 	if not db then return end
 
-	if self.__owner.frameType ~= 'PLAYER' and db.power.displayAltPower and not self.displayType then
-		self:Hide()
-		return
-	end
-
 	if (db.power and db.power.enable and db.power.hideWhenEmpty) and (cur == 0) then
 		self:Hide()
 	else

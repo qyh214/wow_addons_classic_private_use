@@ -39,7 +39,7 @@ Env.GetItemCooldown = GetItemCooldown
 
 
 local GetSpellCooldown = GetSpellCooldown
-function Env.CooldownDuration(spell)
+function Env.CooldownDuration(spell, gcdAsUnusable)
 	if spell == "gcd" then
 		local start, duration = GetSpellCooldown(TMW.GCDSpell)
 		return duration == 0 and 0 or (duration - (TMW.time - start))
@@ -47,7 +47,7 @@ function Env.CooldownDuration(spell)
 
 	local start, duration = GetSpellCooldown(spell)
 	if duration then
-		return ((duration == 0 or OnGCD(duration)) and 0) or (duration - (TMW.time - start))
+		return ((duration == 0 or (not gcdAsUnusable and OnGCD(duration))) and 0) or (duration - (TMW.time - start))
 	end
 	return 0
 end
@@ -72,12 +72,15 @@ ConditionCategory:RegisterCondition(1,	 "SPELLCD", {
 	name = function(editbox)
 		editbox:SetTexts(L["SPELLTOCHECK"], L["CNDT_ONLYFIRST"])
 	end,
+	check = function(check)
+		check:SetTexts(L["ICONMENU_GCDASUNUSABLE"], L["ICONMENU_GCDASUNUSABLE_DESC"])
+	end,
 	useSUG = "spellWithGCD",
 	unit = PLAYER,
 	formatter = TMW.C.Formatter.TIME_0USABLE,
 	icon = "Interface\\Icons\\spell_holy_divineintervention",
 	tcoords = CNDT.COMMON.standardtcoords,
-	funcstr = [[CooldownDuration(c.NameFirst) c.Operator c.Level]],
+	funcstr = [[CooldownDuration(c.NameFirst, c.Checked) c.Operator c.Level]],
 	events = function(ConditionObject, c)
 		return
 			ConditionObject:GenerateNormalEventString("SPELL_UPDATE_COOLDOWN"),
@@ -94,14 +97,20 @@ ConditionCategory:RegisterCondition(2,	 "SPELLCDCOMP", {
 	name = function(editbox)
 		editbox:SetTexts(L["SPELLTOCOMP1"], L["CNDT_ONLYFIRST"])
 	end,
+	check = function(check)
+		check:SetTexts(L["ICONMENU_GCDASUNUSABLE"], L["ICONMENU_GCDASUNUSABLE_DESC"])
+	end,
 	name2 = function(editbox)
 		editbox:SetTexts(L["SPELLTOCOMP2"], L["CNDT_ONLYFIRST"])
+	end,
+	check2 = function(check)
+		check:SetTexts(L["ICONMENU_GCDASUNUSABLE"], L["ICONMENU_GCDASUNUSABLE_DESC"])
 	end,
 	useSUG = "spellWithGCD",
 	unit = PLAYER,
 	icon = "Interface\\Icons\\spell_holy_divineintervention",
 	tcoords = CNDT.COMMON.standardtcoords,
-	funcstr = [[CooldownDuration(c.NameFirst) c.Operator CooldownDuration(c.NameFirst2)]],
+	funcstr = [[CooldownDuration(c.NameFirst, c.Checked) c.Operator CooldownDuration(c.NameFirst2, c.Checked2)]],
 	events = function(ConditionObject, c)
 		return
 			ConditionObject:GenerateNormalEventString("SPELL_UPDATE_COOLDOWN"),
@@ -223,7 +232,7 @@ ConditionCategory:RegisterCondition(3.1, "CURRENTSPELL", {
 	end,
 	useSUG = true,
 	unit = false,
-	formatter = TMW.C.Formatter.BOOL_USABLEUNUSABLE,
+	formatter = TMW.C.Formatter.BOOL,
 	icon = "Interface\\Icons\\ability_rogue_ambush",
 	tcoords = CNDT.COMMON.standardtcoords,
 	Env = {
@@ -233,6 +242,31 @@ ConditionCategory:RegisterCondition(3.1, "CURRENTSPELL", {
 	events = function(ConditionObject, c)
 		return
 			ConditionObject:GenerateNormalEventString("CURRENT_SPELL_CAST_CHANGED")
+	end,
+})
+ConditionCategory:RegisterCondition(3.2, "AUTOSPELL", {
+	text = L["CONDITIONPANEL_AUTOSPELL"],
+	tooltip = L["CONDITIONPANEL_AUTOSPELL_DESC"],
+
+	bool = true,
+	
+	name = function(editbox)
+		editbox:SetTexts(L["SPELLTOCHECK"], L["CNDT_ONLYFIRST"])
+		editbox:SetLabel(L["SPELLTOCHECK"])
+	end,
+	useSUG = true,
+	unit = false,
+	formatter = TMW.C.Formatter.BOOL,
+	icon = 135467,
+	tcoords = CNDT.COMMON.standardtcoords,
+	Env = {
+		IsAutoRepeatSpell = IsAutoRepeatSpell,
+	},
+	funcstr = [[BOOLCHECK( IsAutoRepeatSpell(c.NameFirst) )]],
+	events = function(ConditionObject, c)
+		return
+			ConditionObject:GenerateNormalEventString("START_AUTOREPEAT_SPELL"),
+			ConditionObject:GenerateNormalEventString("STOP_AUTOREPEAT_SPELL")
 	end,
 })
 
@@ -572,37 +606,33 @@ end
 
 ConditionCategory:RegisterSpacer(30)
 
-local UnitCastingInfo, UnitChannelInfo = UnitCastingInfo, UnitChannelInfo
+local UnitCastingInfo, UnitChannelInfo = TMW.UnitCastingInfo, TMW.UnitChannelInfo
 Env.UnitCast = function(unit, level, matchname)
-	local name, _, _, _, _, _, _, notInterruptible = UnitCastingInfo(unit)
+	local name = UnitCastingInfo(unit)
 	if not name then
-		name, _, _, _, _, _, notInterruptible = UnitChannelInfo(unit)
+		name = UnitChannelInfo(unit)
 	end
 	name = strlowerCache[name]
 	if matchname == "" and name then
 		matchname = name
 	end
-	if level == 0 then -- only interruptible
-		return not notInterruptible and name == matchname
-	elseif level == 1 then -- present
+	if level == 0 or level == 1 then -- present
 		return name == matchname
 	else -- absent
 		return name ~= matchname
 	end
 end
 Env.UnitCastTime = function(unit, level, matchname)
-	local name, _, _, _, endTime, _, _, notInterruptible = UnitCastingInfo(unit)
+	local name, _, _, _, endTime = UnitCastingInfo(unit)
 	if not name then
-		name, _, _, _, endTime, _, notInterruptible = UnitChannelInfo(unit)
+		name, _, _, _, endTime = UnitChannelInfo(unit)
 	end
 	name = strlowerCache[name]
 	if matchname == "" and name then
 		matchname = name
 	end
 	local remaining = endTime and endTime/1000 - TMW.time or 0
-	if level == 0 then -- only interruptible
-		return not notInterruptible and name == matchname and remaining or 0
-	elseif level == 1 then -- present
+	if level == 0 or level == 1 then -- present
 		return name == matchname and remaining or 0
 	else -- absent
 		return name ~= matchname and remaining or 0
@@ -610,12 +640,12 @@ Env.UnitCastTime = function(unit, level, matchname)
 end
 ConditionCategory:RegisterCondition(31,	 "CASTING", {
 	text = L["ICONMENU_CAST"],
-	min = 0,
+	min = 1,
 	max = 2,
 	levelChecks = true,
 	nooperator = true,
 	texttable = {
-		[0] = L["CONDITIONPANEL_INTERRUPTIBLE"],
+		-- [0] = L["CONDITIONPANEL_INTERRUPTIBLE"],
 		[1] = L["ICONMENU_PRESENT"],
 		[2] = L["ICONMENU_ABSENT"],
 	},
@@ -628,21 +658,12 @@ ConditionCategory:RegisterCondition(31,	 "CASTING", {
 	useSUG = true,
 	funcstr = [[UnitCast(c.Unit, c.Level, LOWER(c.NameString))]], -- LOWER is some gsub magic
 	events = function(ConditionObject, c)
-		-- holy shit... need i say more?
 		return
 			ConditionObject:GetUnitChangedEventString(CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_START", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_STOP", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_SUCCEEDED", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_FAILED", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_FAILED_QUIET", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_DELAYED", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_INTERRUPTED", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_CHANNEL_START", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_CHANNEL_UPDATE", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_CHANNEL_STOP", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_INTERRUPTIBLE", CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_SPELLCAST_NOT_INTERRUPTIBLE", CNDT:GetUnit(c.Unit))
+			
+			-- We can't check against the unit here because LibClassicCasterino's events don't
+			-- work like the blizzard events do - they don't fire with every valid unitID.
+			ConditionObject:GenerateNormalEventString("TMW_UNIT_CAST_UPDATE" --[[, CNDT:GetUnit(c.Unit)]])
 	end,
 })
 

@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -7,7 +7,7 @@ local _G = _G
 local select = select
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.misc ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.misc then return end
 
 	local skins = {
 		_G.BNToastFrame,
@@ -15,28 +15,29 @@ local function LoadSkin()
 	}
 
 	for i = 1, #skins do
-		skins[i]:SetTemplate("Transparent")
+		skins[i]:SetTemplate('Transparent')
 	end
 
-	local ReportFrame = _G.PlayerReportFrame
-	ReportFrame:StripTextures()
-	ReportFrame:CreateBackdrop("Transparent")
-	ReportFrame.Comment:StripTextures()
-	S:HandleEditBox(ReportFrame.Comment)
-	S:HandleButton(ReportFrame.ReportButton)
-	S:HandleButton(ReportFrame.CancelButton)
+	local PlayerReportFrame = _G.PlayerReportFrame
+	S:HandleFrame(PlayerReportFrame, true)
 
-	local ReportCheatingDialog = _G.ReportCheatingDialog
-	ReportCheatingDialog:StripTextures()
+	PlayerReportFrame.Comment:StripTextures()
+	S:HandleEditBox(PlayerReportFrame.Comment)
+
+	S:HandleButton(PlayerReportFrame.ReportButton)
+	S:HandleButton(PlayerReportFrame.CancelButton)
+
+	S:HandleFrame(_G.ReportCheatingDialog, true)
+
 	_G.ReportCheatingDialogCommentFrame:StripTextures()
+
 	S:HandleButton(_G.ReportCheatingDialogReportButton)
 	S:HandleButton(_G.ReportCheatingDialogCancelButton)
-	ReportCheatingDialog:CreateBackdrop("Transparent")
+
 	S:HandleEditBox(_G.ReportCheatingDialogCommentFrameEditBox)
 
 	local BattleTagInviteFrame = _G.BattleTagInviteFrame
-	BattleTagInviteFrame:StripTextures()
-	BattleTagInviteFrame:CreateBackdrop("Transparent")
+	S:HandleFrame(BattleTagInviteFrame, true)
 
 	for i = 1, BattleTagInviteFrame:GetNumChildren() do
 		local child = select(i, BattleTagInviteFrame:GetChildren())
@@ -46,4 +47,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallback("SkinBNet", LoadSkin)
+S:AddCallback('Skin_BNet', LoadSkin)

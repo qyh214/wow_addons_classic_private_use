@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -84,13 +84,13 @@ local function SkinTableAttributeDisplay(frame)
 end
 
 local function LoadErrorFrameSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.debug ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.debug then return end
 
 	S:SecureHookScript(_G.ScriptErrorsFrame, 'OnShow', SkinOnShow)
 end
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.debug ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.debug then return end
 
 	-- Tooltips
 	if E.private.skins.blizzard.tooltip then
@@ -112,6 +112,8 @@ local function LoadSkin()
 	_G.EventTraceFrame:SetTemplate('Transparent')
 	S:HandleCloseButton(_G.EventTraceFrameCloseButton)
 
+	S:HandleScrollBar(_G.EventTraceFrameScroll, -2)
+
 	--New Table Attribute Display: mouse over frame and (/tableinspect or [/fstack -> then Ctrl])
 	SkinTableAttributeDisplay(_G.TableAttributeDisplay)
 	hooksecurefunc(_G.TableInspectorMixin, 'OnLoad', function(self)
@@ -127,7 +129,7 @@ S:AddCallback('ScriptErrorsFrame', LoadErrorFrameSkin)
 
 -- EventTrace, FrameStack, TableInspect Skins
 if _G.IsAddOnLoaded('Blizzard_DebugTools') then
-	S:AddCallback('SkinDebugTools', LoadSkin)
+	S:AddCallback('Skin_Blizzard_DebugTools', LoadSkin)
 else
-	S:AddCallbackForAddon('Blizzard_DebugTools', 'SkinDebugTools', LoadSkin)
+	S:AddCallbackForAddon('Blizzard_DebugTools', 'Skin_Blizzard_DebugTools', LoadSkin)
 end

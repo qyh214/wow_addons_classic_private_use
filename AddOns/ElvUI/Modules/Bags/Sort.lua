@@ -420,7 +420,7 @@ function B:CanItemGoInBag(bag, slot, targetBag)
 	end
 	local bagFamily = select(2, GetContainerNumFreeSlots(targetBag))
 	if itemFamily then
-		return (bagFamily == 0) or band(itemFamily, bagFamily) > 0
+		return (bagFamily == 0) or (itemFamily == bagFamily)
 	else
 		return false
 	end

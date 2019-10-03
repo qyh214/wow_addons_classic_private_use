@@ -1,0 +1,33 @@
+
+## Title: Guidelime_Bustea's 1-60 leveling Guide
+## Author: Bustea
+## Version: 1.7.0-Release
+## Interface: 11302
+## Dependencies: Guidelime
+## Notes: Bustea's 1-60 leveling Guide
+
+START WITH THIS Orc.lua
+START WITH THIS Troll.lua
+START WITH THIS Undead.lua
+START WITH THIS Tauren.lua
+Ettern_1-6_Durotar_Orc.lua
+Ettern_1-6_Durotar_Troll.lua
+1-6_Freezy3_Undead_Starter.lua
+Ettern_6-12_Durotar_Orc.lua
+Ettern_6-12_Durotar_Troll.lua
+6-12_Freezy3_Undead_Starter.lua
+1-12 Tauren.lua
+Bustea's 12-21 Tauren.lua
+Bustea's 12-21 Orc-Troll.lua
+Bustea's 12-21 Undead.lua
+Bustea's 21-31 leveling.lua
+Bustea's 31-36 leveling.lua
+Bustea's 36-41 leveling.lua
+Bustea's 41-45 leveling.lua
+Bustea's 45-51 leveling.lua
+Bustea's 51-55 leveling.lua
+Bustea's 55-58 leveling.lua
+Bustea's 58-60 leveling PHASE 1-4.lua
+
+
+

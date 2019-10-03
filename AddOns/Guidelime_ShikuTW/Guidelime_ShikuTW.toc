@@ -1,0 +1,43 @@
+## Title: Guidelime_ShikuTW
+## Author: shikushiku/Alexei
+## Version: 0.3-Beta
+## Interface: 11302
+## Dependencies: Guidelime
+## Notes: Guides created by Shikushiku/Alexei on Fairbanks and translate to zhTW
+## Notes-zhTW: Shikushiku/Alexei製作的升級指南，zhTW語系版本
+
+Hakurai1-12.lua
+Hakurai12-14.lua
+Hakurai14-16.lua
+Hakurai16-20.lua
+Hakurai20-22.lua
+Hakurai22-25.lua
+Hakurai25-27.lua
+Hakurai27-30.lua
+Hakurai30-33.lua
+Hakurai33-36.lua
+Hakurai36-37.lua
+Hakurai37-39.lua
+Hakurai39-42.lua
+Hakurai42-45.lua
+Hakurai45-47.lua
+Hakurai47-49.lua
+Hakurai49-51.lua
+Hakurai51-53.lua
+Hakurai53-55.lua
+Hakurai55-56.lua
+Hakurai56-57.lua
+Hakurai57-58.lua
+Hakurai57-60.lua
+Nelf1-12.lua
+CauthonLuck1-10.lua
+TrollMage1-12.lua
+Paladin12.lua
+Mage30AH.lua
+Mage60AH.lua
+Rogue16.lua
+Rogue20.lua
+Warlock20AH.lua
+Warlock20UD.lua
+Warlock30AH.lua
+Warlock30UD.lua

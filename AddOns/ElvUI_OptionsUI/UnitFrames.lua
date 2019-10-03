@@ -408,13 +408,18 @@ local function GetOptionsTable_Auras(auraType, isGroupFrame, updateFunc, groupNa
 		args = {
 			header = {
 				type = "header",
-				order = 1,
+				order = 0,
 				name = auraType == 'buffs' and L["Buffs"] or L["Debuffs"],
 			},
 			enable = {
 				type = 'toggle',
-				order = 2,
+				order = 1,
 				name = L["Enable"],
+			},
+			desaturate = {
+				type = 'toggle',
+				order = 2,
+				name = L["Desaturate Icon"],
 			},
 			perrow = {
 				type = 'range',
@@ -1612,7 +1617,7 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 			},
 			width = {
 				type = 'select',
-				order = 3,
+				order = 4,
 				name = L["Style"],
 				values = {
 					['fill'] = L["Filled"],
@@ -1660,18 +1665,18 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 			height = {
 				type = 'range',
 				name = L["Height"],
-				order = 4,
+				order = 5,
 				min = ((E.db.unitframe.thinBorders or E.PixelMode) and 3 or 7), max = 50, step = 1,
 			},
 			offset = {
 				type = 'range',
 				name = L["Offset"],
 				desc = L["Offset of the powerbar to the healthbar, set to 0 to disable."],
-				order = 5,
+				order = 6,
 				min = 0, max = 20, step = 1,
 			},
 			configureButton = {
-				order = 6,
+				order = 7,
 				name = L["Coloring"],
 				desc = L["This opens the UnitFrames Color settings. These settings affect all unitframes."],
 				type = 'execute',
@@ -1679,24 +1684,24 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 			},
 			reverseFill = {
 				type = "toggle",
-				order = 7,
+				order = 8,
 				name = L["Reverse Fill"],
 			},
 			position = {
 				type = 'select',
-				order = 8,
+				order = 9,
 				name = L["Text Position"],
 				values = positionValues,
 			},
 			xOffset = {
-				order = 9,
+				order = 10,
 				type = 'range',
 				name = L["Text xOffset"],
 				desc = L["Offset position for text."],
 				min = -300, max = 300, step = 1,
 			},
 			yOffset = {
-				order = 10,
+				order = 11,
 				type = 'range',
 				name = L["Text yOffset"],
 				desc = L["Offset position for text."],
@@ -1704,12 +1709,20 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 			},
 			attachTextTo = {
 				type = 'select',
-				order = 11,
+				order = 12,
 				name = L["Attach Text To"],
 				values = attachToValues,
 			},
 		},
 	}
+
+	if groupName == 'player' then
+		config.args.EnergyManaRegen = {
+			type = 'toggle',
+			order = 3,
+			name = L["Energy/Mana Regen Tick"],
+		}
+	end
 
 	if hasDetatchOption then
 			config.args.detachFromFrame = {
@@ -2187,16 +2200,18 @@ local function GetOptionsTable_HealPrediction(updateFunc, groupName, numGroup)
 				type = "toggle",
 				name = L["Enable"],
 			},
-			showOverAbsorbs = {
+			healType = {
 				order = 2,
-				type = "toggle",
-				name = L["Show Over Absorbs"],
-			},
-			showAbsorbAmount = {
-				order = 3,
-				type = "toggle",
-				name = L["Show Absorb Amount"],
-				disabled = function() return not E.db.unitframe.units[groupName].healPrediction.showOverAbsorbs end,
+				type = "select",
+				name = L["Type"],
+				values = {
+					ALL_HEALS = 'All Heals',
+					CHANNEL_HEALS = 'Channel Heals',
+					DIRECT_HEALS = 'Direct Heals',
+					HOT_HEALS = 'HoTs',
+					OVERTIME_HEALS = 'HoTs & Channel',
+					CASTED_HEALS = 'Direct & Channel Heals',
+				},
 			},
 			colors = {
 				order = 4,
@@ -2830,20 +2845,11 @@ E.Options.args.unitframe = {
 									get = function(info) return E.db.unitframe.colors[info[#info]] end,
 									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
 								},
-								healthselection = {
-									order = 2,
-									type = 'toggle',
-									name = L["Selection Health"],
-									desc = L["Color health by color selection."],
-									get = function(info) return E.db.unitframe.colors[info[#info]] end,
-									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
-								},
 								healthclass = {
 									order = 3,
 									type = 'toggle',
 									name = L["Class Health"],
 									desc = L["Color health by classcolor or reaction."],
-									disabled = function() return E.db.unitframe.colors.healthselection end,
 									get = function(info) return E.db.unitframe.colors[info[#info]] end,
 									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
 								},
@@ -2854,7 +2860,7 @@ E.Options.args.unitframe = {
 									desc = L["Forces reaction color instead of class color on units controlled by players."],
 									get = function(info) return E.db.unitframe.colors[info[#info]] end,
 									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
-									disabled = function() return E.db.unitframe.colors.healthselection or not E.db.unitframe.colors.healthclass end,
+									disabled = function() return not E.db.unitframe.colors.healthclass end,
 								},
 								transparentHealth = {
 									order = 6,
@@ -2960,20 +2966,11 @@ E.Options.args.unitframe = {
 									get = function(info) return E.db.unitframe.colors[info[#info]] end,
 									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
 								},
-								powerselection = {
-									order = 3,
-									type = 'toggle',
-									name = L["Selection Power"],
-									desc = L["Color power by color selection."],
-									get = function(info) return E.db.unitframe.colors[info[#info]] end,
-									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
-								},
 								powerclass = {
 									order = 4,
 									type = 'toggle',
 									name = L["Class Power"],
 									desc = L["Color power by classcolor or reaction."],
-									disabled = function() return E.db.unitframe.colors.powerselection end,
 									get = function(info) return E.db.unitframe.colors[info[#info]] end,
 									set = function(info, value) E.db.unitframe.colors[info[#info]] = value; UF:Update_AllFrames() end,
 								},
@@ -3305,89 +3302,6 @@ E.Options.args.unitframe = {
 								GOOD = {
 									order = 3,
 									name = L["Good"],
-									type = 'color',
-								},
-							},
-						},
-						selectionGroup = {
-							order = 7,
-							type = 'group',
-							name = L["Selection"],
-							get = function(info)
-								local n = tonumber(info[#info])
-								local t = E.db.unitframe.colors.selection[n]
-								local d = P.unitframe.colors.selection[n]
-								return t.r, t.g, t.b, t.a, d.r, d.g, d.b
-							end,
-							set = function(info, r, g, b)
-								local n = tonumber(info[#info])
-								local t = E.db.unitframe.colors.selection[n]
-								t.r, t.g, t.b = r, g, b
-								UF:Update_AllFrames()
-							end,
-							args = {
-								['0'] = {
-									order = 0,
-									name = L["Hostile"],
-									type = 'color',
-								},
-								['1'] = {
-									order = 1,
-									name = L["Unfriendly"],
-									type = 'color',
-								},
-								['2'] = {
-									order = 2,
-									name = L["Neutral"],
-									type = 'color',
-								},
-								['3'] = {
-									order = 3,
-									name = L["Friendly"],
-									type = 'color',
-								},
-								--[[ LS- said to just use "Player Extended" as "Player" and don't use "Player Simple" at all
-								['4'] = {
-									order = 4,
-									name = L["Player Simple"],
-									type = 'color',
-								},
-								]]
-								['5'] = {
-									order = 5,
-									name = L["Player"], -- Player Extended
-									type = 'color',
-								},
-								['6'] = {
-									order = 6,
-									name = L["PARTY"],
-									type = 'color',
-								},
-								['7'] = {
-									order = 7,
-									name = L["Party PVP"],
-									type = 'color',
-								},
-								['8'] = {
-									order = 8,
-									name = L["Friend"],
-									type = 'color',
-								},
-								['9'] = {
-									order = 9,
-									name = L["Dead"],
-									type = 'color',
-								},
-								--[[ disabled in oUF for now by LS-
-								['12'] = {
-									order = 12,
-									name = L["Self"],
-									type = 'color',
-								},
-								]]
-								['13'] = {
-									order = 13,
-									name = L["Battleground Friendly"],
 									type = 'color',
 								},
 							},
@@ -5569,7 +5483,7 @@ E.Options.args.unitframe.args.party = {
 		},
 		raidicon = GetOptionsTable_RaidIcon(UF.CreateAndUpdateHeaderGroup, 'party'),
 		readycheckIcon = GetOptionsTable_ReadyCheckIcon(UF.CreateAndUpdateHeaderGroup, 'party'),
-		--resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'party'),
+		resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'party'),
 		cutaway = GetOptionsTable_Cutaway(UF.CreateAndUpdateHeaderGroup, 'party'),
 		phaseIndicator = {
 			order = 5005,
@@ -6015,7 +5929,7 @@ E.Options.args.unitframe.args.raid = {
 		rdebuffs = GetOptionsTable_RaidDebuff(UF.CreateAndUpdateHeaderGroup, 'raid'),
 		raidicon = GetOptionsTable_RaidIcon(UF.CreateAndUpdateHeaderGroup, 'raid'),
 		readycheckIcon = GetOptionsTable_ReadyCheckIcon(UF.CreateAndUpdateHeaderGroup, 'raid'),
-		--resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'raid'),
+		resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'raid'),
 		cutaway = GetOptionsTable_Cutaway(UF.CreateAndUpdateHeaderGroup, 'raid'),
 	},
 }
@@ -6481,7 +6395,7 @@ E.Options.args.unitframe.args.raid40 = {
 		rdebuffs = GetOptionsTable_RaidDebuff(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		raidicon = GetOptionsTable_RaidIcon(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		readycheckIcon = GetOptionsTable_ReadyCheckIcon(UF.CreateAndUpdateHeaderGroup, 'raid40'),
-		--resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'raid40'),
+		resurrectIcon = GetOptionsTable_ResurrectIcon(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		cutaway = GetOptionsTable_Cutaway(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 	},
 }

@@ -1,7 +1,6 @@
 ## Title: Guidelime
-## Title-zhCN: Guidelime - 导航主体
 ## Author: Borick of Arthas(EU)
-## Version: 1.0
+## Version: 1.032
 ## Interface: 11302
 ## SavedVariables: GuidelimeData
 ## SavedVariablesPerCharacter: GuidelimeDataChar
@@ -41,9 +40,3 @@ Data\Guidelime_FlightmasterDB_Locales.lua
 
 DemoGuides\DemoGuides.xml
 
-
-## Q-CAT-Version: 117
-
-## Q-CAT-Version: 118
-
-## Q-CAT-Version: 119

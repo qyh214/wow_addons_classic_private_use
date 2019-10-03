@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
 --Cache global variables
@@ -7,34 +7,29 @@ local _G = _G
 local unpack = unpack
 
 local function LoadSkin()
-	if E.private.skins.blizzard.enable ~= true or E.private.skins.blizzard.talent ~= true then return end
+	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.talent then return end
 
-	local PlayerTalentFrame = _G.PlayerTalentFrame
-	TalentFrame:StripTextures()
-	TalentFrame:CreateBackdrop('Transparent')
-	TalentFrame.backdrop:Point('TOPLEFT', 13, -12)
-	TalentFrame.backdrop:Point('BOTTOMRIGHT', -31, 76)
+	local TalentFrame = _G.TalentFrame
+	S:HandleFrame(TalentFrame, true, nil, 11, -12, -32, 76)
 
-	TalentFramePortrait:Hide()
+	S:HandleCloseButton(_G.TalentFrameCloseButton, TalentFrame.backdrop)
 
-	S:HandleCloseButton(TalentFrameCloseButton)
-
-	TalentFrameCancelButton:Kill()
+	_G.TalentFrameCancelButton:Kill()
 
 	for i = 1, 5 do
 		S:HandleTab(_G['TalentFrameTab'..i])
 	end
 
-	TalentFrameScrollFrame:StripTextures()
-	TalentFrameScrollFrame:CreateBackdrop('Default')
+	_G.TalentFrameScrollFrame:StripTextures()
+	_G.TalentFrameScrollFrame:CreateBackdrop('Default')
 
-	S:HandleScrollBar(TalentFrameScrollFrameScrollBar)
-	TalentFrameScrollFrameScrollBar:Point('TOPLEFT', TalentFrameScrollFrame, 'TOPRIGHT', 10, -16)
+	S:HandleScrollBar(_G.TalentFrameScrollFrameScrollBar)
+	_G.TalentFrameScrollFrameScrollBar:Point('TOPLEFT', _G.TalentFrameScrollFrame, 'TOPRIGHT', 10, -16)
 
-	TalentFrameSpentPoints:Point('TOP', 0, -42)
-	TalentFrameTalentPointsText:Point('BOTTOMRIGHT', TalentFrame, 'BOTTOMLEFT', 220, 84)
+	_G.TalentFrameSpentPoints:Point('TOP', 0, -42)
+	_G.TalentFrameTalentPointsText:Point('BOTTOMRIGHT', TalentFrame, 'BOTTOMLEFT', 220, 84)
 
-	for i = 1, MAX_NUM_TALENTS do
+	for i = 1, _G.MAX_NUM_TALENTS do
 		local talent = _G['TalentFrameTalent'..i]
 		local icon = _G['TalentFrameTalent'..i..'IconTexture']
 		local rank = _G['TalentFrameTalent'..i..'Rank']
@@ -53,4 +48,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallbackForAddon('Blizzard_TalentUI', 'Talent', LoadSkin)
+S:AddCallbackForAddon('Blizzard_TalentUI', 'Skin_Blizzard_TalentUI', LoadSkin)

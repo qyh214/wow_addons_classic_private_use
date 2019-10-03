@@ -37,7 +37,6 @@ L["Auras"] = true
 L["Auto Scale"] = "Dimensionar automaticamente"
 L["AVD: "] = "AVD: "
 L["Avoidance Breakdown"] = "Separação de Anulação"
-L["Azerite Bar"] = true
 L["Bag Mover (Grow Down)"] = true
 L["Bag Mover (Grow Up)"] = true
 L["Bag Mover"] = true

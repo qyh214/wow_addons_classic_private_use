@@ -3,27 +3,20 @@ local RU = E:GetModule('RaidUtility')
 
 --Lua functions
 local _G = _G
-local unpack, ipairs, pairs, next = unpack, ipairs, pairs, next
-local strfind, tinsert, wipe, sort = strfind, tinsert, wipe, sort
+local unpack, pairs, strfind = unpack, pairs, strfind
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local DoReadyCheck = DoReadyCheck
-local GameTooltip_Hide = GameTooltip_Hide
 local GetInstanceInfo = GetInstanceInfo
-local GetNumGroupMembers = GetNumGroupMembers
-local GetRaidRosterInfo = GetRaidRosterInfo
-local GetTexCoordsForRole = GetTexCoordsForRole
 local InCombatLockdown = InCombatLockdown
-local InitiateRolePoll = InitiateRolePoll
 local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
 local SecureHandler_OnClick = SecureHandler_OnClick
 local ToggleFriendsFrame = ToggleFriendsFrame
-local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local UnitIsGroupAssistant = UnitIsGroupAssistant
 local UnitIsGroupLeader = UnitIsGroupLeader
-local NUM_RAID_GROUPS = NUM_RAID_GROUPS
 local PANEL_HEIGHT = 100
+local MAINTANK, MAINASSIST = MAINTANK, MAINASSIST
 
 --Check if We are Raid Leader or Raid Officer
 local function CheckRaidStatus()
@@ -96,99 +89,6 @@ function RU:ToggleRaidUtil(event)
 	end
 end
 
--- Credits oRA3 for the RoleIcons
-local function sortColoredNames(a, b)
-	return a:sub(11) < b:sub(11)
-end
-
-local roleIconRoster = {}
-local function onEnter(self)
-	wipe(roleIconRoster)
-
-	for i = 1, NUM_RAID_GROUPS do
-		roleIconRoster[i] = {}
-	end
-
-	local role = self.role
-	local point = E:GetScreenQuadrant(_G.RaidUtility_ShowButton)
-	local bottom = point and strfind(point, "BOTTOM")
-	local left = point and strfind(point, "LEFT")
-
-	local anchor1 = (bottom and left and "BOTTOMLEFT") or (bottom and "BOTTOMRIGHT") or (left and "TOPLEFT") or "TOPRIGHT"
-	local anchor2 = (bottom and left and "BOTTOMRIGHT") or (bottom and "BOTTOMLEFT") or (left and "TOPRIGHT") or "TOPLEFT"
-	local anchorX = left and 2 or -2
-
-	local GameTooltip = _G.GameTooltip
-	GameTooltip:SetOwner(E.UIParent, "ANCHOR_NONE")
-	GameTooltip:Point(anchor1, self, anchor2, anchorX, 0)
-	GameTooltip:SetText(_G["INLINE_" .. role .. "_ICON"] .. _G[role])
-
-	local name, group, class, groupRole, color, coloredName, _
-	for i = 1, GetNumGroupMembers() do
-		name, _, group, _, _, class, _, _, _, _, _, groupRole = GetRaidRosterInfo(i)
-		if name and groupRole == role then
-			color = class == 'PRIEST' and E.PriestColors or (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[class] or _G.RAID_CLASS_COLORS[class])
-			coloredName = ("|cff%02x%02x%02x%s"):format(color.r * 255, color.g * 255, color.b * 255, name:gsub("%-.+", "*"))
-			tinsert(roleIconRoster[group], coloredName)
-		end
-	end
-
-	for Group, list in ipairs(roleIconRoster) do
-		sort(list, sortColoredNames)
-		for _, Name in ipairs(list) do
-			GameTooltip:AddLine(("[%d] %s"):format(Group, Name), 1, 1, 1)
-		end
-		roleIconRoster[Group] = nil
-	end
-
-	GameTooltip:Show()
-end
-
-local function RaidUtility_PositionRoleIcons()
-	local point = E:GetScreenQuadrant(_G.RaidUtility_ShowButton)
-	local left = point and strfind(point, "LEFT")
-	_G.RaidUtilityRoleIcons:ClearAllPoints()
-	if left then
-		_G.RaidUtilityRoleIcons:Point("LEFT", _G.RaidUtilityPanel, "RIGHT", -1, 0)
-	else
-		_G.RaidUtilityRoleIcons:Point("RIGHT", _G.RaidUtilityPanel, "LEFT", 1, 0)
-	end
-end
-
-local count = {}
-local function UpdateIcons(self)
-	local raid = IsInRaid()
-	local party --= IsInGroup() --We could have this in party :thinking:
-
-	if not (raid or party) then
-		self:Hide()
-		return
-	else
-		self:Show()
-		RaidUtility_PositionRoleIcons()
-	end
-
-	wipe(count)
-
-	local role
-	for i = 1, GetNumGroupMembers() do
-		role = UnitGroupRolesAssigned((raid and "raid" or "party")..i)
-		if role and role ~= "NONE" then
-			count[role] = (count[role] or 0) + 1
-		end
-	end
-
-	if (not raid) and party then -- only need this party (we believe)
-		if E.myrole then
-			count[E.myrole] = (count[E.myrole] or 0) + 1
-		end
-	end
-
-	for Role, icon in next, _G.RaidUtilityRoleIcons.icons do
-		icon.count:SetText(count[Role] or 0)
-	end
-end
-
 function RU:Initialize()
 	if E.private.general.raidUtility == false then return end
 	self.Initialized = true
@@ -221,7 +121,7 @@ function RU:Initialize()
 		local point = self:GetPoint()
 		local raidUtilPoint, closeButtonPoint, yOffset
 
-		if string.find(point, "BOTTOM") then
+		if strfind(point, "BOTTOM") then
 			raidUtilPoint = "BOTTOM"
 			closeButtonPoint = "TOP"
 			yOffset = 1
@@ -240,7 +140,6 @@ function RU:Initialize()
 	]=]):format(-E.Border + E.Spacing*3))
 	RaidUtility_ShowButton:SetScript("OnMouseUp", function()
 		RaidUtilityPanel.toggled = true
-		RaidUtility_PositionRoleIcons()
 	end)
 	RaidUtility_ShowButton:SetMovable(true)
 	RaidUtility_ShowButton:SetClampedToScreen(true)
@@ -275,55 +174,6 @@ function RU:Initialize()
 	RaidUtility_CloseButton:SetScript("OnMouseUp", function() RaidUtilityPanel.toggled = false end)
 	RaidUtilityPanel:SetFrameRef("RaidUtility_CloseButton", RaidUtility_CloseButton)
 
-	--Role Icons
-	local RoleIcons = CreateFrame("Frame", "RaidUtilityRoleIcons", RaidUtilityPanel)
-	RoleIcons:Point("LEFT", RaidUtilityPanel, "RIGHT", -1, 0)
-	RoleIcons:Size(36, PANEL_HEIGHT)
-	RoleIcons:SetTemplate("Transparent")
-	RoleIcons:RegisterEvent("PLAYER_ENTERING_WORLD")
-	RoleIcons:RegisterEvent("GROUP_ROSTER_UPDATE")
-	RoleIcons:SetScript("OnEvent", UpdateIcons)
-
-	RoleIcons.icons = {}
-
-	local roles = {"TANK", "HEALER", "DAMAGER"}
-	for i, role in ipairs(roles) do
-		local frame = CreateFrame("Frame", "$parent_"..role, RoleIcons)
-		if i == 1 then
-			frame:Point("BOTTOM", 0, 4)
-		else
-			frame:Point("BOTTOM", _G["RaidUtilityRoleIcons_"..roles[i-1]], "TOP", 0, 4)
-		end
-
-		frame:Size(28, 28)
-		--frame:SetTemplate()
-
-		local texture = frame:CreateTexture(nil, "OVERLAY")
-		texture:SetTexture(E.Media.Textures.RoleIcons) --(337499)
-		local texA, texB, texC, texD = GetTexCoordsForRole(role)
-		texture:SetTexCoord(texA, texB, texC, texD)
-		--[[if E.PixelMode then
-			texture:SetTexCoord(texA+0.0015, texB-0.005, texC-0.005, texD-0.01)
-		else
-			texture:SetTexCoord(texA+0.01, texB-0.01, texC+0.001, texD-0.015)
-		end]]
-		local texturePlace = --[[(E.PixelMode and 4) or]] 2
-		texture:Point("TOPLEFT", frame, "TOPLEFT", -texturePlace, texturePlace)
-		texture:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT", texturePlace, -texturePlace)
-		frame.texture = texture
-
-		local Count = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-		Count:Point("BOTTOMRIGHT", -2, 2)
-		Count:SetText(0)
-		frame.count = Count
-
-		frame.role = role
-		frame:SetScript("OnEnter", onEnter)
-		frame:SetScript("OnLeave", GameTooltip_Hide)
-
-		RoleIcons.icons[role] = frame
-	end
-
 	--Disband Raid button
 	self:CreateUtilButton("DisbandRaidButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", RaidUtilityPanel:GetWidth() * 0.8, 18, "TOP", RaidUtilityPanel, "TOP", 0, -5, L["Disband Group"], nil)
 	_G.DisbandRaidButton:SetScript("OnMouseUp", function()
@@ -332,28 +182,20 @@ function RU:Initialize()
 		end
 	end)
 
-	--Role Check button
-	self:CreateUtilButton("RoleCheckButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", RaidUtilityPanel:GetWidth() * 0.8, 18, "TOP", _G.DisbandRaidButton, "BOTTOM", 0, -5, _G.ROLE_POLL, nil)
-	_G.RoleCheckButton:SetScript("OnMouseUp", function()
-		if CheckRaidStatus() then
-			InitiateRolePoll()
-		end
-	end)
-
 	--MainTank Button
-	--[[self:CreateUtilButton("MainTankButton", RaidUtilityPanel, "SecureActionButtonTemplate, UIMenuButtonStretchTemplate", (DisbandRaidButton:GetWidth() / 2) - 2, 18, "TOPLEFT", RoleCheckButton, "BOTTOMLEFT", 0, -5, MAINTANK, nil)
-	MainTankButton:SetAttribute("type", "maintank")
-	MainTankButton:SetAttribute("unit", "target")
-	MainTankButton:SetAttribute("action", "toggle")
+	self:CreateUtilButton("MainTankButton", RaidUtilityPanel, "SecureActionButtonTemplate, UIMenuButtonStretchTemplate", (_G.DisbandRaidButton:GetWidth() / 2) - 2, 18, "TOPLEFT", _G.DisbandRaidButton, "BOTTOMLEFT", 0, -5, MAINTANK, nil)
+	_G.MainTankButton:SetAttribute("type", "maintank")
+	_G.MainTankButton:SetAttribute("unit", "target")
+	_G.MainTankButton:SetAttribute("action", "toggle")
 
 	--MainAssist Button
-	self:CreateUtilButton("MainAssistButton", RaidUtilityPanel, "SecureActionButtonTemplate, UIMenuButtonStretchTemplate", (DisbandRaidButton:GetWidth() / 2) - 2, 18, "TOPRIGHT", RoleCheckButton, "BOTTOMRIGHT", 0, -5, MAINASSIST, nil)
-	MainAssistButton:SetAttribute("type", "mainassist")
-	MainAssistButton:SetAttribute("unit", "target")
-	MainAssistButton:SetAttribute("action", "toggle")]]
+	self:CreateUtilButton("MainAssistButton", RaidUtilityPanel, "SecureActionButtonTemplate, UIMenuButtonStretchTemplate", (_G.DisbandRaidButton:GetWidth() / 2) - 2, 18, "TOPRIGHT", _G.DisbandRaidButton, "BOTTOMRIGHT", 0, -5, MAINASSIST, nil)
+	_G.MainAssistButton:SetAttribute("type", "mainassist")
+	_G.MainAssistButton:SetAttribute("unit", "target")
+	_G.MainAssistButton:SetAttribute("action", "toggle")
 
 	--Ready Check button
-	self:CreateUtilButton("ReadyCheckButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", _G.RoleCheckButton:GetWidth() * 0.75, 18, "TOPLEFT", _G.RoleCheckButton, "BOTTOMLEFT", 0, -5, _G.READY_CHECK, nil)
+	self:CreateUtilButton("ReadyCheckButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", RaidUtilityPanel:GetWidth() * 0.8, 18, "TOP", _G.DisbandRaidButton, "BOTTOM", 0, -28, _G.READY_CHECK, nil)
 	_G.ReadyCheckButton:SetScript("OnMouseUp", function()
 		if CheckRaidStatus() then
 			DoReadyCheck()
@@ -361,15 +203,16 @@ function RU:Initialize()
 	end)
 
 	--Raid Control Panel
-	self:CreateUtilButton("RaidControlButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", _G.RoleCheckButton:GetWidth(), 18, "TOPLEFT", _G.ReadyCheckButton, "BOTTOMLEFT", 0, -5, L["Raid Menu"], nil)
+	self:CreateUtilButton("RaidControlButton", RaidUtilityPanel, "UIMenuButtonStretchTemplate", RaidUtilityPanel:GetWidth() * 0.8, 18, "TOP", _G.ReadyCheckButton, "BOTTOM", 0, -5, L["Raid Menu"], nil)
 	_G.RaidControlButton:SetScript("OnMouseUp", function()
 		ToggleFriendsFrame(3)
 	end)
 
 	local buttons = {
 		"DisbandRaidButton",
-		"RoleCheckButton",
 		"ReadyCheckButton",
+		"MainTankButton",
+		"MainAssistButton",
 		"RaidControlButton",
 		"RaidUtility_ShowButton",
 		"RaidUtility_CloseButton"

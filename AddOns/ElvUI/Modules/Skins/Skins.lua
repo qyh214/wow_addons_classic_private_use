@@ -40,7 +40,6 @@ S.Blizzard.Regions = {
 	'Cover',
 	'Border',
 	'Background',
-	-- EditBox
 	'TopTex',
 	'TopLeftTex',
 	'TopRightTex',
@@ -77,8 +76,7 @@ function S:HandleInsetFrame(frame)
 	if frame.Bg then frame.Bg:Hide() end
 end
 
--- All frames that have a Portrait
-function S:HandlePortraitFrame(frame, setBackdrop)
+function S:HandleFrame(frame, setBackdrop, template, x1, y1, x2, y2)
 	assert(frame, "doesn't exist!")
 
 	local name = frame and frame.GetName and frame:GetName()
@@ -102,11 +100,15 @@ function S:HandlePortraitFrame(frame, setBackdrop)
 	end
 
 	if setBackdrop then
-		frame:CreateBackdrop('Transparent')
-		frame.backdrop:SetAllPoints()
+		frame:CreateBackdrop(template or 'Transparent')
 	else
-		frame:SetTemplate('Transparent')
+		frame:SetTemplate(template or 'Transparent')
 	end
+
+    if frame.backdrop then
+        frame.backdrop:Point('TOPLEFT', x1 or 0, y1 or 0)
+        frame.backdrop:Point('BOTTOMRIGHT', x2 or 0, y2 or 0)
+    end
 end
 
 function S:SetModifiedBackdrop()
@@ -305,6 +307,11 @@ function S:HandleButtonHighlight(frame, r, g, b)
 	rightGrad:SetGradientAlpha('Horizontal', r, g, b, 0, r, g, b, 0.35)
 end
 
+function S:HandlePointXY(frame, x, y)
+	local a, b, c, d, e = frame:GetPoint()
+	frame:SetPoint(a, b, c, x or d, y or e)
+end
+
 local function GrabScrollBarElement(frame, element)
 	local FrameName = frame:GetDebugName()
 	return frame[element] or FrameName and (_G[FrameName..element] or strfind(FrameName, element)) or nil
@@ -461,32 +468,42 @@ function S:HandleEditBox(frame)
 	end
 end
 
-function S:HandleDropDownBox(frame, width)
-	if frame.backdrop then return end
+function S:HandleDropDownBox(frame, width, pos)
+	assert(frame, "doesnt exist!")
+
+	local frameName = frame.GetName and frame:GetName()
+	local button = frame.Button or frameName and (_G[frameName.."Button"] or _G[frameName.."_Button"])
+	local text = frameName and _G[frameName.."Text"] or frame.Text
+	local icon = frame.Icon
+
+	if not width then
+		width = 155
+	end
 
 	frame:StripTextures()
+	frame:SetWidth(width)
+
 	frame:CreateBackdrop()
-	frame.backdrop:SetFrameLevel(frame:GetFrameLevel())
-	frame.backdrop:Point("TOPLEFT", frame.Left, 20, -21)
-	frame.backdrop:Point("BOTTOMRIGHT", frame.Right, -19, 23)
+	frame:SetFrameLevel(frame:GetFrameLevel() + 2)
+	frame.backdrop:SetPoint("TOPLEFT", 20, -2)
+	frame.backdrop:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", 2, -2)
 
-	if width then
-		frame:Width(width)
+	button:ClearAllPoints()
+	if pos then
+		button:SetPoint("TOPRIGHT", frame.Right, -20, -21)
+	else
+		button:SetPoint("RIGHT", frame, "RIGHT", -10, 3)
+	end
+	button.SetPoint = E.noop
+	S:HandleNextPrevButton(button)
+
+	if text then
+		text:ClearAllPoints()
+		text:SetPoint("RIGHT", button, "LEFT", -2, 0)
 	end
 
-	local FrameName = frame.GetName and frame:GetName()
-	-- We need to check first for frame.Button otherwise it will fail on some elements
-	local button = frame.Button or FrameName and _G[FrameName..'Button']
-	if button then
-		button:ClearAllPoints()
-		button:Point("RIGHT", frame.backdrop)
-		button:SetSize(16, 16)
-		S:HandleNextPrevButton(button)
-	end
-
-	local icon = frame.Icon
 	if icon then
-		icon:Point("LEFT", 23, 0)
+		icon:SetPoint("LEFT", 23, 0)
 	end
 end
 
@@ -682,7 +699,7 @@ end
 local handleCloseButtonOnEnter = function(btn) if btn.Texture then btn.Texture:SetVertexColor(unpack(E.media.rgbvaluecolor)) end end
 local handleCloseButtonOnLeave = function(btn) if btn.Texture then btn.Texture:SetVertexColor(1, 1, 1) end end
 
-function S:HandleCloseButton(f, point)
+function S:HandleCloseButton(f, point, x, y)
 	f:StripTextures()
 
 	if not f.Texture then
@@ -696,7 +713,7 @@ function S:HandleCloseButton(f, point)
 	end
 
 	if point then
-		f:Point("TOPRIGHT", point, "TOPRIGHT", 2, 2)
+		f:Point("TOPRIGHT", point, "TOPRIGHT", x or 2, y or 2)
 	end
 end
 
@@ -1259,6 +1276,22 @@ function S:ADDON_LOADED(_, addonName)
 	end
 end
 
+function S:PLAYER_ENTERING_WORLD()
+	for addonName, object in pairs(self.addonsToLoad) do
+		local isLoaded, isFinished = IsAddOnLoaded(addonName)
+		if isLoaded and isFinished then
+			S:CallLoadedAddon(addonName, object)
+		end
+	end
+
+	for index, loadFunc in ipairs(self.nonAddonsToLoad) do
+		xpcall(loadFunc, errorhandler)
+		self.nonAddonsToLoad[index] = nil
+	end
+
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end
+
 function S:RegisterSkin(addonName, loadFunc, forceLoad, bypass)
 	if bypass then
 		self.allowBypass[addonName] = true
@@ -1301,18 +1334,6 @@ function S:Initialize()
 
 	S:SkinAce3()
 
-	for addonName, object in pairs(self.addonsToLoad) do
-		local isLoaded, isFinished = IsAddOnLoaded(addonName)
-		if isLoaded and isFinished then
-			S:CallLoadedAddon(addonName, object)
-		end
-	end
-
-	for index, loadFunc in ipairs(self.nonAddonsToLoad) do
-		xpcall(loadFunc, errorhandler)
-		self.nonAddonsToLoad[index] = nil
-	end
-
 	hooksecurefunc("TriStateCheckbox_SetState", function(_, checkButton)
 		if checkButton.forceSaturation then
 			local tex = checkButton:GetCheckedTexture()
@@ -1327,4 +1348,5 @@ function S:Initialize()
 end
 
 S:RegisterEvent('ADDON_LOADED')
+S:RegisterEvent('PLAYER_ENTERING_WORLD')
 E:RegisterModule(S:GetName())

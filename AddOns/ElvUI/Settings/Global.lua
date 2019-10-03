@@ -3,7 +3,7 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 --Global Settings
 G.general = {
 	UIScale = 0.64,
-	version = 1.08,
+	version = 1.13,
 	locale = E:GetLocale(),
 	eyefinity = false,
 	ignoreScalePopup = false,
@@ -94,7 +94,6 @@ G.profileCopy = {
 		experience = true,
 		reputation = true,
 		honor = true,
-		azerite = true
 	},
 	datatexts = {
 		general = true,

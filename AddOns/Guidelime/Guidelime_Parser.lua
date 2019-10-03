@@ -136,7 +136,7 @@ local function textFormatting(text, color)
 		:gsub("%*([^%*]+)%*", (color or "|cFFFFD100") .. "%1|r")
 		:gsub("%*%*","%*")
 	local formattedInactive = formatted:gsub("|r", addon.COLOR_INACTIVE)
-	return formatted, formattedInactive, url
+	return formatted, formattedInactive, url, formatted:gsub("%s", "") == ""
 end
 
 function addon.parseLine(step, guide, strict, nameOnly)
@@ -151,15 +151,14 @@ function addon.parseLine(step, guide, strict, nameOnly)
 		if text ~= "" then
 			local element = {}
 			element.t = "TEXT"
-			element.text, element.textInactive, element.url = textFormatting(text, addon.COLOR_WHITE)
-			element.startPos = pos
-			pos = pos + #text
-			element.endPos = pos - 1
-			element.index = #step.elements + 1
-			element.step = step
-			table.insert(step.elements, element)
-			if addon.debugging and step.text:sub(element.startPos - step.startPos + 1, element.endPos - step.startPos + 1) ~= text then
-				print("LIME: parsing guide \"" .. step.text:sub(element.startPos - step.startPos + 1, element.endPos - step.startPos + 1) .. "\" should be \"" .. text .. "\" at " .. element.startPos .. "-" .. element.endPos .. " in " .. pos0 .. "->" .. step.text)
+			element.text, element.textInactive, element.url, element.empty = textFormatting(text, addon.COLOR_WHITE)
+			if element.text ~= nil then
+				element.startPos = pos
+				pos = pos + #text
+				element.endPos = pos - 1
+				element.index = #step.elements + 1
+				element.step = step
+				table.insert(step.elements, element)
 			end
 		end
 		local element = {}
@@ -178,13 +177,16 @@ function addon.parseLine(step, guide, strict, nameOnly)
 		table.insert(step.elements, element)
 		local tag = code:sub(#addon.codes[element.t] + 1)
 		
-		if addon.debugging and step.text:sub(element.startPos - step.startPos + 1, element.endPos - step.startPos + 1) ~= ("["..code.."]") then
-			print("LIME: parsing guide \"[" .. step.text:sub(element.startPos - step.startPos + 1, element.endPos - step.startPos + 1) .. "]\" should be \"" .. code .. "\" at " .. element.startPos .. "-" .. element.endPos .. " in " .. pos0 .. "->" .. step.text)
-		end
 		if element.t == "NEXT" then
 			local _, c = tag:gsub("%s*(%d*%.?%d*)%s*%-?%s*(%d*%.?%d*)%s*(.*)", function (minLevel, maxLevel, title)
 				if guide.next == nil then guide.next = {} end
-				table.insert(guide.next, minLevel .. "-" .. maxLevel .. " " .. title)
+				if minLevel ~= "" or maxLevel ~= "" then
+					title = " " .. title
+					if maxLevel ~= "" then title = maxLevel .. title end
+					title = "-" .. title
+					if minLevel ~= "" then title = minLevel .. title end
+				end
+				table.insert(guide.next, title)
 			end, 1)
 			if c ~= 1 then
 				addon.createPopupFrame(string.format(L.ERROR_CODE_NOT_RECOGNIZED, guide.title or "", code, (step.line or "") .. " " .. step.text)):Show()
@@ -218,11 +220,11 @@ function addon.parseLine(step, guide, strict, nameOnly)
 		elseif element.t == "GUIDE_APPLIES" then
 			tag:upper():gsub(" ",""):gsub("([^,]+)", function(c)
 				if addon.isClass(c) then
-					if guide.class == nil then guide.class = {} end
-					table.insert(guide.class, addon.getClass(c))
+					if guide.classes == nil then guide.classes = {} end
+					table.insert(guide.classes, addon.getClass(c))
 				elseif addon.isRace(c) then
-					if guide.race == nil then guide.race = {} end
-					table.insert(guide.race, addon.getRace(c))
+					if guide.races == nil then guide.races = {} end
+					table.insert(guide.races, addon.getRace(c))
 				elseif addon.isFaction(c) then
 					guide.faction = addon.getFaction(c)
 				else
@@ -259,7 +261,7 @@ function addon.parseLine(step, guide, strict, nameOnly)
 			elseif element.t == "QUEST" then
 				element.t = "COMPLETE"
 			end
-			local _, c = tag:gsub("%s*([%d/%?]+),?(%d*)%s*(.*)", function(id, objective, title)
+			local _, c = tag:gsub("%s*([%d/%?]+),?(%d*)%s*(.-)%s*$", function(id, objective, title)
 				element.questId = tonumber(id)
 				if element.questId == nil then
 					if strict then 
@@ -267,6 +269,9 @@ function addon.parseLine(step, guide, strict, nameOnly)
 					else
 						element.questId = id
 					end
+				end
+				if addon.questsDB[element.questId] ~= nil and addon.questsDB[element.questId].replacement ~= nil then
+					element.questId = addon.questsDB[element.questId].replacement
 				end
 				if objective ~= "" then element.objective = tonumber(objective) end
 				if title == "-" then
@@ -281,13 +286,13 @@ function addon.parseLine(step, guide, strict, nameOnly)
 				--	error("loading guide \"" .. GuidelimeDataChar.currentGuide.title .. "\": wrong title for quest " .. element.questId .. " \"" .. element.title .. "\" instead of \"" .. addon.questsDB[element.questId].name .. "\" in line \"" .. step.text .. "\"")
 				--end
 				if addon.questsDB[element.questId] ~= nil then
-					if step.race == nil and addon.getQuestRaces(element.questId) ~= nil then 
-						step.race = {}
-						for i, r in pairs(addon.getQuestRaces(element.questId)) do step.race[i] = r end
+					if step.races == nil and addon.getQuestRaces(element.questId) ~= nil then 
+						step.races = {}
+						for i, r in pairs(addon.getQuestRaces(element.questId)) do step.races[i] = r end
 					end
-					if step.class == nil and addon.getQuestClasses(element.questId) ~= nil then 
-						step.class = {}
-						for i, r in pairs(addon.getQuestClasses(element.questId)) do step.class[i] = r end
+					if step.classes == nil and addon.getQuestClasses(element.questId) ~= nil then 
+						step.classes = {}
+						for i, r in pairs(addon.getQuestClasses(element.questId)) do step.classes[i] = r end
 					end
 					if step.faction == nil and addon.getQuestFaction(element.questId) ~= nil then step.faction = addon.getQuestFaction(element.questId) end
 					if addon.questsDB[element.questId].sort ~= nil and addon.mapIDs[addon.questsDB[element.questId].sort] ~= nil then 
@@ -306,11 +311,11 @@ function addon.parseLine(step, guide, strict, nameOnly)
 		elseif element.t == "APPLIES" then
 			tag:upper():gsub(" ",""):gsub("([^,]+)", function(c)
 				if addon.isClass(c) then
-					if step.class == nil then step.class = {} end
-					table.insert(step.class, addon.getClass(c))
+					if step.classes == nil then step.classes = {} end
+					table.insert(step.classes, addon.getClass(c))
 				elseif addon.isRace(c) then
-					if step.race == nil then step.race = {} end
-					table.insert(step.race, addon.getRace(c))
+					if step.races == nil then step.races = {} end
+					table.insert(step.races, addon.getRace(c))
 				elseif addon.isFaction(c) then
 					step.faction = addon.getFaction(c)
 				else
@@ -322,8 +327,9 @@ function addon.parseLine(step, guide, strict, nameOnly)
 			local _, c = tag:gsub("%s*(%d+%.?%d*)%s?,%s?(%d+%.?%d*)%s?,?%s?(%d*%.?%d*)%s?(.*)", function(x, y, radius, zone)
 				element.x = tonumber(x)
 				element.y = tonumber(y)
-				if radius ~= "" then element.radius = tonumber(radius) else element.radius = addon.DEFAULT_GOTO_RADIUS end
-				if zone ~= "" then guide.currentZone = addon.mapIDs[zone] end
+				if radius ~= "" then element.radius = tonumber(radius) end
+				if element.radius == nil or element.radius == 0 then element.radius = addon.DEFAULT_GOTO_RADIUS end
+				if zone ~= "" then guide.currentZone = addon.mapIDs[addon.getZoneName(zone)] end
 				element.mapID = guide.currentZone
 				if element.mapID == nil then 
 					addon.createPopupFrame(string.format(L.ERROR_CODE_ZONE_NOT_FOUND, guide.title or "", code, (step.line or "") .. " " .. step.text)):Show()
@@ -340,7 +346,7 @@ function addon.parseLine(step, guide, strict, nameOnly)
 			local _, c = tag:gsub("%s*(%d+%.?%d*)%s?,%s?(%d+%.?%d*)%s?(.*)", function(x, y, zone)
 				element.x = tonumber(x)
 				element.y = tonumber(y)
-				if zone ~= "" then guide.currentZone = addon.mapIDs[zone] end
+				if zone ~= "" then guide.currentZone = addon.mapIDs[addon.getZoneName(zone)] end
 				element.mapID = guide.currentZone
 				if element.mapID == nil then 
 					addon.createPopupFrame(string.format(L.ERROR_CODE_ZONE_NOT_FOUND, guide.title or "", code, (step.line or "") .. " " .. step.text)):Show()
@@ -358,7 +364,8 @@ function addon.parseLine(step, guide, strict, nameOnly)
 				element.level = tonumber(level)
 				if text ~= "" then
 					element.text, element.textInactive, _ = textFormatting(text:gsub("%s*(.*)", "%1", 1))
-				else
+				end
+				if element.text == nil then
 					element.text = level .. t .. xp
 					element.textInactive = element.text
 				end
@@ -400,7 +407,7 @@ function addon.parseLine(step, guide, strict, nameOnly)
 			end
 		elseif element.t == "FLY" or element.t == "GET_FLIGHT_POINT" then
 			if tag:gsub(" ", "") ~= "" then
-				element.text, element.textInactive, _ = textFormatting(tag)
+				element.text, element.textInactive = textFormatting(tag)
 				element.flightmaster = addon.getFlightmasterByPlace(tag, step.faction or guide.faction)
 --TODO: active this error check
 --				if element.flightmaster == nil then
@@ -409,7 +416,7 @@ function addon.parseLine(step, guide, strict, nameOnly)
 --				end
 			end
 		else
-			element.text, element.textInactive, _ = textFormatting(tag)
+			element.text, element.textInactive = textFormatting(tag)
 		end
 		return ""
 	end)
@@ -418,12 +425,14 @@ function addon.parseLine(step, guide, strict, nameOnly)
 	if t ~= nil and t ~= "" then
 		local element = {}
 		element.t = "TEXT"
-		element.text, element.textInactive, element.url = textFormatting(t, addon.COLOR_WHITE)
-		element.startPos = pos 
-		element.endPos = pos + #t - 1
-		element.index = #step.elements + 1
-		element.step = step
-		table.insert(step.elements, element)
+		element.text, element.textInactive, element.url, element.empty = textFormatting(t, addon.COLOR_WHITE)
+		if element.text ~= nil then
+			element.startPos = pos 
+			element.endPos = pos + #t - 1
+			element.index = #step.elements + 1
+			element.step = step
+			table.insert(step.elements, element)
+		end
 	end
 	return true
 end

@@ -6,6 +6,7 @@ local function DebugBreakPrint()
     print("ERROR");
 end
 
+-- GENERAL UTIL FUNCTIONS --
 local function CSC_GetAppropriateDamage(unit, category)
 	if category == PLAYERSTAT_MELEE_COMBAT then
 		return UnitDamage(unit);
@@ -77,11 +78,75 @@ local function CSC_PaperDollFormatStat(name, base, posBuff, negBuff)
 		-- positive buffs. Otherwise show the number in green
 		if ( negBuff < 0 ) then
 			effective = RED_FONT_COLOR_CODE..effective..FONT_COLOR_CODE_CLOSE;
+		elseif (posBuff > 0) then
+			effective = GREEN_FONT_COLOR_CODE..effective..FONT_COLOR_CODE_CLOSE;
 		end
 	end
     
     return effective, text;
 end
+
+-- returns additional crit % stats from Arcane instability and Critical Mass if any
+local function CSC_GetMageCritStatsFromTalents()
+
+	local arcaneInstabilityCrit = 0;
+	local criticalMassCrit = 0;
+
+	-- Arcane Instability (1, 2, 3)%
+	local arcaneInstabilityTable = { 1, 2, 3 };
+	local spellRank = select(5, GetTalentInfo(1, 15));
+	if (spellRank > 0) and (spellRank <= 3) then
+		arcaneInstabilityCrit = arcaneInstabilityTable[spellRank];
+	end
+
+	-- Critical Mass (2, 4, 6)%
+	local criticalMassTable = { 2, 4, 6 };
+	spellRank = select(5, GetTalentInfo(2, 13));
+	if (spellRank > 0) and (spellRank <= 3) then
+		criticalMassCrit = criticalMassTable[spellRank];
+	end
+
+	return arcaneInstabilityCrit, criticalMassCrit;
+end
+
+-- returns the combined crit stats from Holy Specialization and Force of Will
+local function CSC_GetPriestCritStatsFromTalents()
+	
+	local holySpecializationCrit = 0;
+	local forceOfWillCrit = 0;
+
+	local critTable = { 1, 2, 3, 4, 5 };
+	-- Holy Specialization (1, 2, 3, 4, 5)%
+	local spellRank = select(5, GetTalentInfo(2, 3));
+	if (spellRank > 0) and (spellRank <= 5) then
+		holySpecializationCrit = critTable[spellRank];
+	end
+
+	-- Force of Will (1, 2, 3, 4, 5)%
+	spellRank = select(5, GetTalentInfo(1, 14));
+	if (spellRank > 0) and (spellRank <= 5) then
+		forceOfWillCrit = critTable[spellRank];
+	end
+
+	local critCombined = holySpecializationCrit + forceOfWillCrit;
+	return critCombined;
+end
+
+-- returns the crit bonus from Holy Power
+local function CSC_GetPaladinCritStatsFromTalents()
+
+	local holyPowerCrit = 0;
+	local critTable = { 1, 2, 3, 4, 5 };
+
+	-- Holy Power (1, 2, 3, 4, 5)%
+	local spellRank = select(5, GetTalentInfo(1, 13));
+	if (spellRank > 0) and (spellRank <= 5) then
+		holyPowerCrit = critTable[spellRank];
+	end
+
+	return holyPowerCrit;
+end
+-- GENERAL UTIL FUNCTIONS END --
 
 -- PRIMARY STATS --
 function CSC_PaperDollFrame_SetPrimaryStats(statFrames, unit)
@@ -181,7 +246,7 @@ function CSC_PaperDollFrame_SetDamage(statFrame, unit, category)
     
     local colorPos = "|cff20ff20";
     local colorNeg = "|cffff2020";
-    
+	
     -- epsilon check
 	if ( totalBonus < 0.1 and totalBonus > -0.1 ) then
 		totalBonus = 0.0;
@@ -361,13 +426,50 @@ function CSC_PaperDollFrame_SetSpellCritChance(statFrame, unit)
 		maxSpellCrit = max(maxSpellCrit, bonusCrit);
 	end
 
-    CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
 	statFrame.holyCrit = GetSpellCritChance(2);
 	statFrame.fireCrit = GetSpellCritChance(3);
 	statFrame.natureCrit = GetSpellCritChance(4);
 	statFrame.frostCrit = GetSpellCritChance(5);
 	statFrame.shadowCrit = GetSpellCritChance(6);
 	statFrame.arcaneCrit = GetSpellCritChance(7);
+
+	local unitClassLoc = select(2, UnitClass(unit));
+	if (unitClassLoc == "MAGE") then
+		local arcaneInstabilityCrit, criticalMassCrit = CSC_GetMageCritStatsFromTalents();
+		if (arcaneInstabilityCrit > 0) then
+			-- increases the crit of all spell schools
+			statFrame.holyCrit = statFrame.holyCrit + arcaneInstabilityCrit;
+			statFrame.fireCrit = statFrame.fireCrit + arcaneInstabilityCrit;
+			statFrame.natureCrit = statFrame.natureCrit + arcaneInstabilityCrit;
+			statFrame.frostCrit = statFrame.frostCrit + arcaneInstabilityCrit;
+			statFrame.shadowCrit = statFrame.shadowCrit + arcaneInstabilityCrit;
+			statFrame.arcaneCrit = statFrame.arcaneCrit + arcaneInstabilityCrit;
+			-- set the new maximum
+			maxSpellCrit = maxSpellCrit + arcaneInstabilityCrit;
+		end
+		if (criticalMassCrit > 0) then
+			statFrame.fireCrit = statFrame.fireCrit + criticalMassCrit;
+			-- set the new maximum
+			maxSpellCrit = max(maxSpellCrit, statFrame.fireCrit);
+		end
+	elseif (unitClassLoc == "PRIEST") then
+		local priestHolyCrit = CSC_GetPriestCritStatsFromTalents();
+		if (priestHolyCrit > 0) then
+			statFrame.holyCrit = statFrame.holyCrit + priestHolyCrit;
+			-- set the new maximum
+			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
+		end
+	elseif (unitClassLoc == "PALADIN") then
+		local paladinHolyCrit = CSC_GetPaladinCritStatsFromTalents();
+		if (paladinHolyCrit > 0) then
+			statFrame.holyCrit = statFrame.holyCrit + paladinHolyCrit;
+			-- set the new maximum
+			maxSpellCrit = max(maxSpellCrit, statFrame.holyCrit);
+		end
+	end
+
+	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_CRITICAL_STRIKE, maxSpellCrit, true, maxSpellCrit);
+
     statFrame:Show();
 end
 

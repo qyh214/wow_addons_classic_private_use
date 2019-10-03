@@ -8,7 +8,7 @@ local GetCVarBool = GetCVarBool or C_CVar.GetCVarBool
 local BACKPACK_CONTAINER, LOOT_SLOT_ITEM, NUM_BAG_SLOTS = BACKPACK_CONTAINER, LOOT_SLOT_ITEM, NUM_BAG_SLOTS
 local GetContainerNumFreeSlots = GetContainerNumFreeSlots
 local GetCursorPosition = GetCursorPosition
-local GetItemCount =GetItemCount
+local GetItemCount = GetItemCount
 local GetItemInfo = GetItemInfo
 local GetLootSlotInfo = GetLootSlotInfo
 local GetLootSlotLink = GetLootSlotLink
@@ -18,20 +18,23 @@ local IsFishingLoot = IsFishingLoot
 local IsModifiedClick = IsModifiedClick
 local LootSlot = LootSlot
 local PlaySound = PlaySound
+local band = bit.band
 local select = select
 local tContains = tContains
 
 function AutoLoot:ProcessLoot(item, q)
 	local total, free, bagFamily = 0
+	local itemFamily = GetItemFamily(item)
 	for i = BACKPACK_CONTAINER, NUM_BAG_SLOTS do
 		free, bagFamily = GetContainerNumFreeSlots(i)
-		if bagFamily == 0 then
+		if (not bagFamily or bagFamily == 0) or (itemFamily and band(itemFamily, bagFamily) > 0) then
 			total = total + free
 		end
 	end
 	if total > 0 then
 		return true
 	end
+
 	local have = (GetItemCount(item) or 0)
 	if have > 0 then
 		local itemStackCount = (select(8,GetItemInfo(item)) or 0)
@@ -71,24 +74,21 @@ function AutoLoot:ShowLootFrame(show)
 	end
 end
 
-function AutoLoot:LootItems()
-	local numItems = GetNumLootItems() or 0
+function AutoLoot:LootItems(numItems)
+	for i = numItems, 1, -1 do
+		local itemLink = GetLootSlotLink(i)
+		local slotType = GetLootSlotType(i)
+		local quantity, _, _, locked, isQuestItem = select(3, GetLootSlotInfo(i))
+		if locked then
+			self.isItemLocked = locked
+		elseif slotType ~= LOOT_SLOT_ITEM or (not self.isClassic and isQuestItem) or self:ProcessLoot(itemLink, quantity) then
+			numItems = numItems - 1
+			LootSlot(i)
+		end
+	end
 	if numItems > 0 then
-		for i = numItems, 1, -1 do
-			local itemLink = GetLootSlotLink(i)
-			local slotType = GetLootSlotType(i)
-			local quantity, _, _, locked, isQuestItem = select(3, GetLootSlotInfo(i))
-			if locked then
-				self.isItemLocked = locked
-			elseif slotType ~= LOOT_SLOT_ITEM or (not self.isClassic and isQuestItem) or self:ProcessLoot(itemLink, quantity) then
-				numItems = numItems - 1
-				LootSlot(i)
-			end
-		end
-		if numItems > 0 then
-			self:ShowLootFrame(true)
-			self:PlayInventoryFullSound()
-		end
+		self:ShowLootFrame(true)
+		self:PlayInventoryFullSound()
 	end
 
 	if IsFishingLoot() and not SpeedyAutoLootDB.global.fishingSoundDisabled then
@@ -103,14 +103,21 @@ function AutoLoot:OnEvent(e, ...)
 			SetCVar("autoLootDefault",1)
 		end
 
-		self.ElvUI = (ElvUI and ElvUI[1].private.general.loot)
-		self:ShowLootFrame(false)
+		C_Timer.After(1, function()
+			self.ElvUI = (ElvUI and ElvUI[1].private.general.loot)
+			self:ShowLootFrame(false)
+		end)
 	elseif (e == "LOOT_READY" or e == "LOOT_OPENED") and not self.isLooting then
 		local aL = ...
-		self.isLooting = true
 
+		local numItems = GetNumLootItems()
+		if numItems == 0 then
+			return
+		end
+
+		self.isLooting = true
 		if aL or (aL == nil and GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE")) then
-			self:LootItems()
+			self:LootItems(numItems)
 		else
 			self:ShowLootFrame(true)
 		end

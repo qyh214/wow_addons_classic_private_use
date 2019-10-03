@@ -163,13 +163,6 @@ local function CreateDatatbarsConfig()
 		get = function(info) return E.global.profileCopy.databars[info[#info]] end,
 		set = function(info, value) E.global.profileCopy.databars[info[#info]] = value; end
 	}
-	config.args.azerite = {
-		order = 5,
-		type = "toggle",
-		name = L["Azerite Bar"],
-		get = function(info) return E.global.profileCopy.databars[info[#info]] end,
-		set = function(info, value) E.global.profileCopy.databars[info[#info]] = value; end
-	}
 
 	return config
 end

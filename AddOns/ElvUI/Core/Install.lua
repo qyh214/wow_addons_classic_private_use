@@ -254,7 +254,6 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.bags.bagWidth = 474
 		E.db.bags.bankSize = 42
 		E.db.bags.bankWidth = 474
-		E.db.bags.itemLevelCustomColorEnable = true
 		E.db.bags.scrapIcon = true
 		--Chat
 		E.db.chat.fontSize = 10
@@ -264,16 +263,16 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.chat.panelWidth = 472
 		E.db.chat.tapFontSize = 10
 		--DataBars
-		E.db.databars.azerite.height = 10
-		E.db.databars.azerite.orientation = "HORIZONTAL"
-		E.db.databars.azerite.width = 222
 		E.db.databars.experience.height = 10
 		E.db.databars.experience.orientation = "HORIZONTAL"
 		E.db.databars.experience.textSize = 12
 		E.db.databars.experience.width = 350
-		E.db.databars.honor.height = 10
-		E.db.databars.honor.orientation = "HORIZONTAL"
-		E.db.databars.honor.width = 222
+
+		E.db.databars.petExperience.height = 10
+		E.db.databars.petExperience.orientation = "HORIZONTAL"
+		E.db.databars.petExperience.textSize = 12
+		E.db.databars.petExperience.width = 350
+
 		E.db.databars.reputation.enable = true
 		E.db.databars.reputation.height = 10
 		E.db.databars.reputation.orientation = "HORIZONTAL"
@@ -289,7 +288,6 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		--Movers
 		E.db.movers.AlertFrameMover = "TOP,ElvUIParent,TOP,-1,-18"
 		E.db.movers.AltPowerBarMover = "TOP,ElvUIParent,TOP,-1,-36"
-		E.db.movers.AzeriteBarMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-3,-245"
 		E.db.movers.BelowMinimapContainerMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-4,-274"
 		E.db.movers.BNETMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-4,-274"
 		E.db.movers.BossButton = "BOTTOM,ElvUIParent,BOTTOM,-1,293"
@@ -308,10 +306,9 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.movers.ElvUF_TargetMover = "BOTTOM,ElvUIParent,BOTTOM,342,139"
 		E.db.movers.ElvUF_TargetTargetMover = "BOTTOM,ElvUIParent,BOTTOM,342,100"
 		E.db.movers.ExperienceBarMover = "BOTTOM,ElvUIParent,BOTTOM,0,43"
-		E.db.movers.HonorBarMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-3,-255"
+		E.db.movers.PetExperienceBarMover = "BOTTOM,ElvUIParent,BOTTOM,0,53"
 		E.db.movers.LevelUpBossBannerMover = "TOP,ElvUIParent,TOP,-1,-120"
 		E.db.movers.LootFrameMover = "TOPLEFT,ElvUIParent,TOPLEFT,418,-186"
-		E.db.movers.LossControlMover = "BOTTOM,ElvUIParent,BOTTOM,-1,507"
 		E.db.movers.MirrorTimer1Mover = "TOP,ElvUIParent,TOP,-1,-96"
 		E.db.movers.ObjectiveFrameMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-163,-325"
 		E.db.movers.ReputationBarMover = "TOPRIGHT,ElvUIParent,TOPRIGHT,-3,-246"
@@ -408,7 +405,6 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.unitframe.units.raid.roleIcon.position = "BOTTOMRIGHT"
 		E.db.unitframe.units.raid.roleIcon.size = 12
 		E.db.unitframe.units.raid.roleIcon.xOffset = 0
-		E.db.unitframe.units.raid.visibility = "[@raid6,noexists] hide;show"
 		E.db.unitframe.units.raid.width = 92
 			--Raid40
 		E.db.unitframe.units.raid40.enable = false
@@ -431,7 +427,6 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 			E.db.movers.VOICECHAT = "TOPLEFT,ElvUIParent,TOPLEFT,250,-82"
 			E.db.unitframe.units.party.enable = false
 			E.db.unitframe.units.party.health.frequentUpdates = true
-			E.db.unitframe.units.raid.visibility = "[nogroup] hide;show"
 			E.db.unitframe.units.raid40.health.frequentUpdates = true
 		end
 	end
@@ -596,11 +591,11 @@ local function SetPage(PageNum)
 		InstallSlider:SetObeyStepOnDrag(true)
 		InstallSlider:SetMinMaxValues(0.4, 1.15)
 
-		local value = E:PixelClip(E.global.general.UIScale)
+		local value = E.global.general.UIScale
 		InstallSlider:SetValue(value)
 		InstallSlider.Cur:SetText(value)
 		InstallSlider:SetScript("OnValueChanged", function(self)
-			E.global.general.UIScale =  E:PixelClip(self:GetValue())
+			E.global.general.UIScale =  self:GetValue()
 			InstallSlider.Cur:SetText(E.global.general.UIScale)
 		end)
 
@@ -608,7 +603,7 @@ local function SetPage(PageNum)
 		InstallSlider.Max:SetText(1.15)
 		InstallOption1Button:Show()
 		InstallOption1Button:SetScript('OnClick', function()
-			local scale = E:PixelClip(E:PixelBestSize())
+			local scale = E:PixelBestSize()
 
 			-- this is to just keep the slider in place, the values need updated again afterwards
 			InstallSlider:SetValue(scale)

@@ -18,8 +18,6 @@ A default texture will be applied if the widget is a StatusBar and doesn't have 
 ## Options
 
 .smoothGradient                   - 9 color values to be used with the .colorSmooth option (table)
-.considerSelectionInCombatHostile - Indicates whether selection should be considered hostile while the unit is in
-                                    combat with the player (boolean)
 
 The following options are listed by priority. The first check that returns true decides the color of the bar.
 
@@ -79,9 +77,6 @@ The following options are listed by priority. The first check that returns true 
 
 local _, ns = ...
 local oUF = ns.oUF
-local Private = oUF.Private
-
-local unitSelectionType = Private.unitSelectionType
 
 local function UpdateColor(self, event, unit)
 	if(not unit or self.unit ~= unit) then return end

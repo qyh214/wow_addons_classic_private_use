@@ -33,10 +33,10 @@ if not wow_classic then
 	return
 end
 
-TELLMEWHEN_VERSION = "8.6.9"
+TELLMEWHEN_VERSION = "8.7.1"
 
 TELLMEWHEN_VERSION_MINOR = ""
-local projectVersion = "8.6.9-classic" -- comes out like "6.2.2-21-g4e91cee"
+local projectVersion = "8.7.1-classic" -- comes out like "6.2.2-21-g4e91cee"
 if projectVersion:find("project%-version") then
 	TELLMEWHEN_VERSION_MINOR = "dev"
 elseif strmatch(projectVersion, "%-%d+%-") then
@@ -44,11 +44,11 @@ elseif strmatch(projectVersion, "%-%d+%-") then
 end
 
 TELLMEWHEN_VERSION_FULL = TELLMEWHEN_VERSION .. " Classic " .. TELLMEWHEN_VERSION_MINOR
-TELLMEWHEN_VERSIONNUMBER = 86907 -- NEVER DECREASE THIS NUMBER (duh?).  IT IS ALSO ONLY INTERNAL (for versioning of)
+TELLMEWHEN_VERSIONNUMBER = 87101 -- NEVER DECREASE THIS NUMBER (duh?).  IT IS ALSO ONLY INTERNAL (for versioning of)
 
 TELLMEWHEN_FORCECHANGELOG = 86005 -- if the user hasn't seen the changelog until at least this version, show it to them.
 
-if TELLMEWHEN_VERSIONNUMBER > 87000 or TELLMEWHEN_VERSIONNUMBER < 86000 then
+if TELLMEWHEN_VERSIONNUMBER > 88000 or TELLMEWHEN_VERSIONNUMBER < 87000 then
 	-- safety check because i accidentally made the version number 414069 once
 	return error("TELLMEWHEN: THE VERSION NUMBER IS SCREWED UP OR MAYBE THE SAFETY LIMITS ARE WRONG")
 end
@@ -1081,45 +1081,14 @@ function TMW:PLAYER_LOGIN()
 		return
 
 	-- if the file IS required for gross functionality
-	elseif not TMW.BE then
-		local fileName = "TellMeWhen/Components/Core/Spells/Equivalencies.lua"
-
-
-		-- Ok, so this check clearly has some problems. Maybe? For years now,
-		-- i've been getting occasional reports that this isn't detecting things properly,
-		-- and that it just continually pops up no matter what people do.
-		-- So, instead of forcing a restart on people, i'm going to take out the early return and instead,
-		-- output a ton of debug information.
-		-- local classCount = 0
-		-- for k, v in pairs(TMW.C) do classCount = classCount + 1 end
-
-		-- TMW:Print("There was an issue during TMW's Initialization. A required file, " .. fileName .. " didn't seem to load." )
-		-- TMW:Print("If you haven't restarted WoW since last updating it, please do so now." )
-		-- TMW:Print("If you have restarted and this error keeps happening, please report the following information to the addon page at Curse.com (a screenshot of this would probably be easiest):" )
-		-- TMW:Print(
-		-- 	"v", TELLMEWHEN_VERSIONNUMBER, 
-		-- 	"TMW.C count", classCount,
-		-- 	"TMW.BE", TMW.BE,
-		-- 	"TMW.CNDT", TMW.CNDT, 
-		-- 	"toc v",  GetAddOnMetadata("TellMeWhen", "Version"),
-		-- 	"xcpv",  GetAddOnMetadata("TellMeWhen", "X-Curse-Packaged-Version"),
-		-- 	"dbvar", TellMeWhenDB,
-		-- 	"dbver", TellMeWhenDB and TellMeWhenDB.Version,
-		-- 	"mac?", IsMacClient(),
-		-- 	"wowb", select(2, GetBuildInfo()),
-		-- 	"L", TMW.L,
-		-- 	"ldb", LibStub("LibDataBroker-1.1") and LibStub("LibDataBroker-1.1"):GetDataObjectByName("TellMeWhen") or "noldb",
-		-- 	"types", TMW.approachTable and #(TMW.approachTable(TMW, "C", "IconType", "instances") or {}) or "noapproach"
-		-- )
-
+	elseif not LibStub("LibClassicCasterino", true) then
+		local fileName = "TellMeWhen/Lib/LibClassicCasterino/LibClassicCasterino.lua"
 
 		-- this also includes upgrading from older than 3.0 (pre-Ace3 DB settings)
 		-- GLOBALS: StaticPopupDialogs, StaticPopup_Show, EXIT_GAME, CANCEL, ForceQuit
 		StaticPopupDialogs["TMW_RESTARTNEEDED"] = {
 			text = L["ERROR_MISSINGFILE"], 
-			button1 = EXIT_GAME,
-			button2 = CANCEL,
-			OnAccept = ForceQuit,
+			button1 = OKAY,
 			timeout = 0,
 			showAlert = true,
 			whileDead = true,
@@ -1129,18 +1098,16 @@ function TMW:PLAYER_LOGIN()
 		return
 
 	-- if the file is NOT required for gross functionality
-	elseif not TMW.DOGTAG then
+	elseif not LibStub("DRList-1.0", true) then
 		StaticPopupDialogs["TMW_RESTARTNEEDED"] = {
 			text = L["ERROR_MISSINGFILE_NOREQ"], 
-			button1 = EXIT_GAME,
-			button2 = CANCEL,
-			OnAccept = ForceQuit,
+			button1 = OKAY,
 			timeout = 0,
 			showAlert = true,
 			whileDead = true,
 			preferredIndex = 3, -- http://forums.wowace.com/showthread.php?p=320956
 		}
-		StaticPopup_Show("TMW_RESTARTNEEDED", TELLMEWHEN_VERSION_FULL, "TellMeWhen/Lib/LibBabble-CreatureType-3.0/LibBabble-CreatureType-3.0.lua") -- arg3 could also be L["ERROR_MISSINGFILE_REQFILE"]
+		StaticPopup_Show("TMW_RESTARTNEEDED", TELLMEWHEN_VERSION_FULL, "TellMeWhen/Lib/DRList-1.0/DRList-1.0.lua") -- arg3 could also be L["ERROR_MISSINGFILE_REQFILE"]
 	end
 	
 

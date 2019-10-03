@@ -54,6 +54,7 @@ function UF:Construct_PartyFrames()
 		self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
 		self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
 		self.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(self)
+		self.ResurrectIndicator = UF:Construct_ResurrectionIcon(self)
 		self.MouseGlow = UF:Construct_MouseGlow(self)
 		self.PhaseIndicator = UF:Construct_PhaseIcon(self)
 		self.TargetGlow = UF:Construct_TargetGlow(self)
@@ -228,6 +229,8 @@ function UF:Update_PartyFrames(frame, db)
 		UF:EnableDisable_Auras(frame)
 		UF:Configure_Auras(frame, 'Buffs')
 		UF:Configure_Auras(frame, 'Debuffs')
+
+		UF:Configure_ResurrectionIcon(frame)
 
 		UF:Configure_RaidDebuffs(frame)
 

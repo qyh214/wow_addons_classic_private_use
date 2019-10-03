@@ -353,29 +353,6 @@ ConditionCategory:RegisterCondition(3,	 "BUFFSTACKS", {
 			ConditionObject:GenerateNormalEventString("UNIT_AURA", CNDT:GetUnit(c.Unit))
 	end,
 })
-ConditionCategory:RegisterCondition(4,	 "BUFFTOOLTIP", {
-	text = L["ICONMENU_BUFF"] .. " - " .. L["TOOLTIPSCAN"],
-	tooltip = L["TOOLTIPSCAN_DESC"],
-	range = 500,
-	--texttable = {[0] = "0 ("..L["ICONMENU_ABSENT"]..")"},
-	name = function(editbox)
-		editbox:SetTexts(L["BUFFTOCHECK"], L["TOOLTIPSCAN_DESC"])
-	end,
-	useSUG = true,
-	check = function(check)
-		check:SetTexts(L["ONLYCHECKMINE"], L["ONLYCHECKMINE_DESC"])
-	end,
-	icon = "Interface\\Icons\\spell_ice_lament",
-	tcoords = CNDT.COMMON.standardtcoords,
-	funcstr = function(c)
-		return [[AuraVariableNumber(c.Unit, c.NameFirst, "HELPFUL]] .. (c.Checked and " PLAYER" or "") .. [[") c.Operator c.Level]]
-	end,
-	events = function(ConditionObject, c)
-		return
-			ConditionObject:GetUnitChangedEventString(CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_AURA", CNDT:GetUnit(c.Unit))
-	end,
-})
 for i = 1, 3 do -- BUFFTOOLTIPSCAN
 	ConditionCategory:RegisterCondition(4 + 0.1*i,	 "BUFFTOOLTIPSCAN" .. i, {
 		text = L["ICONMENU_BUFF"] .. " - " .. L["TOOLTIPSCAN2"]:format(i),
@@ -563,29 +540,6 @@ ConditionCategory:RegisterCondition(13,	 "DEBUFFSTACKS", {
 			ConditionObject:GenerateNormalEventString("UNIT_AURA", CNDT:GetUnit(c.Unit))
 	end,
 })
-ConditionCategory:RegisterCondition(14,	 "DEBUFFTOOLTIP", {
-	text = L["ICONMENU_DEBUFF"] .. " - " .. L["TOOLTIPSCAN"],
-	tooltip = L["TOOLTIPSCAN_DESC"],
-	range = 500,
-	--texttable = {[0] = "0 ("..L["ICONMENU_ABSENT"]..")"},
-	name = function(editbox)
-		editbox:SetTexts(L["DEBUFFTOCHECK"], L["TOOLTIPSCAN_DESC"])
-	end,
-	useSUG = true,
-	check = function(check)
-		check:SetTexts(L["ONLYCHECKMINE"], L["ONLYCHECKMINE_DESC"])
-	end,
-	icon = "Interface\\Icons\\spell_shadow_lifedrain",
-	tcoords = CNDT.COMMON.standardtcoords,
-	funcstr = function(c)
-		return [[AuraVariableNumber(c.Unit, c.NameFirst, "HARMFUL]] .. (c.Checked and " PLAYER" or "") .. [[") c.Operator c.Level]]
-	end,
-	events = function(ConditionObject, c)
-		return
-			ConditionObject:GetUnitChangedEventString(CNDT:GetUnit(c.Unit)),
-			ConditionObject:GenerateNormalEventString("UNIT_AURA", CNDT:GetUnit(c.Unit))
-	end,
-})
 for i = 1, 3 do -- BUFFTOOLTIPSCAN
 	ConditionCategory:RegisterCondition(14 + 0.1*i,	 "DEBUFFTOOLTIPSCAN" .. i, {
 		text = L["ICONMENU_DEBUFF"] .. " - " .. L["TOOLTIPSCAN2"]:format(i),
@@ -661,11 +615,11 @@ ConditionCategory:RegisterCondition(22,	 "OFFHAND", {
 	formatter = TMW.C.Formatter.TIME_0ABSENT,
 	icon = function() return GetInventoryItemTexture("player", GetInventorySlotInfo("SecondaryHandSlot")) or "Interface\\Icons\\inv_weapon_shortblade_15" end,
 	tcoords = CNDT.COMMON.standardtcoords,
-	funcstr = [[(select(5, GetWeaponEnchantInfo()) or 0)/1000 c.Operator c.Level]],
+	funcstr = [[(select(6, GetWeaponEnchantInfo()) or 0)/1000 c.Operator c.Level]],
 	events = function(ConditionObject, c)
 		return
 			ConditionObject:GenerateNormalEventString("UNIT_INVENTORY_CHANGED", "player")
 	end,
-	anticipate = [[local _, _, _, _, dur = GetWeaponEnchantInfo()
+	anticipate = [[local _, _, _, _, _, dur = GetWeaponEnchantInfo()
 		local VALUE = time + ((dur or 0)/1000) - c.Level]],
 })
