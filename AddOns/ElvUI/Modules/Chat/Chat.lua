@@ -168,6 +168,8 @@ do --this can save some main file locals
 		-- Simpy
 		["Simpy-Myzrael"]		= itsSimpy, -- Warlock
 		["Cutepally-Myzrael"]	= itsSimpy, -- Paladin
+		["Imsocheesy-Myzrael"]	= itsSimpy, -- [Horde] Priest
+		["Imsospicy-Myzrael"]	= itsSimpy, -- [Horde] Mage
 	}
 end
 
@@ -396,7 +398,7 @@ function CH:StyleChat(frame)
 	--Work around broken SetAltArrowKeyMode API
 	editbox.historyLines = ElvCharacterDB.ChatEditHistory
 	editbox.historyIndex = 0
-	editbox:HookScript("OnKeyDown", OnKeyDown)
+	--editbox:HookScript("OnKeyDown", OnKeyDown)
 	editbox:Hide()
 
 	editbox:HookScript("OnEditFocusGained", function(editBox)

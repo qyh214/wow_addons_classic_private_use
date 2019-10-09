@@ -89,16 +89,14 @@ local function LoadSkin()
 		if not item then return end
 
 		if item then
-			item:StripTextures()
 			item:CreateBackdrop()
-			item:StyleButton()
+			item.backdrop:SetInside()
 			item:Size(143, 40)
 			item:SetFrameLevel(item:GetFrameLevel() + 2)
-			item.backdrop:SetInside()
 		end
 
 		if item.Icon then
-			item.Icon:Size(E.PixelMode and 37 or 32)
+			item.Icon:Size(E.PixelMode and 35 or 32)
 			item.Icon:SetDrawLayer('ARTWORK')
 			item.Icon:Point('TOPLEFT', E.PixelMode and 2 or 4, -(E.PixelMode and 2 or 4))
 			S:HandleIcon(item.Icon)
@@ -109,10 +107,9 @@ local function LoadSkin()
 		end
 
 		if item.Count then
-			item.Count:SetParent(item.backdrop)
 			item.Count:SetDrawLayer('OVERLAY')
 			item.Count:ClearAllPoints()
-			item.Count:Point('BOTTOMRIGHT', item.Icon, 'BOTTOMRIGHT', 2, 0)
+			item.Count:SetPoint('BOTTOMRIGHT', item.Icon, 'BOTTOMRIGHT', 0, 0)
 		end
 
 		if item.NameFrame then
@@ -120,13 +117,24 @@ local function LoadSkin()
 			item.NameFrame:Hide()
 		end
 
+		if item.IconOverlay then
+			item.IconOverlay:SetAlpha(0)
+		end
+
 		if item.Name then
-			item.Name:SetFontObject('GameFontHighlightSmall')
+			item.Name:FontTemplate()
 		end
 
 		if item.CircleBackground then
 			item.CircleBackground:SetAlpha(0)
 			item.CircleBackgroundGlow:SetAlpha(0)
+		end
+
+		for i = 1, item:GetNumRegions() do
+			local Region = select(i, item:GetRegions())
+			if Region and Region:IsObjectType('Texture') and Region:GetTexture() == [[Interface\Spellbook\Spellbook-Parts]] then
+				Region:SetTexture('')
+			end
 		end
 	end
 
@@ -339,6 +347,13 @@ local function LoadSkin()
 		_G.QuestInfoRewardsFrame.spellHeaderPool.textR, _G.QuestInfoRewardsFrame.spellHeaderPool.textG, _G.QuestInfoRewardsFrame.spellHeaderPool.textB = unpack(textColor)
 
 		local requiredMoney = GetQuestLogRequiredMoney()
+
+		for spellHeader, _ in _G.QuestInfoFrame.rewardsFrame.spellHeaderPool:EnumerateActive() do
+			spellHeader:SetVertexColor(1, 1, 1)
+		end
+		for spellIcon, _ in _G.QuestInfoFrame.rewardsFrame.spellRewardPool:EnumerateActive() do
+			handleItemButton(spellIcon)
+		end
 
 		if requiredMoney > 0 then
 			if requiredMoney > GetMoney() then

@@ -48,7 +48,7 @@ function UF:Configure_ClassBar(frame, cur)
 	bars.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
 
 	if frame.USE_MINI_CLASSBAR and not frame.CLASSBAR_DETACHED then
-		if frame.MAX_CLASS_BAR == 1 or frame.ClassBar == "AdditionalPower" or frame.ClassBar == "Stagger" then
+		if frame.MAX_CLASS_BAR == 1 or frame.ClassBar == "AdditionalPower" then
 			CLASSBAR_WIDTH = CLASSBAR_WIDTH * 2/3
 		else
 			CLASSBAR_WIDTH = CLASSBAR_WIDTH * (frame.MAX_CLASS_BAR - 1) / frame.MAX_CLASS_BAR
@@ -60,19 +60,18 @@ function UF:Configure_ClassBar(frame, cur)
 	bars:Width(CLASSBAR_WIDTH)
 	bars:Height(frame.CLASSBAR_HEIGHT - ((frame.BORDER + frame.SPACING)*2))
 
-	if (frame.ClassBar == 'ClassPower' or frame.ClassBar == 'Runes') then
+	if (frame.ClassBar == 'ClassPower' or frame.ClassBar == 'Totems') then
 		--This fixes issue with ComboPoints showing as active when they are not.
 		if frame.ClassBar == "ClassPower" and not cur then
 			cur = 0
 		end
 
-		if E.myclass == "DEATHKNIGHT" and frame.ClassBar == "Runes" then
-			bars.sortOrder = (db.classbar.sortDirection ~= "NONE") and db.classbar.sortDirection
-		end
-
-		local maxClassBarButtons = max(UF.classMaxResourceBar[E.myclass] or 0, MAX_COMBO_POINTS)
+		local maxClassBarButtons = UF.classMaxResourceBar[E.myclass] or MAX_COMBO_POINTS
 		for i = 1, maxClassBarButtons do
-			bars[i]:Hide()
+			if frame.ClassBar == 'ClassPower' then
+				bars[i]:Hide()
+			end
+
 			bars[i].backdrop:Hide()
 
 			if i <= frame.MAX_CLASS_BAR then
@@ -116,24 +115,18 @@ function UF:Configure_ClassBar(frame, cur)
 					bars[i].backdrop:Show()
 				end
 
-				if E.myclass == "MONK" then
-					bars[i]:SetStatusBarColor(unpack(ElvUF.colors.ClassBars[E.myclass][i]))
-				elseif E.myclass == "PALADIN" or E.myclass == "MAGE" or E.myclass == "WARLOCK" then
-					bars[i]:SetStatusBarColor(unpack(ElvUF.colors.ClassBars[E.myclass]))
-				elseif E.myclass == "DEATHKNIGHT" and frame.ClassBar == "Runes" then
-					local r, g, b = unpack(ElvUF.colors.ClassBars.DEATHKNIGHT)
-					bars[i]:SetStatusBarColor(r, g, b)
-					if bars[i].bg then
-						local mu = bars[i].bg.multiplier or 1
-						bars[i].bg:SetVertexColor(r * mu, g * mu, b * mu)
-					end
-				else -- Combo Points for everyone else
+				if frame.ClassBar == "ClassPower" then
 					local r1, g1, b1 = unpack(ElvUF.colors.ComboPoints[1])
 					local r2, g2, b2 = unpack(ElvUF.colors.ComboPoints[2])
 					local r3, g3, b3 = unpack(ElvUF.colors.ComboPoints[3])
 					local maxComboPoints = ((frame.MAX_CLASS_BAR == 10 and 10) or (frame.MAX_CLASS_BAR > 5 and 6 or 5))
 
 					bars[i]:SetStatusBarColor(ElvUF:ColorGradient(i, maxComboPoints, r1, g1, b1, r2, g2, b2, r3, g3, b3))
+				elseif frame.ClassBar == "Totems" then
+					bars[1]:SetStatusBarColor(.58, .23, .10)
+					bars[2]:SetStatusBarColor(.23, .45, .13)
+					bars[3]:SetStatusBarColor(.19, .48, .60)
+					bars[4]:SetStatusBarColor(.42, .18, .74)
 				end
 
 				if frame.CLASSBAR_DETACHED and db.classbar.verticalOrientation then
@@ -143,7 +136,7 @@ function UF:Configure_ClassBar(frame, cur)
 				end
 
 				--Fix missing backdrop colors on Combo Points when using Spaced style
-				if frame.ClassBar == "ClassPower" then
+				if frame.ClassBar == "ClassPower" or frame.ClassBar == 'Totems' then
 					if frame.USE_MINI_CLASSBAR then
 						bars[i].bg:SetParent(bars[i].backdrop)
 					else
@@ -162,7 +155,7 @@ function UF:Configure_ClassBar(frame, cur)
 		else
 			bars.backdrop:Hide()
 		end
-	elseif (frame.ClassBar == "AdditionalPower" or frame.ClassBar == "Stagger") then
+	elseif (frame.ClassBar == "AdditionalPower") then
 		if frame.CLASSBAR_DETACHED and db.classbar.verticalOrientation then
 			bars:SetOrientation("VERTICAL")
 		else
@@ -213,6 +206,7 @@ function UF:Configure_ClassBar(frame, cur)
 			bars:Point("BOTTOMLEFT", frame.Health.backdrop, "TOPLEFT", frame.BORDER, frame.SPACING*3)
 		end
 
+		bars:SetFrameStrata("LOW")
 		bars:SetFrameLevel(frame:GetFrameLevel() + 5)
 
 		if bars.Holder and bars.Holder.mover then
@@ -236,11 +230,8 @@ function UF:Configure_ClassBar(frame, cur)
 		if frame.AdditionalPower and not frame:IsElementEnabled("AdditionalPower") then
 			frame:EnableElement("AdditionalPower")
 		end
-		if frame.Runes and not frame:IsElementEnabled("Runes") then
-			frame:EnableElement("Runes")
-		end
-		if frame.Stagger and not frame:IsElementEnabled("Stagger") then
-			frame:EnableElement("Stagger")
+		if frame.Totems and not frame:IsElementEnabled("Totems") then
+			frame:EnableElement("Totems")
 		end
 	else
 		if frame.ClassPower and frame:IsElementEnabled("ClassPower") then
@@ -249,11 +240,8 @@ function UF:Configure_ClassBar(frame, cur)
 		if frame.AdditionalPower and frame:IsElementEnabled("AdditionalPower") then
 			frame:DisableElement("AdditionalPower")
 		end
-		if frame.Runes and frame:IsElementEnabled("Runes") then
-			frame:DisableElement("Runes")
-		end
-		if frame.Stagger and frame:IsElementEnabled("Stagger") then
-			frame:DisableElement("Stagger")
+		if frame.Totems and frame:IsElementEnabled("Totems") then
+			frame:DisableElement("Totems")
 		end
 	end
 end
@@ -308,7 +296,7 @@ function UF:Construct_ClassBar(frame)
 		bars[i]:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
 		bars[i].backdrop:SetParent(bars)
 
-		bars[i].bg = bars:CreateTexture(nil, 'BORDER')
+		bars[i].bg = bars:CreateTexture(nil, 'BACKGROUND')
 		bars[i].bg:SetAllPoints(bars[i])
 		bars[i].bg:SetTexture(E.media.blankTex)
 	end
@@ -366,67 +354,6 @@ function UF:UpdateClassBar(current, maxBars, hasMaxChanged)
 		end
 	end
 end
-
--------------------------------------------------------------
--- DEATHKNIGHT
--------------------------------------------------------------
-local function PostUpdateRunes(self)
-	local useRunes = not UnitHasVehicleUI('player')
-	if useRunes then
-		self:Show()
-	else
-		self:Hide()
-	end
-end
-
-function UF:Construct_DeathKnightResourceBar(frame)
-	local runes = CreateFrame("Frame", nil, frame)
-	runes:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
-	runes.backdrop:Hide()
-
-	for i = 1, UF.classMaxResourceBar[E.myclass] do
-		runes[i] = CreateFrame("StatusBar", frame:GetName().."RuneButton"..i, runes)
-		runes[i]:SetStatusBarTexture(E.media.blankTex)
-		runes[i]:GetStatusBarTexture():SetHorizTile(false)
-		UF.statusbars[runes[i]] = true
-
-		runes[i]:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
-		runes[i].backdrop:SetParent(runes)
-
-		runes[i].bg = runes[i]:CreateTexture(nil, 'BORDER')
-		runes[i].bg:SetAllPoints()
-		runes[i].bg:SetTexture(E.media.blankTex)
-		runes[i].bg.multiplier = 0.35
-	end
-
-	runes.PostUpdate = PostUpdateRunes
-	runes.UpdateColor = E.noop --We handle colors on our own in Configure_ClassBar
-	runes:SetScript("OnShow", ToggleResourceBar)
-	runes:SetScript("OnHide", ToggleResourceBar)
-
-	return runes
-end
-
--- Keep it for now. Maybe obsolete!
---[[
-function UF:PostVisibilityRunes(enabled)
-	local frame = self.origParent or self:GetParent()
-
-	if enabled then
-		frame.ClassBar = "Runes"
-		frame.MAX_CLASS_BAR = #self
-	else
-		frame.ClassBar = "ClassPower"
-		frame.MAX_CLASS_BAR = MAX_COMBO_POINTS
-	end
-
-	local custom_backdrop = UF.db.colors.customclasspowerbackdrop and UF.db.colors.classpower_backdrop
-	if custom_backdrop then
-		for i=1, #self do
-			self[i].bg:SetVertexColor(custom_backdrop.r, custom_backdrop.g, custom_backdrop.b)
-		end
-	end
-end]]
 
 -------------------------------------------------------------
 -- ALTERNATIVE MANA BAR
@@ -542,47 +469,53 @@ function UF:PostVisibilityAdditionalPower(enabled, stateChanged)
 end
 
 -----------------------------------------------------------
--- Stagger Bar
+-- Totems
 -----------------------------------------------------------
-function UF:Construct_Stagger(frame)
-	local stagger = CreateFrame("Statusbar", nil, frame)
-	stagger:CreateBackdrop(nil,nil, nil, self.thinBorders, true)
-	stagger.PostUpdate = UF.PostUpdateStagger
-	stagger.PostUpdateVisibility = UF.PostUpdateVisibilityStagger
-	UF.statusbars[stagger] = true
+local TotemColors = {
+	[1] = {.58,.23,.10},
+	[2] = {.23,.45,.13},
+	[3] = {.19,.48,.60},
+	[4] = {.42,.18,.74},
+}
 
-	stagger:SetScript("OnShow", ToggleResourceBar)
-	stagger:SetScript("OnHide", ToggleResourceBar)
+function UF:Construct_Totems(frame)
+	local totems = CreateFrame("Frame", nil, frame)
+	totems:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+	totems.Destroy = {}
 
-	return stagger
+	for i = 1, 4 do
+		local r, g, b = unpack(TotemColors[i])
+
+		totems[i] = CreateFrame("StatusBar", frame:GetName().."Totem"..i, totems)
+		totems[i]:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+		totems[i].backdrop:SetParent(totems)
+
+		totems[i]:SetStatusBarTexture(E.media.blankTex)
+		totems[i]:SetStatusBarColor(r, g, b)
+
+		UF.statusbars[totems[i]] = true
+
+		totems[i]:SetMinMaxValues(0, 1)
+		totems[i]:SetValue(0)
+
+		totems[i].bg = totems[i]:CreateTexture(nil, "BORDER")
+		totems[i].bg:SetAllPoints(totems[i])
+		totems[i].bg:SetTexture(E['media'].blankTex)
+		totems[i].bg.multiplier = 0.3
+
+		totems[i].bg:SetVertexColor(r * .3, g * .3, b * .3)
+
+		totems.Destroy[i] = CreateFrame("Button", totems[i]:GetName().."Destroy", UIParent, "SecureUnitButtonTemplate")
+		totems.Destroy[i]:RegisterForClicks("RightButtonUp")
+		totems.Destroy[i]:SetAllPoints(totems[i])
+		totems.Destroy[i]:SetID(i)
+		totems.Destroy[i]:SetAttribute("type2", "destroytotem")
+		totems.Destroy[i]:SetAttribute("*totem-slot*", i)
+	end
+
+	frame.MAX_CLASS_BAR = 4
+	frame.ClassBar = 'Totems'
+
+	return totems
 end
 
-function UF:PostUpdateStagger(stagger)
-	local frame = self.origParent or self:GetParent()
-	local db = frame.db
-
-	if not frame.USE_CLASSBAR or (stagger == 0 and db.classbar.autoHide) then
-		self:Hide()
-	else
-		self:Show()
-	end
-end
-
-function UF:PostUpdateVisibilityStagger(_, _, isShown, stateChanged)
-	local frame = self
-
-	if(isShown) then
-		frame.ClassBar = 'Stagger'
-	else
-		frame.ClassBar = 'ClassPower'
-	end
-
-	--Only update when necessary
-	if(stateChanged) then
-		ToggleResourceBar(frame[frame.ClassBar])
-		UF:Configure_ClassBar(frame)
-		UF:Configure_HealthBar(frame)
-		UF:Configure_Power(frame)
-		UF:Configure_InfoPanel(frame, true) --2nd argument is to prevent it from setting template, which removes threat border
-	end
-end

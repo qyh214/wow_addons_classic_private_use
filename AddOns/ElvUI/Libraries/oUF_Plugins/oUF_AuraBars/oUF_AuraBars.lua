@@ -215,7 +215,7 @@ local function Update(self, event, unit)
 	local counter = 0
 	if(auraBars.forceShow) then
 		for index = 1, auraBars.maxBars do
-			local spellID = 47540
+			local spellID = 9853
 			local name, _, icon = GetSpellInfo(spellID)
 			local count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, canApplyAura, isBossDebuff = 5, 'Magic', 0, 0, 'player', nil, nil, nil, nil
 			lastAuraIndex = lastAuraIndex + 1

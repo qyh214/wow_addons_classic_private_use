@@ -69,6 +69,17 @@ G.unitframe.aurafilters.CCDebuffs = {
 	[6131] = Defaults(1), --Frost Nova(Rank 3)
 	[10230] = Defaults(1), --Frost Nova(Rank 4)
 	[12494] = Defaults(2), --Frostbite
+	[116] = Defaults(2), -- Frostbolt(Rank 1)
+	[205] = Defaults(2), -- Frostbolt(Rank 2)
+	[837] = Defaults(2), -- Frostbolt(Rank 3)
+	[7322] = Defaults(2), -- Frostbolt(Rank 4)
+	[8406] = Defaults(2), -- Frostbolt(Rank 5)
+	[8407] = Defaults(2), -- Frostbolt(Rank 6)
+	[8408] = Defaults(2), -- Frostbolt(Rank 7)
+	[10179] = Defaults(2), -- Frostbolt(Rank 8)
+	[10180] = Defaults(2), -- Frostbolt(Rank 9)
+	[10181] = Defaults(2), -- Frostbolt(Rank 10)
+	[25304] = Defaults(2), -- Frostbolt(Rank 11)
 	[12355] = Defaults(2), --Impact
 	--Paladin
 	[853] = Defaults(3), --Hammer of Justice(Rank 1)

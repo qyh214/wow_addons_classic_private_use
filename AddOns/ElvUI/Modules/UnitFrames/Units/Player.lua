@@ -33,12 +33,16 @@ function UF:Construct_PlayerFrame(frame)
 	frame.ClassBarHolder:Point("BOTTOM", E.UIParent, "BOTTOM", 0, 150)
 
 	--Combo points was moved to the ClassPower element, so all classes need to have a ClassBar now.
-	frame.ClassPower = self:Construct_ClassBar(frame)
-	frame.ClassBar = 'ClassPower'
+	if E.myclass == "SHAMAN" then
+		frame.Totems = self:Construct_Totems(frame)
+	else
+		frame.ClassPower = self:Construct_ClassBar(frame)
+		frame.ClassBar = 'ClassPower'
 
-	--Some classes need another set of different classbars.
-	if E.myclass == "DRUID" then
-		frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
+		--Some classes need another set of different classbars.
+		if E.myclass == "DRUID" then
+			frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
+		end
 	end
 
 	frame.PowerPrediction = self:Construct_PowerPrediction(frame) -- must be AFTER Power & AdditionalPower
@@ -47,6 +51,7 @@ function UF:Construct_PlayerFrame(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
 	frame.RestingIndicator = self:Construct_RestingIndicator(frame)
+	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
 	frame.CombatIndicator = self:Construct_CombatIndicator(frame)
 	frame.HealthPrediction = self:Construct_HealComm(frame)
 	frame.PvPText = self:Construct_PvPIndicator(frame)
@@ -146,6 +151,9 @@ function UF:Update_PlayerFrame(frame, db)
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, 'Buffs')
 	UF:Configure_Auras(frame, 'Debuffs')
+
+	-- Resurrect
+	UF:Configure_ResurrectionIcon(frame)
 
 	--Castbar
 	frame:DisableElement('Castbar')

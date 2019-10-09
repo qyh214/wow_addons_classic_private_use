@@ -21,6 +21,7 @@ P.general = {
 	bonusObjectivePosition = 'LEFT',
 	talkingHeadFrameScale = 0.9,
 	talkingHeadFrameBackdrop = false,
+	objectiveTracker = true,
 	itemLevel = {
 		displayCharacterInfo = true,
 		displayInspectInfo = true,
@@ -186,6 +187,7 @@ P.bags = {
 	useBlizzardCleanup = false,
 	strata = 'HIGH',
 	qualityColors = true,
+	specialtyColors = true,
 	showBindType = false,
 	transparent = false,
 	colors = {
@@ -1879,12 +1881,6 @@ P.unitframe = {
 			NEUTRAL = { r = 218/255, g = 197/255, b = 92/255 },
 			GOOD = { r = 75/255, g = 175/255, b = 76/255 },
 		},
-		threat = {
-			[ 0] = {r = 0.5, g = 0.5, b = 0.5}, -- low
-			[ 1] = {r = 1.0, g = 1.0, b = 0.5}, -- overnuking
-			[ 2] = {r = 1.0, g = 0.5, b = 0.0}, -- losing threat
-			[ 3] = {r = 1.0, g = 0.2, b = 0.2}, -- tanking securely
-		},
 		selection = {
 			[ 0] = {r = 254/255, g = 045/255, b = 045/255}, -- HOSTILE
 			[ 1] = {r = 255/255, g = 129/255, b = 050/255}, -- UNFRIENDLY
@@ -2191,6 +2187,14 @@ P.unitframe = {
 				xOffset = 0,
 				yOffset = 8,
 			},
+			resurrectIcon = {
+				enable = true,
+				size = 30,
+				attachTo = 'CENTER',
+				attachToObject = 'Frame',
+				xOffset = 0,
+				yOffset = 0,
+			},
 			stagger = {
 				enable = true,
 				width = 10,
@@ -2307,6 +2311,18 @@ P.unitframe = {
 				xOffset = 0,
 				yOffset = 0,
 				overlayAlpha = 0.35,
+			},
+			raidRoleIcons = {
+				enable = true,
+				position = 'TOPLEFT',
+			},
+			resurrectIcon = {
+				enable = true,
+				size = 30,
+				attachTo = 'CENTER',
+				attachToObject = 'Frame',
+				xOffset = 0,
+				yOffset = 0,
 			},
 			buffs = {
 				enable = true,
@@ -3072,7 +3088,7 @@ P.unitframe = {
 				clickThrough = false,
 				minDuration = 0,
 				maxDuration = 300,
-				priority = 'Blacklist,TurtleBuffs', --Party Buffs
+				priority = 'Blacklist,CastByPlayers', --Party Buffs
 				xOffset = 0,
 				yOffset = 0,
 			},

@@ -238,6 +238,20 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 		if not color then
 			color = _G.RAID_CLASS_COLORS.PRIEST
 		end
+
+		local levelLine = self:GetLevelLine(tt, 2)
+		if levelLine then
+			local creatureClassification = UnitClassification(unit)
+			local creatureType = UnitCreatureType(unit)
+			local pvpFlag = ""
+			local diffColor = GetCreatureDifficultyColor(level)
+
+			if(UnitIsPVP(unit)) then
+				pvpFlag = format(" (%s)", _G.PVP)
+			end
+
+			levelLine:SetFormattedText("|cff%02x%02x%02x%s|r%s %s%s", diffColor.r * 255, diffColor.g * 255, diffColor.b * 255, level > 0 and level or "??", classification[creatureClassification] or "", creatureType or "", pvpFlag)
+		end
 	end
 
 	return color

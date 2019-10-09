@@ -63,7 +63,8 @@ function AutoLoot:ShowLootFrame(show)
 			self.isHidden = true
 		end
 	elseif LootFrame:IsEventRegistered("LOOT_SLOT_CLEARED") then
-		LootFrame.page = 1;
+        LootFrame.page = 1;
+        LootFrame.selectedQuality = LootFrame.selectedQuality or 1
 		if show then
 			self:LootUnderMouse(LootFrame, UIParent)
 			LootFrame_Show(LootFrame)

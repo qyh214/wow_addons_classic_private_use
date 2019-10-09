@@ -29,6 +29,7 @@ function E:PostAlertMove()
 	end
 
 	local AlertFrame = _G.AlertFrame
+	local GroupLootContainer = _G.GroupLootContainer
 
 	local rollBars = Misc.RollBars
 	if E.private.general.lootRoll then
@@ -56,14 +57,25 @@ function E:PostAlertMove()
 		end
 
 		AlertFrame:ClearAllPoints()
+		GroupLootContainer:ClearAllPoints()
 		if lastShownFrame then
 			AlertFrame:SetAllPoints(lastShownFrame)
+			GroupLootContainer:Point(POSITION, lastShownFrame, ANCHOR_POINT, 0, YOFFSET)
 		else
 			AlertFrame:SetAllPoints(AlertFrameHolder)
+			GroupLootContainer:Point(POSITION, AlertFrameHolder, ANCHOR_POINT, 0, YOFFSET)
+		end
+		if GroupLootContainer:IsShown() then
+			B.GroupLootContainer_Update(GroupLootContainer)
 		end
 	else
 		AlertFrame:ClearAllPoints()
 		AlertFrame:SetAllPoints(AlertFrameHolder)
+		GroupLootContainer:ClearAllPoints()
+		GroupLootContainer:Point(POSITION, AlertFrameHolder, ANCHOR_POINT, 0, YOFFSET)
+		if GroupLootContainer:IsShown() then
+			B.GroupLootContainer_Update(GroupLootContainer)
+		end
 	end
 end
 
@@ -151,6 +163,7 @@ function B:AlertMovers()
 	end)
 
 	self:SecureHook(_G.AlertFrame, "UpdateAnchors", E.PostAlertMove)
+	hooksecurefunc("GroupLootContainer_Update", B.GroupLootContainer_Update)
 
 	--[[ Code you can use for alert testing
 		--Queued Alerts:

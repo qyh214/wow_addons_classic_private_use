@@ -1,4 +1,4 @@
---[[
+﻿--[[
 HandyNotes
 ]]
 
@@ -317,6 +317,7 @@ function HandyNotes.WorldMapDataProvider:RefreshAllData(fromOnShow)
 end
 
 function HandyNotes.WorldMapDataProvider:RefreshPlugin(pluginName)
+	if not self:GetMap() then return end
 	for pin in self:GetMap():EnumeratePinsByTemplate("HandyNotesWorldMapPinTemplate") do
 		if pin.pluginName == pluginName then
 			self:GetMap():RemovePin(pin)
@@ -337,7 +338,7 @@ function HandyNotes.WorldMapDataProvider:RefreshPlugin(pluginName)
 			mapFile = select(3, HBDMigrate:GetLegacyMapInfo(uiMapID2 or uiMapID))
 		end
 		if x and y then
-			self:GetMap():AcquirePin("HandyNotesWorldMapPinTemplate", pluginName, x, y, iconpath, scale, alpha, coord, uiMapID2 or uiMapID, mapFile)
+			self:GetMap():AcquirePin("HandyNotesWorldMapPinTemplate", pluginName, x, y, iconpath, scale or 1.0, alpha or 1.0, coord, uiMapID2 or uiMapID, mapFile)
 		end
 	end
 end
@@ -433,10 +434,10 @@ function HandyNotes:UpdateMinimapPlugin(pluginName)
 		icon:SetParent(Minimap)
 		icon:SetFrameStrata(frameStrata)
 		icon:SetFrameLevel(frameLevel)
-		scale = ourScale * scale
+		scale = ourScale * (scale or 1.0)
 		icon:SetHeight(scale) -- Can't use :SetScale as that changes our positioning scaling as well
 		icon:SetWidth(scale)
-		icon:SetAlpha(ourAlpha * alpha)
+		icon:SetAlpha(ourAlpha * (alpha or 1.0))
 		local t = icon.texture
 		if type(iconpath) == "table" then
 			if iconpath.tCoordLeft then

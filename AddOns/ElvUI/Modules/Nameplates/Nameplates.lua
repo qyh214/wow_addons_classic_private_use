@@ -4,7 +4,7 @@ local oUF = E.oUF
 
 --Lua functions
 local _G = _G
-local format, pairs, select, strsplit, type, wipe = format, pairs, select, strsplit, type, wipe
+local format, pairs, select, strsplit, type = format, pairs, select, strsplit, type
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local GetCVar = GetCVar
@@ -15,7 +15,6 @@ local SetCVar = SetCVar
 local UnitClass = UnitClass
 local UnitClassification = UnitClassification
 local UnitCreatureType = UnitCreatureType
-local UnitExists = UnitExists
 local UnitFactionGroup = UnitFactionGroup
 local UnitGUID = UnitGUID
 local UnitIsFriend = UnitIsFriend
@@ -26,22 +25,8 @@ local UnitName = UnitName
 local UnitPlayerControlled = UnitPlayerControlled
 local UnitReaction = UnitReaction
 local C_NamePlate_SetNamePlateEnemyClickThrough = C_NamePlate.SetNamePlateEnemyClickThrough
-local C_NamePlate_SetNamePlateEnemySize = C_NamePlate.SetNamePlateEnemySize
 local C_NamePlate_SetNamePlateFriendlyClickThrough = C_NamePlate.SetNamePlateFriendlyClickThrough
-local C_NamePlate_SetNamePlateFriendlySize = C_NamePlate.SetNamePlateFriendlySize
 local C_NamePlate_SetNamePlateSelfClickThrough = C_NamePlate.SetNamePlateSelfClickThrough
-local C_NamePlate_SetNamePlateSelfSize = C_NamePlate.SetNamePlateSelfSize
-local hooksecurefunc = hooksecurefunc
-
-do
-	function NP:UnitExists(unit)
-		return UnitExists(unit)
-	end
-
-	function NP:UnitSelectionType(unit, considerHostile)
-		return 0
-	end
-end
 
 local function CopySettings(from, to)
 	for setting, value in pairs(from) do
@@ -193,23 +178,10 @@ function NP:StyleTargetPlate(nameplate)
 	--nameplate.Power.Text = NP:Construct_TagText(nameplate.RaisedElement)
 
 	nameplate.ClassPower = NP:Construct_ClassPower(nameplate)
-
-	if E.myclass == "DEATHKNIGHT" then
-		nameplate.Runes = NP:Construct_Runes(nameplate)
-	elseif E.myclass == "MONK" then
-		nameplate.Stagger = NP:Construct_Stagger(nameplate)
-	end
 end
 
 function NP:UpdateTargetPlate(nameplate)
 	NP:Update_ClassPower(nameplate)
-
-	if E.myclass == "DEATHKNIGHT" then
-		NP:Update_Runes(nameplate)
-	elseif E.myclass == "MONK" then
-		NP:Update_Stagger(nameplate)
-	end
-
 	nameplate:UpdateAllElements("OnShow")
 end
 
