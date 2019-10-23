@@ -518,6 +518,7 @@ L["Growth Direction"] = "나열 방향"
 L["Growth X-Direction"] = true
 L["Growth Y-Direction"] = true
 L["Guardians"] = true
+L["Guide:"] = true
 L["Guild Control Frame"] = "길드 관리 창"
 L["Guild Ranks"] = "길드 내 등급 표시"
 L["Guild Registrar"] = "길드 등록"
@@ -1348,20 +1349,20 @@ L["Your Auras First"] = "자기 주문 우선"
 L["Zone Ability"] = "특수능력 버튼"
 
 ----------------------------------
-L['blockCastByPlayers'] = "[차단] Cast By Players"
-L['blockDispellable'] = "[차단] Dispellable"
-L['blockNoDuration'] = "[차단] No Duration"
-L['blockNonPersonal'] = "[차단] Non Personal"
-L['blockNotDispellable'] = "[차단] Not Dispellable"
-L['Boss'] = "우두머리"
-L['CastByNPC'] = "Cast By NPC"
-L['CastByPlayers'] = "Cast By Players"
-L['CastByUnit'] = "Cast By Unit"
-L['Dispellable'] = "해제 가능"
-L['nonPersonal'] = "Non Personal"
-L['notCastByUnit'] = "Not Cast By Unit"
-L['notDispellable'] = "해제 불가능"
-L['Personal'] = true
+L["blockCastByPlayers"] = "[차단] Cast By Players"
+L["blockDispellable"] = "[차단] Dispellable"
+L["blockNoDuration"] = "[차단] No Duration"
+L["blockNonPersonal"] = "[차단] Non Personal"
+L["blockNotDispellable"] = "[차단] Not Dispellable"
+L["Boss"] = "우두머리"
+L["CastByNPC"] = "Cast By NPC"
+L["CastByPlayers"] = "Cast By Players"
+L["CastByUnit"] = "Cast By Unit"
+L["Dispellable"] = "해제 가능"
+L["nonPersonal"] = "Non Personal"
+L["notCastByUnit"] = "Not Cast By Unit"
+L["notDispellable"] = "해제 불가능"
+L["Personal"] = true
 ----------------------------------
 
 L["ACTIONBARS_DESC"] = "행동단축바의 설정을 변경합니다."

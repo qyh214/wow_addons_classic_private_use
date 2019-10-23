@@ -258,7 +258,7 @@ function addon.loadCurrentGuide()
 	addon.currentGuide = {}
 	addon.currentGuide.name = GuidelimeDataChar.currentGuide
 	addon.currentGuide.steps = {}
-	if addon.quests == nil then addon.quests = {} end
+	addon.quests = {}
 	
 	local guide = addon.guides[GuidelimeDataChar.currentGuide]
 	
@@ -582,10 +582,10 @@ function addon.getQuestIcon(questId, t, objective, finished)
 end
 
 function addon.getElementIcon(element, prevElement)
-	if element.available == false then
-		return "|T" .. addon.icons.UNAVAILABLE .. ":12|t"
-	elseif element.completed and element.t ~= "GOTO" then
+	if element.completed and element.t ~= "GOTO" then
 		return "|T" .. addon.icons.COMPLETED .. ":12|t"
+	elseif element.available == false then
+		return "|T" .. addon.icons.UNAVAILABLE .. ":12|t"
 	elseif addon.getSuperCode(element.t) == "QUEST" then
 		return addon.getQuestIcon(element.questId, element.t, element.objective, element.finished)
 	elseif element.t == "LOC" or element.t == "GOTO" then
@@ -797,13 +797,15 @@ local function updateStepAvailability(i, changedIndexes, scheduled)
 	for _, element in ipairs(step.elements) do
 		element.available = true
 		if element.t == "ACCEPT" then
-			local missingPrequests = addon.getMissingPrequests(element.questId, function(id) return addon.quests[id].completed or scheduled.TURNIN[id] end)
-			if #missingPrequests > 0 then
-				element.available = false
-				addon.currentGuide.unavailableQuests[element.questId] = true
-				for _, id in ipairs(missingPrequests) do
-					if not addon.contains(step.missingPrequests, id) then
-						table.insert(step.missingPrequests, id)
+			if not element.completed then
+				local missingPrequests = addon.getMissingPrequests(element.questId, function(id) return addon.quests[id].completed or scheduled.TURNIN[id] end)
+				if #missingPrequests > 0 then
+					element.available = false
+					addon.currentGuide.unavailableQuests[element.questId] = true
+					for _, id in ipairs(missingPrequests) do
+						if not addon.contains(step.missingPrequests, id) then
+							table.insert(step.missingPrequests, id)
+						end
 					end
 				end
 			end
@@ -938,6 +940,10 @@ local function updateStepsActivation()
 			end
 		end
 	end
+	-- accepting a follow up: maybe a quest dialog is still open and the quest just became active? try to accept it in that case
+	if addon.contains(addon.currentGuide.activeQuests, addon.lastQuestOpened) then 
+		AcceptQuest()
+	end
 end
 
 local function updateFirstActiveIndex()
@@ -1040,7 +1046,7 @@ function addon.updateStepsText(scrollToFirstActive)
 					addon.mainFrame:GetTop()
 					- addon.mainFrame.steps[addon.currentGuide.firstActiveIndex]:GetTop()
 					+ addon.mainFrame.scrollFrame:GetVerticalScroll()
-					- 14)
+					- 20)
 			end
 		end)
 	end
@@ -1448,12 +1454,10 @@ end
 function addon.checkQuests()
 	local completed = GetQuestsCompleted()
 	local count = 0
-	for id, value in pairs(completed) do count = count + 1 end
 	local text = ""
 	for id, value in pairs(completed) do
-		if addon.questsDB[id] == nil then
-			text = text .. "Unknown quest " .. id .. " completed.\r"
-		else
+		count = count + 1
+		if addon.questsDB[id] ~= nil then
 			local missingPrequests = addon.getMissingPrequests(id, function(id) return completed[id] end)
 			local found = false
 			local ids = {id}
@@ -1463,17 +1467,19 @@ function addon.checkQuests()
 				table.insert(ids, pid)
 				found = true
 			end
-			if addon.questsDB[id].replacement ~= nil --[[and not completed[addon.questsDB[id].replacement] ]] then
+			if addon.questsDB[id].replacement ~= nil and not completed[addon.questsDB[id].replacement] then
 				text = text .. "Quest \"" .. addon.questsDB[id].name .. "\"(" .. id .. ") was completed but is marked as being replaced by \"" .. addon.questsDB[addon.questsDB[id].replacement].name .. "\"(" .. addon.questsDB[id].replacement .. ") which is not completed.\r"
 				table.insert(ids, addon.questsDB[id].replacement)
 				found = true
 			end
-			if addon.questsDB[id].replaces ~= nil and not completed[addon.questsDB[id].replaces] then
+			--[[if addon.questsDB[id].replaces ~= nil and not completed[addon.questsDB[id].replaces] then
 				text = text .. "Quest \"" .. addon.questsDB[id].name .. "\"(" .. id .. ") was completed but is marked as being replacement for \"" .. addon.questsDB[addon.questsDB[id].replaces].name .. "\"(" .. addon.questsDB[id].replaces .. ") which is not completed.\r"
 				table.insert(ids, addon.questsDB[id].replaces)
 				found = true
-			end
+			end]]
 			if found then text = text .. listAliasQuests(completed, id, ids) .. "\r" end
+		--else
+			--text = text .. "Unknown quest " .. id .. " completed.\r"
 		end
 	end
 	if text == "" then 

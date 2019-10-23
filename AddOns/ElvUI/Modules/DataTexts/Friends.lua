@@ -34,6 +34,7 @@ local C_FriendList_GetNumOnlineFriends = C_FriendList.GetNumOnlineFriends
 local C_FriendList_GetFriendInfoByIndex = C_FriendList.GetFriendInfoByIndex
 local ChatFrame_SendBNetTell = ChatFrame_SendBNetTell
 local InCombatLockdown = InCombatLockdown
+local PRIEST_COLOR = RAID_CLASS_COLORS.PRIEST
 
 -- create a popup
 E.PopupDialogs.SET_BN_BROADCAST = {
@@ -339,7 +340,7 @@ local function Click(self, btn)
 						shouldSkip = true
 					end
 					if not shouldSkip then
-						local classc, levelc = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[info[3]]) or _G.RAID_CLASS_COLORS[info[3]], GetQuestDifficultyColor(info[2])
+						local classc, levelc = E:ClassColor(info.class), GetQuestDifficultyColor(info[2])
 						classc = classc or GetQuestDifficultyColor(info[2])
 
 						menuCountWhispers = menuCountWhispers + 1
@@ -380,7 +381,7 @@ local function Click(self, btn)
 					end
 
 					if info[6] == wowString and (E.myfaction == info[12]) and not (UnitInParty(info[4]) or UnitInRaid(info[4])) then
-						local classc, levelc = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[info[14]]) or _G.RAID_CLASS_COLORS[info[14]], GetQuestDifficultyColor(info[16])
+						local classc, levelc = E:ClassColor(info[14]), GetQuestDifficultyColor(info[16])
 						classc = classc or GetQuestDifficultyColor(info[16])
 
 						menuCountInvites = menuCountInvites + 1
@@ -444,7 +445,7 @@ local function OnEnter(self)
 				end
 				if not shouldSkip then
 					if E.MapInfo.zoneText and (E.MapInfo.zoneText == info[4]) then zonec = activezone else zonec = inactivezone end
-					classc, levelc = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[info[3]]) or _G.RAID_CLASS_COLORS[info[3]], GetQuestDifficultyColor(info[2])
+					classc, levelc = E:ClassColor(info[3]), GetQuestDifficultyColor(info[2])
 
 					classc = classc or GetQuestDifficultyColor(info[2])
 
@@ -480,17 +481,17 @@ local function OnEnter(self)
 						end
 						if not shouldSkip then
 							if info[6] == wowString then
-								classc = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[info[14]]) or _G.RAID_CLASS_COLORS[info[14]]
+								classc = E:ClassColor(info[14])
 								if info[16] ~= '' then
 									levelc = GetQuestDifficultyColor(info[16])
 								else
-									levelc = _G.RAID_CLASS_COLORS.PRIEST
-									classc = _G.RAID_CLASS_COLORS.PRIEST
+									levelc = PRIEST_COLOR
+									classc = PRIEST_COLOR
 								end
 
 								--Sometimes the friend list is fubar with level 0 unknown friends
 								if not classc then
-									classc = _G.RAID_CLASS_COLORS.PRIEST
+									classc = PRIEST_COLOR
 								end
 
 								if UnitInParty(info[4]) or UnitInRaid(info[4]) then grouped = 1 else grouped = 2 end

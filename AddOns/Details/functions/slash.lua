@@ -14,6 +14,9 @@ SLASH_DETAILS1, SLASH_DETAILS2, SLASH_DETAILS3 = "/details", "/dt", "/de"
 
 function SlashCmdList.DETAILS (msg, editbox)
 
+	local DF = DetailsFramework
+	local df = DetailsFramework
+
 	local command, rest = msg:match("^(%S*)%s*(.-)$")
 	command = string.lower (command)
 	
@@ -825,32 +828,40 @@ function SlashCmdList.DETAILS (msg, editbox)
 		
 		_detalhes:ApplyProfile (profile, false)
 	
-	elseif (msg == "users") then
-		_detalhes.users = {}
+	elseif (msg == "users" or msg == "version" or msg == "versioncheck") then
+		_detalhes.users = {{UnitName("player"), GetRealmName(), (_detalhes.userversion or "") .. " (" .. _detalhes.APIVersion .. ")"}}
 		_detalhes.sent_highfive = GetTime()
 		_detalhes:SendRaidData (_detalhes.network.ids.HIGHFIVE_REQUEST)
-		print (Loc ["STRING_DETAILS1"] .. "highfive sent.")
+
+		print (Loc ["STRING_DETAILS1"] .. "highfive sent, HI!")
 	
-	elseif (command == "showusers") then
-		local users = _detalhes.users
-		if (not users) then
-			return _detalhes:Msg ("there is no users.")
-		end
-		
-		local f = _detalhes.ListPanel
-		if (not f) then
-			f = _detalhes:CreateListPanel()
-		end
-		
-		local i = 0
-		for _, t in ipairs (users) do 
-			i = i + 1
-			f:add (t [1] .. " | " .. t [2] .. " | " .. t [3] , i)
-		end
-		
-		print (i, "users found.")
-	
-		f:Show()
+		C_Timer.After (0.3, function()
+			Details.RefreshUserList()
+		end)
+		C_Timer.After (0.6, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (0.9, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (1.3, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (1.6, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (3, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (4, function()
+			Details.RefreshUserList (true)
+		end)	
+		C_Timer.After (5, function()
+			Details.RefreshUserList (true)
+		end)
+		C_Timer.After (8, function()
+			Details.RefreshUserList (true)
+		end)
 	
 	elseif (command == "names") then
 		local t, filter = rest:match("^(%S*)%s*(.-)$")
@@ -1690,77 +1701,171 @@ Damage Update Status: @INSTANCEDAMAGESTATUS
 	end
 end
 
-function _detalhes:CreateListPanel()
+function Details.RefreshUserList (ignoreIfHidden)
 
-	local f = _detalhes.ListPanel
-	if (f) then
-		return f
+	if (ignoreIfHidden and DetailsUserPanel and not DetailsUserPanel:IsShown()) then
+		return
 	end
 
-	_detalhes.ListPanel = _detalhes.gump:NewPanel (UIParent, nil, "DetailsActorsFrame", nil, 300, 600)
-	_detalhes.ListPanel:SetPoint ("center", UIParent, "center", 300, 0)
-	_detalhes.ListPanel.barras = {}
-	
-	tinsert (UISpecialFrames, "DetailsActorsFrame")
-	_detalhes.ListPanel.close_with_right = true
+	local newList = DetailsFramework.table.copy ({}, _detalhes.users or {})
 
-	local container_barras_window = CreateFrame ("ScrollFrame", "Details_ActorsBarrasScroll", _detalhes.ListPanel.widget) 
-	local container_barras = CreateFrame ("Frame", "Details_ActorsBarras", container_barras_window)
-	_detalhes.ListPanel.container = container_barras
+	table.sort (newList, function(t1, t2)
+		return t1[3] > t2[3]
+	end)
 
-	_detalhes.ListPanel.width = 500
-	_detalhes.ListPanel.locked = false
-	
-	container_barras_window:SetBackdrop({
-		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-gold-Border", tile = true, tileSize = 16, edgeSize = 5,
-		insets = {left = 1, right = 1, top = 0, bottom = 1},})
-	container_barras_window:SetBackdropBorderColor (0, 0, 0, 0)
-	
-	container_barras:SetBackdrop({
-		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", tile = true, tileSize = 16,
-		insets = {left = 1, right = 1, top = 0, bottom = 1},})		
-	container_barras:SetBackdropColor (0, 0, 0, 0)
+	--search for people that didn't answered
+	if (IsInRaid()) then
+		for i = 1, GetNumGroupMembers() do
+			local playerName = UnitName ("raid" .. i)
+			local foundPlayer
 
-	container_barras:SetAllPoints (container_barras_window)
-	container_barras:SetWidth (500)
-	container_barras:SetHeight (150)
-	container_barras:EnableMouse (true)
-	container_barras:SetResizable (false)
-	container_barras:SetMovable (true)
-	
-	container_barras_window:SetWidth (460)
-	container_barras_window:SetHeight (550)
-	container_barras_window:SetScrollChild (container_barras)
-	container_barras_window:SetPoint ("TOPLEFT", _detalhes.ListPanel.widget, "TOPLEFT", 21, -10)
+			for o = 1, #newList do
+				if (newList[o][1]:find (playerName)) then
+					foundPlayer = true
+					break
+				end
+			end
 
-	_detalhes.gump:NewScrollBar (container_barras_window, container_barras, -10, -17)
-	container_barras_window.slider:Altura (560)
-	container_barras_window.slider:cimaPoint (0, 1)
-	container_barras_window.slider:baixoPoint (0, -3)
-	container_barras_window.slider:SetFrameLevel (10)
+			if (not foundPlayer) then
+				tinsert (newList, {playerName, "--", "--"})
+			end
+		end
+	end
 
-	container_barras_window.ultimo = 0
-	
-	container_barras_window.gump = container_barras
-	
-	function _detalhes.ListPanel:add (text, index, filter)
-		local row = _detalhes.ListPanel.barras [index]
-		if (not row) then
-			row = {text = _detalhes.ListPanel.container:CreateFontString (nil, "overlay", "GameFontNormal")}
-			_detalhes.ListPanel.barras [index] = row
-			row.text:SetPoint ("topleft", _detalhes.ListPanel.container, "topleft", 0, -index * 15)
+	Details:UpdateUserPanel (newList)
+end
+
+function Details:UpdateUserPanel (usersTable)
+
+	if (not Details.UserPanel) then
+		DetailsUserPanel = DetailsFramework:CreateSimplePanel (UIParent)
+		DetailsUserPanel:SetSize (707, 505)
+		DetailsUserPanel:SetTitle ("Details! Version Check")
+		DetailsUserPanel.Data = {}
+		DetailsUserPanel:ClearAllPoints()
+		DetailsUserPanel:SetPoint ("left", UIParent, "left", 10, 0)
+		DetailsUserPanel:Hide()
+
+		Details.UserPanel = DetailsUserPanel
+		
+		local scroll_width = 675
+		local scroll_height = 450
+		local scroll_lines = 21
+		local scroll_line_height = 20
+		
+		local backdrop_color = {.2, .2, .2, 0.2}
+		local backdrop_color_on_enter = {.8, .8, .8, 0.4}
+		local backdrop_color_is_critical = {.4, .4, .2, 0.2}
+		local backdrop_color_is_critical_on_enter = {1, 1, .8, 0.4}
+		
+		local y = -15
+		local headerY = y - 15
+		local scrollY = headerY - 20
+
+		--header
+		local headerTable = {
+			{text = "User Name", width = 200},
+			{text = "Realm", width = 200},
+			{text = "Version", width = 200},
+		}
+
+		local headerOptions = {
+			padding = 2,
+		}
+		
+		DetailsUserPanel.Header = DetailsFramework:CreateHeader (DetailsUserPanel, headerTable, headerOptions)
+		DetailsUserPanel.Header:SetPoint ("topleft", DetailsUserPanel, "topleft", 5, headerY)
+		
+		local scroll_refresh = function (self, data, offset, total_lines)
+			for i = 1, total_lines do
+				local index = i + offset
+				local userTable = data [index]
+				
+				if (userTable) then
+				
+					local line = self:GetLine (i)
+					local userName, userRealm, userVersion = unpack (userTable)
+
+					line.UserNameText.text = userName
+					line.RealmText.text = userRealm
+					line.VersionText.text = userVersion
+				end
+			end
+		end		
+		
+		local lineOnEnter = function (self)
+			if (self.IsCritical) then
+				self:SetBackdropColor (unpack (backdrop_color_is_critical_on_enter))
+			else
+				self:SetBackdropColor (unpack (backdrop_color_on_enter))
+			end
 		end
 		
-		if (filter and text:find (filter)) then
-			row.text:SetTextColor (1, 1, 0)
-		else
-			row.text:SetTextColor (1, 1, 1)
+		local lineOnLeave = function (self)
+			if (self.IsCritical) then
+				self:SetBackdropColor (unpack (backdrop_color_is_critical))
+			else
+				self:SetBackdropColor (unpack (backdrop_color))
+			end
+			
+			GameTooltip:Hide()
 		end
 		
-		row.text:SetText (text)
-	end	
-	
-	return _detalhes.ListPanel
+		local scroll_createline = function (self, index)
+			local line = CreateFrame ("button", "$parentLine" .. index, self)
+			line:SetPoint ("topleft", self, "topleft", 3, -((index-1)*(scroll_line_height+1)) - 1)
+			line:SetSize (scroll_width - 2, scroll_line_height)
+			
+			line:SetBackdrop ({bgFile = [[Interface\Tooltips\UI-Tooltip-Background]], tileSize = 64, tile = true})
+			line:SetBackdropColor (unpack (backdrop_color))
+			
+			DetailsFramework:Mixin (line, DetailsFramework.HeaderFunctions)
+			
+			line:SetScript ("OnEnter", lineOnEnter)
+			line:SetScript ("OnLeave", lineOnLeave)
+			
+			--username
+			local userNameText = DetailsFramework:CreateLabel (line)
+			
+			--realm
+			local realmText = DetailsFramework:CreateLabel (line)
+			
+			--version
+			local versionText = DetailsFramework:CreateLabel (line)
+			
+			line:AddFrameToHeaderAlignment (userNameText)
+			line:AddFrameToHeaderAlignment (realmText)
+			line:AddFrameToHeaderAlignment (versionText)
+			
+			line:AlignWithHeader (DetailsUserPanel.Header, "left")
+
+			line.UserNameText = userNameText
+			line.RealmText = realmText
+			line.VersionText = versionText
+
+			return line
+		end
+		
+		local usersScroll = DetailsFramework:CreateScrollBox (DetailsUserPanel, "$parentUsersScroll", scroll_refresh, DetailsUserPanel.Data, scroll_width, scroll_height, scroll_lines, scroll_line_height)
+		DetailsFramework:ReskinSlider (usersScroll)
+		usersScroll:SetPoint ("topleft", DetailsUserPanel, "topleft", 5, scrollY)
+		Details.UserPanel.ScrollBox = usersScroll
+		
+		--create lines
+		for i = 1, scroll_lines do 
+			usersScroll:CreateLine (scroll_createline)
+		end
+		
+		DetailsUserPanel:SetScript ("OnShow", function()
+		end)
+
+		DetailsUserPanel:SetScript ("OnHide", function()
+		end)
+	end
+
+	Details.UserPanel.ScrollBox:SetData (usersTable)
+	Details.UserPanel.ScrollBox:Refresh()
+	DetailsUserPanel:Show()
 end
 
 --doe

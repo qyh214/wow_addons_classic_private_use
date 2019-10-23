@@ -56,20 +56,20 @@ function AutoLoot:ShowLootFrame(show)
 		if show then
 			ElvLootFrame:SetParent(ElvLootFrameHolder)
 			ElvLootFrame:SetFrameStrata("HIGH")
-			self:LootUnderMouse(ElvLootFrame, ElvLootFrameHolder)
+			self:LootUnderMouse(ElvLootFrame, ElvLootFrameHolder, 20)
 			self.isHidden = false
 		else
 			ElvLootFrame:SetParent(self)
 			self.isHidden = true
 		end
-	elseif LootFrame:IsEventRegistered("LOOT_SLOT_CLEARED") then
-        LootFrame.page = 1;
-        LootFrame.selectedQuality = LootFrame.selectedQuality or 1
-		if show then
-			self:LootUnderMouse(LootFrame, UIParent)
-			LootFrame_Show(LootFrame)
+	elseif LootFrame:IsEventRegistered("LOOT_OPENED") then
+        if show then
+            LootFrame:SetParent(UIParent)
+            LootFrame:SetFrameStrata("HIGH")
+			self:LootUnderMouse(LootFrame, UIParent, 95)
 			self.isHidden = false
-		else
+        else
+            LootFrame:SetParent(self)
 			self.isHidden = true
 		end
 	end
@@ -99,6 +99,11 @@ end
 
 function AutoLoot:OnEvent(e, ...)
 	if e == "PLAYER_LOGIN" then
+        -- Fixes issue with Master Looting, when an Item is never clicked these values will not be initalized causing an Error to popup.
+        LootFrame.selectedQuality = 1
+        LootFrame.selectedSlot = 1
+        LootFrame.selectedTexture = 1
+        LootFrame.selectedLootButton = LootButton1
 
 		if SpeedyAutoLootDB.global.alwaysEnableAutoLoot then
 			SetCVar("autoLootDefault",1)
@@ -143,14 +148,14 @@ function AutoLoot:PlayInventoryFullSound()
 	end
 end
 
-function AutoLoot:LootUnderMouse(self, parent)
+function AutoLoot:LootUnderMouse(self, parent, yoffset)
 	if GetCVarBool("lootUnderMouse") then
 		local x, y = GetCursorPosition()
 		x = x / self:GetEffectiveScale()
 		y = y / self:GetEffectiveScale()
 
 		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x - 40, y + 20)
+		self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x - 40, y + (yoffset or 20))
 		self:GetCenter()
 		self:Raise()
 	else
@@ -238,7 +243,5 @@ SLASH_SPEEDYAUTOLOOT1, SLASH_SPEEDYAUTOLOOT2, SLASH_SPEEDYAUTOLOOT3  = "/sal", "
 SlashCmdList["SPEEDYAUTOLOOT"] = function(...)
     AutoLoot:Help(...)
 end
-
-LootFrame:UnregisterEvent("LOOT_OPENED")
 
 AutoLoot:OnLoad()

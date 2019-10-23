@@ -84,9 +84,9 @@ function addon.updateFromQuestLog()
 					q.objectives[k] = {desc = desc, done = done, type = type}
 				end					
 			end
-		else
+		elseif not q.completed then
+			checkCompleted = true
 			if q.logIndex ~= nil and q.logIndex ~= -1 and not isCollapsed[q.sort] then
-				checkCompleted = true
 				q.logIndex = nil
 				newQuest = true
 				--if addon.debugging then print("LIME: removed log entry ".. id) end
@@ -169,7 +169,7 @@ function addon.frame:GOSSIP_SHOW()
 		local selectAvailable = nil
 		addon.openNpcAgain = false
 		for i = 1, GetNumGossipActiveQuests() do
-			local name = q[(i-1) * 7 + 1]
+			local name = q[(i-1) * 6 + 1]
 			if addon.contains(addon.currentGuide.activeQuests, function(id) return name == addon.getQuestNameById(id) end) then
 				if selectActive == nil then
 					selectActive = i
@@ -268,13 +268,17 @@ addon.frame:RegisterEvent('QUEST_DETAIL')
 function addon.frame:QUEST_DETAIL()
 	local id = GetQuestID()
 	if addon.debugging then print ("LIME: QUEST_DETAIL", id) end
-	if GuidelimeData.autoCompleteQuest and not IsShiftKeyDown() and addon.currentGuide ~= nil and addon.currentGuide.activeQuests ~= nil and addon.contains(addon.currentGuide.activeQuests, id) then 
-		C_Timer.After(addon.AUTO_COMPLETE_DELAY, function() 
-			AcceptQuest()
-			if addon.openNpcAgain then 
-				--todo
-			end
-		end)
+	if GuidelimeData.autoCompleteQuest and not IsShiftKeyDown() then
+		if addon.currentGuide ~= nil and addon.currentGuide.activeQuests ~= nil and addon.contains(addon.currentGuide.activeQuests, id) then 
+			C_Timer.After(addon.AUTO_COMPLETE_DELAY, function()
+				AcceptQuest()
+				if addon.openNpcAgain then 
+					--todo
+				end
+			end)
+		else
+			addon.lastQuestOpened = id
+		end
 	end
 end
 

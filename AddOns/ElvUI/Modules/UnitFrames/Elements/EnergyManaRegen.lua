@@ -18,6 +18,9 @@ function UF:Configure_EnergyManaRegen(frame)
 		if not frame:IsElementEnabled('EnergyManaRegen') then
 			frame:EnableElement('EnergyManaRegen')
 		end
+
+		frame.EnergyManaRegen:SetFrameStrata(frame.Power:GetFrameStrata())
+		frame.EnergyManaRegen:SetFrameLevel(frame.Power:GetFrameLevel() + 3)
 	elseif frame:IsElementEnabled('EnergyManaRegen') then
 		frame:DisableElement('EnergyManaRegen')
 	end

@@ -4485,15 +4485,12 @@ function atributo_damage:MontaDetalhesDamageTaken (nome, barra)
 end
 
 ------ Detalhe Info Damage Done e Dps
---local defenses_table = {c = {117/255, 58/255, 0/255}, p = 0}
---local normal_table = {c = {255/255, 180/255, 0/255, 0.5}, p = 0}
---local multistrike_table = {c = {223/255, 249/255, 45/255, 0.5}, p = 0}
---local critical_table = {c = {249/255, 74/255, 45/255, 0.5}, p = 0}
 
 local defenses_table = {c = {1, 1, 1, 0.5}, p = 0}
 local normal_table = {c = {1, 1, 1, 0.5}, p = 0}
 local multistrike_table = {c = {1, 1, 1, 0.5}, p = 0}
 local critical_table = {c = {1, 1, 1, 0.5}, p = 0}
+local miss_table = {c = {1, 1, 1, 0.5}, p = 0}
 
 local data_table = {}
 local t1, t2, t3, t4 = {}, {}, {}, {}
@@ -4566,6 +4563,7 @@ function atributo_damage:MontaDetalhesDamageDone (spellid, barra, instancia)
 	end
 	
 	--> icone direito superior
+
 	local _, _, icone = Details.GetSpellInfoC (spellid)
 
 	_detalhes.janela_info.spell_icone:SetTexture (icone)
@@ -4705,6 +4703,7 @@ function atributo_damage:MontaDetalhesDamageDone (spellid, barra, instancia)
 		local outros_desvios = esta_magia.g_amt + esta_magia.b_amt
 		local parry = esta_magia ["PARRY"] or 0
 		local dodge = esta_magia ["DODGE"] or 0
+		
 		local erros = parry + dodge
 
 		if (outros_desvios > 0 or erros > 0) then
@@ -4724,6 +4723,26 @@ function atributo_damage:MontaDetalhesDamageDone (spellid, barra, instancia)
 			t3[8] = (outros_desvios+erros) .. " / " .. _cstr ("%.1f", porcentagem_defesas) .. "%"
 
 		end
+
+	--> miss
+		local miss = esta_magia ["MISS"] or 0
+		if (miss and miss > 0) then
+			local missPercent = miss / total_hits * 100
+
+			data [#data+1] = t4
+			miss_table.p = missPercent
+			
+			t4[1] = miss
+			t4[2] = miss_table
+			t4[3] = MISS or "Miss"
+			t4[4] = (MISS or "Miss") .. ": " .. miss .. " (" .. _math_floor (esta_magia.MISS / esta_magia.counter * 100) .. "%)"
+			t4[5] = ""
+			t4[6] = ""
+			t4[7] = ""
+			t4[8] = (miss) .. " / " .. _cstr ("%.1f", missPercent) .. "%"
+		end
+
+
 	
 	--> multistrike
 		--[=[

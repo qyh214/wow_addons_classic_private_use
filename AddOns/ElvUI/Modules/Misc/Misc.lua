@@ -153,6 +153,8 @@ function M:AutoInvite(event, _, _, _, _, _, _, inviterGUID)
 	if event == "PARTY_INVITE_REQUEST" then
 		if BNGetGameAccountInfoByGUID(inviterGUID) or IsCharacterFriend(inviterGUID) or IsGuildMember(inviterGUID) then
 			AcceptGroup()
+			StaticPopupDialogs["PARTY_INVITE"].inviteAccepted = 1
+			StaticPopup_Hide("PARTY_INVITE")
 		end
 	end
 end

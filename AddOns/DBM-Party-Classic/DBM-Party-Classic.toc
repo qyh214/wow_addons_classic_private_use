@@ -137,6 +137,20 @@ ScarletMonastery\Herod.lua
 ScarletMonastery\Mograine_and_Whitemane.lua
 ScarletMonastery\HighInquisitorFairbanks.lua
 
+Scholomance\KirtonostheHerald.lua
+Scholomance\JandiceBarov.lua
+Scholomance\Rattlegore.lua
+Scholomance\MardukBlackpool.lua
+Scholomance\Vectus.lua
+Scholomance\RasFrostwhisper.lua
+Scholomance\InstructorMalicia.lua
+Scholomance\DoctorTheolenKrastinov.lua
+Scholomance\LorekeeperPolkelt.lua
+Scholomance\TheRavenian.lua
+Scholomance\LordAlexeiBarov.lua
+Scholomance\LadyIlluciaBarov.lua
+Scholomance\DarkmasterGandling.lua
+
 Shadowfangkeep\Rethilgore.lua
 Shadowfangkeep\RazorclawtheButcher.lua
 Shadowfangkeep\BaronSilverlaine.lua

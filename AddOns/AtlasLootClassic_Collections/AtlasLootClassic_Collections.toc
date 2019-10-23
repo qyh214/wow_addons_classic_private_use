@@ -1,14 +1,14 @@
 ﻿## Interface: 11302
 ## Author: Lag
-## Version: v1.2.2
+## Version: v1.3.2
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
 ## Title: AtlasLootClassic |cFF0099FF[Collections]|r
 ## Title-deDE: AtlasLootClassic |cFF0099FF[Sammlungen]|r
-## Title-esES: AtlasLootClassic |cFF0099FF[Collections]|r
-## Title-esMX: AtlasLootClassic |cFF0099FF[Collections]|r
-## Title-frFR: AtlasLootClassic |cFF0099FF[Collections]|r
+## Title-esES: AtlasLootClassic |cFF0099FF[Colecciones]|r
+## Title-esMX: AtlasLootClassic |cFF0099FF[Colecciones]|r
+## Title-frFR: AtlasLoot Classic |cFF0099FF[Collections]|r
 ## Title-itIT: AtlasLootClassic |cFF0099FF[Collections]|r
 ## Title-koKR: AtlasLoot 클래식 |cFF0099FF[수집품]|r
 ## Title-ptBR: AtlasLootClassic |cFF0099FF[Collections]|r
@@ -17,11 +17,11 @@
 ## Title-zhTW: 副本戰利品查詢經典版 |cFF0099FF[收藏]|r
 ## Notes: AtlasLoot loot tables from Collections
 ## Notes-deDE: AtlasLoot Beuteverzeichnis der Sammlungen
-## Notes-esES: AtlasLoot loot tables from Collections
-## Notes-esMX: AtlasLoot loot tables from Collections
-## Notes-frFR: AtlasLoot loot tables from Collections
+## Notes-esES: AtlasLoot tablas de botín de Colecciones
+## Notes-esMX: AtlasLoot tablas de botín de Colecciones
+## Notes-frFR: Tables de butin des collections
 ## Notes-itIT: AtlasLoot loot tables from Collections
-## Notes-koKR: AtlasLoot loot tables from Collections
+## Notes-koKR: 수집품에 대한 AtlasLoot 전리품 테이블
 ## Notes-ptBR: AtlasLoot loot tables from Collections
 ## Notes-ruRU: Таблицы добычи AtlasLoot для коллекций предметов.
 ## Notes-zhCN: 收藏物品资料库。

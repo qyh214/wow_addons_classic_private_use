@@ -5,6 +5,7 @@ if not AL then return end
 -- These localization strings are translated on Curseforge: https://www.curseforge.com/wow/addons/atlaslootclassic/localization
 -- Crafting
 AL["Apprentice"] = "Lehrling"
+AL["Armor"] = "Rüstung"
 AL["Artisan"] = "Fachmann"
 AL["Axes"] = "Äxte"
 AL["Class Professions"] = "Klassenspezifische Berufe"
@@ -21,6 +22,7 @@ AL["Pets"] = "Haustiere"
 AL["Protection Potions"] = "Schutztränke"
 AL["Secondary Professions"] = "Sekundäre Fertigkeiten"
 AL["Smelting"] = "Verhüttung"
+AL["Special"] = "Spezial"
 AL["Special Elixirs"] = "Spezielle Elixiere"
 AL["Stat Elixirs"] = "Wert-Elixiere"
 AL["Swords"] = "Schwerter"

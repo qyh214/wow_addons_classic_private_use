@@ -50,7 +50,7 @@ local function SetTip(frame)
 	GameTooltip:SetText(frame.tiptext)
 	for name, tbl in pairs(frame.parent.rolls) do
 		if rolltypes[tbl[1]] == rolltypes[frame.rolltype] then
-			local classColor = _G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[tbl[2]] or _G.RAID_CLASS_COLORS[tbl[2]]
+			local classColor = E:ClassColor(tbl[2])
 			GameTooltip:AddLine(name, classColor.r, classColor.g, classColor.b)
 		end
 	end

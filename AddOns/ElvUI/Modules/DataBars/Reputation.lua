@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local mod = E:GetModule('DataBars')
 local LSM = E.Libs.LSM
 
@@ -6,14 +6,11 @@ local LSM = E.Libs.LSM
 local _G = _G
 local format = format
 --WoW API / Variables
+local CreateFrame = CreateFrame
 local GetWatchedFactionInfo, GetNumFactions, GetFactionInfo = GetWatchedFactionInfo, GetNumFactions, GetFactionInfo
 local InCombatLockdown = InCombatLockdown
 local ToggleCharacter = ToggleCharacter
-local CreateFrame = CreateFrame
 local REPUTATION, STANDING = REPUTATION, STANDING
-
-local backupColor = _G.FACTION_BAR_COLORS[1]
-local FactionStandingLabelUnknown = UNKNOWN
 
 function mod:UpdateReputation(event)
 	if not mod.db.reputation.enable then return end
@@ -29,23 +26,23 @@ function mod:UpdateReputation(event)
 		isCapped = true
 	end
 
-	local numFactions = GetNumFactions();
+	local numFactions = GetNumFactions()
 
-	if not name or (event == "PLAYER_REGEN_DISABLED" and self.db.reputation.hideInCombat) then
+	if not name or (event == 'PLAYER_REGEN_DISABLED' and self.db.reputation.hideInCombat) then
 		bar:Hide()
 	elseif name and (not self.db.reputation.hideInCombat or not InCombatLockdown()) then
 		bar:Show()
 
 		local text = ''
 		local textFormat = self.db.reputation.textFormat
-		local color = _G.FACTION_BAR_COLORS[reaction] or backupColor
+		local color = _G.FACTION_BAR_COLORS[reaction] or _G.FACTION_BAR_COLORS[1]
 		bar.statusBar:SetStatusBarColor(color.r, color.g, color.b)
 
 		bar.statusBar:SetMinMaxValues(min, max)
 		bar.statusBar:SetValue(value)
 
-		for i=1, numFactions do
-			local factionName, _, standingID = GetFactionInfo(i);
+		for i = 1, numFactions do
+			local factionName, _, standingID = GetFactionInfo(i)
 			if factionName == name then
 				ID = standingID
 			end
@@ -54,12 +51,12 @@ function mod:UpdateReputation(event)
 		if ID then
 			standingLabel = _G['FACTION_STANDING_LABEL'..ID]
 		else
-			standingLabel = FactionStandingLabelUnknown
+			standingLabel = UNKNOWN
 		end
 
 		--Prevent a division by zero
 		local maxMinDiff = max - min
-		if (maxMinDiff == 0) then
+		if maxMinDiff == 0 then
 			maxMinDiff = 1
 		end
 
@@ -90,6 +87,7 @@ end
 
 function mod:ReputationBar_OnEnter()
 	local GameTooltip = _G.GameTooltip
+	local name, reaction, min, max, value = GetWatchedFactionInfo()
 
 	if mod.db.reputation.mouseover then
 		E:UIFrameFadeIn(self, 0.4, self:GetAlpha(), 1)
@@ -97,8 +95,6 @@ function mod:ReputationBar_OnEnter()
 
 	GameTooltip:ClearLines()
 	GameTooltip:SetOwner(self, 'ANCHOR_CURSOR', 0, -4)
-
-	local name, reaction, min, max, value = GetWatchedFactionInfo()
 
 	if name then
 		GameTooltip:AddLine(name)
@@ -113,7 +109,7 @@ function mod:ReputationBar_OnEnter()
 end
 
 function mod:ReputationBar_OnClick()
-	ToggleCharacter("ReputationFrame")
+	ToggleCharacter('ReputationFrame')
 end
 
 function mod:UpdateReputationDimensions()
@@ -121,9 +117,9 @@ function mod:UpdateReputationDimensions()
 	self.repBar:Height(self.db.reputation.height)
 	self.repBar.statusBar:SetOrientation(self.db.reputation.orientation)
 	self.repBar.statusBar:SetReverseFill(self.db.reputation.reverseFill)
-	self.repBar.text:FontTemplate(LSM:Fetch("font", self.db.reputation.font), self.db.reputation.textSize, self.db.reputation.fontOutline)
+	self.repBar.text:FontTemplate(LSM:Fetch('font', self.db.reputation.font), self.db.reputation.textSize, self.db.reputation.fontOutline)
 
-	if self.db.reputation.orientation == "HORIZONTAL" then
+	if self.db.reputation.orientation == 'HORIZONTAL' then
 		self.repBar.statusBar:SetRotatesTexture(false)
 	else
 		self.repBar.statusBar:SetRotatesTexture(true)
@@ -152,14 +148,14 @@ function mod:LoadReputationBar()
 	self.repBar = self:CreateBar('ElvUI_ReputationBar', self.ReputationBar_OnEnter, self.ReputationBar_OnClick, 'RIGHT', _G.RightChatPanel, 'LEFT', E.Border - E.Spacing*3, 0)
 	E:RegisterStatusBar(self.repBar.statusBar)
 
-	self.repBar.eventFrame = CreateFrame("Frame")
+	self.repBar.eventFrame = CreateFrame('Frame')
 	self.repBar.eventFrame:Hide()
-	self.repBar.eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self.repBar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-	self.repBar.eventFrame:SetScript("OnEvent", function(_, event) mod:UpdateReputation(event) end)
+	self.repBar.eventFrame:RegisterEvent('PLAYER_REGEN_DISABLED')
+	self.repBar.eventFrame:RegisterEvent('PLAYER_REGEN_ENABLED')
+	self.repBar.eventFrame:SetScript('OnEvent', function(_, event) mod:UpdateReputation(event) end)
 
 	self:UpdateReputationDimensions()
 
-	E:CreateMover(self.repBar, "ReputationBarMover", L["Reputation Bar"], nil, nil, nil, nil, nil, 'databars,reputation')
+	E:CreateMover(self.repBar, 'ReputationBarMover', L["Reputation Bar"], nil, nil, nil, nil, nil, 'databars,reputation')
 	self:EnableDisable_ReputationBar()
 end

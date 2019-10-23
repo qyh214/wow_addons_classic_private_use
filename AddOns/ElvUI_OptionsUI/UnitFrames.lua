@@ -5,9 +5,8 @@ local NP = E:GetModule("NamePlates")
 
 local _G = _G
 local format, gsub, ipairs, pairs, select, strmatch, strsplit = format, gsub, ipairs, pairs, select, strmatch, strsplit
-local tconcat, tinsert, tremove, type, wipe, tonumber = table.concat, tinsert, tremove, type, wipe, tonumber
+local tconcat, tinsert, tremove, type, wipe = table.concat, tinsert, tremove, type, wipe
 local GetScreenWidth = GetScreenWidth
-local IsAddOnLoaded = IsAddOnLoaded
 
 -- GLOBALS: ElvUF_Parent, ElvUF_Player, ElvUF_Pet, ElvUF_PetTarget, ElvUF_Party, ElvUF_Raidpet
 -- GLOBALS: ElvUF_Target, ElvUF_TargetTarget, ElvUF_TargetTargetTarget, ElvUF_Focus, ElvUF_FocusTarget
@@ -152,31 +151,31 @@ local function GetOptionsTable_AuraBars(updateFunc, groupName)
 		set = function(info, value) E.db.unitframe.units[groupName].aurabar[info[#info]] = value; updateFunc(UF, groupName) end,
 		args = {
 			header = {
-				order = 1,
+				order = 0,
 				type = "header",
 				name = L["Aura Bars"],
 			},
 			enable = {
 				type = 'toggle',
-				order = 2,
+				order = 1,
 				name = L["Enable"],
 			},
 			configureButton1 = {
-				order = 3,
+				order = 2,
 				name = L["Coloring"],
 				desc = L["This opens the UnitFrames Color settings. These settings affect all unitframes."],
 				type = 'execute',
 				func = function() ACD:SelectGroup("ElvUI", "unitframe", "generalOptionsGroup", "allColorsGroup", "auraBars") end,
 			},
 			configureButton2 = {
-				order = 4,
+				order = 3,
 				name = L["Coloring (Specific)"],
 				type = 'execute',
 				func = function() E:SetToFilterConfig('AuraBar Colors') end,
 			},
 			anchorPoint = {
 				type = 'select',
-				order = 5,
+				order = 4,
 				name = L["Anchor Point"],
 				desc = L["What point to anchor to the frame you set to attach to."],
 				values = {
@@ -186,20 +185,27 @@ local function GetOptionsTable_AuraBars(updateFunc, groupName)
 			},
 			attachTo = {
 				type = 'select',
-				order = 6,
+				order = 5,
 				name = L["Attach To"],
 				desc = L["The object you want to attach to."],
 				values = {
 					['FRAME'] = L["Frame"],
 					['DEBUFFS'] = L["Debuffs"],
 					['BUFFS'] = L["Buffs"],
+					['DETACHED'] = L["Detach From Frame"],
 				},
 			},
 			height = {
 				type = 'range',
-				order = 7,
+				order = 6,
 				name = L["Height"],
 				min = 6, max = 40, step = 1,
+			},
+			detachedWidth = {
+				type = 'range',
+				order = 7,
+				name = L["Detached Width"],
+				min = 50, max = 500, step = 1,
 			},
 			maxBars = {
 				type = 'range',
@@ -207,17 +213,27 @@ local function GetOptionsTable_AuraBars(updateFunc, groupName)
 				name = L["Max Bars"],
 				min = 1, max = 40, step = 1,
 			},
-			sort = {
-				type = 'select',
+			sortMethod = {
 				order = 9,
-				name = L["Sort Method"],
+				name = L["Sort By"],
+				desc = L["Method to sort by."],
+				type = 'select',
 				values = {
 					['TIME_REMAINING'] = L["Time Remaining"],
-					['TIME_REMAINING_REVERSE'] = L["Time Remaining Reverse"],
-					['TIME_DURATION'] = L["Duration"],
-					['TIME_DURATION_REVERSE'] = L["Duration Reverse"],
+					['DURATION'] = L["Duration"],
 					['NAME'] = L["NAME"],
-					['NONE'] = L["NONE"],
+					['INDEX'] = L["Index"],
+					["PLAYER"] = L["PLAYER"],
+				},
+			},
+			sortDirection = {
+				order = 10,
+				name = L["Sort Direction"],
+				desc = L["Ascending or Descending order."],
+				type = 'select',
+				values = {
+					['ASCENDING'] = L["Ascending"],
+					['DESCENDING'] = L["Descending"],
 				},
 			},
 			friendlyAuraType = {
@@ -239,13 +255,6 @@ local function GetOptionsTable_AuraBars(updateFunc, groupName)
 					['HARMFUL'] = L["Debuffs"],
 					['HELPFUL'] = L["Buffs"],
 				},
-			},
-			uniformThreshold = {
-				order = 18,
-				type = "range",
-				name = L["Uniform Threshold"],
-				desc = L["Seconds remaining on the aura duration before the bar starts moving. Set to 0 to disable."],
-				min = 0, max = 3600, step = 1,
 			},
 			yOffset = {
 				order = 19,
@@ -1713,6 +1722,11 @@ local function GetOptionsTable_Power(hasDetatchOption, updateFunc, groupName, nu
 				name = L["Attach Text To"],
 				values = attachToValues,
 			},
+			autoHide = {
+				order = 12,
+				type = 'toggle',
+				name = L["Auto-Hide"],
+			},
 		},
 	}
 
@@ -3031,36 +3045,6 @@ E.Options.args.unitframe = {
 									name = L["ENERGY"],
 									type = 'color',
 								},
-								RUNIC_POWER = {
-									order = 24,
-									name = L["RUNIC_POWER"],
-									type = 'color',
-								},
-								PAIN = {
-									order = 25,
-									name = L["PAIN"],
-									type = 'color',
-								},
-								FURY = {
-									order = 26,
-									name = L["FURY"],
-									type = 'color',
-								},
-								LUNAR_POWER = {
-									order = 27,
-									name = L["LUNAR_POWER"],
-									type = 'color'
-								},
-								INSANITY = {
-									order = 28,
-									name = L["INSANITY"],
-									type = 'color'
-								},
-								MAELSTROM = {
-									order = 29,
-									name = L["MAELSTROM"],
-									type = 'color'
-								},
 							},
 						},
 						castBars = {
@@ -3232,7 +3216,7 @@ E.Options.args.unitframe = {
 									end,
 									set = function(info, r, g, b)
 										if E:CheckClassColor(r, g, b) then
-											local classColor = E.myclass == 'PRIEST' and E.PriestColors or (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[E.myclass] or _G.RAID_CLASS_COLORS[E.myclass])
+											local classColor = E:ClassColor(E.myclass, true)
 											r, g, b = classColor.r, classColor.g, classColor.b
 										end
 
@@ -3700,7 +3684,7 @@ E.Options.args.unitframe.args.player = {
 				},
 			},
 		},
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'player'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'player'),
 		customText = GetOptionsTable_CustomText(UF.CreateAndUpdateUF, 'player'),
 		health = GetOptionsTable_Health(false, UF.CreateAndUpdateUF, 'player'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateUF, 'player'),
@@ -4305,7 +4289,7 @@ E.Options.args.unitframe.args.target = {
 				},
 			},
 		},
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'target'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'target'),
 		customText = GetOptionsTable_CustomText(UF.CreateAndUpdateUF, 'target'),
 		health = GetOptionsTable_Health(false, UF.CreateAndUpdateUF, 'target'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateUF, 'target'),
@@ -4415,6 +4399,34 @@ E.Options.args.unitframe.args.target = {
 					type = "range",
 					name = L["Y-Offset"],
 					min = -100, max = 100, step = 1,
+				},
+			},
+		},
+		raidRoleIcons = {
+			order = 703,
+			type = 'group',
+			name = L["RL Icon"],
+			get = function(info) return E.db.unitframe.units.target.raidRoleIcons[info[#info]] end,
+			set = function(info, value) E.db.unitframe.units.target.raidRoleIcons[info[#info]] = value; UF:CreateAndUpdateUF('target') end,
+			args = {
+				header = {
+					order = 1,
+					type = "header",
+					name = L["RL Icon"],
+				},
+				enable = {
+					type = 'toggle',
+					name = L["Enable"],
+					order = 2,
+				},
+				position = {
+					type = 'select',
+					order = 3,
+					name = L["Position"],
+					values = {
+						['TOPLEFT'] = 'TOPLEFT',
+						['TOPRIGHT'] = 'TOPRIGHT',
+					},
 				},
 			},
 		},
@@ -4814,15 +4826,18 @@ E.Options.args.unitframe.args.pet = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 			},
 		},
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'pet'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateUF, 'pet'),
 		customText = GetOptionsTable_CustomText(UF.CreateAndUpdateUF, 'pet'),
 		health = GetOptionsTable_Health(false, UF.CreateAndUpdateUF, 'pet'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateUF, 'pet'),
@@ -5169,9 +5184,6 @@ E.Options.args.unitframe.args.party = {
 							type = 'select',
 							values = {
 								['CLASS'] = L["CLASS"],
-								['CLASSROLE'] = L["CLASS"]..' & '..L["ROLE"],
-								['ROLE'] = L["Role: Tank, Healer, Damage"],
-								['ROLE2'] = L["Role: Tank, Damage, Healer"],
 								['NAME'] = L["NAME"],
 								['MTMA'] = L["Main Tanks / Main Assist"],
 								['GROUP'] = L["GROUP"],
@@ -5241,11 +5253,14 @@ E.Options.args.unitframe.args.party = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				profileSpecific = {
 					type = 'toggle',
@@ -5296,7 +5311,7 @@ E.Options.args.unitframe.args.party = {
 			},
 		},
 		health = GetOptionsTable_Health(true, UF.CreateAndUpdateHeaderGroup, 'party'),
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'party'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'party'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateHeaderGroup, 'party'),
 		power = GetOptionsTable_Power(false, UF.CreateAndUpdateHeaderGroup, 'party'),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateHeaderGroup, 'party'),
@@ -5744,9 +5759,6 @@ E.Options.args.unitframe.args.raid = {
 							type = 'select',
 							values = {
 								['CLASS'] = L["CLASS"],
-								['CLASSROLE'] = L["CLASS"]..' & '..L["ROLE"],
-								['ROLE'] = L["Role: Tank, Healer, Damage"],
-								['ROLE2'] = L["Role: Tank, Damage, Healer"],
 								['NAME'] = L["NAME"],
 								['MTMA'] = L["Main Tanks / Main Assist"],
 								['GROUP'] = L["GROUP"],
@@ -5793,7 +5805,7 @@ E.Options.args.unitframe.args.raid = {
 			},
 		},
 		health = GetOptionsTable_Health(true, UF.CreateAndUpdateHeaderGroup, 'raid'),
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raid'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raid'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateHeaderGroup, 'raid'),
 		power = GetOptionsTable_Power(false, UF.CreateAndUpdateHeaderGroup, 'raid'),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateHeaderGroup, 'raid'),
@@ -5825,11 +5837,14 @@ E.Options.args.unitframe.args.raid = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				profileSpecific = {
 					type = 'toggle',
@@ -6141,9 +6156,6 @@ E.Options.args.unitframe.args.raid40 = {
 							type = 'select',
 							values = {
 								['CLASS'] = L["CLASS"],
-								['CLASSROLE'] = L["CLASS"]..' & '..L["ROLE"],
-								['ROLE'] = L["Role: Tank, Healer, Damage"],
-								['ROLE2'] = L["Role: Tank, Damage, Healer"],
 								['NAME'] = L["NAME"],
 								['MTMA'] = L["Main Tanks / Main Assist"],
 								['GROUP'] = L["GROUP"],
@@ -6190,7 +6202,7 @@ E.Options.args.unitframe.args.raid40 = {
 			},
 		},
 		health = GetOptionsTable_Health(true, UF.CreateAndUpdateHeaderGroup, 'raid40'),
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raid40'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		infoPanel = GetOptionsTable_InformationPanel(UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		power = GetOptionsTable_Power(false, UF.CreateAndUpdateHeaderGroup, 'raid40'),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateHeaderGroup, 'raid40'),
@@ -6222,11 +6234,14 @@ E.Options.args.unitframe.args.raid40 = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				profileSpecific = {
 					type = 'toggle',
@@ -6245,75 +6260,6 @@ E.Options.args.unitframe.args.raid40 = {
 						end
 					end,
 					order = 6
-				},
-			},
-		},
-		roleIcon = {
-			order = 702,
-			type = 'group',
-			name = L["Role Icon"],
-			get = function(info) return E.db.unitframe.units.raid40.roleIcon[info[#info]] end,
-			set = function(info, value) E.db.unitframe.units.raid40.roleIcon[info[#info]] = value; UF:CreateAndUpdateHeaderGroup('raid40') end,
-			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["Role Icon"],
-				},
-				enable = {
-					type = 'toggle',
-					name = L["Enable"],
-					order = 2,
-				},
-				position = {
-					type = 'select',
-					order = 3,
-					name = L["Position"],
-					values = positionValues,
-				},
-				attachTo = {
-					type = 'select',
-					order = 4,
-					name = L["Attach To"],
-					values = attachToValues,
-				},
-				xOffset = {
-					order = 5,
-					type = 'range',
-					name = L["xOffset"],
-					min = -300, max = 300, step = 1,
-				},
-				yOffset = {
-					order = 6,
-					type = 'range',
-					name = L["yOffset"],
-					min = -300, max = 300, step = 1,
-				},
-				size = {
-					type = 'range',
-					order = 7,
-					name = L["Size"],
-					min = 4, max = 100, step = 1,
-				},
-				tank = {
-					order = 8,
-					type = "toggle",
-					name = L["Show For Tanks"],
-				},
-				healer = {
-					order = 9,
-					type = "toggle",
-					name = L["Show For Healers"],
-				},
-				damager = {
-					order = 10,
-					type = "toggle",
-					name = L["Show For DPS"],
-				},
-				combatHide = {
-					order = 11,
-					type = "toggle",
-					name = L["Hide In Combat"],
 				},
 			},
 		},
@@ -6637,7 +6583,7 @@ E.Options.args.unitframe.args.raidpet = {
 			},
 		},
 		health = GetOptionsTable_Health(true, UF.CreateAndUpdateHeaderGroup, 'raidpet'),
-		healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raidpet'),
+		--healPredction = GetOptionsTable_HealPrediction(UF.CreateAndUpdateHeaderGroup, 'raidpet'),
 		name = GetOptionsTable_Name(UF.CreateAndUpdateHeaderGroup, 'raidpet'),
 		portrait = GetOptionsTable_Portrait(UF.CreateAndUpdateHeaderGroup, 'raidpet'),
 		fader = GetOptionsTable_Fader(UF.CreateAndUpdateHeaderGroup, 'raidpet'),
@@ -6670,11 +6616,14 @@ E.Options.args.unitframe.args.raidpet = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				configureButton = {
 					type = 'execute',
@@ -6861,11 +6810,14 @@ E.Options.args.unitframe.args.tank = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				profileSpecific = {
 					type = 'toggle',
@@ -7068,11 +7020,14 @@ E.Options.args.unitframe.args.assist = {
 					order = 3,
 					min = 4, max = 50, step = 1,
 				},
-				fontSize = {
-					type = 'range',
-					name = L["FONT_SIZE"],
+				style = {
+					name = L["Style"],
 					order = 4,
-					min = 7, max = 212, step = 1,
+					type = 'select',
+					values = {
+						['coloredIcon'] = L["Colored Icon"],
+						['texturedIcon'] = L["Textured Icon"],
+					},
 				},
 				profileSpecific = {
 					type = 'toggle',

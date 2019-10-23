@@ -2,6 +2,33 @@
 
 This mod is distributed under Version 2 of the GPL.  A copy of the GPL is included in this zip file with links to non-english translations.
 
+## v1.3.1 (Oct. 15, 2019)
+
+- Add Legendarys into Collections
+- Add PvP Insignia
+- Move Zul'Farrak / Dustwraith into Phase 1
+
+## v1.3.0 (Oct. 12, 2019)
+
+- Add AtlasLootClassic_Data module (Needs game restart!)
+- Add Sources addon that shows dropsources in item tooltips
+- Update DireMaul content phase
+- Middle click on MiniMapButton now ignores auto selection
+- Fix some typos (thanks @AntiTcb)
+- Move Worldbosses into the DungeonsAndRaids module
+
+## v1.2.3 (Oct. 09, 2019)
+
+- Update content phases
+- Mark Zul'Farrak rares
+- Fix bug with autoselection lootpage update
+- Add quest requirements for DireMaul books
+
+## v1.2.2 (Oct. 02, 2019)
+
+- Update BRD/LBRS loot
+- Add much more drop rate data from classic.wowhead.com. Use their tool/addon and help them to get more data!
+
 ## v1.2.1 (Oct. 01, 2019)
 
 - Add a option to show level for bosses

@@ -1,14 +1,14 @@
 ## Interface: 11302
 ## Author: Lag
-## Version: v1.2.2
+## Version: v1.3.2
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
 ## Title: AtlasLootClassic |cFF0099FF[Crafting]|r
 ## Title-deDE: AtlasLootClassic |cFF0099FF[Berufe]|r
-## Title-esES: AtlasLootClassic |cFF0099FF[Crafting]|r
-## Title-esMX: AtlasLootClassic |cFF0099FF[Crafting]|r
-## Title-frFR: AtlasLootClassic |cFF0099FF[Crafting]|r
+## Title-esES: AtlasLootClassic |cFF0099FF[Fabricados]|r
+## Title-esMX: AtlasLootClassic |cFF0099FF[Fabricados]|r
+## Title-frFR: AtlasLoot Classic |cFF0099FF[Artisanat]|r
 ## Title-itIT: AtlasLootClassic |cFF0099FF[Crafting]|r
 ## Title-koKR: AtlasLoot 클래식 |cFF0099FF[제작 아이템]|r
 ## Title-ptBR: AtlasLootClassic |cFF0099FF[Crafting]|r
@@ -17,11 +17,11 @@
 ## Title-zhTW: 副本戰利品查詢經典版 |cFF0099FF[專業製作]|r
 ## Notes: AtlasLoot loot tables of Crafting Items
 ## Notes-deDE: AtlasLoot Beuteverzeichnis der Berufe
-## Notes-esES: AtlasLoot loot tables of Crafting Items
-## Notes-esMX: AtlasLoot loot tables of Crafting Items
-## Notes-frFR: Notes-Artisanat
+## Notes-esES: AtlasLoot tablas de botín de Fabricados
+## Notes-esMX: AtlasLoot tablas de botín de Fabricados
+## Notes-frFR: Tables de butin des objets d'artisanat
 ## Notes-itIT: AtlasLoot loot tables of Crafting Items
-## Notes-koKR: 제작 아이템의 AtlasLoot 전리품 표
+## Notes-koKR: 제작 아이템의 AtlasLoot 전리품 테이블
 ## Notes-ptBR: AtlasLoot loot tables of Crafting Items
 ## Notes-ruRU: Таблицы добычи AtlasLoot для профессий.
 ## Notes-zhCN: AtlasLoot专业制作物品列表

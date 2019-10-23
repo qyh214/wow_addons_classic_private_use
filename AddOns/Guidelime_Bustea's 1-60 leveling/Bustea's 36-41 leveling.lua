@@ -32,6 +32,7 @@ Fly to [F Undercity]
 Turn in [QT1164]
 Take the Zeppelin to Orgrimmar
 Set your hearth to [S Orgrimmar]
+Go to the Auction House and buy *10x Shellfish*
 Accept [QA1431] and turn [QT1431 it] back in.
 Accept [QA1432]
 [T] Get your skills from the trainer.(Druids will have to go to Moonglade and then fly back)
@@ -47,7 +48,7 @@ Turn in [QT1432] and accept [QA1433] and [QA1434]
 Turn in [QT1433] and accept [QA1435]
 Accept [QA5381][QA6143]
 Get the FP [P Shadowprey Village]
-Check for Shellfish Traps in the Water until you have 10, turn those in to *Jinar'Zillen* and get 2 *Bloodbelly Fish* for [QC5386]
+Turn your Shellfish in to *Jinar'Zillen* and get 2 *Bloodbelly Fish* for [QC5386]
 Kill Magram Centaurs until youre friendly with Gelkis for [QC1368]
 Accept [QA5561]
 Rescue Kodos for [QC5561] and turn [QT5561 it] in

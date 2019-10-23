@@ -209,7 +209,7 @@ function Item.OnEnter(button, owner)
 		--tooltip:SetItemByID(button.ItemID)
 		tooltip:SetHyperlink("item:"..button.ItemID)
 	end
-	if button.Droprate then
+	if button.Droprate and AtlasLoot.db.showDropRate then
 		tooltip:AddDoubleLine(AL["Droprate:"], format(WHITE_TEXT, button.Droprate.."%"))
 	end
 	if AtlasLoot.db.showIDsInTT then
@@ -309,7 +309,7 @@ function Item.Refresh(button)
 	end
 	--elseif Recipe.IsRecipe(itemID) then
 	if AtlasLoot.db.ContentPhase.enableOnItems then
-		local phaseT = Recipe.IsRecipe(itemID) and Recipe.GetPhaseTextureForItemID(itemID) or ContentPhase:GetPhaseTextureForItemID(itemID)
+		local phaseT = ContentPhase:GetPhaseTextureForItemID(itemID)
 		if phaseT then
 			button.phaseIndicator:SetTexture(phaseT)
 			button.phaseIndicator:Show()

@@ -1,6 +1,6 @@
 --[[-----------------------------------------------------------------------------
 Name: ThreatClassic-1.0
-Revision: $Revision: 7 $
+Revision: $Revision: 10 $
 Author(s): Es (EsreverWoW)
 Website: https://github.com/EsreverWoW/LibThreatClassic
 Documentation: https://github.com/EsreverWoW/LibThreatClassic/wiki
@@ -53,8 +53,10 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 -------------------------------------------------------------------------------]]
+-- Don't load if not WoW Classic
+if _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_CLASSIC then return end
 
-local MAJOR, MINOR = "ThreatClassic-1.0", 7
+local MAJOR, MINOR = "ThreatClassic-1.0", 10
 assert(LibStub, MAJOR .. " requires LibStub")
 
 -- local ThreatLib = LibStub:NewLibrary(MAJOR, MINOR)
@@ -388,6 +390,7 @@ function ThreatLib:SerializeThreatTable(pgid, t)
 end
 
 function ThreatLib:NPCID(guid)
+	if not guid or type(guid) ~= "string" then return end
 	local unitType, _, _, _, _, npcID = strsplit("-", guid)
 	if unitType ~= "Player" then
 		return tonumber(npcID)
@@ -474,11 +477,11 @@ ThreatLib.inCombat = InCombatLockdown
  NPC IDs to completely ignore all threat calculations on, in decimal.
  This should be things like Crypt Scarabs, which do not have a death message after kamikaze-ing, or
  other very-low-HP enemies that zerg players and for whom threat data is not important.
-
+ 
  The reason for this is to eliminate unnecessary comms traffic gluts when these enemies are spawned, or to
  prevent getting enemies that despawn (and not die) from getting "stuck" in the threat list for the duration
  of the fight.
-]]--
+]]-- 
 
 ThreatLib.BLACKLIST_MOB_IDS = {
 	[17967] = true,		-- Crypt Scarabs, used by Crypt Fiends in Hyjal
@@ -493,8 +496,8 @@ ThreatLib.BLACKLIST_MOB_IDS = {
 	[24554] = true,		-- Eramas Brightblaze
 	[24555] = true,		-- Garaxxas
 	[24556] = true,		-- Zelfan
-	[24557] = true,		-- Kagani Nightstrike
-	[24558] = true,		-- Ellris Duskhallow
+	[24557] = true,		-- Kagani Nightstrike 
+	[24558] = true,		-- Ellris Duskhallow 
 	[24559] = true,		-- Warlord Salaris
 	[24560] = true,		-- Priestess Delrissa
 	[24561] = true,		-- Yazzai
@@ -534,7 +537,7 @@ ThreatLib.BLACKLIST_MOB_IDS = {
 	[25744] = true,		-- Dark Fiend (M'uru)
 	[25502] = true,		-- Shield Orb (Kil'jaeden)
 
-	-- [22144] = true,	-- Test, comment out for production
+	-- [22144] = true,	-- Test, comment out for production 
 }
 
 function ThreatLib:IsMobBlacklisted(guid)
@@ -1265,7 +1268,7 @@ end
 
 ------------------------------------------------------------------------
 -- :GetThreat("playerName", "targetName" or "targetHash")
--- Arguments:
+-- Arguments: 
 --  string - Name of the player or pet to get threat for
 --  string - Name or hash of the target to get threat on
 -- Notes:
@@ -1299,7 +1302,7 @@ end
 
 ------------------------------------------------------------------------
 -- :UnitInMeleeRange("unitID")
--- Arguments:
+-- Arguments: 
 --  string - UnitID to check melee range for
 -- Notes:
 -- Returns true if the unit is within 10 yards
@@ -1493,7 +1496,7 @@ end
 --   integer - NPC ID of the enemy to ask the group to wipe threat on
 -- Notes:
 -- Sends a comm message to the group instructing them to wipe their threat
--- levels on a specific mob. This is not protected as it needs to be able to
+-- levels on a specific mob. This is not protected as it needs to be able to 
 -- be executed by anyone who sees the relevant events.
 --
 -- KTM protects this by requiring 2 or more people to send the event before
@@ -1594,7 +1597,7 @@ end
 
 ------------------------------------------------------------------------
 -- :GetThreatStatusColor("unit", "mob")
--- Arguments:
+-- Arguments: 
 --  integer - the threat status value to get colors for.
 -- Returns:
 --  float - a value between 0 and 1 for the red content of the color
@@ -1618,7 +1621,7 @@ end
 
 ------------------------------------------------------------------------
 -- :UnitDetailedThreatSituation("unit", "mob")
--- Arguments:
+-- Arguments: 
 --  string - unitID of the unit to get threat information for.
 --  string - unitID of the target unit to reference.
 -- Returns:
@@ -1692,7 +1695,7 @@ end
 
 ------------------------------------------------------------------------
 -- :UnitThreatSituation("unit", "mob")
--- Arguments:
+-- Arguments: 
 --  string - unitID of the unit to get threat information for.
 --  string - unitID of the target unit to reference.
 -- Returns:

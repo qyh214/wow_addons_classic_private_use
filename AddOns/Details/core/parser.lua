@@ -1199,14 +1199,14 @@
 		end
 		
 	end
-	
+
 	--function parser:swingmissed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, missType, isOffHand, amountMissed)
 	function parser:swingmissed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
-		return parser:missed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, 1, "Corpo-a-Corpo", 00000001, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
+		return parser:missed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, 1, meleeString, 00000001, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
 	end
 
 	function parser:rangemissed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, spellid, spellname, spelltype, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
-		return parser:missed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, 2, "Tiro-Autom�tico", 00000001, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
+		return parser:missed (token, time, who_serial, who_name, who_flags, alvo_serial, alvo_name, alvo_flags, alvo_flags2, 2, autoShotString, 00000001, missType, isOffHand, amountMissed) --, isOffHand, amountMissed, arg1
 	end
 
 	-- ~miss
@@ -1228,12 +1228,8 @@
 	
 	------------------------------------------------------------------------------------------------
 	--> get actors
-		--print ("MISS", "|", missType, "|", isOffHand, "|", amountMissed, "|", arg1)
 		
 	
-		--print (missType, who_name,  spellname, amountMissed)
-		
-		
 		--> 'misser'
 		local este_jogador = damage_cache [who_serial]
 		if (not este_jogador) then
@@ -1317,6 +1313,7 @@
 			end
 		
 			--> actor spells table
+			spellid = spellname
 			local spell = este_jogador.spells._ActorTable [spellid]
 			if (not spell) then
 				spell = este_jogador.spells:PegaHabilidade (spellid, true, token)
@@ -1325,6 +1322,7 @@
 					_detalhes.spell_school_cache [spellname] = spelltype
 				end
 			end
+		
 			return spell_damageMiss_func (spell, alvo_serial, alvo_name, alvo_flags, who_name, missType)		
 		end
 		

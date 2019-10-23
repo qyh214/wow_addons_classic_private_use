@@ -6,3 +6,4 @@ if not AL then return end
 -- PvP
 AL["Battlegrounds"] = "Поля боя"
 AL["Class Sets"] = "Классовые наборы предметов"
+AL["Insignia"] = "Знак отличия"

@@ -63,7 +63,12 @@
 			end
 			
 			-- ~bossdetection ~classic
-			local libBossIds = LibStub("LibBossIDs-1.0")
+			local libBossIds = LibStub:GetLibrary("LibBossIDs-1.0")
+			if (not libBossIds) then
+				Details:Msg ("failed to load LibBossIDs-1.0, did you restared Details! after updating?")
+				return Loc ["STRING_UNKNOW"]
+			end
+
 			for _, actor in _ipairs (_detalhes.tabela_vigente[class_type_dano]._ActorTable) do 
 				if (actor:IsEnemy()) then
 					local npcId = _detalhes:GetNpcIdFromGuid (actor.serial)
@@ -284,7 +289,7 @@
 		
 			local ZoneName, InstanceType, DifficultyID, _, _, _, _, ZoneMapID = _GetInstanceInfo()
 			local BossIds = _detalhes:GetBossIds (ZoneMapID)
-			
+
 			if (BossIds) then
 				local BossIndex = nil
 				local ActorsContainer = _detalhes.tabela_vigente [class_type_dano]._ActorTable
@@ -310,8 +315,8 @@
 			for _, actor in _ipairs (_detalhes.tabela_vigente[class_type_dano]._ActorTable) do 
 				if (actor:IsEnemy()) then
 					local npcId = _detalhes:GetNpcIdFromGuid (actor.serial)
-					if (npcID) then
-						if (libBossIds and libBossIds.BossIDs[npcID]) then 
+					if (npcId) then
+						if (libBossIds and libBossIds.BossIDs[npcId]) then 
 							local boss_table = {
 								index = 1,
 								name = actor:GetName(),

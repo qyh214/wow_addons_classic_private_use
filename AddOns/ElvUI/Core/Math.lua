@@ -100,11 +100,11 @@ function E:Truncate(v, decimals)
 end
 
 --RGB to Hex
-function E:RGBToHex(r, g, b)
+function E:RGBToHex(r, g, b, header)
 	r = r <= 1 and r >= 0 and r or 1
 	g = g <= 1 and g >= 0 and g or 1
 	b = b <= 1 and b >= 0 and b or 1
-	return format("|cff%02x%02x%02x", r*255, g*255, b*255)
+	return format('%s%02x%02x%02x', header or '|cff', r*255, g*255, b*255)
 end
 
 --Hex to RGB
@@ -324,9 +324,14 @@ E.TimeFormats = { -- short and long aura time formats
 local DAY, HOUR, MINUTE = 86400, 3600, 60 --used for calculating aura time text
 local DAYISH, HOURISH, MINUTEISH = HOUR * 23.5, MINUTE * 59.5, 59.5 --used for caclculating aura time at transition points
 local HALFDAYISH, HALFHOURISH, HALFMINUTEISH = DAY/2 + 0.5, HOUR/2 + 0.5, MINUTE/2 + 0.5 --used for calculating next update times
+local Infinity = math.huge
 
 -- will return the the value to display, the formatter id to use and calculates the next update for the Aura
 function E:GetTimeInfo(s, threshhold, hhmm, mmss)
+	if s == Infinity then
+		return
+	end
+
 	if s < MINUTE then
 		if s >= threshhold then
 			return floor(s), 3, 0.51

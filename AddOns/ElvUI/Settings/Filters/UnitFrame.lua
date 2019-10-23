@@ -21,126 +21,140 @@ G.unitframe.aurafilters.CCDebuffs = {
 	type = 'Whitelist',
 	spells = {
 	--Druid
-	[339] = Defaults(1), --Entangling Roots(Rank 1)
-	[1062] = Defaults(1), --Entangling Roots(Rank 2)
-	[5195] = Defaults(1), --Entangling Roots(Rank 3)
-	[5196] = Defaults(1), --Entangling Roots(Rank 4)
-	[9852] = Defaults(1), --Entangling Roots(Rank 5)
-	[9853] = Defaults(1), --Entangling Roots(Rank 6)
-	[2637] = Defaults(1), --Hibernate(Rank 1)
-	[18657] = Defaults(1), --Hibernate(Rank 2)
-	[18658] = Defaults(1), --Hibernate(Rank 3)
-	[19675] = Defaults(2), --Feral Charge Effect
-	[5211] = Defaults(4), --Bash(Rank 1)
-	[6798] = Defaults(4), --Bash(Rank 2)
-	[8983] = Defaults(4), --Bash(Rank 3)
-	[16922] = Defaults(2), --Starfire Stun
-	[9005] = Defaults(2), --Pounce(Rank 1)
-	[9823] = Defaults(2), --Pounce(Rank 2)
-	[9827] = Defaults(2), --Pounce(Rank 3)
+		[339] = Defaults(1), --Entangling Roots(Rank 1)
+		[1062] = Defaults(1), --Entangling Roots(Rank 2)
+		[5195] = Defaults(1), --Entangling Roots(Rank 3)
+		[5196] = Defaults(1), --Entangling Roots(Rank 4)
+		[9852] = Defaults(1), --Entangling Roots(Rank 5)
+		[9853] = Defaults(1), --Entangling Roots(Rank 6)
+		[2637] = Defaults(1), --Hibernate(Rank 1)
+		[18657] = Defaults(1), --Hibernate(Rank 2)
+		[18658] = Defaults(1), --Hibernate(Rank 3)
+		[19675] = Defaults(2), --Feral Charge Effect
+		[5211] = Defaults(4), --Bash(Rank 1)
+		[6798] = Defaults(4), --Bash(Rank 2)
+		[8983] = Defaults(4), --Bash(Rank 3)
+		[16922] = Defaults(2), --Starfire Stun
+		[9005] = Defaults(2), --Pounce(Rank 1)
+		[9823] = Defaults(2), --Pounce(Rank 2)
+		[9827] = Defaults(2), --Pounce(Rank 3)
 	--Hunter
-	[1499] = Defaults(3), --Freezing Trap(Rank 1)
-	[14310] = Defaults(3), --Freezing Trap(Rank 2)
-	[14311] = Defaults(3), --Freezing Trap(Rank 3)
-	[13809] = Defaults(1), --Frost Trap
-	[19503] = Defaults(4), --Scatter Shot
-	[5116] = Defaults(2), --Concussive Shot
-	[297] = Defaults(2), --Wing Clip(Rank 1)
-	[14267] = Defaults(2), --Wing Clip(Rank 2)
-	[14268] = Defaults(2), --Wing Clip(Rank 3)
-	[1513] = Defaults(2), --Scare Beast(Rank 1)
-	[14326] = Defaults(2), --Scare Beast(Rank 2)
-	[14327] = Defaults(2), --Scare Beast(Rank 3)
-	[19577] = Defaults(2), --Intimidation
-	[19386] = Defaults(2), --Wyvern Sting(Rank 1)
-	[24132] = Defaults(2), --Wyvern Sting(Rank 2)
-	[24133] = Defaults(2), --Wyvern Sting(Rank 3)
-	[19229] = Defaults(2), --Improved Wing Clip
-	[19306] = Defaults(2), --Counterattack(Rank 1)
-	[20909] = Defaults(2), --Counterattack(Rank 2)
-	[20910] = Defaults(2), --Counterattack(Rank 3)
+		[1499] = Defaults(3), --Freezing Trap(Rank 1)
+		[14310] = Defaults(3), --Freezing Trap(Rank 2)
+		[14311] = Defaults(3), --Freezing Trap(Rank 3)
+		[13809] = Defaults(1), --Frost Trap
+		[19503] = Defaults(4), --Scatter Shot
+		[5116] = Defaults(2), --Concussive Shot
+		[297] = Defaults(2), --Wing Clip(Rank 1)
+		[14267] = Defaults(2), --Wing Clip(Rank 2)
+		[14268] = Defaults(2), --Wing Clip(Rank 3)
+		[1513] = Defaults(2), --Scare Beast(Rank 1)
+		[14326] = Defaults(2), --Scare Beast(Rank 2)
+		[14327] = Defaults(2), --Scare Beast(Rank 3)
+		[19577] = Defaults(2), --Intimidation
+		[19386] = Defaults(2), --Wyvern Sting(Rank 1)
+		[24132] = Defaults(2), --Wyvern Sting(Rank 2)
+		[24133] = Defaults(2), --Wyvern Sting(Rank 3)
+		[19229] = Defaults(2), --Improved Wing Clip
+		[19306] = Defaults(2), --Counterattack(Rank 1)
+		[20909] = Defaults(2), --Counterattack(Rank 2)
+		[20910] = Defaults(2), --Counterattack(Rank 3)
 	--Mage
-	[118] = Defaults(3), --Polymorph(Rank 1)
-	[12824] = Defaults(3), --Polymorph(Rank 2)
-	[12825] = Defaults(3), --Polymorph(Rank 3)
-	[12826] = Defaults(3), --Polymorph(Rank 4)
-	[122] = Defaults(1), --Frost Nova(Rank 1)
-	[865] = Defaults(1), --Frost Nova(Rank 2)
-	[6131] = Defaults(1), --Frost Nova(Rank 3)
-	[10230] = Defaults(1), --Frost Nova(Rank 4)
-	[12494] = Defaults(2), --Frostbite
-	[116] = Defaults(2), -- Frostbolt(Rank 1)
-	[205] = Defaults(2), -- Frostbolt(Rank 2)
-	[837] = Defaults(2), -- Frostbolt(Rank 3)
-	[7322] = Defaults(2), -- Frostbolt(Rank 4)
-	[8406] = Defaults(2), -- Frostbolt(Rank 5)
-	[8407] = Defaults(2), -- Frostbolt(Rank 6)
-	[8408] = Defaults(2), -- Frostbolt(Rank 7)
-	[10179] = Defaults(2), -- Frostbolt(Rank 8)
-	[10180] = Defaults(2), -- Frostbolt(Rank 9)
-	[10181] = Defaults(2), -- Frostbolt(Rank 10)
-	[25304] = Defaults(2), -- Frostbolt(Rank 11)
-	[12355] = Defaults(2), --Impact
+		[118] = Defaults(3), --Polymorph(Rank 1)
+		[12824] = Defaults(3), --Polymorph(Rank 2)
+		[12825] = Defaults(3), --Polymorph(Rank 3)
+		[12826] = Defaults(3), --Polymorph(Rank 4)
+		[122] = Defaults(1), --Frost Nova(Rank 1)
+		[865] = Defaults(1), --Frost Nova(Rank 2)
+		[6131] = Defaults(1), --Frost Nova(Rank 3)
+		[10230] = Defaults(1), --Frost Nova(Rank 4)
+		[12494] = Defaults(2), --Frostbite
+		[116] = Defaults(2), -- Frostbolt(Rank 1)
+		[205] = Defaults(2), -- Frostbolt(Rank 2)
+		[837] = Defaults(2), -- Frostbolt(Rank 3)
+		[7322] = Defaults(2), -- Frostbolt(Rank 4)
+		[8406] = Defaults(2), -- Frostbolt(Rank 5)
+		[8407] = Defaults(2), -- Frostbolt(Rank 6)
+		[8408] = Defaults(2), -- Frostbolt(Rank 7)
+		[10179] = Defaults(2), -- Frostbolt(Rank 8)
+		[10180] = Defaults(2), -- Frostbolt(Rank 9)
+		[10181] = Defaults(2), -- Frostbolt(Rank 10)
+		[25304] = Defaults(2), -- Frostbolt(Rank 11)
+		[12355] = Defaults(2), --Impact
 	--Paladin
-	[853] = Defaults(3), --Hammer of Justice(Rank 1)
-	[5588] = Defaults(3), --Hammer of Justice(Rank 2)
-	[5589] = Defaults(3), --Hammer of Justice(Rank 3)
-	[10308] = Defaults(3), --Hammer of Justice(Rank 4)
-	[20066] = Defaults(3), --Repentance
+		[853] = Defaults(3), --Hammer of Justice(Rank 1)
+		[5588] = Defaults(3), --Hammer of Justice(Rank 2)
+		[5589] = Defaults(3), --Hammer of Justice(Rank 3)
+		[10308] = Defaults(3), --Hammer of Justice(Rank 4)
+		[20066] = Defaults(3), --Repentance
 	--Priest
-	[8122] = Defaults(3), --Psychic Scream(Rank 1)
-	[8124] = Defaults(3), --Psychic Scream(Rank 2)
-	[10888] = Defaults(3), --Psychic Scream(Rank 3)
-	[10890] = Defaults(3), --Psychic Scream(Rank 4)
-	[605] = Defaults(5), --Mind Control(Rank 1)
-	[10911] = Defaults(5), --Mind Control(Rank 2)
-	[10912] = Defaults(5), --Mind Control(Rank 3)
-	[15269] = Defaults(2), --Blackout
-	[15407] = Defaults(2), --Mind Flay(Rank 1)
-	[17311] = Defaults(2), --Mind Flay(Rank 2)
-	[17312] = Defaults(2), --Mind Flay(Rank 3)
-	[17313] = Defaults(2), --Mind Flay(Rank 4)
-	[17314] = Defaults(2), --Mind Flay(Rank 5)
-	[18807] = Defaults(2), --Mind Flay(Rank 6)
+		[8122] = Defaults(3), --Psychic Scream(Rank 1)
+		[8124] = Defaults(3), --Psychic Scream(Rank 2)
+		[10888] = Defaults(3), --Psychic Scream(Rank 3)
+		[10890] = Defaults(3), --Psychic Scream(Rank 4)
+		[605] = Defaults(5), --Mind Control(Rank 1)
+		[10911] = Defaults(5), --Mind Control(Rank 2)
+		[10912] = Defaults(5), --Mind Control(Rank 3)
+		[15269] = Defaults(2), --Blackout
+		[15407] = Defaults(2), --Mind Flay(Rank 1)
+		[17311] = Defaults(2), --Mind Flay(Rank 2)
+		[17312] = Defaults(2), --Mind Flay(Rank 3)
+		[17313] = Defaults(2), --Mind Flay(Rank 4)
+		[17314] = Defaults(2), --Mind Flay(Rank 5)
+		[18807] = Defaults(2), --Mind Flay(Rank 6)
 	--Rogue
-	[6770] = Defaults(4), --Sap(Rank 1)
-	[2070] = Defaults(4), --Sap(Rank 2)
-	[11297] = Defaults(4), --Sap(Rank 3)
-	[2094] = Defaults(5), --Blind
-	[408] = Defaults(4), --Kidney Shot(Rank 1)
-	[8643] = Defaults(4), --Kidney Shot(Rank 2)
-	[1833] = Defaults(2), --Cheap Shot
-	[1776] = Defaults(2), --Gouge(Rank 1)
-	[1777] = Defaults(2), --Gouge(Rank 2)
-	[8629] = Defaults(2), --Gouge(Rank 3)
-	[11285] = Defaults(2), --Gouge(Rank 4)
-	[11286] = Defaults(2), --Gouge(Rank 5)
-	[5530] = Defaults(2), -- Mace Stun Effect
+		[6770] = Defaults(4), --Sap(Rank 1)
+		[2070] = Defaults(4), --Sap(Rank 2)
+		[11297] = Defaults(4), --Sap(Rank 3)
+		[2094] = Defaults(5), --Blind
+		[408] = Defaults(4), --Kidney Shot(Rank 1)
+		[8643] = Defaults(4), --Kidney Shot(Rank 2)
+		[1833] = Defaults(2), --Cheap Shot
+		[1776] = Defaults(2), --Gouge(Rank 1)
+		[1777] = Defaults(2), --Gouge(Rank 2)
+		[8629] = Defaults(2), --Gouge(Rank 3)
+		[11285] = Defaults(2), --Gouge(Rank 4)
+		[11286] = Defaults(2), --Gouge(Rank 5)
+		[5530] = Defaults(2), -- Mace Stun Effect
 	--Shaman
-	[2484] = Defaults(1), --Earthbind Totem
-	[8056] = Defaults(2), --Frost Shock(Rank 1)
-	[8058] = Defaults(2), --Frost Shock(Rank 2)
-	[10472] = Defaults(2), --Frost Shock(Rank 3)
-	[10473] = Defaults(2), --Frost Shock(Rank 4)
+		[2484] = Defaults(1), --Earthbind Totem
+		[8056] = Defaults(2), --Frost Shock(Rank 1)
+		[8058] = Defaults(2), --Frost Shock(Rank 2)
+		[10472] = Defaults(2), --Frost Shock(Rank 3)
+		[10473] = Defaults(2), --Frost Shock(Rank 4)
 	--Warlock
-	[5782] = Defaults(3), --Fear(Rank 1)
-	[6213] = Defaults(3), --Fear(Rank 2)
-	[6215] = Defaults(3), --Fear(Rank 3)
-	[18223] = Defaults(2), --Curse of Exhaustion
-	[18093] = Defaults(2), --Pyroclasm
-	[710] = Defaults(2), --Banish(Rank 1)
-	[18647] = Defaults(2), --Banish(Rank 2)
+		[5782] = Defaults(3), --Fear(Rank 1)
+		[6213] = Defaults(3), --Fear(Rank 2)
+		[6215] = Defaults(3), --Fear(Rank 3)
+		[18223] = Defaults(2), --Curse of Exhaustion
+		[18093] = Defaults(2), --Pyroclasm
+		[710] = Defaults(2), --Banish(Rank 1)
+		[18647] = Defaults(2), --Banish(Rank 2)
 	--Warrior
-	[5246] = Defaults(4), --Intimidating Shout
-	[1715] = Defaults(2), --Hamstring(Rank 1)
-	[7372] = Defaults(2), --Hamstring(Rank 2)
-	[7373] = Defaults(2), --Hamstring(Rank 3)
-	[12809] = Defaults(2), --Concussion Blow
-	[20252] = Defaults(2), --Intercept(Rank 1)
-	[20616] = Defaults(2), --Intercept(Rank 2)
-	[20617] = Defaults(2), --Intercept(Rank 3)
+		[5246] = Defaults(4), --Intimidating Shout
+		[1715] = Defaults(2), --Hamstring(Rank 1)
+		[7372] = Defaults(2), --Hamstring(Rank 2)
+		[7373] = Defaults(2), --Hamstring(Rank 3)
+		[12809] = Defaults(2), --Concussion Blow
+		[20252] = Defaults(2), --Intercept(Rank 1)
+		[20616] = Defaults(2), --Intercept(Rank 2)
+		[20617] = Defaults(2), --Intercept(Rank 3)
 	--Racial
-	[20549] = Defaults(2), --War Stomp
+		[20549] = Defaults(2), --War Stomp
+	--Sunder Armor, Faerie Fire
+		[7386] = Defaults(6), --Sunder Armor(Rank 1)
+		[7405] = Defaults(6), --Sunder Armor(Rank 2)
+		[8380] = Defaults(6), --Sunder Armor(Rank 3)
+		[11596] = Defaults(6), --Sunder Armor(Rank 4)
+		[11597] = Defaults(6), --Sunder Armor(Rank 5)
+		[770] = Defaults(5), --Faerie Fire(Rank 1)
+		[778] = Defaults(5), --Faerie Fire(Rank 2)
+		[9749] = Defaults(5), --Faerie Fire(Rank 3)
+		[9907] = Defaults(5), --Faerie Fire(Rank 4)
+		[16857] = Defaults(5), --Faerie Fire (Feral)(Rank 1)
+		[17390] = Defaults(5), --Faerie Fire (Feral)(Rank 2)
+		[17391] = Defaults(5), --Faerie Fire (Feral)(Rank 3)
+		[17392] = Defaults(5), --Faerie Fire (Feral)(Rank 4)
 	},
 }
 
@@ -151,42 +165,163 @@ G.unitframe.aurafilters.TurtleBuffs = {
 	--Druid
 	--Hunter
 	--Mage
-	[11958] = Defaults(2), --Ice Block A
-	[27619] = Defaults(2), --Ice Block B
+		[11958] = Defaults(2), --Ice Block A
+		[27619] = Defaults(2), --Ice Block B
 	--Paladin
-	[498] = Defaults(2), --Divine Protection(Rank 1)
-	[5573] = Defaults(2), --Divine Protection(Rank 2)
-	[642] = Defaults(2), --Divine Shield(Rank 1)
-	[1020] = Defaults(2), --Divine Shield(Rank 2)
-	[1022] = Defaults(2), --Blessing of Protection(Rank 1)
-	[5599] = Defaults(2), --Blessing of Protection(Rank 2)
-	[10278] = Defaults(2), --Blessing of Protection(Rank 3)
+		[498] = Defaults(2), --Divine Protection(Rank 1)
+		[5573] = Defaults(2), --Divine Protection(Rank 2)
+		[642] = Defaults(2), --Divine Shield(Rank 1)
+		[1020] = Defaults(2), --Divine Shield(Rank 2)
+		[1022] = Defaults(2), --Blessing of Protection(Rank 1)
+		[5599] = Defaults(2), --Blessing of Protection(Rank 2)
+		[10278] = Defaults(2), --Blessing of Protection(Rank 3)
 	--Priest
 	--Rogue
 	--Shaman
 	--Warlock
 	--Warrior
 	--Consumables
-	[3169] = Defaults(2), --Limited Invulnerability Potion
+		[3169] = Defaults(2), --Limited Invulnerability Potion
 	--Racial
+		[7744] = Defaults(2), --Will of the Forsaken
+		[6346] = Defaults(2), --Fear Ward
+		[20594] = Defaults(2), --Stoneform
 	--All Classes
-	[19753] = Defaults(2), --Divine Intervention
+		[19753] = Defaults(2), --Divine Intervention
 	},
 }
 
+--Default whitelist for player buffs, still WIP
 G.unitframe.aurafilters.PlayerBuffs = {
 	type = 'Whitelist',
 	spells = {
 	--Druid
+		[29166] = Defaults(), --Innervate
+		[22812] = Defaults(), --Barkskin
+		[17116] = Defaults(), --Nature's Swiftness
+		[16689] = Defaults(), --Nature's Grasp(Rank 1)
+		[16810] = Defaults(), --Nature's Grasp(Rank 2)
+		[16811] = Defaults(), --Nature's Grasp(Rank 3)
+		[16812] = Defaults(), --Nature's Grasp(Rank 4)
+		[16813] = Defaults(), --Nature's Grasp(Rank 5)
+		[17329] = Defaults(), --Nature's Grasp(Rank 6)
+		[16864] = Defaults(), --Omen of Clarity
+		[5217] = Defaults(), --Tiger's Fury(Rank 1)
+		[6793] = Defaults(), --Tiger's Fury(Rank 2)
+		[9845] = Defaults(), --Tiger's Fury(Rank 3)
+		[9846] = Defaults(), --Tiger's Fury(Rank 4)
+		[2893] = Defaults(), --Abolish Poison
+		[5229] = Defaults(), --Enrage
+		[1850] = Defaults(), --Dash(Rank 1)
+		[9821] = Defaults(), --Dash(Rank 2)
+		[23110] = Defaults(), --Dash(Rank 3)
 	--Hunter
+		[13161] = Defaults(), --Aspect of the Beast
+		[5118] = Defaults(), --Aspect of the Cheetah
+		[13163] = Defaults(), --Aspect of the Monkey
+		[13159] = Defaults(), --Aspect of the Pack
+		[20043] = Defaults(), --Aspect of the Wild(Rank 1)
+		[20190] = Defaults(), --Aspect of the Wild(Rank 2)
+		[3045] = Defaults(), --Rapid Fire
+		[19263] = Defaults(), --Deterrence
+		[13165] = Defaults(), --Aspect of the Hawk(Rank 1)
+		[14318] = Defaults(), --Aspect of the Hawk(Rank 2)
+		[14319] = Defaults(), --Aspect of the Hawk(Rank 3)
+		[14320] = Defaults(), --Aspect of the Hawk(Rank 4)
+		[14321] = Defaults(), --Aspect of the Hawk(Rank 5)
+		[14322] = Defaults(), --Aspect of the Hawk(Rank 6)
+		[25296] = Defaults(), --Aspect of the Hawk(Rank 7)
 	--Mage
+		[11958] = Defaults(), --Ice Block A
+		[27619] = Defaults(), --Ice Block B
+		[12043] = Defaults(), --Presence of Mind
+		[11129] = Defaults(), --Combustion
+		[12042] = Defaults(), --Arcane Power
+		[11426] = Defaults(), --Ice Barrier(Rank 1)
+		[13031] = Defaults(), --Ice Barrier(Rank 2)
+		[13032] = Defaults(), --Ice Barrier(Rank 3)
+		[13033] = Defaults(), --Ice Barrier(Rank 4)
 	--Paladin
+		[1044] = Defaults(), --Blessing of Freedom
+		[1038] = Defaults(), --Blessing of Salvation
+		[465] = Defaults(), --Devotion Aura(Rank 1)
+		[10290] = Defaults(), --Devotion Aura(Rank 2)
+		[643] = Defaults(), --Devotion Aura(Rank 3)
+		[10291] = Defaults(), --Devotion Aura(Rank 4)
+		[1032] = Defaults(), --Devotion Aura(Rank 5)
+		[10292] = Defaults(), --Devotion Aura(Rank 6)
+		[10293] = Defaults(), --Devotion Aura(Rank 7)
+		[19746] = Defaults(), --Concentration Aura
+		[7294] = Defaults(), --Retribution Aura(Rank 1)
+		[10298] = Defaults(), --Retribution Aura(Rank 2)
+		[10299] = Defaults(), --Retribution Aura(Rank 3)
+		[10300] = Defaults(), --Retribution Aura(Rank 4)
+		[10301] = Defaults(), --Retribution Aura(Rank 5)
+		[19876] = Defaults(), --Shadow Resistance Aura(Rank 1)
+		[19895] = Defaults(), --Shadow Resistance Aura(Rank 2)
+		[19896] = Defaults(), --Shadow Resistance Aura(Rank 3)
+		[19888] = Defaults(), --Frost Resistance Aura(Rank 1)
+		[19897] = Defaults(), --Frost Resistance Aura(Rank 2)
+		[19898] = Defaults(), --Frost Resistance Aura(Rank 3)
+		[19891] = Defaults(), --Fire Resistance Aura(Rank 1)
+		[19899] = Defaults(), --Fire Resistance Aura(Rank 2)
+		[19900] = Defaults(), --Fire Resistance Aura(Rank 3)
 	--Priest
+		[15473] = Defaults(), --Shadowform
+		[10060] = Defaults(), --Power Infusion
+		[14751] = Defaults(), --Inner Focus
+		[1706] = Defaults(), --Levitate
+		[586] = Defaults(), --Fade(Rank 1)
+		[9578] = Defaults(), --Fade(Rank 2)
+		[9579] = Defaults(), --Fade(Rank 3)
+		[9592] = Defaults(), --Fade(Rank 4)
+		[10941] = Defaults(), --Fade(Rank 5)
+		[10942] = Defaults(), --Fade(Rank 6)
 	--Rogue
+		[14177] = Defaults(), --Cold Blood
+		[13877] = Defaults(), --Blade Flurry
+		[13750] = Defaults(), --Adrenaline Rush
+		[2983] = Defaults(), --Sprint(Rank 1)
+		[8696] = Defaults(), --Sprint(Rank 2)
+		[11305] = Defaults(), --Sprint(Rank 3)
+		[5171] = Defaults(), --Slice and Dice(Rank 1)
+		[6774] = Defaults(), --Slice and Dice(Rank 2)
 	--Shaman
+		[2645] = Defaults(), --Ghost Wolf
+		[324] = Defaults(), --Lightning Shield(Rank 1)
+		[325] = Defaults(), --Lightning Shield(Rank 2)
+		[905] = Defaults(), --Lightning Shield(Rank 3)
+		[945] = Defaults(), --Lightning Shield(Rank 4)
+		[8134] = Defaults(), --Lightning Shield(Rank 5)
+		[10431] = Defaults(), --Lightning Shield(Rank 6)
+		[10432] = Defaults(), --Lightning Shield(Rank 7)
+		[16188] = Defaults(), --Nature's Swiftness
+		[16166] = Defaults(), --Elemental Mastery
 	--Warlock
+		[18788] = Defaults(), --Demonic Sacrifice
+		[5697] = Defaults(), --Unending Breath
+		[19028] = Defaults(), --Soul Link A
+		[25228] = Defaults(), --Soul Link B
 	--Warrior
+		[12975] = Defaults(), --Last Stand
+		[871] = Defaults(), --Shield Wall
+		[20230] = Defaults(), --Retaliation
+		[1719] = Defaults(), --Recklessness
+		[18499] = Defaults(), --Berserker Rage
+		[2687] = Defaults(), --Bloodrage
+		[12328] = Defaults(), --Death Wish
+		[2565] = Defaults(), --Shield Block
+		[12880] = Defaults(), --Enrage(Rank 1)
+		[14201] = Defaults(), --Enrage(Rank 2)
+		[14202] = Defaults(), --Enrage(Rank 3)
+		[14203] = Defaults(), --Enrage(Rank 4)
+		[14204] = Defaults(), --Enrage(Rank 5)
 	--Racial
+		[20554] = Defaults(), --Berserking
+		[7744] = Defaults(), --Will of the Forsaken
+		[20572] = Defaults(), --Blood Fury
+		[6346] = Defaults(), --Fear Ward
+		[20594] = Defaults(), --Stoneform
 	},
 }
 
@@ -366,8 +501,22 @@ G.unitframe.aurafilters.DungeonDebuffs = {
 G.unitframe.aurafilters.RaidBuffsElvUI = {
 	type = 'Whitelist',
 	spells = {
-		--Mythic/Mythic+
-		--Raids
+	--Molten Core
+		--Magmadar
+		[19451] = Defaults(), --Frenzy
+		--Shazzrah
+		[19714] = Defaults(), --Deaden Magic
+		--Garr
+		[19516] = Defaults(), --Enrage
+		--Baron Geddon
+		[19695] = Defaults(), --Inferno
+		[20478] = Defaults(), --Armageddon
+		--Sulfuron Harbinger
+		[19779] = Defaults(), --Inspire
+		--Majordomo Executus
+		[20620] = Defaults(), --Aegis of Ragnaros
+		[21075] = Defaults(), --Damage Shield
+		[20619] = Defaults(), --Magic Reflection
 	},
 }
 
@@ -375,15 +524,14 @@ G.unitframe.aurafilters.RaidBuffsElvUI = {
 E.ReverseTimer = {}
 
 -- BuffWatch: List of personal spells to show on unitframes as icon
-local function ClassBuff(id, point, color, anyUnit, onlyShowMissing, style, displayText, decimalThreshold, textColor, textThreshold, xOffset, yOffset, sizeOverride)
+local function ClassBuff(id, point, color, anyUnit, onlyShowMissing, displayText, textThreshold, xOffset, yOffset, sizeOverride)
+	if not id then return end
+
 	local name = GetSpellInfo(id)
 	if not name then return end
 
 	local r, g, b = 1, 1, 1
 	if color then r, g, b = unpack(color) end
-
-	local r2, g2, b2 = 1, 1, 1
-	if textColor then r2, g2, b2 = unpack(textColor) end
 
 	local rankText = GetSpellSubtext(id)
 	local spellRank = rankText and strfind(rankText, '%d') and GetSpellSubtext(id) or nil
@@ -395,16 +543,14 @@ local function ClassBuff(id, point, color, anyUnit, onlyShowMissing, style, disp
 		rank = spellRank,
 		point = point or 'TOPLEFT',
 		color = {r = r, g = g, b = b},
-		anyUnit = anyUnit,
-		onlyShowMissing = onlyShowMissing,
-		style = style or 'coloredIcon',
-		displayText = displayText or false,
-		decimalThreshold = decimalThreshold or 5,
-		textColor = {r = r2, g = g2, b = b2},
+		anyUnit = anyUnit or false,
+		onlyShowMissing = onlyShowMissing or false,
+		styleOverride = 'Default',
+		displayText = displayText or true,
 		textThreshold = textThreshold or -1,
 		xOffset = xOffset or 0,
 		yOffset = yOffset or 0,
-		sizeOverride = sizeOverride or 0
+		sizeOverride = sizeOverride or 0,
 	}
 end
 
@@ -455,7 +601,7 @@ G.unitframe.buffwatch = {
 		[5234] = ClassBuff(5234, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Mark of the Wild (Rank 4)
 		[8907] = ClassBuff(8907, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Mark of the Wild (Rank 5)
 		[9884] = ClassBuff(9884, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Mark of the Wild (Rank 6)
-		[16878] = ClassBuff(16878, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Mark of the Wild (Rank 7)
+		[9885] = ClassBuff(9885, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Mark of the Wild (Rank 7)
 		[21849] = ClassBuff(21849, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Gift of the Wild (Rank 1)
 		[21850] = ClassBuff(21850, "TOPLEFT", {0.2, 0.8, 0.8}, true), --Gift of the Wild (Rank 2)
 		[467] = ClassBuff(467, "TOPRIGHT", {0.4, 0.2, 0.8}, true), --Thorns (Rank 1)
@@ -619,19 +765,66 @@ P.unitframe.filters = {
 -- List of spells to display ticks
 G.unitframe.ChannelTicks = {
 	-- Warlock
-	[198590] = 6, -- Drain Soul
-	[755]    = 6, -- Health Funnel
-	[234153] = 6, -- Drain Life
+	[1120] = 5, -- Drain Soul(Rank 1)
+	[8288] = 5, -- Drain Soul(Rank 2)
+	[8289] = 5, -- Drain Soul(Rank 3)
+	[11675] = 5, -- Drain Soul(Rank 4)
+	[755] = 10, -- Health Funnel(Rank 1)
+	[3698] = 10, -- Health Funnel(Rank 2)
+	[3699] = 10, -- Health Funnel(Rank 3)
+	[3700] = 10, -- Health Funnel(Rank 4)
+	[11693] = 10, -- Health Funnel(Rank 5)
+	[11694] = 10, -- Health Funnel(Rank 6)
+	[11695] = 10, -- Health Funnel(Rank 7)
+	[689] = 5, -- Drain Life(Rank 1)
+	[699] = 5, -- Drain Life(Rank 2)
+	[709] = 5, -- Drain Life(Rank 3)
+	[7651] = 5, -- Drain Life(Rank 4)
+	[11699] = 5, -- Drain Life(Rank 5)
+	[11700] = 5, -- Drain Life(Rank 6)
+	[5740] =  4, --Rain of Fire(Rank 1)
+	[6219] =  4, --Rain of Fire(Rank 2)
+	[11677] =  4, --Rain of Fire(Rank 3)
+	[11678] =  4, --Rain of Fire(Rank 4)
+	[1949] = 15, --Hellfire(Rank 1)
+	[11683] = 15, --Hellfire(Rank 2)
+	[11684] = 15, --Hellfire(Rank 3)
+	[5138] = 5, --Drain Mana(Rank 1)
+	[6226] = 5, --Drain Mana(Rank 2)
+	[11703] = 5, --Drain Mana(Rank 3)
+	[11704] = 5, --Drain Mana(Rank 4)
 	-- Priest
-	[64843]  = 4, -- Divine Hymn
-	[15407]  = 4, -- Mind Flay
-	[48045] = 5, -- Mind Sear
+	[15407] = 3, -- Mind Flay(Rank 1)
+	[17311] = 3, -- Mind Flay(Rank 2)
+	[17312] = 3, -- Mind Flay(Rank 3)
+	[17313] = 3, -- Mind Flay(Rank 4)
+	[17314] = 3, -- Mind Flay(Rank 5)
+	[18807] = 3, -- Mind Flay(Rank 6)
 	-- Mage
-	[5143]   = 5,  -- Arcane Missiles
-	[12051]  = 3,  -- Evocation
-	[205021] = 10, -- Ray of Frost
+	[5143] = 3, -- Arcane Missiles(Rank 1)
+	[5144] = 4, -- Arcane Missiles(Rank 2)
+	[5145] = 5, -- Arcane Missiles(Rank 3)
+	[8416] = 5, -- Arcane Missiles(Rank 4)
+	[8417] = 5, -- Arcane Missiles(Rank 5)
+	[10211] = 5, -- Arcane Missiles(Rank 6)
+	[10212] = 5, -- Arcane Missiles(Rank 7)
+	[12051] = 4, -- Evocation
 	--Druid
-	[740]    = 4, -- Tranquility
+	[740] = 5, -- Tranquility(Rank 1)
+	[8918] = 5, --Tranquility(Rank 2)
+	[9862] = 5, --Tranquility(Rank 3)
+	[9863] = 5, --Tranquility(Rank 4)
+	--Hunter
+	[1510] = 6, --Volley(Rank 1)
+	[14294] = 6, --Volley(Rank 2)
+	[14295] = 6, --Volley(Rank 3)
+	[136] = 5, --Mend Pet(Rank 1)
+	[3111] = 5, --Mend Pet(Rank 2)
+	[3661] = 5, --Mend Pet(Rank 3)
+	[3662] = 5, --Mend Pet(Rank 4)
+	[13542] = 5, --Mend Pet(Rank 5)
+	[13543] = 5, --Mend Pet(Rank 6)
+	[13544] = 5, --Mend Pet(Rank 7)
 }
 
 local f = CreateFrame("Frame")

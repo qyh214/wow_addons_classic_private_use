@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local mod = E:GetModule('DataBars')
 local LSM = E.Libs.LSM
 
@@ -7,11 +7,11 @@ local _G = _G
 local format = format
 local min = min
 --WoW API / Variables
-local GetExpansionLevel = GetExpansionLevel
-local MAX_PLAYER_LEVEL_TABLE = MAX_PLAYER_LEVEL_TABLE
-local InCombatLockdown = InCombatLockdown
 local CreateFrame = CreateFrame
+local GetExpansionLevel = GetExpansionLevel
 local HasPetUI = HasPetUI
+local InCombatLockdown = InCombatLockdown
+local MAX_PLAYER_LEVEL_TABLE = MAX_PLAYER_LEVEL_TABLE
 
 function mod:UpdatePetExperience(event)
 	if E.myclass ~= 'HUNTER' then return end
@@ -20,7 +20,7 @@ function mod:UpdatePetExperience(event)
 	local bar = self.petExpBar
 	local hideXP = ((UnitLevel('pet') == MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()] and self.db.petExperience.hideAtMaxLevel))
 
-	if hideXP or (event == "PLAYER_REGEN_DISABLED" and self.db.petExperience.hideInCombat) then
+	if hideXP or (event == 'PLAYER_REGEN_DISABLED' and self.db.petExperience.hideInCombat) then
 		E:DisableMover(self.petExpBar.mover:GetName())
 		bar:Hide()
 	elseif not hideXP and (not self.db.petExperience.hideInCombat or not InCombatLockdown()) then
@@ -84,12 +84,12 @@ function mod:UpdatePetExperienceDimensions()
 	self.petExpBar:Width(self.db.petExperience.width)
 	self.petExpBar:Height(self.db.petExperience.height)
 
-	self.petExpBar.text:FontTemplate(LSM:Fetch("font", self.db.petExperience.font), self.db.petExperience.textSize, self.db.petExperience.fontOutline)
+	self.petExpBar.text:FontTemplate(LSM:Fetch('font', self.db.petExperience.font), self.db.petExperience.textSize, self.db.petExperience.fontOutline)
 	self.petExpBar.statusBar:SetReverseFill(self.db.petExperience.reverseFill)
 
 	self.petExpBar.statusBar:SetOrientation(self.db.petExperience.orientation)
 
-	if self.db.petExperience.orientation == "HORIZONTAL" then
+	if self.db.petExperience.orientation == 'HORIZONTAL' then
 		self.petExpBar.statusBar:SetRotatesTexture(false)
 	else
 		self.petExpBar.statusBar:SetRotatesTexture(true)
@@ -118,22 +118,22 @@ function mod:LoadPetExperienceBar()
 	self.petExpBar = self:CreateBar('ElvUI_PetExperienceBar', self.PetExperienceBar_OnEnter, self.PetExperienceBar_OnClick, 'LEFT', _G.LeftChatPanel, 'RIGHT', -E.Border + E.Spacing*3, 0)
 	self.petExpBar.statusBar:SetStatusBarColor(1, 1, .41, .8)
 
-	self.petExpBar.eventFrame = CreateFrame("Frame")
+	self.petExpBar.eventFrame = CreateFrame('Frame')
 	self.petExpBar.eventFrame:Hide()
-	self.petExpBar.eventFrame:RegisterEvent("UNIT_PET")
-	self.petExpBar.eventFrame:RegisterEvent("UNIT_PET_EXPERIENCE")
-	self.petExpBar.eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-	self.petExpBar.eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+	self.petExpBar.eventFrame:RegisterEvent('UNIT_PET')
+	self.petExpBar.eventFrame:RegisterEvent('UNIT_PET_EXPERIENCE')
+	self.petExpBar.eventFrame:RegisterEvent('PLAYER_REGEN_DISABLED')
+	self.petExpBar.eventFrame:RegisterEvent('PLAYER_REGEN_ENABLED')
 	self.petExpBar.eventFrame:SetScript('OnEvent', function(self, event)
-		if event == "UNIT_PET" then
+		if event == 'UNIT_PET' then
 			mod:EnableDisable_PetExperienceBar()
-		else
+		elseif HasPetUI() then
 			mod:UpdatePetExperience(event)
 		end
 	end)
 
 	self:UpdatePetExperienceDimensions()
 
-	E:CreateMover(self.petExpBar, "PetExperienceBarMover", L["Pet Experience Bar"], nil, nil, nil, nil, nil, 'databars,petExperience')
+	E:CreateMover(self.petExpBar, 'PetExperienceBarMover', L["Pet Experience Bar"], nil, nil, nil, nil, nil, 'databars,petExperience')
 	self:EnableDisable_PetExperienceBar()
 end

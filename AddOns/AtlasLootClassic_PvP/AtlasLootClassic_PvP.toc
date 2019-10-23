@@ -1,14 +1,14 @@
 ﻿## Interface: 11302
 ## Author: Lag
-## Version: v1.2.2
+## Version: v1.3.2
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
 ## Title: AtlasLootClassic |cFF0099FF[PvP]|r
 ## Title-deDE: AtlasLootClassic |cFF0099FF[PvP]|r
-## Title-esES: AtlasLootClassic |cFF0099FF[PvP]|r
-## Title-esMX: AtlasLootClassic |cFF0099FF[PvP]|r
-## Title-frFR: AtlasLootClassic |cFF0099FF[PvP]|r
+## Title-esES: AtlasLootClassic |cFF0099FF[JcJ]|r
+## Title-esMX: AtlasLootClassic |cFF0099FF[JcJ]|r
+## Title-frFR: AtlasLoot Classic |cFF0099FF[JcJ]|r
 ## Title-itIT: AtlasLootClassic |cFF0099FF[PvP]|r
 ## Title-koKR: AtlasLoot 클래식 |cFF0099FF[PvP]|r
 ## Title-ptBR: AtlasLootClassic |cFF0099FF[PvP]|r
@@ -17,11 +17,11 @@
 ## Title-zhTW: 副本戰利品查詢經典版 |cFF0099FF[PvP]|r
 ## Notes: AtlasLoot loot tables from PvP
 ## Notes-deDE: AtlasLoot Beuteverzeichnis für PvP
-## Notes-esES: AtlasLoot loot tables from PvP
-## Notes-esMX: AtlasLoot loot tables from PvP
-## Notes-frFR: AtlasLoot loot tables from PvP
+## Notes-esES: AtlasLoot tablas de botín de JcJ
+## Notes-esMX: AtlasLoot tablas de botín de JcJ
+## Notes-frFR: Tables de butin JcJ
 ## Notes-itIT: AtlasLoot loot tables from PvP
-## Notes-koKR: PvP의 AtlasLoot 전리품 표
+## Notes-koKR: PvP에 대한 AtlasLoot 전리품 테이블
 ## Notes-ptBR: AtlasLoot loot tables from PvP
 ## Notes-ruRU: Таблицы добычи AtlasLoot для PvP.
 ## Notes-zhCN: AtlasLoot  PvP掉落列表

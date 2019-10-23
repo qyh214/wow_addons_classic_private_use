@@ -94,7 +94,7 @@ local function UpdateClassSection()
 		local coloredName;
 		for _, classTag in ipairs(classIndexTable) do
 			classOrder = classOrder+1
-			coloredName = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[classTag]) or _G.RAID_CLASS_COLORS[classTag]
+			coloredName = E:ClassColor(classTag)
 			coloredName = (coloredName and coloredName.colorStr) or "ff666666"
 			E.Options.args.nameplate.args.filters.args.triggers.args.class.args[classTag] = {
 				order = classOrder,
@@ -4315,6 +4315,8 @@ E.Options.args.nameplate = {
 					desc = L["Delete a created filter, you cannot delete pre-existing filters, only custom ones."],
 					type = 'execute',
 					buttonElvUI = true,
+					confirm = true,
+					confirmText = L["Delete Filter"],
 					func = function()
 						for profile in pairs(E.data.profiles) do
 							if E.data.profiles[profile].nameplates and E.data.profiles[profile].nameplates.filters and E.data.profiles[profile].nameplates.filters[selectedNameplateFilter] then

@@ -33,7 +33,7 @@ function UF:Construct_RaidpetFrames()
 	self.TargetGlow = UF:Construct_TargetGlow(self)
 	self.MouseGlow = UF:Construct_MouseGlow(self)
 	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
-	self.HealthPrediction = UF:Construct_HealComm(self)
+	--self.HealthPrediction = UF:Construct_HealComm(self)
 	self.Fader = UF:Construct_Fader()
 	self.Cutaway = UF:Construct_Cutaway(self)
 
@@ -153,13 +153,13 @@ function UF:Update_RaidpetFrames(frame, db)
 	UF:Configure_DebuffHighlight(frame)
 
 	--OverHealing
-	UF:Configure_HealComm(frame)
+	--UF:Configure_HealComm(frame)
 
 	--Fader
 	UF:Configure_Fader(frame)
 
 	--BuffIndicator
-	UF:UpdateAuraWatch(frame, true) --2nd argument is the petOverride
+	UF:Configure_AuraWatch(frame, true)
 
 	--Cutaway
 	UF:Configure_Cutaway(frame)

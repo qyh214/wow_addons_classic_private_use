@@ -14,7 +14,6 @@
 
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
 	<Script file="LibClassicCasterino-1.0\LibClassicCasterino.lua"/>
-	<Script file="LibClassicHealComm\LibClassicHealComm.lua"/>
 	<Include file="LibThreatClassic\lib.xml"/>
 	<Include file="LibSharedMedia-3.0\lib.xml"/>
 	<Script file="LibSimpleSticky\LibSimpleSticky.lua"/>

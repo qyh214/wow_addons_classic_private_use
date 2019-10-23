@@ -6,4 +6,5 @@ if not AL then return end
 -- PvP
 AL["Battlegrounds"] = "Schlachtfelder"
 AL["Class Sets"] = "Klassensets"
+AL["Insignia"] = "Insignien"
 

@@ -1,0 +1,30 @@
+tag 986ac0855df4336de52c33d7205cc5370a0c90b0 v1.036
+Author:	max-ri <max_r_@web.de>
+Date:	Thu Oct 17 14:15:37 2019 +0200
+
+v1.036
+
+commit db255506379f60c37bb18fcd4e3c9fcaeec32ae2
+Author: max-ri <max_r_@web.de>
+Date:   Thu Oct 17 14:15:36 2019 +0200
+
+    v1.036
+
+commit 2b047455586e964541a96fa4947eaa94c8161c68
+Author: max-ri <max_r_@web.de>
+Date:   Thu Oct 17 14:15:06 2019 +0200
+
+    do not consider quest positions when there are over 1000
+    
+    this was causing severe lag when using the editor
+    eg with quests like "Caught!" (4449) which has silk cloth as an objective
+
+commit 2fdf8fa22efb1330b33e5c059193363ba31c52ca
+Author: max-ri <max_r_@web.de>
+Date:   Thu Oct 17 14:13:01 2019 +0200
+
+    corrections to quests db
+    
+    - requires any prequest for druid "Moonglade" (5922) and "Lessons Anew" (6126)
+    - source npc was switched for druid bear form quests "Heeding the Call" (5926 / 5928)
+

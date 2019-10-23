@@ -61,8 +61,6 @@ A default texture will be applied to the Texture widgets if they don't have a te
 
 local _, ns = ...
 local oUF = ns.oUF
-local myGUID = UnitGUID('player')
-local HealComm = LibStub("LibClassicHealComm-1.0")
 
 local function Update(self, event, unit)
 	if(self.unit ~= unit) then return end
@@ -79,10 +77,8 @@ local function Update(self, event, unit)
 		element:PreUpdate(unit)
 	end
 
-	local guid = UnitGUID(unit)
-
-	local allIncomingHeal = HealComm:GetHealAmount(guid, element.healType) or 0
-	local myIncomingHeal = (HealComm:GetHealAmount(guid, element.healType, nil, myGUID) or 0) * (HealComm:GetHealModifier(myGUID) or 1)
+	local allIncomingHeal = 0
+	local myIncomingHeal = 0
 	local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
 	local otherIncomingHeal = 0
 
@@ -93,7 +89,7 @@ local function Update(self, event, unit)
 	if(allIncomingHeal < myIncomingHeal) then
 		myIncomingHeal = allIncomingHeal
 	else
-		otherIncomingHeal = HealComm:GetOthersHealAmount(guid, HealComm.ALL_HEALS) or 0
+		otherIncomingHeal = 0
 	end
 
 	if(element.myBar) then
@@ -170,35 +166,10 @@ local function Enable(self)
 	if(element) then
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
-		element.healType = element.healType or HealComm.ALL_HEALS
+		element.healType = element.healType
 
 		self:RegisterEvent('UNIT_HEALTH_FREQUENT', Path)
 		self:RegisterEvent('UNIT_MAXHEALTH', Path)
-
-		local function HealCommUpdate(...)
-			if self.HealthPrediction and self:IsVisible() then
-				for i = 1, select('#', ...) do
-					if self.unit and UnitGUID(self.unit) == select(i, ...) then
-						Path(self, nil, self.unit)
-					end
-				end
-			end
-		end
-
-		local function HealComm_Heal_Update(event, casterGUID, spellID, healType, _, ...)
-			HealCommUpdate(...)
-		end
-
-		local function HealComm_Modified(event, guid)
-			HealCommUpdate(guid)
-		end
-
-		HealComm.RegisterCallback(element, 'HealComm_HealStarted', HealComm_Heal_Update)
-		HealComm.RegisterCallback(element, 'HealComm_HealUpdated', HealComm_Heal_Update)
-		HealComm.RegisterCallback(element, 'HealComm_HealDelayed', HealComm_Heal_Update)
-		HealComm.RegisterCallback(element, 'HealComm_HealStopped', HealComm_Heal_Update)
-		HealComm.RegisterCallback(element, 'HealComm_ModifierChanged', HealComm_Modified)
-		HealComm.RegisterCallback(element, 'HealComm_GUIDDisappeared', HealComm_Modified)
 
 		if(not element.maxOverflow) then
 			element.maxOverflow = 1.05
@@ -272,13 +243,6 @@ local function Disable(self)
 		if(element.overHealAbsorb) then
 			element.overHealAbsorb:Hide()
 		end
-
-		HealComm.UnregisterCallback(element, 'HealComm_HealStarted')
-		HealComm.UnregisterCallback(element, 'HealComm_HealUpdated')
-		HealComm.UnregisterCallback(element, 'HealComm_HealDelayed')
-		HealComm.UnregisterCallback(element, 'HealComm_HealStopped')
-		HealComm.UnregisterCallback(element, 'HealComm_ModifierChanged')
-		HealComm.UnregisterCallback(element, 'HealComm_GUIDDisappeared')
 
 		self:UnregisterEvent('UNIT_MAXHEALTH', Path)
 		self:UnregisterEvent('UNIT_HEALTH_FREQUENT', Path)

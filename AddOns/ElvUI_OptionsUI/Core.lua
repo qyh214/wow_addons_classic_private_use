@@ -181,7 +181,11 @@ local DEVELOPERS = {
 	"NihilisticPandemonium",
 	"|cffff7d0aMerathilis|r",
 	"|cFF8866ccSimpy|r",
-	"|cFF0070DEAzilroka|r"
+	"|cFF0070DEAzilroka|r",
+	"Luckyone",
+	"thurin",
+	"catskull",
+	"Crum"
 }
 
 local TESTERS = {

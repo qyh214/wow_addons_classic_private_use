@@ -6082,7 +6082,7 @@ addon.questsDB = {
 	   };
 	   ["prev"] = 202;
 	   ["prequests"] = {
-	      [1] = 202;
+	      [1] = 204;
 	   };
 	   ["level"] = 38;
 	   ["source"] = {
@@ -12564,9 +12564,7 @@ addon.questsDB = {
 	   };
 	   ["name"] = "Wild Hearts";
 	   ["prev"] = 428;
-	   ["prequests"] = {
-	      [1] = 428;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 11;
 	   ["source"] = {
 	      [1] = {
@@ -28762,6 +28760,7 @@ addon.questsDB = {
 	   ["req"] = 10;
 	};
 	[990] = {
+	   ["oneOfPrequests"] = true;
 	   ["objective"] = "Find Raene Wolfrunner in Ashenvale.";
 	   ["zone"] = "Ashenvale";
 	   ["sort"] = "Ashenvale";
@@ -34895,34 +34894,6 @@ addon.questsDB = {
 	   };
 	   ["req"] = 60;
 	};
-	[7797] = {
-	   ["objective"] = "";
-	   ["zone"] = "Darnassus";
-	   ["sort"] = "Darnassus";
-	   ["gather"] = {
-	      [1] = 2592;
-	   };
-	   ["repgain"] = {
-	      [69] = 150;
-	   };
-	   ["followup"] = 7798;
-	   ["deliver"] = {
-	      [1] = {
-	         ["id"] = 14725;
-	         ["type"] = "npc";
-	      };
-	   };
-	   ["faction"] = "Alliance";
-	   ["name"] = "A Donation of Wool";
-	   ["level"] = 60;
-	   ["source"] = {
-	      [1] = {
-	         ["id"] = 14725;
-	         ["type"] = "npc";
-	      };
-	   };
-	   ["req"] = 12;
-	};
 	[7813] = {
 	   ["objective"] = "";
 	   ["zone"] = "Undercity";
@@ -38235,7 +38206,7 @@ addon.questsDB = {
 	   ["level"] = 10;
 	   ["source"] = {
 	      [1] = {
-	         ["id"] = 3064;
+	         ["id"] = 6746;
 	         ["type"] = "npc";
 	      };
 	   };
@@ -40839,7 +40810,7 @@ addon.questsDB = {
 	   };
 	   ["prev"] = 7797;
 	   ["prequests"] = {
-	      [1] = 7797;
+	      [1] = 7792;
 	   };
 	   ["level"] = 60;
 	   ["source"] = {
@@ -41599,7 +41570,6 @@ addon.questsDB = {
 	   ["req"] = 40;
 	};
 	[8460] = {
-	   ["replaces"] = 6131;
 	   ["objective"] = "Grazle wants you to prove yourself by killing 6 Deadwood Warriors, 6 Deadwood Pathfinders, and 6 Deadwood Gardeners.  Return to him in southern Felwood near the Emerald Sanctuary when you are done.";
 	   ["zone"] = "Felwood";
 	   ["reward"] = {
@@ -43953,7 +43923,6 @@ addon.questsDB = {
 	   ["req"] = 50;
 	};
 	[8461] = {
-	   ["replaces"] = 6221;
 	   ["objective"] = "Nafien would like you to kill 6 Deadwood Den Watchers, 6 Deadwood Avengers, and 6 Deadwood Shamans.  Return to him in northern Felwood near the entrance to Timbermaw Hold.";
 	   ["zone"] = "Felwood";
 	   ["reward"] = {
@@ -45188,21 +45157,17 @@ addon.questsDB = {
 	};
 	[7383] = {
 	   ["faction"] = "Alliance";
-	   ["replaces"] = 934;
-	   ["source"] = {
-	      [1] = {
-	         ["id"] = 3515;
-	         ["type"] = "npc";
-	      };
-	   };
-	   ["next"] = 935;
 	   ["series"] = 5;
 	   ["objective"] = "Fill the Amethyst Phial and bring it back to Corithras Moonrage in Dolanaar.";
+	   ["zone"] = "Teldrassil";
+	   ["sort"] = "Teldrassil";
 	   ["gather"] = {
 	      [1] = 18151;
 	   };
-	   ["zone"] = "Teldrassil";
-	   ["sort"] = "Teldrassil";
+	   ["repgain"] = {
+	      [69] = 150;
+	   };
+	   ["next"] = 935;
 	   ["deliver"] = {
 	      [1] = {
 	         ["id"] = 3515;
@@ -45215,8 +45180,11 @@ addon.questsDB = {
 	      [1] = 933;
 	   };
 	   ["level"] = 11;
-	   ["repgain"] = {
-	      [69] = 150;
+	   ["source"] = {
+	      [1] = {
+	         ["id"] = 3515;
+	         ["type"] = "npc";
+	      };
 	   };
 	   ["req"] = 1;
 	};
@@ -47809,7 +47777,7 @@ addon.questsDB = {
 	   ["level"] = 10;
 	   ["source"] = {
 	      [1] = {
-	         ["id"] = 6746;
+	         ["id"] = 3064;
 	         ["type"] = "npc";
 	      };
 	   };
@@ -49908,7 +49876,6 @@ addon.questsDB = {
 	   ["req"] = 30;
 	};
 	[8464] = {
-	   ["replaces"] = 6241;
 	   ["objective"] = "Salfa wants you to kill 8 Winterfall Totemics, 8 Winterfall Den Watchers, and 8 Winterfall Pathfinders.";
 	   ["zone"] = "Felwood";
 	   ["reward"] = {
@@ -57163,9 +57130,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["prev"] = 1477;
-	   ["prequests"] = {
-	      [1] = 1477;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 45;
 	   ["source"] = {
 	      [1] = {
@@ -62170,9 +62135,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["prev"] = 2519;
-	   ["prequests"] = {
-	      [1] = 2519;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 12;
 	   ["source"] = {
 	      [1] = {
@@ -66749,9 +66712,7 @@ addon.questsDB = {
 	   };
 	   ["name"] = "Doomrigger's Clasp";
 	   ["prev"] = 4766;
-	   ["prequests"] = {
-	      [1] = 4766;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 60;
 	   ["sort"] = "Blackrock Spire";
 	   ["req"] = 57;
@@ -70273,6 +70234,38 @@ addon.questsDB = {
 	   };
 	   ["req"] = 12;
 	};
+	[4286] = {
+	   ["type"] = "Dungeon";
+	   ["objective"] = "Travel to Blackrock Depths and recover 20 Dark Iron Fanny Packs. Return to Oralius when you have completed this task. You assume that the Dark Iron dwarves inside Blackrock Depths carry these 'fanny pack' contraptions.\
+";
+	   ["zone"] = "Blackrock Depths";
+	   ["sort"] = "Blackrock Depths";
+	   ["gather"] = {
+	      [1] = 11468;
+	   };
+	   ["reward"] = {
+	      [1] = 11883;
+	   };
+	   ["repgain"] = {
+	      [47] = 250;
+	   };
+	   ["deliver"] = {
+	      [1] = {
+	         ["id"] = 9177;
+	         ["type"] = "npc";
+	      };
+	   };
+	   ["name"] = "The Good Stuff";
+	   ["faction"] = "Alliance";
+	   ["level"] = 56;
+	   ["source"] = {
+	      [1] = {
+	         ["id"] = 9177;
+	         ["type"] = "npc";
+	      };
+	   };
+	   ["req"] = 50;
+	};
 	[4861] = {
 	   ["objective"] = "Locate Jaron Stoneshaper's wrecked camp and supplies in southern Winterspring.";
 	   ["zone"] = "Winterspring";
@@ -70818,10 +70811,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["name"] = "Pamela's Doll";
-	   ["prequests"] = {
-	      [1] = 5142;
-	      [2] = 5601;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 55;
 	   ["source"] = {
 	      [1] = {
@@ -71623,9 +71613,7 @@ addon.questsDB = {
 	   };
 	   ["name"] = "Hurley Blackbreath";
 	   ["prev"] = 4128;
-	   ["prequests"] = {
-	      [1] = 4128;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 55;
 	   ["sort"] = "Blackrock Depths";
 	   ["req"] = 50;
@@ -77710,9 +77698,7 @@ addon.questsDB = {
 	   };
 	   ["name"] = "Egg Freezing";
 	   ["prev"] = 4907;
-	   ["prequests"] = {
-	      [1] = 4907;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 60;
 	   ["source"] = {
 	      [1] = {
@@ -77865,9 +77851,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["prev"] = 1260;
-	   ["prequests"] = {
-	      [1] = 1260;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 38;
 	   ["source"] = {
 	      [1] = {
@@ -82874,9 +82858,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["prev"] = 1883;
-	   ["prequests"] = {
-	      [1] = 1883;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 10;
 	   ["sort"] = "Mage";
 	   ["req"] = 10;
@@ -98871,37 +98853,33 @@ addon.questsDB = {
 	   };
 	   ["req"] = 20;
 	};
-	[4286] = {
-	   ["type"] = "Dungeon";
-	   ["objective"] = "Travel to Blackrock Depths and recover 20 Dark Iron Fanny Packs. Return to Oralius when you have completed this task. You assume that the Dark Iron dwarves inside Blackrock Depths carry these 'fanny pack' contraptions.\
-";
-	   ["zone"] = "Blackrock Depths";
-	   ["sort"] = "Blackrock Depths";
+	[7792] = {
+	   ["objective"] = "";
+	   ["zone"] = "Darnassus";
+	   ["sort"] = "Darnassus";
 	   ["gather"] = {
-	      [1] = 11468;
-	   };
-	   ["reward"] = {
-	      [1] = 11883;
+	      [1] = 2592;
 	   };
 	   ["repgain"] = {
-	      [47] = 250;
+	      [69] = 150;
 	   };
+	   ["followup"] = 7798;
 	   ["deliver"] = {
 	      [1] = {
-	         ["id"] = 9177;
+	         ["id"] = 14725;
 	         ["type"] = "npc";
 	      };
 	   };
-	   ["name"] = "The Good Stuff";
 	   ["faction"] = "Alliance";
-	   ["level"] = 56;
+	   ["name"] = "A Donation of Wool";
+	   ["level"] = 60;
 	   ["source"] = {
 	      [1] = {
-	         ["id"] = 9177;
+	         ["id"] = 14725;
 	         ["type"] = "npc";
 	      };
 	   };
-	   ["req"] = 50;
+	   ["req"] = 12;
 	};
 	[7808] = {
 	   ["faction"] = "Alliance";
@@ -120675,6 +120653,7 @@ addon.questsDB = {
 	   ["req"] = 45;
 	};
 	[5922] = {
+	   ["oneOfPrequests"] = true;
 	   ["objective"] = "Use the spell \"Teleport: Moonglade\" to travel to Moonglade.  When you arrive, speak with Dendrite Starblaze in the village of Nighthaven.";
 	   ["next"] = 5930;
 	   ["name"] = "Moonglade";
@@ -127910,6 +127889,7 @@ addon.questsDB = {
 	   ["req"] = 25;
 	};
 	[6126] = {
+	   ["oneOfPrequests"] = true;
 	   ["objective"] = "Travel to Moonglade and speak with Dendrite Starblaze in the village of Nighthaven.";
 	   ["next"] = 6127;
 	   ["sort"] = "Druid";

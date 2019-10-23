@@ -161,7 +161,7 @@ end
 local function updateIcon(element, unit, index, offset, filter, isDebuff, visible)
 	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
 
-	if LCD and spellID then
+	if LCD and spellID and not UnitIsUnit('player', unit) then
 		local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
 		if durationNew and durationNew > 0 then
 			duration, expiration = durationNew, expirationTimeNew
@@ -227,9 +227,8 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 		--]]
 
 		-- ElvUI changed block
-		local show = true
-		if element.forceCreate then show = false end
-		if not element.forceShow and not element.forceCreate then
+		local show = not element.forceCreate
+		if not (element.forceShow or element.forceCreate) then
 			show = (element.CustomFilter or customFilter) (element, unit, button, name, texture,
 				count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID,
 				canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,timeMod, effect1, effect2, effect3)
@@ -241,7 +240,7 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 			-- object to this point, but I think that will just make things needlessly
 			-- complicated.
 			if(button.cd and not element.disableCooldown) then
-				if(duration and duration > 0) then
+				if (expiration and expiration > 0) and (duration and duration > 0) then
 					button.cd:SetCooldown(expiration - duration, duration)
 					button.cd:Show()
 				else
@@ -300,10 +299,9 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 		elseif element.forceCreate then
 			local size = element.size or 16
 			button:SetSize(size, size)
-
 			button:Hide()
 
-			if (element.PostUpdateIcon) then
+			if element.PostUpdateIcon then
 				element:PostUpdateIcon(unit, button, index, position, duration, expiration, debuffType, isStealable)
 			end
 
