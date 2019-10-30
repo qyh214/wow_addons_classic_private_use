@@ -387,6 +387,8 @@ L["Entering"] = "Entering"
 --[[Translation missing --]]
 L["Entering/Leaving Combat"] = "Entering/Leaving Combat"
 --[[Translation missing --]]
+L["Entry Order"] = "Entry Order"
+--[[Translation missing --]]
 L["Environment Type"] = "Environment Type"
 --[[Translation missing --]]
 L["Environmental"] = "Environmental"
@@ -440,6 +442,8 @@ L["First Value of Tooltip Text"] = "First Value of Tooltip Text"
 L["Fishing Lure / Weapon Enchant (Old)"] = "Fishing Lure / Weapon Enchant (Old)"
 --[[Translation missing --]]
 L["Fixed"] = "Fixed"
+--[[Translation missing --]]
+L["Fixed Names"] = "Fixed Names"
 --[[Translation missing --]]
 L["Fixed Size"] = "Fixed Size"
 --[[Translation missing --]]

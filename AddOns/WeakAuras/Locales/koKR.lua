@@ -289,6 +289,8 @@ L["Energize"] = "마력 얻음"
 L["Enrage"] = "격노"
 L["Entering"] = "입장"
 L["Entering/Leaving Combat"] = "전투 시작/종료"
+--[[Translation missing --]]
+L["Entry Order"] = "Entry Order"
 L["Environment Type"] = "환경 종류"
 L["Environmental"] = "환경"
 L["Equipment Set"] = "장비 세트"
@@ -320,6 +322,8 @@ L["First"] = "첫 번째"
 L["First Value of Tooltip Text"] = "툴팁 문자의 첫 번째 값"
 L["Fishing Lure / Weapon Enchant (Old)"] = "낚시 미끼 / 무기 마법부여 (구)"
 L["Fixed"] = "고정됨"
+--[[Translation missing --]]
+L["Fixed Names"] = "Fixed Names"
 --[[Translation missing --]]
 L["Fixed Size"] = "Fixed Size"
 L["Flash"] = "반짝임"

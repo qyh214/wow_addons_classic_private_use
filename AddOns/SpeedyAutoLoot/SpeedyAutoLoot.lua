@@ -62,29 +62,30 @@ function AutoLoot:ShowLootFrame(show)
 			ElvLootFrame:SetParent(self)
 			self.isHidden = true
 		end
-	elseif LootFrame:IsEventRegistered("LOOT_OPENED") then
-        if show then
-            LootFrame:SetParent(UIParent)
-            LootFrame:SetFrameStrata("HIGH")
-			self:LootUnderMouse(LootFrame, UIParent, 95)
+	elseif LootFrame:IsEventRegistered("LOOT_SLOT_CLEARED") then
+		LootFrame.page = 1;
+		if show then
+			LootFrame_Show(LootFrame)
 			self.isHidden = false
-        else
-            LootFrame:SetParent(self)
+		else
 			self.isHidden = true
 		end
 	end
 end
 
 function AutoLoot:LootItems(numItems)
+	local lootThreshold = (self.isClassic and select(2,GetLootMethod()) == 0) and GetLootThreshold() or 10
 	for i = numItems, 1, -1 do
 		local itemLink = GetLootSlotLink(i)
 		local slotType = GetLootSlotType(i)
-		local quantity, _, _, locked, isQuestItem = select(3, GetLootSlotInfo(i))
-		if locked then
-			self.isItemLocked = locked
-		elseif slotType ~= LOOT_SLOT_ITEM or (not self.isClassic and isQuestItem) or self:ProcessLoot(itemLink, quantity) then
-			numItems = numItems - 1
-			LootSlot(i)
+		local quantity, _, quality, locked, isQuestItem = select(3, GetLootSlotInfo(i))
+		if locked or (quality and quality >= lootThreshold) then
+			self.isItemLocked = true
+		else
+			if slotType ~= LOOT_SLOT_ITEM or (not self.isClassic and isQuestItem) or self:ProcessLoot(itemLink, quantity) then
+				numItems = numItems - 1
+				LootSlot(i)
+			end
 		end
 	end
 	if numItems > 0 then
@@ -98,13 +99,7 @@ function AutoLoot:LootItems(numItems)
 end
 
 function AutoLoot:OnEvent(e, ...)
-	if e == "PLAYER_LOGIN" then
-        -- Fixes issue with Master Looting, when an Item is never clicked these values will not be initalized causing an Error to popup.
-        LootFrame.selectedQuality = 1
-        LootFrame.selectedSlot = 1
-        LootFrame.selectedTexture = 1
-        LootFrame.selectedLootButton = LootButton1
-
+    if e == "PLAYER_LOGIN" then
 		if SpeedyAutoLootDB.global.alwaysEnableAutoLoot then
 			SetCVar("autoLootDefault",1)
 		end
@@ -235,8 +230,11 @@ function AutoLoot:OnLoad()
 	self.isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
 
 	if self.isClassic then
-		self:RegisterEvent("LOOT_BIND_CONFIRM")
+        self:RegisterEvent("LOOT_BIND_CONFIRM")
+        self:RegisterEvent("OPEN_MASTER_LOOT_LIST")
 	end
+
+	LootFrame:UnregisterEvent('LOOT_OPENED')
 end
 
 SLASH_SPEEDYAUTOLOOT1, SLASH_SPEEDYAUTOLOOT2, SLASH_SPEEDYAUTOLOOT3  = "/sal", "/speedyloot", "/speedyautoloot"

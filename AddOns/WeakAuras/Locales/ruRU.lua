@@ -335,6 +335,8 @@ L["Energize"] = "Восполнение"
 L["Enrage"] = "Исступление"
 L["Entering"] = "Вход"
 L["Entering/Leaving Combat"] = "Вход / Выход из боя"
+--[[Translation missing --]]
+L["Entry Order"] = "Entry Order"
 L["Environment Type"] = "Тип окружения"
 L["Environmental"] = "Окружающая среда"
 L["Equipment Set"] = "Комплект экипировки"
@@ -368,6 +370,8 @@ L["First"] = "Первое"
 L["First Value of Tooltip Text"] = "First Value of Tooltip Text"
 L["Fishing Lure / Weapon Enchant (Old)"] = "Рыболовная приманка / Чары оружия (старые)"
 L["Fixed"] = "Фиксированная"
+--[[Translation missing --]]
+L["Fixed Names"] = "Fixed Names"
 --[[Translation missing --]]
 L["Fixed Size"] = "Fixed Size"
 L["Flash"] = "Вспышка"

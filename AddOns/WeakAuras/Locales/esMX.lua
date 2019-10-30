@@ -369,6 +369,8 @@ L["Energize"] = "Vigorizar"
 L["Enrage"] = "Enfurecer"
 L["Entering"] = "Entrando"
 L["Entering/Leaving Combat"] = "Entrando/abandonando batalla"
+--[[Translation missing --]]
+L["Entry Order"] = "Entry Order"
 L["Environment Type"] = "Tipo de entorno"
 L["Environmental"] = "Ambiental"
 L["Equipment Set"] = "Equipamiento"
@@ -407,6 +409,8 @@ L["First Value of Tooltip Text"] = "First Value of Tooltip Text"
 L["Fishing Lure / Weapon Enchant (Old)"] = "Anzuelos/Encantamiento de armas (antiguo)"
 --[[Translation missing --]]
 L["Fixed"] = "Fixed"
+--[[Translation missing --]]
+L["Fixed Names"] = "Fixed Names"
 --[[Translation missing --]]
 L["Fixed Size"] = "Fixed Size"
 L["Flash"] = "Destello"

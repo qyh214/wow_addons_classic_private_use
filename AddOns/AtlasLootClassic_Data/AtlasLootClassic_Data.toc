@@ -1,6 +1,6 @@
 ﻿## Interface: 11302
 ## Author: Lag
-## Version: v1.3.2
+## Version: v1.3.3
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
@@ -13,7 +13,7 @@
 ## Title-koKR: AtlasLoot 클래식 |cFFFF0000[데이터]|r
 ## Title-ptBR: AtlasLootClassic |cFFFF0000[Data]|r
 ## Title-ruRU: AtlasLootClassic |cFFFF0000[Data]|r
-## Title-zhCN: AtlasLootClassic |cFFFF0000[Data]|r
+## Title-zhCN: AtlasLoot经典版 |cFFFF0000[数据]|r
 ## Title-zhTW: AtlasLootClassic |cFFFF0000[Data]|r
 ## Notes: AtlasLoot data module
 ## Notes-deDE: AtlasLoot Datenmodul
@@ -24,7 +24,7 @@
 ## Notes-koKR: AtlasLoot 데이터 모듈
 ## Notes-ptBR: AtlasLoot data module
 ## Notes-ruRU: Модуль данных AtlasLoot
-## Notes-zhCN: AtlasLoot data module
+## Notes-zhCN: AtlasLoot 数据模块
 ## Notes-zhTW: AtlasLoot data module
 
 ## X-Category: Map

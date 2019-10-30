@@ -309,8 +309,6 @@ function QuestieQuest:AcceptQuest(questId)
     if(QuestiePlayer.currentQuestlog[questId] == nil) then
         Questie:Debug(DEBUG_INFO, "[QuestieQuest]: ".. QuestieLocale:GetUIString('DEBUG_ACCEPT_QUEST', questId));
 
-        QuestieQuest:CalculateAvailableQuests()
-        QuestieQuest:DrawAllAvailableQuests()
 
         --Get all the Frames for the quest and unload them, the available quest icon for example.
         QuestieMap:UnloadQuestFrames(questId);
@@ -343,6 +341,8 @@ function QuestieQuest:AcceptQuest(questId)
 
         --TODO: Insert call to drawing objective logic here!
         --QuestieQuest:TrackQuest(questId);
+        QuestieQuest:CalculateAvailableQuests()
+        QuestieQuest:DrawAllAvailableQuests()
         
         --For safety, remove all these icons.
         QuestieMap:UnloadQuestFrames(questId, ICON_TYPE_AVAILABLE);
@@ -928,13 +928,13 @@ function QuestieQuest:PopulateObjective(Quest, ObjectiveIndex, Objective, BlockI
                     tinsert(orderedList, icons[distance]);
                 end
                 local range = QUESTIE_NOTES_CLUSTERMUL_HACK
-                if orderedList[1].Icon == ICON_TYPE_OBJECT then -- new clustering / limit code should prevent problems, always show all object notes
+                if orderedList and orderedList[1] and orderedList[1].Icon == ICON_TYPE_OBJECT then -- new clustering / limit code should prevent problems, always show all object notes
                     range = range * 0.2;  -- Only use 20% of the default range.
                 end
                 
                 local hotzones = QuestieMap.utils:CalcHotzones(orderedList, range);
 
-                for index, hotzone in pairs(hotzones) do
+                for index, hotzone in pairs(hotzones or {}) do
                     if(spawnedIcons[questId] > maxPerType) then
                         Questie:Debug(DEBUG_DEVELOP, "[QuestieQuest]", "Too many icons for quest:", questId)
                         break;
@@ -1171,7 +1171,20 @@ function QuestieQuest:GetAllQuestObjectives(Quest)
                             if(item and item.Name) then
                                 oName = slower(item.Name);-- this is capital letters for some reason...
                             else
-                                oName = nil;
+                                local itemName = GetItemInfo(objectiveDB.Id)
+                                if(itemName) then
+                                    oName = itemName;
+                                else
+                                    oName = nil;
+                                    --[[
+                                    This is a good idea, but would require us to break out the objective identification code to a function
+                                    that runs a specific quest. I instead try to pre-cache the items in CacheAllItemNames
+                                    local item = Item:CreateFromItemID(objective.id)
+                                    item:ContinueOnItemLoad(function()
+                                        local itemName = GetItemInfo(objectiveDB.Id)
+                                        oName = itemName;
+                                    end)]]--
+                                end
                             end
                         end
                         -- To lower the questlog objective text
@@ -1403,7 +1416,14 @@ function QuestieQuest:GetAllLeaderBoardDetails(questId)
             local text = objective.text;
             if(objective.type == "monster") then
                 local i, j, monsterName = strfind(text, L_QUEST_MONSTERS_KILLED)
-                text = monsterName;
+
+                if(monsterName and objective.text and strlen(monsterName) == strlen(objective.text)) then
+                    --The above doesn't seem to work with the chinese, the row below tries to remove the extra numbers.
+                    local cleanerText = smatch(monsterName or text, "(.*)：");
+                    text = cleanerText
+                else
+                    text = monsterName;
+                end
             elseif(objective.type == "item") then
                 local i, j, itemName = strfind(text, L_QUEST_ITEMS_NEEDED)
                 text = itemName;

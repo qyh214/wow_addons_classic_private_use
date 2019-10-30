@@ -223,21 +223,6 @@ function _QuestieFramePool:QuestieCreateFrame()
     f.glow:SetPoint("CENTER", -9, -9) -- 2 pixels bigger than normal icon
     f.glow:EnableMouse(false)
 
-    --f.mouseIsOver = false;
-    --f:SetScript("OnUpdate", function()
-    --  local mo = MouseIsOver(self); -- function exists in classic but crashes the game
-    --  if mo and (not f.mouseIsOver) then
-    --    f.mouseIsOver = true
-    --    _QuestieFramePool:Questie_Tooltip(self)
-    --  elseif (not mo) and f.mouseIsOver then
-    --    f.mouseIsOver = false
-    --    if(WorldMapTooltip) then WorldMapTooltip:Hide() end if(GameTooltip) then GameTooltip:Hide() end
-    --  end
-    --end)
-
-    --f:SetScript('OnEnter', function() Questie:Print("Enter") end)
-    --f:SetScript('OnLeave', function() Questie:Print("Leave") end)
-
     f:SetScript("OnEnter", function(self) _QuestieFramePool:Questie_Tooltip(self) end); --Script Toolip
     f:SetScript("OnLeave", function(self) 
       if(WorldMapTooltip) then WorldMapTooltip:Hide(); WorldMapTooltip._rebuild = nil; end 
@@ -311,7 +296,10 @@ function _QuestieFramePool:QuestieCreateFrame()
             local _,_,_,alpha = self.texture:GetVertexColor()
             self.glowTexture:SetVertexColor(self.data.ObjectiveData.Color[1], self.data.ObjectiveData.Color[2], self.data.ObjectiveData.Color[3], alpha or 1);
             self.glow:Show()
-            self.glow:SetFrameLevel(self:GetFrameLevel() - 1)
+            local frameLevel = self:GetFrameLevel();
+            if(frameLevel > 0) then
+                self.glow:SetFrameLevel(frameLevel - 1)
+            end
         end
     end--end)
     f.BaseOnHide = function(self)--f:HookScript("OnHide", function(self)
@@ -324,6 +312,10 @@ function _QuestieFramePool:QuestieCreateFrame()
         self:SetScript("OnHide", nil)
         self:SetFrameStrata("FULLSCREEN");
         self:SetFrameLevel(0);
+
+        if(QuestieMap.minimapFrames[self:GetName()]) then
+            QuestieMap.minimapFrames[self:GetName()] = nil;
+        end
 
         --We are reseting the frames, making sure that no data is wrong.
         if self ~= nil and self.hidden and self._show ~= nil and self._hide ~= nil then -- restore state to normal (toggle questie)
@@ -609,6 +601,10 @@ function _QuestieFramePool:Questie_Tooltip_line(self)
 end
 
 function _QuestieFramePool:Questie_Tooltip(self)
+    local r, g, b, a = self.texture:GetVertexColor();
+    if(a == 0) then
+        return
+    end
     if GetTime() - _QuestieFramePool.lastTooltipShowHack < 0.05 and GameTooltip:IsShown() then
         return
     end
