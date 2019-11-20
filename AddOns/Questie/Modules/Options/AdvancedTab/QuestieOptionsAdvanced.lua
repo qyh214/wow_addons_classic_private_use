@@ -1,8 +1,28 @@
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieQuest
+local QuestieQuest = QuestieLoader:ImportModule("QuestieQuest");
+---@type QuestieOptions
+local QuestieOptions = QuestieLoader:ImportModule("QuestieOptions");
+---@type QuestieOptionsDefaults
+local QuestieOptionsDefaults = QuestieLoader:ImportModule("QuestieOptionsDefaults");
+---@type QuestieOptionsUtils
+local QuestieOptionsUtils = QuestieLoader:ImportModule("QuestieOptionsUtils");
+---@type QuestieTracker
+local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker");
+---@type QuestieCoords
+local QuestieCoords = QuestieLoader:ImportModule("QuestieCoords");
+---@type QuestieNameplate
+local QuestieNameplate = QuestieLoader:ImportModule("QuestieNameplate");
+---@type QuestieMap
+local QuestieMap = QuestieLoader:ImportModule("QuestieMap");
+
 QuestieOptions.tabs.advanced = {...}
 local optionsDefaults = QuestieOptionsDefaults:Load()
 
 
-function QuestieOptions.tabs.advanced:Initalize()
+function QuestieOptions.tabs.advanced:Initialize()
     return {
         name = function() return QuestieLocale:GetUIString('ADV_TAB'); end,
         type = "group",
@@ -11,7 +31,7 @@ function QuestieOptions.tabs.advanced:Initalize()
             map_options = {
                 type = "header",
                 order = 1,
-                name = function() return "Advanced Settings"; end,
+                name = function() return QuestieLocale:GetUIString('ADV_SET'); end,
             },
             enableIconLimit = {
                 type = "toggle",
@@ -58,24 +78,9 @@ function QuestieOptions.tabs.advanced:Initalize()
                     QuestieConfigCharacter = {}
                 end,
             },
-            debugLevel = {
-                type = "range",
-                order = 5,
-                name = function() return QuestieLocale:GetUIString('DEBUG_LEVEL'); end,
-                desc = function() return QuestieLocale:GetUIString('DEBUG_LEVEL_DESC', "\nDEBUG_CRITICAL = 1\nDEBUG_ELEVATED = 2\nDEBUG_INFO = 3\nDEBUG_DEVELOP = 4\nDEBUG_SPAM = 5"); end,
-                width = "normal",
-                min = 1,
-                max = 5,
-                step = 1,
-                disabled = function() return not Questie.db.global.debugEnabled; end,
-                get = function(info) return QuestieOptions:GetGlobalOptionValue(info); end,
-                set = function (info, value)
-                    QuestieOptions:SetGlobalOptionValue(info, value)
-                end,
-            },
             debugEnabledPrint = {
                 type = "toggle",
-                order = 6,
+                order = 5,
                 disabled = function() return not Questie.db.global.debugEnabled; end,
                 name = function() return QuestieLocale:GetUIString('ENABLE_DEBUG').."-PRINT" end,
                 desc = function() return QuestieLocale:GetUIString('ENABLE_DEBUG_DESC').."-PRINT" end,
@@ -85,10 +90,40 @@ function QuestieOptions.tabs.advanced:Initalize()
                     Questie.db.global.debugEnabledPrint = value
                 end,
             },
+            debugLevel = {
+                type = "multiselect",
+                values = {
+                    [0] = "DEBUG_CRITICAL",
+                    [1] = "DEBUG_ELEVATED",
+                    [2] = "DEBUG_INFO",
+                    [3] = "DEBUG_DEVELOP",
+                    [4] = "DEBUG_SPAM",
+                },
+                order = 6,
+                name = function() return QuestieLocale:GetUIString('DEBUG_LEVEL'); end,
+                width = "normal",
+                disabled = function() return not Questie.db.global.debugEnabled; end,
+                get = function(state, key)
+                    --Questie:Debug(DEBUG_SPAM, "Debug Key:", key, math.pow(2, key), state.option.values[key])
+                    --Questie:Debug(DEBUG_SPAM, "Debug Level:", Questie.db.global.debugLevel, bit.band(Questie.db.global.debugLevel, math.pow(2, key)))
+                    return bit.band(Questie.db.global.debugLevel, math.pow(2, key)) > 0
+                end,
+                set = function (info, value)
+                    local currentValue = Questie.db.global.debugLevel
+                    local flag = math.pow(2, value)
+                    --Questie:Debug(DEBUG_SPAM, "Setting Debug:", currentValue, flag, bit.band(currentValue, flag)>0)
+                    -- When current debug level is active, remove it
+                    if (bit.band(currentValue, flag) > 0) then
+                        Questie.db.global.debugLevel = bit.bxor(flag, currentValue)
+                    -- When current debug level is inactive, add it
+                    else
+                        Questie.db.global.debugLevel = bit.bor(flag, currentValue)
+                    end
+                end,
+            },
             showQuestIDs = {
                 type = "toggle",
                 order = 7,
-                disabled = function() return not Questie.db.global.debugEnabled; end,
                 name = function() return QuestieLocale:GetUIString('ENABLE_TOOLTIPS_QUEST_IDS'); end,
                 desc = function() return QuestieLocale:GetUIString('ENABLE_TOOLTIPS_QUEST_LEVEL_IDS'); end,
                 width = "full",
@@ -110,8 +145,10 @@ function QuestieOptions.tabs.advanced:Initalize()
                 type = "select",
                 order = 13,
                 values = {
+                    ['auto'] = QuestieLocale:GetUIString('LOCALE_DROP_AUTOMATIC'),
                     ['enUS'] = 'English',
                     ['esES'] = 'Español',
+                    ['esMX'] = 'Español (México)',
                     ['ptBR'] = 'Português',
                     ['frFR'] = 'Français',
                     ['deDE'] = 'Deutsch',
@@ -122,8 +159,21 @@ function QuestieOptions.tabs.advanced:Initalize()
                 },
                 style = 'dropdown',
                 name = function() return QuestieLocale:GetUIString('LOCALE_DROP'); end,
-                get = function() return QuestieLocale:GetUILocale(); end,
+                get = function()
+                    if not Questie.db.global.questieLocaleDiff then
+                        return 'auto'
+                    else
+                        return QuestieLocale:GetUILocale(); 
+                    end
+                end,
                 set = function(input, lang)
+                    if lang == 'auto' then
+                        local clientLocale = GetLocale()
+                        QuestieLocale:SetUILocale(clientLocale)
+                        Questie.db.global.questieLocale = clientLocale
+                        Questie.db.global.questieLocaleDiff = false
+                        return
+                    end
                     QuestieLocale:SetUILocale(lang);
                     Questie.db.global.questieLocale = lang;
                     Questie.db.global.questieLocaleDiff = true;

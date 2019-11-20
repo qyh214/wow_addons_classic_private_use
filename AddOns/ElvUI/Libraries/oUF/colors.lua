@@ -17,7 +17,13 @@ local colors = {
 		[1] = {.69, .31, .31},
 		[2] = {.65, .63, .35},
 		[3] = {.33, .59, .33},
-	}
+	},
+	threat = {
+		[0] = {.69, .69, .69 },
+		[1] = {1, 1, .47 },
+		[2] = {1, .60, 0 },
+		[3] = {1, 0, 0},
+	},
 }
 
 -- We do this because people edit the vars directly, and changing the default

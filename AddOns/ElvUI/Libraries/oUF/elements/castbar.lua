@@ -95,6 +95,16 @@ local UnitCastingInfo = CastingInfo
 local UnitChannelInfo = ChannelInfo
 local EventFunctions = {}
 
+local tradeskillCurrent, tradeskillTotal, mergeTradeskill = 0, 0, false
+local UNIT_SPELLCAST_SENT = function (self, event, unit, target, castID, spellID)
+	local castbar = self.Castbar
+	castbar.curTarget = (target and target ~= "") and target or nil
+
+	if castbar.isTradeSkill then
+		castbar.tradeSkillCastId = castID
+	end
+end
+
 local function resetAttributes(self)
 	self.castID = nil
 	self.casting = nil
@@ -410,6 +420,10 @@ local function Enable(self, unit)
 		end
 
 		element.holdTime = 0
+
+		-- ElvUI block
+		self:RegisterEvent('UNIT_SPELLCAST_SENT', UNIT_SPELLCAST_SENT, true)
+		-- end block
 
 		element:SetScript('OnUpdate', element.OnUpdate or onUpdate)
 

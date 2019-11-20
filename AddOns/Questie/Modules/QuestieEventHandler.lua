@@ -1,12 +1,35 @@
-local function _Hack_prime_log() -- this seems to make it update the data much quicker
-  for i=1,GetNumQuestLogEntries()+1 do
-    GetQuestLogTitle(i)
-    QuestieQuest:GetRawLeaderBoardDetails(i)
-  end
-end
-
 --- GLOBAL ---
-QuestieEventHandler = {}
+---@class QuestieEventHandler
+local QuestieEventHandler = QuestieLoader:CreateModule("QuestieEventHandler");
+
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieQuest
+local QuestieQuest = QuestieLoader:ImportModule("QuestieQuest");
+---@type QuestieJourney
+local QuestieJourney = QuestieLoader:ImportModule("QuestieJourney");
+---@type QuestieComms
+local QuestieComms = QuestieLoader:ImportModule("QuestieComms");
+---@type QuestieProfessions
+local QuestieProfessions = QuestieLoader:ImportModule("QuestieProfessions");
+---@type QuestieTracker
+local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker");
+---@type QuestieReputation
+local QuestieReputation = QuestieLoader:ImportModule("QuestieReputation");
+---@type QuestieNameplate
+local QuestieNameplate = QuestieLoader:ImportModule("QuestieNameplate");
+---@type QuestieMap
+local QuestieMap = QuestieLoader:ImportModule("QuestieMap");
+---@type QuestieLib
+local QuestieLib = QuestieLoader:ImportModule("QuestieLib");
+---@type QuestieHash
+local QuestieHash = QuestieLoader:ImportModule("QuestieHash");
+---@type QuestiePlayer
+local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer");
+---@type QuestieDB
+local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
 __UPDATEFIX_IDX = 1; -- temporary bad fix
 
 --- LOCAL ---
@@ -14,6 +37,14 @@ __UPDATEFIX_IDX = 1; -- temporary bad fix
 local playerEntered = false;
 local hasFirstQLU = false;
 local runQLU = false
+
+
+local function _Hack_prime_log() -- this seems to make it update the data much quicker
+  for i=1, GetNumQuestLogEntries()+1 do
+    GetQuestLogTitle(i)
+    QuestieQuest:GetRawLeaderBoardDetails(i)
+  end
+end
 
 function QuestieEventHandler:PLAYER_LOGIN()
     C_Timer.After(1, function()
@@ -62,10 +93,8 @@ end
 --Fires on MAP_EXPLORATION_UPDATED.
 function QuestieEventHandler:MAP_EXPLORATION_UPDATED()
     Questie:Debug(DEBUG_DEVELOP, "EVENT: MAP_EXPLORATION_UPDATED");
-    _Hack_prime_log()
-
     if Questie.db.global.hideUnexploredMapIcons then
-        QuestieQuest:Reset();
+        QuestieMap.utils:MapExplorationUpdate();
     end
 end
 
@@ -98,6 +127,9 @@ function QuestieEventHandler:CompleteQuest(questId, count)
         count = 1;
     end
     local quest = QuestieDB:GetQuest(questId);
+    if not quest then
+        return
+    end
     if(IsQuestFlaggedCompleted(questId) or quest.Repeatable or count > 50) then
         QuestieQuest:CompleteQuest(questId)
         QuestieJourney:CompleteQuest(questId)
@@ -115,6 +147,13 @@ function QuestieEventHandler:QUEST_TURNED_IN(questID, xpReward, moneyReward)
     Questie:Debug(DEBUG_DEVELOP, "EVENT: QUEST_TURNED_IN", questID, xpReward, moneyReward)
     _Hack_prime_log()
     finishedEventReceived = questID
+
+    -- Some repeatable sub quests don't fire a UQLC event when they're completed.
+    -- Therefore we have to check here to make sure the next QLU updates the state.
+    local quest = QuestieDB:GetQuest(questID)
+    if quest and quest.parentQuest and quest.Repeatable then
+        runQLU = true
+    end
 end
 
 -- Fires when the quest log changes. That includes visual changes and
@@ -139,7 +178,7 @@ function QuestieEventHandler:QUEST_LOG_UPDATE()
 
     -- QR or UQLC events have set the flag, so we need to update Questie state.
     if runQLU then
-        QuestieQuest:CompareQuestHashes()
+        QuestieHash:CompareQuestHashes()
         runQLU = false
     end
 end
@@ -184,7 +223,12 @@ end
 -- Fired when some chat messages about skills are displayed
 function QuestieEventHandler:CHAT_MSG_SKILL()
     Questie:Debug(DEBUG_DEVELOP, "CHAT_MSG_SKILL")
-    QuestieProfessions:Update()
+    local isProfUpdate = QuestieProfessions:Update()
+    -- This needs to be done to draw new quests that just came available
+    if isProfUpdate then
+        QuestieQuest:CalculateAvailableQuests()
+        QuestieQuest:DrawAllAvailableQuests()
+    end
 end
 
 -- Fired when some chat messages about reputations are displayed
@@ -233,6 +277,7 @@ function QuestieEventHandler:GROUP_LEFT()
     --Resets both QuestieComms.remoteQuestLog and QuestieComms.data
     QuestieComms:ResetAll();
 end
+
 
 --Old unused code
 

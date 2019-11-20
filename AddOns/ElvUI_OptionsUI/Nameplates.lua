@@ -10,7 +10,6 @@ local next, ipairs, tremove, tinsert, sort, tonumber, format = next, ipairs, tre
 
 local GetCVar = GetCVar
 local GetCVarBool = GetCVarBool
-local GetDifficultyInfo = GetDifficultyInfo
 local GetSpellInfo = GetSpellInfo
 local SetCVar = SetCVar
 
@@ -25,20 +24,23 @@ local positionValues = {
 }
 
 local carryFilterFrom, carryFilterTo
-local function filterValue(value)
-	return gsub(value,'([%(%)%.%%%+%-%*%?%[%^%$])','%%%1')
-end
-
-local function filterMatch(s,v)
-	local m1, m2, m3, m4 = "^"..v.."$", "^"..v..",", ","..v.."$", ","..v..","
-	return (strmatch(s, m1) and m1) or (strmatch(s, m2) and m2) or (strmatch(s, m3) and m3) or (strmatch(s, m4) and v..",")
+local function filterMatch(s, v)
+	local m1, m2, m3, m4 = "^" .. v .. "$", "^" .. v .. ",", "," .. v .. "$", "," .. v .. ","
+	return (strmatch(s, m1) and m1) or (strmatch(s, m2) and m2) or (strmatch(s, m3) and m3) or (strmatch(s, m4) and v .. ",")
 end
 
 local function filterPriority(auraType, unit, value, remove, movehere, friendState)
-	if not auraType or not value then return end
-	local filter = E.db.nameplates.units[unit] and E.db.nameplates.units[unit][auraType] and E.db.nameplates.units[unit][auraType].filters and E.db.nameplates.units[unit][auraType].filters.priority
-	if not filter then return end
-	local found = filterMatch(filter, filterValue(value))
+	if not auraType or not value then
+		return
+	end
+	local filter =
+		E.db.nameplates.units[unit] and E.db.nameplates.units[unit][auraType] and
+		E.db.nameplates.units[unit][auraType].filters and
+		E.db.nameplates.units[unit][auraType].filters.priority
+	if not filter then
+		return
+	end
+	local found = filterMatch(filter, E:EscapeString(value))
 	if found and movehere then
 		local tbl, sv, sm = {strsplit(",",filter)}
 		for i in ipairs(tbl) do
@@ -49,9 +51,9 @@ local function filterPriority(auraType, unit, value, remove, movehere, friendSta
 		E.db.nameplates.units[unit][auraType].filters.priority = tconcat(tbl,',')
 	elseif found and friendState then
 		local realValue = strmatch(value, "^Friendly:([^,]*)") or strmatch(value, "^Enemy:([^,]*)") or value
-		local friend = filterMatch(filter, filterValue("Friendly:"..realValue))
-		local enemy = filterMatch(filter, filterValue("Enemy:"..realValue))
-		local default = filterMatch(filter, filterValue(realValue))
+		local friend = filterMatch(filter, E:EscapeString("Friendly:" .. realValue))
+		local enemy = filterMatch(filter, E:EscapeString("Enemy:" .. realValue))
+		local default = filterMatch(filter, E:EscapeString(realValue))
 
 		local state =
 			(friend and (not enemy) and format("%s%s","Enemy:",realValue))					--[x] friend [ ] enemy: > enemy
@@ -61,7 +63,7 @@ local function filterPriority(auraType, unit, value, remove, movehere, friendSta
 		or	(friend and enemy and realValue)												--[x] friend [x] enemy: > default
 
 		if state then
-			local stateFound = filterMatch(filter, filterValue(state))
+			local stateFound = filterMatch(filter, E:EscapeString(state))
 			if not stateFound then
 				local tbl, sv = {strsplit(",",filter)}
 				for i in ipairs(tbl) do
@@ -1772,7 +1774,6 @@ local function GetUnitSettings(unit, name)
 							format = {
 								order = 2,
 								name = L["Text Format"],
-								desc = L["TEXT_FORMAT_DESC"],
 								type = "input",
 							},
 							position = {
@@ -1935,7 +1936,6 @@ local function GetUnitSettings(unit, name)
 							format = {
 								order = 2,
 								name = L["Text Format"],
-								desc = L["TEXT_FORMAT_DESC"],
 								type = "input",
 							},
 							position = {
@@ -2111,7 +2111,7 @@ local function GetUnitSettings(unit, name)
 							},
 							textPosition = {
 								order = 3,
-								name = L["Text Position"],
+								name = L["Position"],
 								type = "select",
 								values = {
 									["ONBAR"] = L["Cast Bar"],
@@ -2233,15 +2233,20 @@ local function GetUnitSettings(unit, name)
 						name = L["Enable"],
 						type = "toggle",
 					},
-					numAuras = {
+					desaturate = {
+						type = 'toggle',
 						order = 2,
+						name = L["Desaturate Icon"],
+					},
+					numAuras = {
+						order = 3,
 						name = L["# Displayed Auras"],
 						--desc = L["Controls how many auras are displayed, this will also affect the size of the auras."],
 						type = "range",
 						min = 1, max = 8, step = 1,
 					},
 					size = {
-						order = 3,
+						order = 4,
 						name = L["Icon Size"],
 						type = "range",
 						min = 6, max = 60, step = 1,
@@ -2521,15 +2526,20 @@ local function GetUnitSettings(unit, name)
 						name = L["Enable"],
 						type = "toggle",
 					},
-					numAuras = {
+					desaturate = {
+						type = 'toggle',
 						order = 2,
+						name = L["Desaturate Icon"],
+					},
+					numAuras = {
+						order = 3,
 						name = L["# Displayed Auras"],
 						desc = L["Controls how many auras are displayed, this will also affect the size of the auras."],
 						type = "range",
 						min = 1, max = 8, step = 1,
 					},
 					size = {
-						order = 3,
+						order = 4,
 						name = L["Icon Size"],
 						type = "range",
 						min = 6, max = 60, step = 1,
@@ -2953,7 +2963,6 @@ local function GetUnitSettings(unit, name)
 					format = {
 						order = 2,
 						name = L["Text Format"],
-						desc = L["TEXT_FORMAT_DESC"],
 						type = "input",
 					},
 					position = {
@@ -3217,7 +3226,7 @@ local function GetUnitSettings(unit, name)
 			order = 4, -- stays at 4
 			type = 'toggle',
 			name = L["Display Target"],
-			desc = L["Display the target of your current cast. Useful for mouseover casts."],
+			desc = L["Display the target of your current cast. Useful for mouseover casts."]
 		}
 	elseif unit == "FRIENDLY_PLAYER" or unit == "ENEMY_PLAYER" then
 		group.args.general.args.visibilityShortcut = {
@@ -3293,59 +3302,6 @@ local function GetUnitSettings(unit, name)
 				},
 			},
 		}
---[=[
-		group.args.questIcon = {
-			order = 13,
-			name = L["Quest Icon"],
-			type = 'group',
-			get = function(info) return E.db.nameplates.units[unit].questIcon[info[#info]] end,
-			set = function(info, value) E.db.nameplates.units[unit].questIcon[info[#info]] = value; NP:SetCVars() NP:ConfigureAll() end,
-			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Quest Icon"],
-				},
-				enable = {
-					type = 'toggle',
-					order = 1,
-					name = L["Enable"],
-				},
-				size = {
-					type = 'range',
-					order = 2,
-					name = L["Size"],
-					min = 10, max = 50, step = 1,
-				},
-				position = {
-					order = 3,
-					type = "select",
-					name = L["Icon Position"],
-					values = {
-						["CENTER"] = "CENTER",
-						["TOPLEFT"] = "TOPLEFT",
-						["BOTTOMLEFT"] = "BOTTOMLEFT",
-						["TOPRIGHT"] = "TOPRIGHT",
-						["BOTTOMRIGHT"] = "BOTTOMRIGHT",
-						["LEFT"] = "LEFT",
-						["RIGHT"] = "RIGHT",
-					},
-				},
-				xOffset = {
-					order = 4,
-					name = L["X-Offset"],
-					type = "range",
-					min = -100, max = 100, step = 1,
-				},
-				yOffset = {
-					order = 5,
-					name = L["Y-Offset"],
-					type = "range",
-					min = -100, max = 100, step = 1,
-				},
-			},
-		}
-]=]
 		group.args.general.args.visibilityShortcut = {
 			order = 100,
 			type = "execute",
@@ -3388,7 +3344,6 @@ local function GetUnitSettings(unit, name)
 				format = {
 					order = 2,
 					name = L["Text Format"],
-					desc = L["TEXT_FORMAT_DESC"],
 					type = "input",
 				},
 				position = {
@@ -3464,134 +3419,21 @@ end
 E.Options.args.nameplate = {
 	type = "group",
 	name = L["NamePlates"],
-	childGroups = "tree",
+	childGroups = "tab",
 	get = function(info) return E.db.nameplates[info[#info]] end,
 	set = function(info, value) E.db.nameplates[info[#info]] = value; NP:ConfigureAll() end,
 	args = {
+		intro = {
+			order = 0,
+			type = "description",
+			name = L["NAMEPLATE_DESC"],
+		},
 		enable = {
 			order = 1,
 			type = "toggle",
 			name = L["Enable"],
 			get = function(info) return E.private.nameplates[info[#info]] end,
 			set = function(info, value) E.private.nameplates[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end
-		},
-		intro = {
-			order = 2,
-			type = "description",
-			name = L["NAMEPLATE_DESC"],
-		},
-		header = {
-			order = 3,
-			type = "header",
-			name = L["Shortcuts"],
-		},
-		spacer1 = {
-			order = 4,
-			type = "description",
-			name = " ",
-		},
-		generalShortcut = {
-			order = 5,
-			type = "execute",
-			name = L["General"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "generalGroup", "general") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		cooldownShortcut = {
-			order = 6,
-			type = "execute",
-			name = L["Cooldowns"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "cooldown", "nameplates") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		colorsShortcut = {
-			order = 7,
-			type = "execute",
-			name = L["COLORS"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "generalGroup", "colorsGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		spacer2 = {
-			order = 8,
-			type = "description",
-			name = " ",
-		},
-		cutawayShortcut = {
-			order = 10,
-			type = "execute",
-			name = L["Cutaway Bars"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "generalGroup", "cutaway") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		filtersShortcut = {
-			order = 11,
-			type = "execute",
-			name = L["Style Filter"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "filters") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		spacer3 = {
-			order = 12,
-			type = "description",
-			name = " ",
-		},
-		playerShortcut = {
-			order = 13,
-			type = "execute",
-			name = L["Player"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "playerGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		friendlyPlayerShortcut = {
-			order = 14,
-			type = "execute",
-			name = L["FRIENDLY_PLAYER"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "friendlyPlayerGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		friendlyNPCShortcut = {
-			order = 15,
-			type = "execute",
-			name = L["FRIENDLY_NPC"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "friendlyNPCGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		spacer4 = {
-			order = 16,
-			type = "description",
-			name = " ",
-		},
-		enemyPlayerShortcut = {
-			order = 17,
-			type = "execute",
-			name = L["ENEMY_PLAYER"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "enemyPlayerGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		enemyNPCShortcut = {
-			order = 18,
-			type = "execute",
-			name = L["ENEMY_NPC"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "enemyNPCGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
-		},
-		targetShortcut = {
-			order = 19,
-			type = "execute",
-			name = L["TARGET"],
-			buttonElvUI = true,
-			func = function() ACD:SelectGroup("ElvUI", "nameplate", "targetGroup") end,
-			disabled = function() return not E.NamePlates.Initialized end,
 		},
 		generalGroup = {
 			order = 25,
@@ -3690,7 +3532,7 @@ E.Options.args.nameplate = {
 						otherAtBase = {
 							order = 9,
 							type = "toggle",
-							name = L["Nameplate at Base"],
+							name = L["Nameplate At Base"],
 							desc = L["Position other Nameplates at the base, rather than overhead."],
 							get = function() return GetCVarBool('nameplateOtherAtBase') end,
 							set = function(_, value) SetCVar('nameplateOtherAtBase', value and 2 or 0) end,
@@ -3735,7 +3577,7 @@ E.Options.args.nameplate = {
 						plateVisibility = {
 							order = 50,
 							type = "group",
-							childGroups = "tabs",
+							childGroups = "tab",
 							name = L["Visibility"],
 							args = {
 								showAll = {
@@ -3867,7 +3709,7 @@ E.Options.args.nameplate = {
 						clickThrough = {
 							order = 51,
 							type = "group",
-							childGroups = "tabs",
+							childGroups = "tab",
 							name = L["Click Through"],
 							get = function(info) return E.db.nameplates.clickThrough[info[#info]] end,
 							args = {
@@ -3894,7 +3736,7 @@ E.Options.args.nameplate = {
 						clickableRange = {
 							order = 52,
 							type = "group",
-							childGroups = "tabs",
+							childGroups = "tab",
 							name = L["Clickable Size"],
 							args = {
 								personal = {
@@ -3974,7 +3816,7 @@ E.Options.args.nameplate = {
 						cutaway = {
 							order = 53,
 							type = 'group',
-							childGroups = "tabs",
+							childGroups = "tab",
 							name = L["Cutaway Bars"],
 							args = {
 								health = {

@@ -4,7 +4,7 @@ if not AS:CheckAddOn('ArkInventory') then return end
 
 function AS:ArkInventory()
 	hooksecurefunc(ArkInventory, 'Frame_Main_Paint', function(frame)
-		if not ArkInventory.ValidFrame(frame, true) then return	end
+		if not ArkInventory.ValidFrame(frame, true) then return end
 		for i = 1, select('#', frame:GetChildren()) do
 			local subframe = select(i, frame:GetChildren())
 			if subframe.IsSkinned then return end
@@ -19,13 +19,18 @@ function AS:ArkInventory()
 	end)
 
 	hooksecurefunc(ArkInventory, 'Frame_Main_Anchor_Set', function(loc_id)
-		local frame = ArkInventory.Frame_Main_Get(loc_id):GetName()
-		AS:SkinEditBox(_G[frame..ArkInventory.Const.Frame.Search.Name..'Filter'])
-		local f = _G[frame..ArkInventory.Const.Frame.Search.Name..'Filter']
-		local b = _G[frame..ArkInventory.Const.Frame.Search.Name..'Clear']
-		if f and f.Backdrop then
-			f.Backdrop:SetFrameLevel(0)
-			f.Backdrop:SetOutside(f.Backdrop:GetParent(), 1, -2)
+		local mainframe = ArkInventory.Frame_Main_Get(loc_id):GetName()
+		local f = _G[mainframe..ArkInventory.Const.Frame.Search.Name..'Filter']
+		local b = _G[mainframe..ArkInventory.Const.Frame.Search.Name..'Clear']
+		if f then
+			AS:SkinEditBox(f)
+			local bd = f.backdrop or f.Backdrop or nil
+			if bd then
+				local bbc = ArkInventory.GetLocationCodex(loc_id).style.bar.border.colour
+				bd:SetFrameLevel(f:GetFrameLevel())
+				AS:SetOutside(bd, nil, 1, -5)
+				bd:SetBackdropBorderColor(bbc.r, bbc.g, bbc.b, bbc.a or 1)
+			end
 		end
 		if b then
 			AS:SkinButton(b)
@@ -37,7 +42,6 @@ function AS:ArkInventory()
 
 	hooksecurefunc(ArkInventory, 'Frame_Bar_Paint', function(bar)
 		local loc_id = bar.ARK_Data.loc_id
-
 		if not bar.IsSkinned then
 			local name = bar:GetName()
 			if _G[name..'ArkBorder'] then AS:Kill(_G[name..'ArkBorder']) end
@@ -56,12 +60,10 @@ function AS:ArkInventory()
 	end)
 
 	hooksecurefunc(ArkInventory, 'SetItemButtonTexture', function(frame, texture, r, g, b)
-		if not (frame and frame.icon) then
-			return
-		end
+		if not (frame and frame.icon) then return end
 
 		AS:SkinTexture(frame.icon)
-		frame.icon:SetInside()
+		AS:SetInside(frame.icon)
 	end)
 
 	hooksecurefunc(ArkInventory, 'Frame_Item_Update_Border', function(frame)
@@ -78,7 +80,7 @@ function AS:ArkInventory()
 		if _G[frame:GetName()] == ARKINV_Frame1ChangerWindowBag1 then
 			ARKINV_Frame1ChangerWindowBag1IconTexture:SetTexture('interface\\icons\\inv_misc_bag_07_green')
 			AS:SkinTexture(ARKINV_Frame1ChangerWindowBag1IconTexture)
-			ARKINV_Frame1ChangerWindowBag1IconTexture:SetInside()
+			AS:SetInside(ARKINV_Frame1ChangerWindowBag1IconTexture)
 		end
 	end)
 

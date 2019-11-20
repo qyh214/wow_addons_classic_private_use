@@ -12,32 +12,34 @@ local IsAddOnLoaded = IsAddOnLoaded
 
 function UF:Construct_TargetFrame(frame)
 	frame.Health = self:Construct_HealthBar(frame, true, true, 'RIGHT')
-	frame.Health.frequentUpdates = true;
 	frame.Power = self:Construct_PowerBar(frame, true, true, 'LEFT')
 	frame.Power.frequentUpdates = true;
-	frame.Name = self:Construct_NameText(frame)
-	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
-	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
-	frame.Buffs = self:Construct_Buffs(frame)
-	frame.Debuffs = self:Construct_Debuffs(frame)
 	frame.Castbar = self:Construct_Castbar(frame, L["Target Castbar"])
 	frame.Castbar.SafeZone = nil
 	frame.Castbar.LatencyTexture:Hide()
-	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
-	--frame.HealthPrediction = self:Construct_HealComm(frame)
-	frame.DebuffHighlight = self:Construct_DebuffHighlight(frame)
 	frame.InfoPanel = self:Construct_InfoPanel(frame)
-	frame.MouseGlow = self:Construct_MouseGlow(frame)
-	frame.TargetGlow = self:Construct_TargetGlow(frame)
-	frame.AuraBars = self:Construct_AuraBarHeader(frame)
-	frame.PvPIndicator = self:Construct_PvPIcon(frame)
-	frame.Fader = self:Construct_Fader()
-	frame.Cutaway = self:Construct_Cutaway(frame)
+	frame.Name = self:Construct_NameText(frame)
+	frame.Buffs = self:Construct_Buffs(frame)
+	frame.Debuffs = self:Construct_Debuffs(frame)
 	frame.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(frame)
-	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
+	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
+	frame.DebuffHighlight = self:Construct_DebuffHighlight(frame)
+	frame.ThreatIndicator = self:Construct_Threat(frame)
+	frame.PvPIndicator = self:Construct_PvPIcon(frame)
 
+	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
+	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
+
+	frame.AuraBars = self:Construct_AuraBarHeader(frame)
 	frame.customTexts = {}
+	frame.Cutaway = self:Construct_Cutaway(frame)
+	frame.Fader = self:Construct_Fader()
+	frame.HealthPrediction = self:Construct_HealComm(frame)
+	frame.MouseGlow = self:Construct_MouseGlow(frame)
+	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
+	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
+	frame.TargetGlow = self:Construct_TargetGlow(frame)
+
 	frame:Point('BOTTOMRIGHT', E.UIParent, 'BOTTOM', 413, 68)
 	E:CreateMover(frame, frame:GetName()..'Mover', L["Target Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,target,generalGroup')
 
@@ -88,58 +90,29 @@ function UF:Update_TargetFrame(frame, db)
 		end
 	end
 
-	UF:Configure_InfoPanel(frame)
-
-	--Health
 	UF:Configure_HealthBar(frame)
-
-	--Name
-	UF:UpdateNameSettings(frame)
-
-	--Power
 	UF:Configure_Power(frame)
+	UF:Configure_InfoPanel(frame)
+	UF:UpdateNameSettings(frame)
+	UF:Configure_Castbar(frame)
 
-	UF:Configure_PowerPrediction(frame)
-
-	--Portrait
-	UF:Configure_Portrait(frame)
-
-	--Auras
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, 'Buffs')
 	UF:Configure_Auras(frame, 'Debuffs')
 
-	-- Resurrect
-	UF:Configure_ResurrectionIcon(frame)
-
-	--Castbar
-	UF:Configure_Castbar(frame)
-
-	--Fader
-	UF:Configure_Fader(frame)
-
-	--Debuff Highlight
-	UF:Configure_DebuffHighlight(frame)
-
-	--OverHealing
-	--UF:Configure_HealComm(frame)
-
-	--Raid Icon
-	UF:Configure_RaidIcon(frame)
-
-	UF:Configure_RaidRoleIcons(frame)
-
-	--AuraBars
 	UF:Configure_AuraBars(frame)
-
-	--PvP & Prestige Icon
-	UF:Configure_PVPIcon(frame)
-
-	--Cutaway
-	UF:Configure_Cutaway(frame)
-
-	--CustomTexts
 	UF:Configure_CustomTexts(frame)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_Fader(frame)
+	UF:Configure_HealComm(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_PowerPrediction(frame)
+	UF:Configure_PVPIcon(frame)
+	UF:Configure_RaidIcon(frame)
+	UF:Configure_RaidRoleIcons(frame)
+	UF:Configure_ResurrectionIcon(frame)
+	UF:Configure_Threat(frame)
 
 	E:SetMoverSnapOffset(frame:GetName()..'Mover', -(12 + db.castbar.height))
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")

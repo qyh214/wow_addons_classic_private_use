@@ -32,6 +32,8 @@ QuestieLocale.locale['enUS'] = {
     ['ICON_TYPE_HEADER'] = "Icon Types",
     ['ENABLE_MAP_ICONS'] = "Enable Map Icons",
     ['ENABLE_MAP_ICONS_DESC'] = "Show/hide all icons from the main map.",
+    ['ENABLE_MAP_ICONS_MINIMALISTIC'] = "Enable Minimalistic Map Icons",
+    ['ENABLE_MAP_ICONS_DESC_MINIMALISTIC'] = "A minimalistic version of the normal icons.",
     ['ENABLE_MINIMAP_ICONS'] = "Enable Minimap Icons",
     ['ENABLE_MINIMAP_ICONS_DESC'] = "Show/hide all icons from the minimap.",
     ['HIDE_UNEXPLORED_ICONS'] = "Hide unexplored area Icons",
@@ -40,6 +42,12 @@ QuestieLocale.locale['enUS'] = {
     ['ENABLE_ICON_LIMIT_DESC'] = "Enable the limit of icons drawn per type.",
     ['ICON_LIMIT'] = "Icon Limit",
     ['ICON_LIMIT_DESC'] = "Limits the amount of icons drawn per type. ( Default: %s )",
+    ['ENABLE_REPEATABLE_QUEST_ICONS'] = "Show repeatable quests on map",
+    ['ENABLE_REPEATABLE_QUEST_ICONS_DESC'] = "Choose whether repeatable quests should be visible on the map and minimap.",
+    ['ENABLE_AUTO_ACCEPT_QUESTS'] = "Auto Accept Quests",
+    ['ENABLE_AUTO_ACCEPT_QUESTS_DESC'] = "Enable or disable Questie auto-accepting quests.",
+    ['ENABLE_AUTO_COMPLETE'] = "Auto Complete",
+    ['ENABLE_AUTO_COMPLETE_DESC'] = "Enable or disable Questie auto-complete quests.",
 
     -- Minimap tab
     ['MINIMAP_TAB'] = "Minimap",
@@ -140,6 +148,7 @@ QuestieLocale.locale['enUS'] = {
 
     -- Advanced tab
     ['ADV_TAB'] = "Advanced",
+    ['ADV_SET'] = "Advanced Settings",
     ['DEV_OPTIONS'] = "Developer Options",
     ['ENABLE_DEBUG'] = "Enable Debug",
     ['ENABLE_DEBUG_DESC'] = "Enable or disable debug functionality.",
@@ -149,6 +158,7 @@ QuestieLocale.locale['enUS'] = {
     ['ENABLE_TOOLTIPS_QUEST_LEVEL_IDS'] = "When this is checked, the ID of quests will show in the tooltips and the tracker.",
     ['LOCALE'] = "Localization Settings",
     ['LOCALE_DROP'] = "Select UI Locale",
+    ['LOCALE_DROP_AUTOMATIC'] = "Automatic",
     ['RESET_QUESTIE'] = "Reset Questie",
     ['RESET_QUESTIE_DESC'] = "Hitting this button will reset all of the Questie configuration settings back to their default values. (Excluding Localization)",
     ['RESET_QUESTIE_BTN'] = "Reset Questie",
@@ -202,10 +212,15 @@ QuestieLocale.locale['enUS'] = {
     ['TRACKER_SHOW_COMPLETE_DESC'] = "When this is checked, completed quests will show in the Questie tracker.",
     ['TRACKER_SHOW_QUEST_LEVEL'] = "Show Quest Level",
     ['TRACKER_SHOW_QUEST_LEVEL_DESC'] = "When this is checked, the level of quests will show in the Questie tracker.",
+    ['TRACKER_SHOW_QUEST_COUNTER'] = "Show Quest Counter",
+    ['TRACKER_SHOW_QUEST_COUNTER_DESC'] = "When this is checked, the total number of quests you have will be shown above the tracker.",
+    ['TRACKER_SHOW_BLIZZARD_QUEST_TIMER'] = "Show Blizzard Quest Timer",
+    ['TRACKER_SHOW_BLIZZARD_QUEST_TIMER_DESC'] = "When this is checked, the default timer for quests will be shown.",
     ['TRACKER_COLOR_OBJECTIVES'] = "Objective Color",
     ['TRACKER_COLOR_OBJECTIVES_DESC'] = "Change the color of objectives in the tracker by how complete they are.",
     ['TRACKER_COLOR_WHITE'] = "White",
     ['TRACKER_COLOR_WHITE_TO_GREEN'] = "White to Green",
+    ['TRACKER_COLOR_WHITE_AND_GREEN'] = "White and Green",
     ['TRACKER_COLOR_RED_TO_GREEN'] = "Red to Green",
     ['TRACKER_FONT_HEADER'] = "Font Size for Quest Names",
     ['TRACKER_FONT_HEADER_DESC'] = "The font size the tracker uses for quest names.",
@@ -229,6 +244,8 @@ QuestieLocale.locale['enUS'] = {
     ['TRACKER_SHORTCUT'] = " Shortcut",
     ['TRACKER_SET_TOMTOM_DESC'] = "The tracker shortcut to open TomTom",
     ['TRACKER_SHOW_QUESTLOG_DESC'] = "The tracker shortcut to show the quest in the quest log.",
+    ['TRACKER_UNTRACK_DESC'] = "Removes a quest from the Tracker.",
+    ['TRACKER_ACTIVE_QUESTS'] = "Active Quests: ",
 
     -- tracker right click menu
     ['TRACKER_UNFOCUS'] = "Unfocus", -- focus makes only that quest/objective show on map
@@ -237,7 +254,7 @@ QuestieLocale.locale['enUS'] = {
     ['TRACKER_CANCEL'] = "Cancel",
     ['TRACKER_UNTRACK'] = "Untrack Quest",
     ['TRACKER_SHOW_QUESTLOG'] = "Show in Quest Log",
-    ['TRACKER_SET_TOMTOM'] = "Set TomTom Target",
+    ['TRACKER_SET_TOMTOM'] = "Set |cFF54e33bTomTom|r Target",
     ['TRACKER_SHOW_ICONS'] = "Show Icons",
     ['TRACKER_HIDE_ICONS'] = "Hide Icons",
     ['TRACKER_OBJECTIVES'] = "Objectives",
@@ -252,6 +269,8 @@ QuestieLocale.locale['enUS'] = {
     ['JOURNEY_SEARCH_TAB'] = "Advanced Search",
     ['JOURNEY_AVAILABLE_TITLE'] = "Available Quests",
     ['JOURNEY_COMPLETE_TITLE'] = "Completed Quests",
+    ['JOURNEY_REPEATABLE_TITLE'] = "Repeatable Quests",
+    ['JOURNEY_UNOBTAINABLE_TITLE'] = "Unobtainable Quests",
     ['JOURNEY_SELECT_HEAD'] = "Select Your Continent and Zone",
     ['JOURNEY_SELECT_CONT'] = "Select Your Continent",
     ['JOURNEY_SELECT_ZONE'] = "Select Your Zone",
@@ -326,8 +345,8 @@ QuestieLocale.locale['enUS'] = {
     ['DEBUG_DRAW'] = "%s available quests drawn. PlayerLevel = %s",
     ['DEBUG_UNLOAD_QFRAMES'] = "Unloading quest frames: %s",
     ['DEBUG_UNLOAD_ALL'] = "Unloading all frames, count: %s",
-    ['QUESTIE_ACCEPT_NIL'] = "|cFFFF0000Questie ERROR:|r Attempt to accept nil quest! You may need to run /questie reload", 
-    ['QUESTIE_UPDATED_RESTART'] = "|cFFFF0000WARNING!|r You have updated questie without restarting the game, this will likely cause problems. Please restart the game before continuing",
+    ['QUESTIE_ACCEPT_NIL'] = "|cFFFF0000Questie ERROR:|r Attempt to accept nil quest! You may need to run /questie reload",
+    ['QUESTIE_UPDATED_RESTART'] = "|cFFFF0000WARNING!|r You have updated Questie without restarting the game, this will likely cause problems. Please restart the game before continuing",
 
     -- TODO finally switch all keys to this style for code readability:
     ['Show on Map'] = "Show on Map",

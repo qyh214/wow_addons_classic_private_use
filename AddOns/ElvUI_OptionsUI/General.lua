@@ -437,48 +437,6 @@ E.Options.args.general = {
 				},
 			},
 		},
---[=[
-		objectiveFrameGroup = {
-			order = 8,
-			type = "group",
-			name = L["Objective Frame"],
-			get = function(info) return E.db.general[info[#info]] end,
-			args = {
-				objectiveFrameHeader = {
-					order = 30,
-					type = "header",
-					name = L["Objective Frame"],
-				},
-				--objectiveFrameAutoHide = {
-					--order = 31,
-					--type = "toggle",
-					--name = L["Auto Hide"],
-					--desc = L["Automatically hide the objetive frame during boss or arena fights."],
-					--disabled = function() return IsAddOnLoaded("!KalielsTracker") end,
-					--set = function(info, value) E.db.general.objectiveFrameAutoHide = value; Blizzard:SetObjectiveFrameAutoHide(); end,
-				--},
-				objectiveFrameHeight = {
-					order = 32,
-					type = 'range',
-					name = L["Objective Frame Height"],
-					desc = L["Height of the objective tracker. Increase size to be able to see more objectives."],
-					min = 400, max = E.screenheight, step = 1,
-					set = function(info, value) E.db.general.objectiveFrameHeight = value; Blizzard:SetQuestWatchFrameHeight(); end,
-				},
-				--bonusObjectivePosition = {
-					--order = 33,
-					--type = 'select',
-					--name = L["Bonus Reward Position"],
-					--desc = L["Position of bonus quest reward frame relative to the objective tracker."],
-					--values = {
-						--['RIGHT'] = L["Right"],
-						--['LEFT'] = L["Left"],
-						--['AUTO'] = L["Automatic"],
-					--},
-				--},
-			},
-		},
-]=]
 		blizzUIImprovements = {
 			order = 11,
 			type = "group",
@@ -634,6 +592,7 @@ E.Options.args.general = {
 					values = {
 						['NONE'] = L["NONE"],
 						['SAY'] = L["SAY"],
+						['YELL'] = L["YELL"],
 						['PARTY'] = L["Party Only"],
 						['RAID'] = L["Party / Raid"],
 						['RAID_ONLY'] = L["Raid Only"],
@@ -655,7 +614,6 @@ E.Options.args.general = {
 					type = 'select',
 					values = {
 						['NONE'] = L["NONE"],
-						['GUILD'] = L["GUILD"],
 						['PLAYER'] = L["PLAYER"],
 					},
 				},
@@ -671,6 +629,12 @@ E.Options.args.general = {
 					desc = L["Automatically select greed or disenchant (when available) on green quality items. This will only work if you are the max level."],
 					type = 'toggle',
 					disabled = function() return not E.private.general.lootRoll end
+				},
+				questRewardMostValueIcon = {
+					order = 5,
+					type = "toggle",
+					name = L["Mark Quest Reward"],
+					desc = L["Marks the most valuable quest reward with a gold coin."],
 				},
 			},
 		},

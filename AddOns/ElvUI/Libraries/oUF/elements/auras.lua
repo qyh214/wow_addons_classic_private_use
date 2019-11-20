@@ -27,16 +27,16 @@ At least one of the above widgets must be present for the element to work.
 .['growth-y']       - Vertical growth direction. Defaults to 'UP' (string)
 .initialAnchor      - Anchor point for the icons. Defaults to 'BOTTOMLEFT' (string)
 .filter             - Custom filter list for auras to display. Defaults to 'HELPFUL' for buffs and 'HARMFUL' for
-                      debuffs (string)
+					  debuffs (string)
 .tooltipAnchor      - Anchor point for the tooltip. Defaults to 'ANCHOR_BOTTOMRIGHT', however, if a frame has anchoring
-                      restrictions it will be set to 'ANCHOR_CURSOR' (string)
+					  restrictions it will be set to 'ANCHOR_CURSOR' (string)
 
 ## Options Auras
 
 .numBuffs     - The maximum number of buffs to display. Defaults to 32 (number)
 .numDebuffs   - The maximum number of debuffs to display. Defaults to 40 (number)
 .numTotal     - The maximum number of auras to display. Prioritizes buffs over debuffs. Defaults to the sum of
-                .numBuffs and .numDebuffs (number)
+				.numBuffs and .numDebuffs (number)
 .gap          - Controls the creation of an invisible icon between buffs and debuffs. Defaults to false (boolean)
 .buffFilter   - Custom filter list for buffs to display. Takes priority over `filter` (string)
 .debuffFilter - Custom filter list for debuffs to display. Takes priority over `filter` (string)
@@ -58,13 +58,13 @@ button.isPlayer - indicates if the aura caster is the player or their vehicle (b
 
 ## Examples
 
-    -- Position and size
-    local Buffs = CreateFrame('Frame', nil, self)
-    Buffs:SetPoint('RIGHT', self, 'LEFT')
-    Buffs:SetSize(16 * 2, 16 * 16)
+	-- Position and size
+	local Buffs = CreateFrame('Frame', nil, self)
+	Buffs:SetPoint('RIGHT', self, 'LEFT')
+	Buffs:SetSize(16 * 2, 16 * 16)
 
-    -- Register with oUF
-    self.Buffs = Buffs
+	-- Register with oUF
+	self.Buffs = Buffs
 --]]
 
 local _, ns = ...
@@ -81,6 +81,7 @@ local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local UnitAura = UnitAura
 local UnitIsUnit = UnitIsUnit
+local UnitIsEnemy = UnitIsEnemy
 local floor, min = math.floor, math.min
 local LCD = LibStub('LibClassicDurations', true)
 local myClass = select(2, UnitClass('player'))
@@ -159,23 +160,21 @@ local function customFilter(element, unit, button, name)
 end
 
 local function updateIcon(element, unit, index, offset, filter, isDebuff, visible)
-	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
+	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3
 
-	if LCD and spellID and not UnitIsUnit('player', unit) then
-		local durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
+	if LCD and not UnitIsUnit('player', unit) then
+		local durationNew, expirationTimeNew
+		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = LCD:UnitAura(unit, index, filter)
+
+		if spellID then
+			durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
+		end
+
 		if durationNew and durationNew > 0 then
 			duration, expiration = durationNew, expirationTimeNew
 		end
-	end
-
-	if myClass == "SHAMAN" then
-		for slot = 1, 4 do
-			local _, _, start, durationTime, icon = GetTotemInfo(slot)
-			if icon == texture then
-				duration = durationTime
-				expiration = start + duration
-			end
-		end
+	else
+		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
 	end
 
 	-- ElvUI block
@@ -570,6 +569,12 @@ local function Enable(self)
 			end
 
 			buffs:Show()
+
+			if not UnitIsUnit("player", self.unit) then
+				LCD.RegisterCallback('ElvUI', "UNIT_BUFF", function(event, unit)
+					Update(buffs, "UNIT_AURA", unit)
+				end)
+			end
 		end
 
 		local debuffs = self.Debuffs

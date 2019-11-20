@@ -4,15 +4,20 @@ local Bags = E:GetModule('Bags')
 
 --Lua functions
 local _G = _G
+local select = select
 local format = format
 --WoW API / Variables
+local CreateFrame = CreateFrame
 local AcceptGroup = AcceptGroup
 local BNGetGameAccountInfoByGUID = BNGetGameAccountInfoByGUID
 local CanMerchantRepair = CanMerchantRepair
 local GetCVarBool, SetCVar = GetCVarBool, SetCVar
-local GetGuildBankWithdrawMoney = GetGuildBankWithdrawMoney
 local GetInstanceInfo = GetInstanceInfo
+local GetItemInfo = GetItemInfo
 local GetNumGroupMembers = GetNumGroupMembers
+local GetQuestItemInfo = GetQuestItemInfo
+local GetQuestItemLink = GetQuestItemLink
+local GetNumQuestChoices = GetNumQuestChoices
 local GetRaidRosterInfo = GetRaidRosterInfo
 local GetRepairAllCost = GetRepairAllCost
 local InCombatLockdown = InCombatLockdown
@@ -30,7 +35,6 @@ local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitInRaid = UnitInRaid
 local UnitName = UnitName
-local IsInGuild = IsInGuild
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY = LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY
@@ -55,7 +59,7 @@ function M:COMBAT_LOG_EVENT_UNFILTERED()
 	if not inGroup then return end -- not in group, exit.
 
 	local _, event, _, sourceGUID, _, _, _, _, destName, _, _, _, _, _, _, spellName = CombatLogGetCurrentEventInfo()
-	if not (event == "SPELL_INTERRUPT" and (sourceGUID == E.myguid or sourceGUID == UnitGUID('pet'))) then return end -- No announce-able interrupt from player or pet, exit.
+	if not (strmatch(event, "_INTERRUPT") and (sourceGUID == E.myguid or sourceGUID == UnitGUID('pet'))) then return end -- No announce-able interrupt from player or pet, exit.
 
 	local interruptAnnounce, msg = E.db.general.interruptAnnounce, format(INTERRUPT_MSG, destName or UNKNOWN, spellName or UNKNOWN)
 	if interruptAnnounce == "PARTY" then
@@ -64,17 +68,19 @@ function M:COMBAT_LOG_EVENT_UNFILTERED()
 		SendChatMessage(msg, (inRaid and "RAID" or "PARTY"))
 	elseif interruptAnnounce == "RAID_ONLY" and inRaid then
 		SendChatMessage(msg, "RAID")
-	elseif interruptAnnounce == "SAY" then
+	elseif interruptAnnounce == "SAY" and IsInInstance() then
 		SendChatMessage(msg, "SAY")
+	elseif interruptAnnounce == "YELL" and IsInInstance() then
+		SendChatMessage(msg, "YELL")
 	elseif interruptAnnounce == "EMOTE" then
 		SendChatMessage(msg, "EMOTE")
 	end
 end
 
 do -- Auto Repair Functions
-	local STATUS, TYPE, COST, POSS
+	local STATUS, COST, POSS
 	function M:AttemptAutoRepair()
-		STATUS, TYPE, COST, POSS = "", E.db.general.autoRepair, GetRepairAllCost()
+		STATUS, COST, POSS = "", GetRepairAllCost()
 
 		if POSS and COST > 0 then
 			RepairAllItems()
@@ -176,6 +182,57 @@ function M:ADDON_LOADED(_, addon)
 	end
 end
 
+do
+	local _
+	local bestValue, totalValue, bestItem, itemSellPrice
+	local questLink, amount, numQuests
+
+	function M:QUEST_COMPLETE()
+		if not E.db.general.questRewardMostValueIcon then return end
+
+		bestValue = 0
+		numQuests = GetNumQuestChoices()
+
+		if numQuests <= 0 then
+			return -- no choices, quick exit
+		end
+
+		if not self.QuestRewardGoldIconFrame then
+			local frame = CreateFrame("Frame", nil, _G.QuestInfoRewardsFrameQuestInfoItem1)
+			frame:SetFrameStrata("HIGH")
+			frame:Size(20)
+			frame.Icon = frame:CreateTexture(nil, "OVERLAY")
+			frame.Icon:SetAllPoints(frame)
+			frame.Icon:SetTexture("Interface\\MONEYFRAME\\UI-GoldIcon")
+			frame:Hide()
+			self.QuestRewardGoldIconFrame = frame
+		end
+
+		self.QuestRewardGoldIconFrame:Hide()
+
+		for i = 1, numQuests do
+			questLink = GetQuestItemLink('choice', i)
+			_,_, amount = GetQuestItemInfo('choice', i)
+			itemSellPrice = questLink and select(11, GetItemInfo(questLink))
+
+			totalValue = (itemSellPrice and itemSellPrice * amount) or 0
+			if totalValue > bestValue then
+				bestValue = totalValue
+				bestItem = i
+			end
+		end
+
+		if bestItem then
+			local btn = _G['QuestInfoRewardsFrameQuestInfoItem'..bestItem]
+			if btn.type == 'choice' then
+				self.QuestRewardGoldIconFrame:ClearAllPoints()
+				self.QuestRewardGoldIconFrame:Point("TOPRIGHT", btn, "TOPRIGHT", -2, -2)
+				self.QuestRewardGoldIconFrame:Show()
+			end
+		end
+	end
+end
+
 function M:Initialize()
 	self.Initialized = true
 	self:LoadRaidMarker()
@@ -194,6 +251,7 @@ function M:Initialize()
 	self:RegisterEvent('GROUP_ROSTER_UPDATE', 'AutoInvite')
 	self:RegisterEvent('CVAR_UPDATE', 'ForceCVars')
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
+	self:RegisterEvent("QUEST_COMPLETE")
 --[[
 	if IsAddOnLoaded("Blizzard_InspectUI") then
 		M:SetupInspectPageInfo()

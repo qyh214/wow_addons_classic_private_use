@@ -1,6 +1,8 @@
 -- small binary stream library with "base 89" decoder (credit to Aero for the algorithm)
+---@class QuestieStreamLib
+local QuestieStreamLib = QuestieLoader:CreateModule("QuestieStreamLib");
 
-QuestieStreamLib = {}
+local tinsert = table.insert
 
 -- shift level table
 QSL_dltab = {};
@@ -49,7 +51,7 @@ function QuestieStreamLib:GetStream(mode) -- returns a new stream
     end
     stream.finished = function(self) -- its best to call this (not required) when done using the stream
         self:reset()
-        table.insert(StreamPool, self)
+        tinsert(StreamPool, self)
     end
     if mode then
         if mode == "1short" then
@@ -166,16 +168,16 @@ end
 
 function QuestieStreamLib:ReadBytes(count)
     local ret = {};
-    for i=1,count do
-        table.insert(ret, self:ReadByte());
+    for i=1, count do
+        tinsert(ret, self:ReadByte());
     end
     return unpack(ret)
 end
 
 function QuestieStreamLib:ReadShorts(count)
     local ret = {};
-    for i=1,count do
-        table.insert(ret, self:ReadShort());
+    for i=1, count do
+        tinsert(ret, self:ReadShort());
     end
     return unpack(ret)
 end
@@ -248,14 +250,14 @@ end
 
 function QuestieStreamLib:WriteTinyString(val)
     self:WriteByte(string.len(val));
-    for i=1,string.len(val) do
+    for i=1, string.len(val) do
         self:WriteByte(string.byte(val, i));
     end
 end
 
 function QuestieStreamLib:WriteShortString(val)
     self:WriteShort(string.len(val));
-    for i=1,string.len(val) do
+    for i=1, string.len(val) do
         self:WriteByte(string.byte(val, i));
     end
 end

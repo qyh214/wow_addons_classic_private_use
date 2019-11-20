@@ -16,7 +16,7 @@ local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
 function UF.HealthClipFrame_OnUpdate(clipFrame)
-	--UF.HealthClipFrame_HealComm(clipFrame.__frame)
+	UF.HealthClipFrame_HealComm(clipFrame.__frame)
 
 	clipFrame:SetScript('OnUpdate', nil)
 end

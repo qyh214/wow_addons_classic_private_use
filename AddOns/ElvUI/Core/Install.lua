@@ -383,6 +383,22 @@ function E:SetupLayout(layout, noDataReset, noDisplayMsg)
 		E.db.unitframe.units.pet.infoPanel.height = 14
 		E.db.unitframe.units.pet.portrait.camDistanceScale = 2
 		E.db.unitframe.units.pet.width = 270
+		-- Happines
+		if E.myclass == "HUNTER" then
+			if not E.db.unitframe.units.pet.customTexts then E.db.unitframe.units.pet.customTexts = {} end
+			E.db.unitframe.units.pet.customText = {}
+
+			E.db.unitframe.units.pet.customTexts.happiness = {
+				font = 'PT Sans Narrow',
+				fontOutline = 'OUTLINE',
+				size = 10,
+				justifyH = 'LEFT',
+				text_format = '[happiness:icon]',
+				attachTextTo = 'Frame',
+				xOffset = 0,
+				yOffset = 0,
+			}
+		end
 		--Party
 		E.db.unitframe.units.party.height = 74
 		E.db.unitframe.units.party.power.height = 13

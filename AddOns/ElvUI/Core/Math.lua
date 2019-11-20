@@ -109,7 +109,8 @@ end
 
 --Hex to RGB
 function E:HexToRGB(hex)
-	local rhex, ghex, bhex = strsub(hex, 1, 2), strsub(hex, 3, 4), strsub(hex, 5, 6)
+    hex = gsub(hex, '^|c[fF][fF]', '')
+	local rhex, ghex, bhex = string.sub(hex, 1, 2), string.sub(hex, 3, 4), string.sub(hex, 5, 6)
 	return tonumber(rhex, 16), tonumber(ghex, 16), tonumber(bhex, 16)
 end
 
@@ -302,6 +303,7 @@ function E:StringTitle(str)
 end
 
 E.TimeThreshold = 3
+
 E.TimeColors = { -- aura time colors for days, hours, minutes, seconds, fadetimer
 	[0] = '|cffeeeeee',
 	[1] = '|cffeeeeee',
@@ -311,14 +313,25 @@ E.TimeColors = { -- aura time colors for days, hours, minutes, seconds, fadetime
 	[5] = '|cff909090', --mmss
 	[6] = '|cff707070', --hhmm
 }
+
 E.TimeFormats = { -- short and long aura time formats
-	[0] = {'%dd', '%dd'},
-	[1] = {'%dh', '%dh'},
-	[2] = {'%dm', '%dm'},
-	[3] = {'%ds', '%d'},
-	[4] = {'%.1fs', '%.1f'},
-	[5] = {'%d:%02d', '%d:%02d'}, --mmss
-	[6] = {'%d:%02d', '%d:%02d'}, --hhmm
+	[0] = {'%dd', '%dd', 'd'},
+	[1] = {'%dh', '%dh', 'h'},
+	[2] = {'%dm', '%dm', 'm'},
+	[3] = {'%ds', '%d', 's'},
+	[4] = {'%.1fs', '%.1f', 's'},
+	[5] = {'%d:%02d', '%d:%02d', ':'}, --mmss
+	[6] = {'%d:%02d', '%d:%02d', ':'}, --hhmm
+}
+
+E.TimeIndicatorColors = {
+	[0] = '|cff00b3ff',
+	[1] = '|cff00b3ff',
+	[2] = '|cff00b3ff',
+	[3] = '|cff00b3ff',
+	[4] = '|cff00b3ff',
+	[5] = '|cff00b3ff',
+	[6] = '|cff00b3ff',
 }
 
 local DAY, HOUR, MINUTE = 86400, 3600, 60 --used for calculating aura time text

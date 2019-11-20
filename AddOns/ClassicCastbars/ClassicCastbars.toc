@@ -3,7 +3,7 @@
 ## Notes: Adds castbars to various unitframes.
 ## SavedVariables: ClassicCastbarsDB
 ## Author: Wardz
-## Version: v1.1.3
+## Version: v1.1.5
 ## X-Curse-Project-ID: 322865
 ## X-WoWI-ID: 24925
 

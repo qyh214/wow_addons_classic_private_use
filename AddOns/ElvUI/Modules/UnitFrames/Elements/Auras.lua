@@ -5,6 +5,7 @@ local LSM = E.Libs.LSM
 --Lua functions
 local _G = _G
 local unpack, strfind, format, strsplit, sort, ceil = unpack, strfind, format, strsplit, sort, ceil
+local huge = math.huge
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local IsShiftKeyDown = IsShiftKeyDown
@@ -330,6 +331,23 @@ local function SortAurasByCaster(a, b)
 	end
 end
 
+local function SortAurasByIndex(a, b)
+	if (a and b and a:GetParent().db) then
+		if a:IsShown() and b:IsShown() then
+			local sortDirection = a:GetParent().db.sortDirection
+			local aIndex = a:GetID() or 0
+			local bIndex = b:GetID() or 0
+			if(sortDirection == "DESCENDING") then
+				return aIndex < bIndex
+			else
+				return aIndex > bIndex
+			end
+		elseif a:IsShown() then
+			return true
+		end
+	end
+end
+
 function UF:SortAuras()
 	if not self.db then return end
 
@@ -342,6 +360,8 @@ function UF:SortAuras()
 		sort(self, SortAurasByDuration)
 	elseif self.db.sortMethod == "PLAYER" then
 		sort(self, SortAurasByCaster)
+	elseif self.db.sortMethod == "INDEX" then
+		sort(self, SortAurasByIndex)
 	end
 
 	--Look into possibly applying filter priorities for auras here.
@@ -349,16 +369,16 @@ function UF:SortAuras()
 	return 1, #self --from/to range needed for the :SetPosition call in oUF aura element. Without this aura icon position gets all whacky when not sorted by index
 end
 
-function UF:PostUpdateAura(unit, button, index)
+function UF:PostUpdateAura(unit, button)
 	if button.isDebuff then
 		if(not button.isFriend and not button.isPlayer) then --[[and (not E.isDebuffWhiteList[name])]]
 			button:SetBackdropBorderColor(0.9, 0.1, 0.1)
 			button.icon:SetDesaturated(button.canDesaturate)
 		else
-			local color = (button.dtype and _G.DebuffTypeColor[button.dtype]) or _G.DebuffTypeColor.none
-			if button.name and (button.name == "Unstable Affliction" or button.name == "Vampiric Touch") and E.myclass ~= "WARLOCK" then
+			if E.BadDispels[button.spellID] and E:IsDispellableByMe(button.dtype) then
 				button:SetBackdropBorderColor(0.05, 0.85, 0.94)
 			else
+				local color = (button.dtype and _G.DebuffTypeColor[button.dtype]) or _G.DebuffTypeColor.none
 				button:SetBackdropBorderColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
 			end
 			button.icon:SetDesaturated(false)
@@ -428,10 +448,10 @@ function UF:CheckFilter(name, caster, spellID, isFriend, isPlayer, isUnit, isBos
 	end
 end
 
-function UF:AuraFilter(unit, button, name, _, _, debuffType, duration, expiration, caster, isStealable, _, spellID, _, isBossDebuff, casterIsPlayer)
+function UF:AuraFilter(unit, button, name, _, count, debuffType, duration, expiration, caster, isStealable, _, spellID, _, isBossDebuff, casterIsPlayer)
 	if not name then return end -- checking for an aura that is not there, pass nil to break while loop
 
-	local db = button.db
+	local db = button.db or self.db
 	if not db then return true elseif db.filters then db = db.filters end
 
 	local isPlayer = (caster == 'player' or caster == 'vehicle')
@@ -444,6 +464,7 @@ function UF:AuraFilter(unit, button, name, _, _, debuffType, duration, expiratio
 	button.dtype = debuffType
 	button.duration = duration
 	button.expiration = expiration
+	button.stackCount = count
 	button.name = name
 	button.spellID = spellID
 	button.owner = caster

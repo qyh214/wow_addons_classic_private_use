@@ -1,6 +1,20 @@
 
 -- todo: move this in to a proper global
-QuestieTooltips = {};
+---@class QuestieTooltips
+local QuestieTooltips = QuestieLoader:CreateModule("QuestieTooltips");
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieComms
+local QuestieComms = QuestieLoader:ImportModule("QuestieComms");
+---@type QuestieLib
+local QuestieLib = QuestieLoader:ImportModule("QuestieLib");
+---@type QuestiePlayer
+local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer");
+---@type QuestieDB
+local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
+
+local tinsert = table.insert
 local _QuestieTooltips = {};
 QuestieTooltips.lastTooltipTime = GetTime() -- hack for object tooltips
 QuestieTooltips.lastGametooltip = ""
@@ -24,7 +38,7 @@ function QuestieTooltips:RegisterTooltip(questid, key, Objective)
     local tooltip = {};
     tooltip.QuestId = questid;
     tooltip.Objective = Objective
-    --table.insert(QuestieTooltips.tooltipLookup[key], tooltip);
+    --tinsert(QuestieTooltips.tooltipLookup[key], tooltip);
     QuestieTooltips.tooltipLookup[key][tostring(questid) .. " " .. Objective.Index] = tooltip
 end
 
@@ -42,7 +56,10 @@ function QuestieTooltips:GetTooltip(key)
         title = coloredTitle,
         objectivesText = {
             [objectiveIndex] = {
-                [playerName] = text
+                [playerName] = {
+                    [color] = color,
+                    [text] = text
+                }
             }
         }
     }]]--
@@ -74,17 +91,19 @@ function QuestieTooltips:GetTooltip(key)
                 end
 
                 local text = nil;
+                local color = QuestieLib:GetRGBForObjective(tooltip.Objective)
+                
                 if tooltip.Objective.Needed then
-                    text = "   |cFF33FF33" .. tostring(tooltip.Objective.Collected) .. "/" .. tostring(tooltip.Objective.Needed) .. " " .. tostring(tooltip.Objective.Description);
+                    text = "   " .. color .. tostring(tooltip.Objective.Collected) .. "/" .. tostring(tooltip.Objective.Needed) .. " " .. tostring(tooltip.Objective.Description);
                 else
-                    text = "   |cFF33FF33" .. tostring(tooltip.Objective.Description);
+                    text = "   " .. color .. tostring(tooltip.Objective.Description);
                 end
                 
                 --Reduntant if 
                 if tooltip.Objective.Needed then
-                    tooltipData[questId].objectivesText[objectiveIndex][name] = text;
+                    tooltipData[questId].objectivesText[objectiveIndex][name] = {["color"] = color, ["text"] = text};
                 else
-                    tooltipData[questId].objectivesText[objectiveIndex][name] = text;
+                    tooltipData[questId].objectivesText[objectiveIndex][name] = {["color"] = color, ["text"] = text};
                 end
             end
         end
@@ -99,11 +118,13 @@ function QuestieTooltips:GetTooltip(key)
         for questId, playerList in pairs(tooltipDataExternal) do
             if(not tooltipData[questId]) then
                 local quest = QuestieDB:GetQuest(questId);
-                tooltipData[questId] = {}
-                tooltipData[questId].title = quest:GetColoredQuestName();
+                if quest then
+                    tooltipData[questId] = {}
+                    tooltipData[questId].title = quest:GetColoredQuestName();
+                end
             end
             for playerName, objectives in pairs(playerList) do
-                local playerInfo = QuestieLib:PlayerInGroup(playerName);
+                local playerInfo = QuestiePlayer:GetPartyMemberByName(playerName);
                 if(playerInfo) then
                     anotherPlayer = true;
                     for objectiveIndex, objective in pairs(objectives) do
@@ -119,13 +140,15 @@ function QuestieTooltips:GetTooltip(key)
                         end
 
                         local text = nil;
+                        local color = QuestieLib:GetRGBForObjective(objective)
+
                         if objective.required then
-                            text = "   |cFF33FF33" .. tostring(objective.fulfilled) .. "/" .. tostring(objective.required) .. " " .. objective.text;
+                            text = "   " .. color .. tostring(objective.fulfilled) .. "/" .. tostring(objective.required) .. " " .. objective.text;
                         else
-                            text = "   |cFF33FF33" .. objective.text;
+                            text = "   " .. color .. objective.text;
                         end
                         
-                        tooltipData[questId].objectivesText[objectiveIndex][playerName] = text;
+                        tooltipData[questId].objectivesText[objectiveIndex][playerName] = {["color"] = color, ["text"] = text};
                     end
                 end
             end
@@ -136,7 +159,10 @@ function QuestieTooltips:GetTooltip(key)
     title = coloredTitle,
     objectivesText = {
         [objectiveIndex] = {
-            [playerName] = text
+            [playerName] = {
+                [color] = color,
+                [text] = text
+            }
         }
     }
     }]]--
@@ -145,32 +171,32 @@ function QuestieTooltips:GetTooltip(key)
         if(tip == nil) then
             tip = {}
         end
-        table.insert(tip, questData.title);
+        tinsert(tip, questData.title);
         local tempObjectives = {}
         for objectiveIndex, playerList in pairs(questData.objectivesText or {}) do -- Should we do or {} here?
-            for playerName, objectiveText in pairs(playerList) do
-                local playerInfo = QuestieLib:PlayerInGroup(playerName);
+            for playerName, objectiveInfo in pairs(playerList) do
+                local playerInfo = QuestiePlayer:GetPartyMemberByName(playerName);
                 local useName = "";
                 if(playerName == name and anotherPlayer) then
                     local _, classFilename = UnitClass("player");
                     local _, _, _, argbHex = GetClassColor(classFilename)
-                    useName = " (|c"..argbHex..name.."|r|cFF33FF33)|r";
+                    useName = " (|c"..argbHex..name.."|r"..objectiveInfo.color..")|r";
                 elseif(playerInfo and playerName ~= name) then
-                    useName = " (|c"..playerInfo.colorHex..playerName.."|r|cFF33FF33)|r";
+                    useName = " (|c"..playerInfo.colorHex..playerName.."|r"..objectiveInfo.color..")|r";
                 end
                 if(anotherPlayer) then
-                    objectiveText = objectiveText..useName;
+                    objectiveInfo.text = objectiveInfo.text..useName;
                 end
                 -- We want the player to be on top.
                 if(playerName == name) then
-                    table.insert(tempObjectives, 1, objectiveText);
+                    tinsert(tempObjectives, 1, objectiveInfo.text);
                 else
-                    table.insert(tempObjectives, objectiveText);
+                    tinsert(tempObjectives, objectiveInfo.text);
                 end
             end
         end
         for index, text in pairs(tempObjectives) do
-            table.insert(tip, text);
+            tinsert(tip, text);
         end
     end
     return tip
@@ -225,6 +251,7 @@ end
 local lastItemId = 0;
 local function TooltipShowing_item(self)
     if self.IsForbidden and self:IsForbidden() then return; end
+    if not Questie.db.global.enableTooltips then return; end
     --QuestieTooltips.lastTooltipTime = GetTime()
     local name, link = self:GetItem()
     local itemId = nil;
@@ -284,7 +311,7 @@ function _QuestieTooltips:CountTooltip()
     return tooltipcount
 end
 
-function QuestieTooltips:Init()
+function QuestieTooltips:Initialize()
     -- For the clicked item frame.
     ItemRefTooltip:HookScript("OnTooltipSetItem", TooltipShowing_item)
     ItemRefTooltip:HookScript("OnHide", function(self)
@@ -307,11 +334,6 @@ function QuestieTooltips:Init()
             QuestieTooltips.lastGametooltipCount = 0
             QuestieTooltips.lastFrameName = "";
         end
-        --local name, unit = self:GetUnit()
-        --Questie:Debug(DEBUG_DEVELOP,"SHOW!", unit)
-        --if name == nil and unit == nil  then
-        --    TooltipShowing_maybeobject(GameTooltipTextLeft1:GetText())
-        --nd
     end)
     GameTooltip:HookScript("OnHide", function(self)
         if (not self.IsForbidden) or (not self:IsForbidden()) then -- do we need this here also
@@ -324,8 +346,10 @@ function QuestieTooltips:Init()
 
     GameTooltip:HookScript("OnUpdate", function(self)
         if (not self.IsForbidden) or (not self:IsForbidden()) then
-            local name, unit = self:GetUnit()
-            if( name == nil and unit == nil and (QuestieTooltips.lastGametooltip ~= GameTooltipTextLeft1:GetText() or (not QuestieTooltips.lastGametooltipCount) or _QuestieTooltips:CountTooltip() < QuestieTooltips.lastGametooltipCount  or QuestieTooltips.lastGametooltipType ~= "object")) then
+            --Because this is an OnUpdate we need to check that it is actually not a Unit or Item to think its a
+            local uName, unit = self:GetUnit()
+            local iName, link = self:GetItem()
+            if((uName == nil and unit == nil and iName == nil and link == nil) and (QuestieTooltips.lastGametooltip ~= GameTooltipTextLeft1:GetText() or (not QuestieTooltips.lastGametooltipCount) or _QuestieTooltips:CountTooltip() < QuestieTooltips.lastGametooltipCount  or QuestieTooltips.lastGametooltipType ~= "object")) then
                 TooltipShowing_maybeobject(GameTooltipTextLeft1:GetText())
                 QuestieTooltips.lastGametooltipCount = _QuestieTooltips:CountTooltip()
             end
@@ -333,6 +357,3 @@ function QuestieTooltips:Init()
         end
     end)
 end
-
--- todo move this call into loader
-QuestieTooltips:Init()

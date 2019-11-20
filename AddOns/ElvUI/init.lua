@@ -59,6 +59,13 @@ do
 end
 
 do
+	local arg1,arg2 = '([%(%)%.%%%+%-%*%?%[%^%$])','%%%1'
+	function AddOn:EscapeString(str)
+		return gsub(str,arg1,arg2)
+	end
+end
+
+do
 	AddOn.Libs = {}
 	AddOn.LibsMinor = {}
 	function AddOn:AddLib(name, major, minor)

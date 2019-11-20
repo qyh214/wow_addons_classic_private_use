@@ -544,6 +544,7 @@ L["HH:MM Threshold"] = "Граница ЧЧ:ММ"
 L["Hide At Max Level"] = "Прятать на максимальном уровне"
 L["Hide Below Max Level"] = "Скрывать до максимального уровня"
 L["Hide Both"] = "Скрыть оба"
+L["Hide Castbar text. Useful if your power height is very low or if you use power offset."] = true
 L["Hide Cooldown Bling"] = "Скрыть вспышку восстановления"
 L["Hide Delay"] = "Задержка скрытия"
 L["Hide Error Text"] = "Прятать сообщения об ошибках"
@@ -553,6 +554,7 @@ L["Hide In Vehicle"] = "Прятать в транспорте"
 L["Hide Outside PvP"] = "Скрывать вне PvP"
 L["Hide specific sections in the datatext tooltip."] = "Скрывать определенные части подсказки инфо-текста."
 L["Hide Spell Name"] = "Скрыть название заклинания"
+L["Hide Text"] = true
 L["Hide Time"] = "Скрыть время"
 L["Hide tooltip while in combat."] = "Скрывать подсказку в бою"
 L["Hide Voice Buttons"] = "Скрыть голосовой чат"
@@ -720,6 +722,8 @@ L["Make the unitframe glow yellow when it is below this percent of health, it wi
 L["Make the world map smaller."] = "Сделать карту мира меньше. Она больше не будет занимать весь экран в увеличенном варианте."
 L["Map Opacity When Moving"] = "Прозрачность карты в движении"
 L["Maps"] = "Карты"
+L["Mark Quest Reward"] = true
+L["Marks the most valuable quest reward with a gold coin."] = true
 L["Masque Support"] = "Поддержка Masque"
 L["Match Frame Width"] = "По ширине рамки"
 L["Match if Name or NPC ID is NOT in the list."] = true
@@ -1145,11 +1149,9 @@ L["Testing:"] = "Тестирование:"
 L["Text Color"] = "Цвет текста"
 L["Text Font Size"] = "Размер шрифта текста"
 L["Text Format"] = "Формат текста"
-L["Text Position"] = "Позиция текста"
+L["Text Options"] = true
 L["Text Threshold"] = "Значение текста"
 L["Text Toggle On NPC"] = "Переключение текста для НИП"
-L["Text xOffset"] = "Отступ текста по Х"
-L["Text yOffset"] = "Отступ текста по Y"
 L["Text"] = "Текст"
 L["Texture"] = "Текстура"
 L["Textured Icon"] = "Иконка с текстурой"
@@ -1215,8 +1217,11 @@ L["Threshold (in seconds) before text is shown in the MM:SS format. Set to -1 to
 L["Threshold before text goes into decimal form. Set to -1 to disable decimals."] = "Граница, после которых текст будет показывать десятые доли. Установите на -1 для отключения."
 L["Threshold before text turns red and is in decimal form. Set to -1 for it to never turn red"] = "Время, после которого текст станет красным и начнет отображать доли секунды. Установите -1, чтобы не отображать текст в такой форме."
 L["Threshold before the icon will fade out and back in. Set to -1 to disable."] = "Значение, при котором иконка начнем мерцать. Установите на -1 для отключения."
+L["Threshold Colors"] = true
 L["Ticks"] = "Тики"
 L["Tiers"] = "Ряды"
+L["Time Indicator Colors"] = true
+L["Time Options"] = true
 L["Time Remaining Reverse"] = "Оставшееся время, обратное"
 L["Time Remaining"] = "Оставшееся время"
 L["Time To Hold"] = "Время задержки"
@@ -1286,6 +1291,10 @@ L["Use Dead Backdrop"] = "Фон мертвого"
 L["Use Default"] = "Использовать умолчания"
 L["Use drag and drop to rearrange filter priority or right click to remove a filter."] = "Используйте перетаскивание для смены приоритета или ПКМ для удаления фильтра."
 L["Use Health Texture on Background"] = "Использовать текстуру здоровья на фоне"
+L["Use Instance ID or Name"] = "Использовать название или ID инстанса"
+L["Use Indicator Color"] = true
+L["Use Map ID or Name"] = "Использовать название или ID карты"
+L["Use Zone Names"] = "Использовать названия зон"
 L["Use Portrait"] = "Отображать портрет"
 L["Use Position Override"] = "Использовать точку фиксации"
 L["Use Real ID BattleTag"] = "Использовать BattleTag"
@@ -1334,9 +1343,7 @@ L["Word Wrap"] = "Перенос слов"
 L["World Map Coordinates"] = "Координаты карты мира"
 L["Wrap After"] = "Размер ряда"
 L["X-Offset"] = "Отступ по X"
-L["xOffset"] = "Отступ по Х"
 L["Y-Offset"] = "Отступ по Y"
-L["yOffset"] = "Отступ по Y"
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from your current |cff4beb2c\"%s\"|r profile to |cff4beb2c\"%s\"|r profile. Are you sure?"] = "Вы собираетесь скопировать настройки для модуля |cffD3CF00\"%s\"|r из вашего текущего профиля |cff4beb2c\"%s\"|r в профиль |cff4beb2c\"%s\"|r. Вы уверены?"
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from |cff4beb2c\"%s\"|r profile to your current |cff4beb2c\"%s\"|r profile. Are you sure?"] = "Вы собираетесь скопировать настройки для модуля |cffD3CF00\"%s\"|r из вашего профиля |cff4beb2c\"%s\"|r в текущий профиль |cff4beb2c\"%s\"|r. Вы уверены?"
 L["You cannot copy settings from the same unit."] = "Вы не можете копировать установки из того же юнита."
@@ -1407,28 +1414,6 @@ L["SEARCH_SYNTAX_DESC"] = [=[С добавлением библиотеки LibI
     • keystone : Mythic Keystone.
     • followers : Предметы последователей.
     • champions : Champion equipment.]=]
-
-L["TEXT_FORMAT_DESC"] = [=[Строка для изменения вида текста.
-
-Примеры:
-[namecolor][name] [difficultycolor][smartlevel] [shortclassification]
-[healthcolor][health:current-max]
-[powercolor][power:current]
-
-Форматы здоровья/резурсов:
-"current" - текущее значение
-"percent" - значение в процентах
-"current-max" - текущее значение, за которым идет максимальное значение. Будет отображать только максимальное значение, если текущее равно ему.
-"current-percent" - текущее значение, за которым идет значение в процентах.Будет отображать только максимальное значение, если текущее равно ему.
-"current-max-percent" - текущее значение, максимальное значение, за которым идет значение в процентах, Будет отображать только максимальное значение, если текущее равно ему.
-"deficit" - отображает значение недостающего до максимума здоровья/ресурса. Не будет отображать ничего, если текущее значение равно максимальному.
-
-Форматы имени:
-"name:short" - Имя с ограничением длины в 10 символов
-"name:medium" - Имя с ограничением длины в 15 символов
-"name:long" - Имя с ограничением длины в 20 символов
-
-Для отключения оставьте поле пустым, для дополнительной информации посетите http://www.tukui.org]=]
 
 L[ [=[This works like a macro, you can run different situations to get the actionbar to page differently.
  Example: '[combat] 2;']=] ] = [=[Работает как макрос. Вы можете задать различные условия для отображения разных панелей.

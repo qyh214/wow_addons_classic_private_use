@@ -544,6 +544,7 @@ L["HH:MM Threshold"] = true
 L["Hide At Max Level"] = true
 L["Hide Below Max Level"] = true
 L["Hide Both"] = "Ocultar Ambos"
+L["Hide Castbar text. Useful if your power height is very low or if you use power offset."] = true
 L["Hide Cooldown Bling"] = true
 L["Hide Delay"] = true
 L["Hide Error Text"] = "Ocultar Texto de Error"
@@ -553,6 +554,7 @@ L["Hide In Vehicle"] = true
 L["Hide Outside PvP"] = true
 L["Hide specific sections in the datatext tooltip."] = true
 L["Hide Spell Name"] = true
+L["Hide Text"] = true
 L["Hide Time"] = true
 L["Hide tooltip while in combat."] = "Oculta la descripción emergente mientras estás en combate."
 L["Hide Voice Buttons"] = true
@@ -720,6 +722,8 @@ L["Make the unitframe glow yellow when it is below this percent of health, it wi
 L["Make the world map smaller."] = true
 L["Map Opacity When Moving"] = true
 L["Maps"] = "Mapas"
+L["Mark Quest Reward"] = true
+L["Marks the most valuable quest reward with a gold coin."] = true
 L["Masque Support"] = true
 L["Match Frame Width"] = "Coincidir con la Anchura del Marco"
 L["Match if Name or NPC ID is NOT in the list."] = true
@@ -1145,11 +1149,9 @@ L["Testing:"] = "Pruebas:"
 L["Text Color"] = "Color de Texto"
 L["Text Font Size"] = true
 L["Text Format"] = "Formato de Texto"
-L["Text Position"] = "Posición del Texto"
+L["Text Options"] = true
 L["Text Threshold"] = "Límite del Texto"
 L["Text Toggle On NPC"] = "Alternar Texto en PNJ"
-L["Text xOffset"] = "Desplazamiento X del Texto"
-L["Text yOffset"] = "Desplazamiento Y del Texto"
 L["Text"] = "Texto"
 L["Texture"] = true
 L["Textured Icon"] = "Icono Texturizado"
@@ -1215,8 +1217,11 @@ L["Threshold (in seconds) before text is shown in the MM:SS format. Set to -1 to
 L["Threshold before text goes into decimal form. Set to -1 to disable decimals."] = true
 L["Threshold before text turns red and is in decimal form. Set to -1 for it to never turn red"] = "Umbral para que el texto se ponga rojo y esté en forma decimal. Establécelo en -1 para que nunca se ponga rojo"
 L["Threshold before the icon will fade out and back in. Set to -1 to disable."] = true
+L["Threshold Colors"] = true
 L["Ticks"] = "Ticks"
 L["Tiers"] = true
+L["Time Indicator Colors"] = true
+L["Time Options"] = true
 L["Time Remaining Reverse"] = "Revertir Tiempo Restante"
 L["Time Remaining"] = "Tiempo Restante"
 L["Time To Hold"] = true
@@ -1286,6 +1291,11 @@ L["Use Dead Backdrop"] = true
 L["Use Default"] = "Usar Predeterminado"
 L["Use drag and drop to rearrange filter priority or right click to remove a filter."] = true
 L["Use Health Texture on Background"] = true
+L["Use Indicator Color"] = true
+L["Use Instance ID or Name"] = true
+L["Use Map ID or Name"] = true
+L["Use Subzone Names"] = true
+L["Use Zone Names"] = true
 L["Use Portrait"] = true
 L["Use Position Override"] = true
 L["Use Real ID BattleTag"] = true
@@ -1333,10 +1343,8 @@ L["Will show Buffs in the Debuff position when there are no Debuffs active, or v
 L["Word Wrap"] = true
 L["World Map Coordinates"] = true
 L["Wrap After"] = "Auras por Fila/Columna"
-L["X-Offset"] = true
-L["xOffset"] = "DesplazamientoX"
-L["Y-Offset"] = true
-L["yOffset"] = "DesplazamientoY"
+L["X-Offset"] = "DesplazamientoX"
+L["Y-Offset"] = "DesplazamientoY"
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from your current |cff4beb2c\"%s\"|r profile to |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from |cff4beb2c\"%s\"|r profile to your current |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You cannot copy settings from the same unit."] = "No puedes copiar la configuración desde la misma unidad"
@@ -1407,28 +1415,6 @@ The following search keywords can also be used:
     • keystone : Mythic Keystone.
     • followers : Follower items.
     • champions : Champion equipment.]=]
-
-L["TEXT_FORMAT_DESC"] = [=[Proporciona una cadena para cambiar el formato de texto.
-
-Ejemplos:
-[namecolor][name] [difficultycolor][smartlevel] [shortclassification]
-[healthcolor][health:current-max]
-[powercolor][power:current]
-
-Formatos de Salud / Poder:
-'current' - cantidad actual
-'percent' - cantidad porcentual
-'current-max' - cantidad actual seguido de cantidad máxima, sólo se mostrará la máxima si la actual es igual a la máxima
-'current-percent' - cantidad actual seguido de porcentaje
-'current-max-percent' - cantidad actual, cantidad máxima y porcentaje, sólo se mostrará la máxima si la actual es igual a la máxima
-'deficit' - muestra el valor de déficit, no muestra nada si no hay déficit
-
-Formatos de Nombre:
-'name:short' - Nombre restringido a 10 caracteres
-'name:medium' - Nombre restringido a 15 caracteres
-'name:long' - Nombre restringido a 20 caracteres
-
-Para desactivarlo dejar el campo en blanco, si necesitas más información visita http://www.tukui.org]=]
 
 L[ [=[This works like a macro, you can run different situations to get the actionbar to page differently.
  Example: '[combat] 2;']=] ] = [=[Esto funciona como una macro. Puedes ejecutar diferentes situaciones para paginar la barra de acción de forma diferente.

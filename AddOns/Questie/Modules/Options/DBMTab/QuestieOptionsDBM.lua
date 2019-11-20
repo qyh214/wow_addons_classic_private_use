@@ -1,10 +1,24 @@
+-------------------------
+--Import modules.
+-------------------------
+---@type QuestieQuest
+local QuestieQuest = QuestieLoader:ImportModule("QuestieQuest");
+---@type QuestieOptions
+local QuestieOptions = QuestieLoader:ImportModule("QuestieOptions");
+---@type QuestieOptionsDefaults
+local QuestieOptionsDefaults = QuestieLoader:ImportModule("QuestieOptionsDefaults");
+---@type QuestieOptionsUtils
+local QuestieOptionsUtils = QuestieLoader:ImportModule("QuestieOptionsUtils");
+---@type QuestieDBMIntegration
+local QuestieDBMIntegration = QuestieLoader:ImportModule("QuestieDBMIntegration");
+
 QuestieOptions.tabs.dbm = {...}
 local optionsDefaults = QuestieOptionsDefaults:Load()
 
 
 --TODO, hid hud tab if DBMHudMap global doesn't exist? Or at very least gray out options?
 --dbmHUDEnable, dbmHUDShowAlert, DBMHUDZoom, dbmHUDRadius, dbmHUDShowQuest, dbmHUDShowSlay, dbmHUDShowLoot, dbmHUDShowInteract
-function QuestieOptions.tabs.dbm:Initalize()
+function QuestieOptions.tabs.dbm:Initialize()
     return {
         name = function() return QuestieLocale:GetUIString('DBM_HUD_TAB'); end,
         type = "group",

@@ -545,6 +545,7 @@ L["HH:MM Threshold"] = true
 L["Hide At Max Level"] = "Cacher au niveau maximum"
 L["Hide Below Max Level"] = true
 L["Hide Both"] = "Masquer les deux"
+L["Hide Castbar text. Useful if your power height is very low or if you use power offset."] = true
 L["Hide Cooldown Bling"] = "Masquer l'effet du temps de recharge"
 L["Hide Delay"] = true
 L["Hide Error Text"] = "Cacher les textes d'erreurs"
@@ -554,6 +555,7 @@ L["Hide In Vehicle"] = "Cacher en véhicule"
 L["Hide Outside PvP"] = "Cacher en dehors du PVP"
 L["Hide specific sections in the datatext tooltip."] = true
 L["Hide Spell Name"] = true
+L["Hide Text"] = true
 L["Hide Time"] = true
 L["Hide tooltip while in combat."] = "Masquer toutes les infobulles quand vous êtes en combat."
 L["Hide Voice Buttons"] = true
@@ -612,6 +614,10 @@ L["If enabled then the filter will only activate when the unit is targeting you.
 L["If enabled then the filter will only activate when you are focusing the unit."] = true
 L["If enabled then the filter will only activate when you are in a Vehicle."] = true
 L["If enabled then the filter will only activate when you are in combat."] = true
+L["If enabled, the style filter will only activate when you are in one of the instances specified in Instance ID."] = true
+L["If enabled, the style filter will only activate when you are in one of the maps specified in Map ID."] = true
+L["If enabled, the style filter will only activate when you are in one of the subzones specified in Add Suzbone Name."] = true
+L["If enabled, the style filter will only activate when you are in one of the zones specified in Add Zone Name."] = true
 L["If enabled then the filter will only activate when you are not focusing the unit."] = true
 L["If enabled then the filter will only activate when you are not in a Vehicle."] = true
 L["If enabled then the filter will only activate when you are not targeting the unit."] = true
@@ -721,6 +727,8 @@ L["Make the unitframe glow yellow when it is below this percent of health, it wi
 L["Make the world map smaller."] = "Rendre la carte du monde plus petite"
 L["Map Opacity When Moving"] = "Opacité de la carte en mouvement"
 L["Maps"] = "Cartes"
+L["Mark Quest Reward"] = true
+L["Marks the most valuable quest reward with a gold coin."] = true
 L["Masque Support"] = "Support de Maque"
 L["Match Frame Width"] = "Accorder à la largeur du cadre"
 L["Match if Name or NPC ID is NOT in the list."] = true
@@ -1145,11 +1153,9 @@ L["Testing:"] = "Testeurs :"
 L["Text Color"] = "Couleur du texte"
 L["Text Font Size"] = "Police d'écriture du texte"
 L["Text Format"] = "Format du texte"
-L["Text Position"] = "Position du texte"
+L["Text Options"] = true
 L["Text Threshold"] = "Seuil du texte"
 L["Text Toggle On NPC"] = "Afficher le texte des PNJ"
-L["Text xOffset"] =  "Décalage de l'axe X du texte"
-L["Text yOffset"] = "Décalage de l'axe Y du texte"
 L["Text"] = "Texte"
 L["Texture"] = true
 L["Textured Icon"] = "Texture de l'icône"
@@ -1215,8 +1221,11 @@ L["Threshold (in seconds) before text is shown in the MM:SS format. Set to -1 to
 L["Threshold before text goes into decimal form. Set to -1 to disable decimals."] = "Seuil avant que le texte ne s'affiche sous forme décimale. Mettre à -1 pour désactiver l'affichage en décimal."
 L["Threshold before text turns red and is in decimal form. Set to -1 for it to never turn red"] = "Seuil avant que le texte devienne rouge sous forme de décimal. Mettre -1 pour qu'il ne devienne jamais rouge."
 L["Threshold before the icon will fade out and back in. Set to -1 to disable."] = true
+L["Threshold Colors"] = true
 L["Ticks"] = "Ticks"
 L["Tiers"] = true
+L["Time Indicator Colors"] = true
+L["Time Options"] = true
 L["Time Remaining Reverse"] =  "Temps restant inversé"
 L["Time Remaining"] = "Temps restant"
 L["Time To Hold"] = true
@@ -1286,6 +1295,11 @@ L["Use Dead Backdrop"] = "Utiliser le fond pour les joueurs morts"
 L["Use Default"] = "Par défaut"
 L["Use drag and drop to rearrange filter priority or right click to remove a filter."] = true
 L["Use Health Texture on Background"] = true
+L["Use Indicator Color"] = true
+L["Use Instance ID or Name"] = true
+L["Use Map ID or Name"] = true
+L["Use Subzone Names"] = true
+L["Use Zone Names"] = true
 L["Use Portrait"] = true
 L["Use Position Override"] = true
 L["Use Real ID BattleTag"] = true
@@ -1333,10 +1347,8 @@ L["Will show Buffs in the Debuff position when there are no Debuffs active, or v
 L["Word Wrap"] = "Césure des mots"
 L["World Map Coordinates"] = "Coordonnées de la carte du Monde"
 L["Wrap After"] = "Retour à la ligne après"
-L["X-Offset"] = "Décalage X"
-L["xOffset"] = "Décalage de l'axe X"
-L["Y-Offset"] = "Décalage Y"
-L["yOffset"] = "Décalage de l'axe Y"
+L["X-Offset"] = "Décalage de l'axe X"
+L["Y-Offset"] = "Décalage de l'axe Y"
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from your current |cff4beb2c\"%s\"|r profile to |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from |cff4beb2c\"%s\"|r profile to your current |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You cannot copy settings from the same unit."] = "Vous ne pouvez pas copier les réglages du même cadre."
@@ -1407,28 +1419,6 @@ The following search keywords can also be used:
     • keystone : Mythic Keystone.
     • followers : Follower items.
     • champions : Champion equipment.]=]
-
-L["TEXT_FORMAT_DESC"] = [=[Entrer une séquence pour changer le format du texte.
-
-Exemples:
-[namecolor][name] [difficultycolor][smartlevel] [shortclassification]
-[healthcolor][health:current-max]
-[powercolor][power:current]
-
-Formats de la Vie / des Ressources:
-'current' - Quantité actuelle
-'percent' - Quantité en pourcentage
-'current-max' - Quantité actuelle maximale, n'affichera seulement la quantité maximale si la quantité actuelle est égale au maximum.
-'current-percent' - Quantité actuelle suivie par quantité en pourcentage, n'affichera seulement la quantité maximale si la quantité actuelle est égale au maximum
-'current-max-percent' -  Quantité actuelle, quantité maximale, suivie par quantité en pourcentage, n'affichera seulement la quantité maximale si la quantité actuelle est égale au maximum
-'deficit' - Affiche la valeur du déficit, n'affichera rien si il n'y a pas de déficit
-
-Format des Noms:
-'name:short' - Nom limité à 10 caractères
-'name:medium' - Nom limité à 15 caractères
-'name:long' - Nom limité à 20 caractères
-
-Pour désactiver, laisser le champs vide. Pour plus d'information, merci de visiter http://www.tukui.org]=]
 
 L[ [=[This works like a macro, you can run different situations to get the actionbar to page differently.
  Example: '[combat] 2;']=] ] = [=[Ceci fonctionne comme une macro, vous pouvez exécuter différentes situations pour avoir une pagination de la barre d'actions différente.

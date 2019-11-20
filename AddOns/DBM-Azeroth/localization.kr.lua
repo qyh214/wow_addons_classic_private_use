@@ -31,7 +31,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "Peace is but a fleeting dream! Let the NIGHTMARE reign!"
+	Pull		= "평화란 부질없는 꿈일 뿐! 이 세상은 악몽이 지배할 것이다!"
 })
 
 -- Ysondre (Feralas)

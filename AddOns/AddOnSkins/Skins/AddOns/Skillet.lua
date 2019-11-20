@@ -1,6 +1,6 @@
 local AS = unpack(AddOnSkins)
 
-if not AS:CheckAddOn('Skillet') then return end
+if not (AS:CheckAddOn('Skillet') or AS:CheckAddOn('Skillet-Classic')) then return end
 
 function AS:Skillet()
 	local function SkinButton(ButtonOrSpellID, Guild)
@@ -23,7 +23,7 @@ function AS:Skillet()
 
 		if texture then
 			texture:ClearAllPoints()
-			texture:SetInside()
+			AS:SetInside(texture)
 			AS:SkinTexture(texture)
 		end
 	end
@@ -81,7 +81,7 @@ function AS:Skillet()
 		for _, object in pairs(Backdrops) do
 			AS:SkinBackdropFrame(object)
 			object.Backdrop:SetFrameLevel(object:GetFrameLevel())
-			object.Backdrop:SetInside()
+			AS:SetInside(object.Backdrop)
 		end
 
 		AS:SkinCloseButton(SkilletNotesCloseButton)
@@ -169,7 +169,9 @@ function AS:Skillet()
 	SkilletQueueLoadButton:SetPoint('LEFT', SkilletQueueLoadDropdown, 'RIGHT', -10, 0)
 	SkilletQueueDeleteButton:SetPoint('LEFT', SkilletQueueLoadButton, 'RIGHT', 2, 0)
 
-	AS:Desaturate(SkilletSearchFilterClear)
+	if SkilletSearchFilterClear then
+		AS:Desaturate(SkilletSearchFilterClear)
+	end
 
 	AS:SkinArrowButton(SkilletSortAscButton)
 	AS:SkinArrowButton(SkilletSortDescButton)

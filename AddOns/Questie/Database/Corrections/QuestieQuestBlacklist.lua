@@ -2,14 +2,15 @@ QuestieQuestBlacklist = {...}
 
 function QuestieQuestBlacklist:Load()
     return {
-        [1878] = true, -- Repeatable version of 1707 - Fixing #775
-        [2881] = true, -- Repeatable version of 2880
+        --[1878] = true, -- Repeatable version of 1707 - Fixing #775
+        --[2881] = true, -- Repeatable version of 2880
         [5663] = true, -- Touch of Weakness of Dark Cleric Beryl - Fixing #730
-        [7725] = true, -- Repeatable version of 7003 - Fixing #891
-        [7726] = true, -- Repeatable version of 7721 - Fixing #891
+        --[7725] = true, -- Repeatable version of 7003 - Fixing #891
+        --[7726] = true, -- Repeatable version of 7721 - Fixing #891
         [2358] = true, -- Horns of Nez'ra is not in the game at this point. See #921
         [787] = true, -- The New Horde is not in the game. See #830
         [6606] = true, -- Quest is not in the game. See #1338
+        [6072] = true, -- Ayanna Everstride doesn't start "Hunter's Path" (this quest is most likely simply not in the game) #700
         --Stray quests
         [3861] = true, --CLUCK!
         --World event quests
@@ -532,6 +533,7 @@ function QuestieQuestBlacklist:Load()
         [7888] = true,
         [7921] = true,
         [8292] = true,
+        [8289] = true,
         [7366] = true,
         [7142] = true,
         [8105] = true,
@@ -580,7 +582,6 @@ function QuestieQuestBlacklist:Load()
         [7867] = true,
         [7868] = true,
       
-      
         -- corrupted windblossom
         [2523] = true,
         [2878] = true,
@@ -627,6 +628,7 @@ function QuestieQuestBlacklist:Load()
         [8254] = true,
         [9063] = true,
         [8410] = true,
+        [8411] = true,
         [8419] = true,
         [8420] = true,
         [8056] = true,

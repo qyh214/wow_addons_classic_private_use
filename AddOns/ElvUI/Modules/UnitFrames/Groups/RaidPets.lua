@@ -23,21 +23,23 @@ function UF:Construct_RaidpetFrames()
 
 	self.Health = UF:Construct_HealthBar(self, true, true, 'RIGHT')
 	self.Name = UF:Construct_NameText(self)
-	self.Portrait3D = UF:Construct_Portrait(self, 'model')
-	self.Portrait2D = UF:Construct_Portrait(self, 'texture')
+
 	self.Buffs = UF:Construct_Buffs(self)
 	self.Debuffs = UF:Construct_Debuffs(self)
-	self.AuraWatch = UF:Construct_AuraWatch(self)
-	self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
-	self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
-	self.TargetGlow = UF:Construct_TargetGlow(self)
-	self.MouseGlow = UF:Construct_MouseGlow(self)
-	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
-	--self.HealthPrediction = UF:Construct_HealComm(self)
-	self.Fader = UF:Construct_Fader()
-	self.Cutaway = UF:Construct_Cutaway(self)
 
+	self.AuraWatch = UF:Construct_AuraWatch(self)
 	self.customTexts = {}
+	self.Cutaway = UF:Construct_Cutaway(self)
+	self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
+	self.Fader = UF:Construct_Fader()
+	self.HealthPrediction = UF:Construct_HealComm(self)
+	self.MouseGlow = UF:Construct_MouseGlow(self)
+	self.Portrait2D = UF:Construct_Portrait(self, 'texture')
+	self.Portrait3D = UF:Construct_Portrait(self, 'model')
+	self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
+	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
+	self.TargetGlow = UF:Construct_TargetGlow(self)
+	self.ThreatIndicator = UF:Construct_Threat(self)
 
 	self.unitframeType = "raidpet"
 
@@ -125,47 +127,25 @@ function UF:Update_RaidpetFrames(frame, db)
 		frame.VARIABLES_SET = true
 	end
 
-	if not InCombatLockdown() then
-		frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
-	end
+	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 
-	--Health
 	UF:Configure_HealthBar(frame)
-
-	--Name
 	UF:UpdateNameSettings(frame)
 
-	--Portrait
-	UF:Configure_Portrait(frame)
-
-	--Auras
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, 'Buffs')
 	UF:Configure_Auras(frame, 'Debuffs')
 
-	--RaidDebuffs
-	UF:Configure_RaidDebuffs(frame)
-
-	--Raid Icon
-	UF:Configure_RaidIcon(frame)
-
-	--Debuff Highlight
-	UF:Configure_DebuffHighlight(frame)
-
-	--OverHealing
-	--UF:Configure_HealComm(frame)
-
-	--Fader
-	UF:Configure_Fader(frame)
-
-	--BuffIndicator
 	UF:Configure_AuraWatch(frame, true)
-
-	--Cutaway
-	UF:Configure_Cutaway(frame)
-
-	--CustomTexts
 	UF:Configure_CustomTexts(frame)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_Fader(frame)
+	UF:Configure_HealComm(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_RaidDebuffs(frame)
+	UF:Configure_RaidIcon(frame)
+	UF:Configure_Threat(frame)
 
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")
 end

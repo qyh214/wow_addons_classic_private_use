@@ -6,7 +6,7 @@ https://github.com/AeroScripts/QuestieDev/releases/latest
 Follow the [Installation Guide](https://github.com/AeroScripts/QuestieDev/wiki/Installation-Guide) in the Wiki if you just want to get the latest version of Questie up and running. If you have problems, please read the [Frequently Asked Questions](https://github.com/AeroScripts/QuestieDev/wiki/FAQ-for-Classic-(1.13)).
 
 [![Downloads](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/)
-[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v4.3.0/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
+[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v5.2.1/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Date Latest](https://img.shields.io/github/release-date/AeroScripts/QuestieDev.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
 [![Commits Since Latest](https://img.shields.io/github/commits-since/AeroScripts/QuestieDev/latest.svg)](https://github.com/AeroScripts/QuestieDev/commits/master)
 
@@ -65,7 +65,7 @@ Trust us it's (Good)!
 
 - Waypoint lines for quest givers showing their pathing.
 
-![Waypoints](https://cdn.discordapp.com/attachments/579999220170227716/636266368777584660/unknown.png)
+![Waypoints](https://media.discordapp.net/attachments/263040777658171392/643203302993035294/unknown.png)
 
 ### Journey Log
 - Questie records the steps of your journey in the "My Journey" window. (right-click on minimap button to open)

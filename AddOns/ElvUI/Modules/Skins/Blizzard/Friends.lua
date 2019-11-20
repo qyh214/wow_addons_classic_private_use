@@ -11,15 +11,6 @@ local GetGuildRosterInfo = GetGuildRosterInfo
 local GUILDMEMBERS_TO_DISPLAY = GUILDMEMBERS_TO_DISPLAY
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
-local localizedTable = {}
-for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-	localizedTable[v] = k
-end
-
-for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-	localizedTable[v] = k
-end
-
 local function skinFriendRequest(frame)
 	if frame.isSkinned then return end
 	S:HandleButton(frame.DeclineButton, nil, true)
@@ -280,7 +271,7 @@ local function LoadSkin()
 
 		numWhos = numWhos > WHOS_TO_DISPLAY and WHOS_TO_DISPLAY or numWhos
 
-		local button, buttonText, classTextColor, levelTextColor
+		local button, buttonText, classTextColor, levelTextColor, info
 
 		for i = 1, numWhos do
 			button = _G['WhoFrameButton'..i]
@@ -376,7 +367,7 @@ local function LoadSkin()
 				button = _G['GuildFrameButton'..i]
 				_, _, _, level, class, zone, _, _, online = GetGuildRosterInfo(button.guildIndex)
 
-				classFileName = localizedTable[class]
+				classFileName = E:UnlocalizedClassName(class)
 				if classFileName then
 					if online then
 						classTextColor = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFileName] or RAID_CLASS_COLORS[classFileName]
@@ -402,7 +393,7 @@ local function LoadSkin()
 				button = _G['GuildFrameGuildStatusButton'..i]
 				_, _, _, _, class, _, _, _, online = GetGuildRosterInfo(button.guildIndex)
 
-				classFileName = localizedTable[class]
+				classFileName = E:UnlocalizedClassName(class)
 				if classFileName then
 					if online then
 						classTextColor = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[classFileName] or RAID_CLASS_COLORS[classFileName]
@@ -457,12 +448,10 @@ local function LoadSkin()
 	_G.GuildFrameDemoteButton:SetHitRectInsets(0, 0, 0, 0)
 	_G.GuildFrameDemoteButton:Point('LEFT', GuildFramePromoteButton, 'RIGHT', 2, 0)
 
-	_G.GuildMemberNoteBackground:Point('TOPLEFT', 3, -130)
 	_G.GuildMemberNoteBackground:StripTextures()
 	_G.GuildMemberNoteBackground:CreateBackdrop('Default')
 	_G.GuildMemberNoteBackground.backdrop:Point('TOPLEFT', 0, -2)
 	_G.GuildMemberNoteBackground.backdrop:Point('BOTTOMRIGHT', 0, 2)
-	_G.GuildMemberNoteBackground:Width(205)
 
 	_G.PersonalNoteText:Point('TOPLEFT', 4, -4)
 	_G.PersonalNoteText:Width(197)
@@ -481,8 +470,6 @@ local function LoadSkin()
 	_G.GuildMOTDEditButton.backdrop:Point('TOPLEFT', -7, 3)
 	_G.GuildMOTDEditButton.backdrop:Point('BOTTOMRIGHT', 7, -2)
 	_G.GuildMOTDEditButton:SetHitRectInsets(-7, -7, -3, -2)
-
-	_G.GuildFrameNotesText:Size(320, 49)
 
 	-- Info Frame
 	_G.GuildInfoFrame:StripTextures()
@@ -536,18 +523,15 @@ local function LoadSkin()
 	SkinPlusMinus(_G.GuildControlPopupFrameRemoveRankButton, true)
 	_G.GuildControlPopupFrameRemoveRankButton:Point('LEFT', _G.GuildControlPopupFrameAddRankButton, 'RIGHT', 4, 0)
 
-
-	local left, right = select(2, _G.GuildControlPopupFrameEditBox:GetRegions())
-	left:Kill() right:Kill()
+	_G.GuildControlPopupFrameEditBox:StripTextures()
 
 	S:HandleEditBox(_G.GuildControlPopupFrameEditBox)
 	_G.GuildControlPopupFrameEditBox.backdrop:Point('TOPLEFT', 0, -5)
 	_G.GuildControlPopupFrameEditBox.backdrop:Point('BOTTOMRIGHT', 0, 5)
 
-	for i = 1, 17 do
-		local checkbox = _G['GuildControlPopupFrameCheckbox'..i]
-		if checkbox then
-			S:HandleCheckBox(checkbox)
+	for _, CheckBox in pairs({ GuildControlPopupFrameCheckboxes:GetChildren()}) do
+		if CheckBox:IsObjectType("CheckButton") then
+			S:HandleCheckBox(CheckBox)
 		end
 	end
 

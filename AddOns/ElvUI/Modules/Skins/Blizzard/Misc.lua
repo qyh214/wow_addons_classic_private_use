@@ -283,7 +283,6 @@ local function LoadSkin()
 		end
 	end)
 
-
 	local SideDressUpFrame = _G.SideDressUpFrame
 	S:HandleCloseButton(_G.SideDressUpModelCloseButton)
 	SideDressUpFrame:StripTextures()
@@ -303,8 +302,8 @@ local function LoadSkin()
 	StackSplitFrame.bg1:Point('BOTTOMRIGHT', -10, 55)
 	StackSplitFrame.bg1:SetFrameLevel(StackSplitFrame.bg1:GetFrameLevel() - 1)
 
-	-- S:HandleButton(StackSplitFrame.OkayButton)
-	-- S:HandleButton(StackSplitFrame.CancelButton)
+	S:HandleButton(_G.StackSplitOkayButton)
+	S:HandleButton(_G.StackSplitCancelButton)
 
 	local buttons = {StackSplitFrame.LeftButton, StackSplitFrame.RightButton}
 	for _, btn in pairs(buttons) do

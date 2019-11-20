@@ -12,7 +12,6 @@ local GetInventoryItemQuality = GetInventoryItemQuality
 local GetInventoryItemTexture = GetInventoryItemTexture
 local GetItemQualityColor = GetItemQualityColor
 local GetTime = GetTime
-local GetTotemInfo = GetTotemInfo
 local GetWeaponEnchantInfo = GetWeaponEnchantInfo
 local RegisterAttributeDriver = RegisterAttributeDriver
 local RegisterStateDriver = RegisterStateDriver
@@ -63,7 +62,7 @@ local IS_HORIZONTAL_GROWTH = {
 }
 
 function A:UpdateTime(elapsed)
-	if self.nextUpdate >= 0 then
+	if self.nextUpdate > 0 then
 		self.nextUpdate = self.nextUpdate - elapsed
 		return
 	end
@@ -88,15 +87,25 @@ function A:UpdateTime(elapsed)
 			self.timeLeft = self.timeLeft - elapsed
 		end
 
-		local timeColors, timeThreshold = (self.timerOptions and self.timerOptions.timeColors) or E.TimeColors, (self.timerOptions and self.timerOptions.timeThreshold) or E.db.cooldown.threshold
+		local timeColors, indicatorColors, timeThreshold = (self.timerOptions and self.timerOptions.timeColors) or E.TimeColors, (self.timerOptions and self.timerOptions.indicatorColors) or E.TimeIndicatorColors, (self.timerOptions and self.timerOptions.timeThreshold) or E.db.cooldown.threshold
 		if not timeThreshold then timeThreshold = E.TimeThreshold end
 
 		local hhmmThreshold = (self.timerOptions and self.timerOptions.hhmmThreshold) or (E.db.cooldown.checkSeconds and E.db.cooldown.hhmmThreshold)
 		local mmssThreshold = (self.timerOptions and self.timerOptions.mmssThreshold) or (E.db.cooldown.checkSeconds and E.db.cooldown.mmssThreshold)
+		local useIndicatorColor = (self.timerOptions and self.timerOptions.useIndicatorColor) or E.db.cooldown.useIndicatorColor
 
 		local value1, formatID, nextUpdate, value2 = E:GetTimeInfo(self.timeLeft, timeThreshold, hhmmThreshold, mmssThreshold)
 		self.nextUpdate = nextUpdate
-		self.time:SetFormattedText(format("%s%s|r", timeColors[formatID], E.TimeFormats[formatID][1]), value1, value2)
+
+		if useIndicatorColor then
+			self.time:SetFormattedText(gsub(E.TimeFormats[formatID][1], '(.*)%l', '%1'..indicatorColors[formatID]..E.TimeFormats[formatID][3]..FONT_COLOR_CODE_CLOSE), value1, value2)
+		else
+			self.time:SetFormattedText(E.TimeFormats[formatID][1], value1, value2)
+		end
+
+		self.time:SetTextColor(timeColors[formatID].r, timeColors[formatID].g, timeColors[formatID].b)
+
+		self.statusBar:SetValue(self.timeLeft)
 
 		if self.timeLeft > E.db.auras.fadeThreshold then
 			E:StopFlash(self)
@@ -132,8 +141,25 @@ function A:CreateIcon(button)
 	button.time:Point("TOP", button, 'BOTTOM', 1 + self.db.timeXOffset, 0 + self.db.timeYOffset)
 
 	button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
-	button.highlight:SetColorTexture(1, 1, 1, 0.45)
+	button.highlight:SetColorTexture(1, 1, 1, .45)
 	button.highlight:SetInside()
+
+	button.statusBar = CreateFrame('StatusBar', nil, button)
+	button.statusBar:SetFrameLevel(button:GetFrameLevel())
+	button.statusBar:SetFrameStrata(button:GetFrameStrata())
+	button.statusBar:SetStatusBarTexture(E.Libs.LSM:Fetch("statusbar", self.db.barTexture))
+	button.statusBar:CreateBackdrop()
+
+	local pos, spacing, iconSize = self.db.barPosition, self.db.barSpacing, db.size - (E.Border * 2)
+	local isOnTop = pos == 'TOP' and true or false
+	local isOnBottom = pos == 'BOTTOM' and true or false
+	local isOnLeft = pos == 'LEFT' and true or false
+	local isOnRight = pos == 'RIGHT' and true or false
+
+	button.statusBar:Width((isOnTop or isOnBottom) and iconSize or (self.db.barWidth + (E.PixelMode and 0 or 2)))
+	button.statusBar:Height((isOnLeft or isOnRight) and iconSize or (self.db.barHeight + (E.PixelMode and 0 or 2)))
+	button.statusBar:Point(E.InversePoints[pos], button, pos, (isOnTop or isOnBottom) and 0 or ((isOnLeft and -((E.PixelMode and 1 or 3) + spacing)) or ((E.PixelMode and 1 or 3) + spacing)), (isOnLeft or isOnRight) and 0 or ((isOnTop and ((E.PixelMode and 1 or 3) + spacing) or -((E.PixelMode and 1 or 3) + spacing))))
+	if isOnLeft or isOnRight then button.statusBar:SetOrientation('VERTICAL') end
 
 	E:SetUpAnimGroup(button)
 
@@ -200,7 +226,8 @@ function A:CreateIcon(button)
 end
 
 function A:UpdateAura(button, index)
-	local name, texture, count, dtype, duration, expirationTime = UnitAura('player', index, button.filter)
+	local unit = button:GetParent():GetAttribute('unit')
+	local name, texture, count, dtype, duration, expirationTime = UnitAura(unit, index, button.filter)
 
 	if name then
 		if E.myclass == "SHAMAN" then
@@ -213,7 +240,12 @@ function A:UpdateAura(button, index)
 			end
 		end
 
+		button.statusBar:Show()
+
 		if (duration > 0) and expirationTime then
+			if not self.db.barShow then button.statusBar:Hide() end
+			button.nextUpdate = 0
+
 			local timeLeft = expirationTime - GetTime()
 			if not button.timeLeft then
 				button.timeLeft = timeLeft
@@ -222,25 +254,47 @@ function A:UpdateAura(button, index)
 				button.timeLeft = timeLeft
 			end
 
-			button.nextUpdate = -1
-			A.UpdateTime(button, 0)
+			button.statusBar:SetMinMaxValues(0, duration)
 		else
+			if not (self.db.barShow and self.db.barNoDuration) then button.statusBar:Hide() end
+
 			button.timeLeft = nil
 			button.time:SetText('')
+
+			button.statusBar:SetMinMaxValues(0, 1)
+			button.statusBar:SetValue(1)
+
 			button:SetScript("OnUpdate", nil)
 		end
+
+		local r, g, b
+		if button.timeLeft and self.db.barColorGradient then
+			r, g, b = E.oUF:ColorGradient(button.timeLeft, duration or 0, .8, 0, 0, .8, .8, 0, 0, .8, 0)
+		else
+			r, g, b = self.db.barColor.r, self.db.barColor.g, self.db.barColor.b
+		end
+
+		button.statusBar:SetStatusBarColor(r, g, b)
 
 		if count and (count > 1) then
 			button.count:SetText(count)
 		else
-			button.count:SetText('')
+			button.count:SetText()
+		end
+
+		if self.db.showDuration then
+			button.time:Show()
+		else
+			button.time:Hide()
 		end
 
 		if button.filter == "HARMFUL" then
-			local color = _G.DebuffTypeColor[dtype or ""]
+			local color = _G.DebuffTypeColor[dtype or "none"]
 			button:SetBackdropBorderColor(color.r, color.g, color.b)
+			button.statusBar.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
 		else
 			button:SetBackdropBorderColor(unpack(E.media.bordercolor))
+			button.statusBar.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
 		end
 
 		button.texture:SetTexture(texture)
@@ -267,15 +321,30 @@ function A:UpdateTempEnchant(button, index)
 		end
 
 		button.offset = offset
+		button.nextUpdate = 0
+		button.timeLeft = expirationTime - GetTime()
+
+		button.statusBar:SetMinMaxValues(0, button.timeLeft)
 		button:SetScript("OnUpdate", A.UpdateTime)
-		button.nextUpdate = -1
-		A.UpdateTime(button, 0)
 	else
 		button.offset = nil
 		button.timeLeft = nil
-		button:SetScript("OnUpdate", nil)
 		button.time:SetText('')
+
+		button.statusBar:SetMinMaxValues(0, 1)
+		button.statusBar:SetValue(1)
+
+		button:SetScript("OnUpdate", nil)
 	end
+
+	local r, g, b
+	if button.timeLeft and self.db.barColorGradient then
+		r, g, b = E.oUF:ColorGradient((button.timeLeft or 0), expirationTime and (expirationTime / 1e3) or 0, .8, 0, 0, .8, .8, 0, 0, .8, 0)
+	else
+		r, g, b = self.db.barColor.r, self.db.barColor.g, self.db.barColor.b
+	end
+
+	button.statusBar:SetStatusBarColor(r, g, b)
 end
 
 function A:CooldownText_Update(button)
@@ -290,9 +359,10 @@ function A:CooldownText_Update(button)
 
 	button.timerOptions.reverseToggle = self.db.cooldown.reverse
 	button.timerOptions.hideBlizzard = self.db.cooldown.hideBlizzard
+	button.timerOptions.useIndicatorColor = self.db.cooldown.useIndicatorColor
 
-	if self.db.cooldown.override and E.TimeColors.auras then
-		button.timerOptions.timeColors, button.timerOptions.timeThreshold = E.TimeColors.auras, self.db.cooldown.thresholdd
+	if self.db.cooldown.override and E.TimeColors.auras and E.TimeIndicatorColors.auras then
+		button.timerOptions.timeColors, button.timerOptions.indicatorColors, button.timerOptions.timeThreshold = E.TimeColors.auras, E.TimeIndicatorColors.auras, self.db.cooldown.threshold
 	else
 		button.timerOptions.timeColors, button.timerOptions.timeThreshold = nil, nil
 	end
@@ -358,6 +428,12 @@ function A:UpdateHeader(header)
 
 	header:SetAttribute("template", ("ElvUIAuraTemplate%d"):format(db.size))
 
+	local pos, spacing, iconSize = self.db.barPosition, self.db.barSpacing, db.size - (E.Border * 2)
+	local isOnTop = pos == 'TOP' and true or false
+	local isOnBottom = pos == 'BOTTOM' and true or false
+	local isOnLeft = pos == 'LEFT' and true or false
+	local isOnRight = pos == 'RIGHT' and true or false
+
 	local index = 1
 	local child = select(index, header:GetChildren())
 	while child do
@@ -376,11 +452,24 @@ function A:UpdateHeader(header)
 			child.count:ClearAllPoints()
 			child.count:Point("BOTTOMRIGHT", -1 + self.db.countXOffset, 0 + self.db.countYOffset)
 			child.count:FontTemplate(font, db.countFontSize, self.db.fontOutline)
+
+			A:CooldownText_Update(child)
 		end
 
 		--Blizzard bug fix, icons arent being hidden when you reduce the amount of maximum buttons
 		if (index > (db.maxWraps * db.wrapAfter)) and child:IsShown() then
 			child:Hide()
+		end
+
+		child.statusBar:Width((isOnTop or isOnBottom) and iconSize or (self.db.barWidth + (E.PixelMode and 0 or 2)))
+		child.statusBar:Height((isOnLeft or isOnRight) and iconSize or (self.db.barHeight + (E.PixelMode and 0 or 2)))
+		child.statusBar:ClearAllPoints()
+		child.statusBar:Point(E.InversePoints[pos], child, pos, (isOnTop or isOnBottom) and 0 or ((isOnLeft and -((E.PixelMode and 1 or 3) + spacing)) or ((E.PixelMode and 1 or 3) + spacing)), (isOnLeft or isOnRight) and 0 or ((isOnTop and ((E.PixelMode and 1 or 3) + spacing) or -((E.PixelMode and 1 or 3) + spacing))))
+		child.statusBar:SetStatusBarTexture(E.Libs.LSM:Fetch("statusbar", self.db.barTexture))
+		if isOnLeft or isOnRight then
+			child.statusBar:SetOrientation('VERTICAL')
+		else
+			child.statusBar:SetOrientation('HORIZONTAL')
 		end
 
 		index = index + 1

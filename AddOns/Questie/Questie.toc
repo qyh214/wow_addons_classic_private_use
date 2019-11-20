@@ -1,8 +1,8 @@
 ## Interface: 11302
-## Title: |cFFFFFFFFQuestie|r|cFF00FF00 v5.0.1_e2e80b7|r
-## Author: Aero/Logon/Muehe/Dyaxler/Schaka/Zoey/Everyone else
+## Title: |cFFFFFFFFQuestie|r|cFF00FF00 v5.2.2|r
+## Author: Aero/Logon/Muehe/TheCrux(BreakBB)/Dyaxler/Schaka/Zoey/Everyone else
 ## Notes: A standalone Classic QuestHelper
-## Version: 5.0.1 2 e2e80b7
+## Version: 5.2.2 1 a6c8207
 ## RequiredDeps:
 ## OptionalDeps: Ace3, LibDataBroker-1.1, LibCompress
 ## SavedVariables: QuestieConfig
@@ -12,6 +12,9 @@ embeds.xml
 Libs\HereBeDragons\HereBeDragons-2.0.lua
 Libs\HereBeDragons\HereBeDragons-Pins-2.0.lua
 Libs\HereBeDragons\HereBeDragons-Migrate.lua
+
+#Loader module
+Modules\Libs\QuestieLoader.lua
 
 #stream module (used by DB)
 Modules\QuestieStream.lua
@@ -23,8 +26,6 @@ Database\questDB.lua
 Database\objectDB.lua
 Database\spawnDB.lua
 Database\zoneDB.lua
-Database\TEMP_questie4items.lua
-Database\TEMP_repprof.lua
 Database\specialspawns.lua
 Database\itemDB.lua
 
@@ -42,6 +43,7 @@ Database\Corrections\QuestieEvent.lua
 Locale\QuestieLocale.lua
 Locale\enUS\locale.xml
 Locale\esES\locale.xml
+Locale\esMX\locale.xml
 Locale\deDE\locale.xml
 Locale\zhCN\locale.xml
 Locale\zhTW\locale.xml
@@ -55,29 +57,46 @@ Modules\Libs\QuestieLib.lua
 #Modules\Libs\QuestieCompress.lua
 Modules\Libs\QuestiePlayer.lua
 Modules\Libs\QuestieSerializer.lua
+Modules\Libs\QuestieCombatQueue.lua
+Modules\Libs\QuestieHash.lua
 
 ##Modules
 Modules\QuestieAuto.lua
 Modules\QuestieTooltips.lua
 Modules\QuestieEventHandler.lua
-Modules\QuestieFramePool.lua
+
+#FramePool
+Modules\FramePool\QuestieFramePool.lua
+Modules\FramePool\QuestieFrame.lua
 
 #Map
 Modules\Map\QuestieMap.lua
 Modules\Map\QuestieMapUtils.lua
 
-Modules\QuestieQuest.lua
+#Quest
+Modules\Quest\QuestieQuest.lua
+Modules\Quest\QuestieQuestPrivates.lua
+
 Modules\QuestieNameplate.lua
 Modules\QuestieCoordinates.lua
-Modules\QuestieJourney.lua
 
 #Network
 Modules\Network\QuestieComms.lua
 Modules\Network\QuestieCommsData.lua
 
-Modules\QuestieSearchResults.lua
-Modules\QuestieSearch.lua
-Modules\QuestieTracker.lua
+#Journey
+Modules\Journey\QuestieJourney.lua
+Modules\Journey\QuestieJourneyUtils.lua
+Modules\Journey\QuestieSearch.lua
+Modules\Journey\QuestieSearchResults.lua
+
+#Tracker
+Modules\Tracker\QuestieTracker.lua
+Modules\Tracker\QuestieTrackerUtils.lua
+Modules\Tracker\QuestieTrackerMenu.lua
+Modules\Tracker\QuestieTrackerPrivates.lua
+Modules\Tracker\QuestieQuestTimers.lua
+
 Modules\QuestieProfessions.lua
 Modules\QuestieReputation.lua
 Modules\QuestieDBMIntegration.lua

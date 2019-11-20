@@ -11,19 +11,22 @@ local tinsert = tinsert
 function UF:Construct_TargetTargetTargetFrame(frame)
 	frame.Health = self:Construct_HealthBar(frame, true, true, 'RIGHT')
 	frame.Power = self:Construct_PowerBar(frame, true, true, 'LEFT')
-	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
+	frame.InfoPanel = self:Construct_InfoPanel(frame)
 	frame.Name = self:Construct_NameText(frame)
+	frame.Buffs = self:Construct_Buffs(frame)
+	frame.Debuffs = self:Construct_Debuffs(frame)
+
 	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
 	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
-	frame.Buffs = self:Construct_Buffs(frame)
-	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.Debuffs = self:Construct_Debuffs(frame)
-	frame.InfoPanel = self:Construct_InfoPanel(frame)
-	frame.MouseGlow = self:Construct_MouseGlow(frame)
-	frame.TargetGlow = self:Construct_TargetGlow(frame)
+
+	frame.customTexts = {}
 	frame.Cutaway = self:Construct_Cutaway(frame)
 	frame.Fader = self:Construct_Fader()
-	frame.customTexts = {}
+	frame.MouseGlow = self:Construct_MouseGlow(frame)
+	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
+	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
+	frame.TargetGlow = self:Construct_TargetGlow(frame)
+	frame.ThreatIndicator = self:Construct_Threat(frame)
 
 	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 160) --Set to default position
 	E:CreateMover(frame, frame:GetName()..'Mover', L["TargetTargetTarget Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,targettargettarget,generalGroup')
@@ -66,37 +69,22 @@ function UF:Update_TargetTargetTargetFrame(frame, db)
 	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 	_G[frame:GetName()..'Mover']:Size(frame:GetSize())
-	UF:Configure_InfoPanel(frame)
-	--Health
+
 	UF:Configure_HealthBar(frame)
-
-	--Name
-	UF:UpdateNameSettings(frame)
-
-	--Power
 	UF:Configure_Power(frame)
-
-	--Power Predicition
-	UF:Configure_PowerPrediction(frame)
-
-	--Portrait
-	UF:Configure_Portrait(frame)
-
-	--Auras
+	UF:Configure_InfoPanel(frame)
+	UF:UpdateNameSettings(frame)
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_Auras(frame, 'Buffs')
 	UF:Configure_Auras(frame, 'Debuffs')
 
-	--Fader
-	UF:Configure_Fader(frame)
-
-	--Raid Icon
-	UF:Configure_RaidIcon(frame)
-
-	--Cutaway
-	UF:Configure_Cutaway(frame)
-
 	UF:Configure_CustomTexts(frame)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_Fader(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_PowerPrediction(frame)
+	UF:Configure_RaidIcon(frame)
+	UF:Configure_Threat(frame)
 
 	E:SetMoverSnapOffset(frame:GetName()..'Mover', -(12 + self.db.units.player.castbar.height))
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")

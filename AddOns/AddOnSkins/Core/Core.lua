@@ -39,6 +39,28 @@ function AS:GetColor(name)
 	return (color):format(name)
 end
 
+function AS:RGBToHex(r, g, b, header)
+	r = r <= 1 and r >= 0 and r or 1
+	g = g <= 1 and g >= 0 and g or 1
+	b = b <= 1 and b >= 0 and b or 1
+	return format('%s%02x%02x%02x', header or '|cff', r * 255, g * 255, b * 255)
+end
+
+function AS:GetClassColor(class)
+	if not class then return end
+
+	local color = (_G.CUSTOM_CLASS_COLORS and _G.CUSTOM_CLASS_COLORS[class]) or _G.RAID_CLASS_COLORS[class]
+	if type(color) ~= 'table' then return end
+
+	if not color.colorStr then
+		color.colorStr = AS:RGBToHex(color.r, color.g, color.b, 'ff')
+	elseif strlen(color.colorStr) == 6 then
+		color.colorStr = 'ff'..color.colorStr
+	end
+
+	return color
+end
+
 function AS:Scale(Number)
 	return AS.Mult * floor(Number/AS.Mult + .5)
 end
@@ -199,7 +221,7 @@ function AS:CallSkin(addonName, func, event, ...)
 			AddOnSkinsDS[AS.Version] = AddOnSkinsDS[AS.Version] or {}
 			AddOnSkinsDS[AS.Version][addonName] = true
 			AS:SetOption(addonName, false)
-			local Name = AS:CheckAddOn(addonName) and format('%s %s', addonName, AS:GetAddOnVersion(addonName)) or addonName
+			local Name = AS:CheckAddOn(addonName) and format('%s %s', addonName, AS:GetAddOnVersion(addonName) or 'UNKNOWN') or addonName
 
 			tinsert(AS.SkinErrors, Name)
 
@@ -231,16 +253,13 @@ function AS:UpdateMedia()
 	AS.PixelFont = AS.LSM:Fetch('font', "Arial Narrow")
 	AS.NormTex = AS.LSM:Fetch('statusbar', "Blizzard")
 	AS.BackdropColor = { .2, .2, .2, .8}
-	AS.BorderColor = { 1, 1, 1}
+	AS.BorderColor = { 0, 0, 0 }
 	AS.Color = AS.ClassColor
 	AS.HideShadows = false
 end
 
 function AS:GetPixelScale()
-	local scale = UIParent:GetScale()
-	local pixel, ratio = 1, 768 / AS.ScreenHeight
-
-	AS.mult = (pixel / scale) - ((pixel - ratio) / scale)
+	AS.mult = max(0.4, min(1.15, 768 / AS.ScreenHeight))
 end
 
 function AS:StartSkinning(event)
@@ -271,18 +290,16 @@ function AS:StartSkinning(event)
 		end
 	end
 
-	-- Check forced Blizzard AddOns
 	for addonName, funcs in AS:OrderedPairs(AS.skins) do
+		if AS:CheckAddOn('ElvUI') and AS:GetElvUIBlizzardSkinOption(addonName) then
+			AS:SetOption(addonName, false)
+		end
+
+		-- Check forced Blizzard AddOns
 		if AS:CheckOption(addonName) and strfind(addonName, 'Blizzard_') and IsAddOnLoaded(addonName) then
 			for _, func in ipairs(funcs) do
 				AS:CallSkin(addonName, func, 'ADDON_LOADED', addonName)
 			end
-		end
-	end
-
-	for addonName, funcs in AS:OrderedPairs(AS.skins) do
-		if AS:CheckAddOn('ElvUI') and AS:GetElvUIBlizzardSkinOption(addonName) then
-			AS:SetOption(addonName, false)
 		end
 
 		if AS:CheckOption(addonName) then
@@ -305,6 +322,8 @@ function AS:StartSkinning(event)
 		AS:Print(format('Please report this to Azilroka immediately @ %s', AS:PrintURL(AS.TicketTracker)))
 	end
 
+	AS:EmbedInit()
+
 	AS.RunOnce = true
 end
 
@@ -319,8 +338,6 @@ function AS:Init(event, addon)
 
 	if event == 'PLAYER_LOGIN' then
 		AS:BuildOptions()
-		AS:UpdateMedia()
-		AS:EmbedInit()
 
 		if _G.EnhancedShadows then
 			AS.ES = _G.EnhancedShadows

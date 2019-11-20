@@ -7,6 +7,16 @@ local LastValue = CurrentValue
 local allowPowerEvent = true
 local myClass = select(2, UnitClass("player"))
 local Mp5Delay = 5
+local Mp5IgnoredSpells = {
+	[11689] = true, -- life tap 6
+	[11688] = true, -- life tap 5
+	[11687] = true, -- life tap 4
+	[1456] = true, -- life tap 3
+	[1455] = true, -- life tap 2
+	[1454] = true, -- life tap 1
+	[18182] = true, -- improved life tap 1
+	[18183] = true, -- improved life tap 2
+}
 
 local Update = function(self, elapsed)
 	local element = self.EnergyManaRegen
@@ -43,14 +53,14 @@ local Update = function(self, elapsed)
 				element.Spark:SetVertexColor(1, 1, 1, 1)
 				element:SetValue(Timer)
 				allowPowerEvent = true
-				
+
 				LastValue = CurrentValue
 			elseif Timer < 0 then
 				-- if negative, it's mp5delay
 				element.Spark:Show()
-				element:SetMinMaxValues(0, 5)
+				element:SetMinMaxValues(0, Mp5Delay)
 				element.Spark:SetVertexColor(1, 1, 0, 1)
-				
+
 				element:SetValue(math.abs(Timer))
 			end
 
@@ -83,7 +93,15 @@ local EventHandler = function(self, event, _, _, spellID)
 	end
 
 	if event == 'UNIT_SPELLCAST_SUCCEEDED' then
-		if spellID == 75 or spellID == 5019 then
+		local spellCost = false
+		local costTable = GetSpellPowerCost(spellID)
+		for _, costInfo in next, costTable do
+			if costInfo.cost then
+				spellCost = true
+			end
+		end
+
+		if (CurrentValue < LastValue) and (not spellCost or Mp5IgnoredSpells[spellID]) then
 			return
 		end
 

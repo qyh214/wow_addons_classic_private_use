@@ -49,11 +49,11 @@ G.nameplate.filters = {
 			},
 		},
 		triggers = {
-			requireTarget = true,
+			isNotTapDenied = true,
+			inCombatUnit = true,
 			nameplateType = {
-				friendlyPlayer = false,
-				enemyPlayer = false,
-				friendlyNPC = false,
+				enemyNPC = true,
+				enable = true,
 			},
 			inCombat = true,
 		},
@@ -66,11 +66,11 @@ G.nameplate.filters = {
 			},
 		},
 		triggers = {
-			requireTarget = true,
+			isNotTapDenied = true,
+			inCombatUnit = true,
 			nameplateType = {
-				friendlyPlayer = false,
-				enemyPlayer = false,
-				friendlyNPC = false,
+				enemyNPC = true,
+				enable = true,
 			},
 			inCombat = true,
 			targetMe = true,

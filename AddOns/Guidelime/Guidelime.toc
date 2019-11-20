@@ -1,6 +1,6 @@
 ## Title: Guidelime
 ## Author: Borick of Arthas(EU)
-## Version: 1.036
+## Version: 1.037
 ## Interface: 11302
 ## SavedVariables: GuidelimeData
 ## SavedVariablesPerCharacter: GuidelimeDataChar
@@ -24,6 +24,7 @@ Guidelime_EditorTools.lua
 Guidelime_Parser.lua
 Guidelime_Map.lua
 Guidelime_Import.lua
+Guidelime_QuestLog.lua
 Data\Guidelime_MapDB.lua
 Data\Guidelime_QuestsDB.lua
 Data\Guidelime_CreaturesDB.lua

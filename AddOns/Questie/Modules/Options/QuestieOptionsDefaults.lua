@@ -1,4 +1,5 @@
-QuestieOptionsDefaults = {...}
+---@class QuestieOptionsDefaults
+local QuestieOptionsDefaults = QuestieLoader:CreateModule("QuestieOptionsDefaults");
 
 function QuestieOptionsDefaults:Load()
     return {
@@ -21,7 +22,7 @@ function QuestieOptionsDefaults:Load()
             fadeOverPlayerDistance = 5,
             debugEnabled = false,
             debugEnabledPrint = false,
-            debugLevel = 4,
+            debugLevel = 0,
             nameplateX = -17,
             nameplateY = -7,
             nameplateScale = 1,
@@ -61,18 +62,24 @@ function QuestieOptionsDefaults:Load()
             hookTracking = true,
             trackerEnabled = true,
             trackerShowQuestLevel = true,
+            showBlizzardQuestTimer = false,
             trackerColorObjectives = 'white',
             trackerQuestPadding = 2,
             trackerSortObjectives = 'byComplete',
             trackerbindOpenQuestLog = 'left',
             trackerbindSetTomTom = 'ctrlleft',
+            trackerbindUntrack = "shiftleft",
             iconFadeLevel = 0.3,
             trackerLocked = true,
-            hideUnexploredMapIcons = false
+            hideUnexploredMapIcons = false,
+            showRepeatableQuests = true,
+            trackerCounterEnabled = true,
+            trackerBackgroundEnabled = false,
         },
         char = {
             complete = {},
             hidden = {},
+            enableMinimalisticIcons = false,
             enabled = true,
             lowlevel = false,
             manualMinLevelOffset = false,

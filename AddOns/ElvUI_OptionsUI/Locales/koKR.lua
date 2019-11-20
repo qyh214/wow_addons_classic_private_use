@@ -544,6 +544,7 @@ L["HH:MM Threshold"] = true
 L["Hide At Max Level"] = "만렙시 숨김"
 L["Hide Below Max Level"] = true
 L["Hide Both"] = "둘 다 숨기기"
+L["Hide Castbar text. Useful if your power height is very low or if you use power offset."] = true
 L["Hide Cooldown Bling"] = "재사용 깜빡임 끄기"
 L["Hide Delay"] = "숨김 지연"
 L["Hide Error Text"] = "전투중 에러 숨기기"
@@ -553,6 +554,7 @@ L["Hide In Vehicle"] = "탈것사용중 숨김"
 L["Hide Outside PvP"] = "PVP가 아닐때 숨김"
 L["Hide specific sections in the datatext tooltip."] = true
 L["Hide Spell Name"] = "주문 이름 숨김"
+L["Hide Text"] = true
 L["Hide Time"] = "시간 숨김"
 L["Hide tooltip while in combat."] = "전투 중에는 툴팁을 표시하지 않게 합니다."
 L["Hide Voice Buttons"] = true
@@ -720,6 +722,8 @@ L["Make the unitframe glow yellow when it is below this percent of health, it wi
 L["Make the world map smaller."] = "월드맵을 작게 표시합니다."
 L["Map Opacity When Moving"] = "이동시 지도 불투명도"
 L["Maps"] = "지도"
+L["Mark Quest Reward"] = true
+L["Marks the most valuable quest reward with a gold coin."] = true
 L["Masque Support"] = "Masque 지원"
 L["Match Frame Width"] = "프레임 너비와 맞춤"
 L["Match if Name or NPC ID is NOT in the list."] = true
@@ -1145,11 +1149,9 @@ L["Testing:"] = "|cff2eb7e4< 테스터 >|r"
 L["Text Color"] = "글자 색"
 L["Text Font Size"] = "내용 글씨 크기"
 L["Text Format"] = "글자 형식"
-L["Text Position"] = "위치 기준"
+L["Text Options"] = true
 L["Text Threshold"] = "글자 표시 임계점"
 L["Text Toggle On NPC"] = "NPC면 자원에 이름표시"
-L["Text xOffset"] = "글자 x 좌표"
-L["Text yOffset"] = "글자 y 좌표"
 L["Text"] = "글자 표시"
 L["Texture"] = "텍스쳐"
 L["Textured Icon"] = "스킬이미지 아이콘"
@@ -1215,8 +1217,11 @@ L["Threshold (in seconds) before text is shown in the MM:SS format. Set to -1 to
 L["Threshold before text goes into decimal form. Set to -1 to disable decimals."] = "소숫점으로 표시하게 될 기준점을 결정합니다. -1로 지정 시 작동하지 않습니다."
 L["Threshold before text turns red and is in decimal form. Set to -1 for it to never turn red"] = "이 값 이하로 시간이 내려가면 시간이 소숫점 단위 초읽기 형태로 표시됩니다.|n|n-1로 설정하면 이 기능을 사용하지 않습니다."
 L["Threshold before the icon will fade out and back in. Set to -1 to disable."] = true
+L["Threshold Colors"] = true
 L["Ticks"] = "주문 틱 표시"
 L["Tiers"] = true
+L["Time Indicator Colors"] = true
+L["Time Options"] = true
 L["Time Remaining Reverse"] = "남은시간이 짧은 순으로"
 L["Time Remaining"] = "남은시간이 긴 순으로"
 L["Time To Hold"] = "유지하는 시간"
@@ -1286,6 +1291,11 @@ L["Use Dead Backdrop"] = "죽음 배경 사용"
 L["Use Default"] = "기존 설정대로"
 L["Use drag and drop to rearrange filter priority or right click to remove a filter."] = "끌어다 놓기로 재정렬하거나 우클릭으로 필터에서 제거합니다."
 L["Use Health Texture on Background"] = true
+L["Use Indicator Color"] = true
+L["Use Instance ID or Name"] = true
+L["Use Map ID or Name"] = true
+L["Use Subzone Names"] = true
+L["Use Zone Names"] = true
 L["Use Portrait"] = "초상화 사용"
 L["Use Position Override"] = true
 L["Use Real ID BattleTag"] = "배틀태그 사용"
@@ -1333,10 +1343,8 @@ L["Will show Buffs in the Debuff position when there are no Debuffs active, or v
 L["Word Wrap"] = true
 L["World Map Coordinates"] = "세계 지도 좌표"
 L["Wrap After"] = "한 줄에 표시할 오라 수"
-L["X-Offset"] = "가로 조정"
-L["xOffset"] = "X 좌표"
-L["Y-Offset"] = "세로 조정"
-L["yOffset"] = "Y 좌표"
+L["X-Offset"] = "X 좌표"
+L["Y-Offset"] = "Y 좌표"
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from your current |cff4beb2c\"%s\"|r profile to |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You are going to copy settings for |cffD3CF00\"%s\"|r from |cff4beb2c\"%s\"|r profile to your current |cff4beb2c\"%s\"|r profile. Are you sure?"] = true
 L["You cannot copy settings from the same unit."] = "같은 유닛은 복사할 수 없습니다."
@@ -1437,38 +1445,6 @@ L["SEARCH_SYNTAX_DESC"] = [=[
      - keystone : Mythic Keystone.
      - followers : Follower items.
      - champions : Champion equipment.]=]
-
-L["TEXT_FORMAT_DESC"] = [=[글자가 표시되는 형식을 변경할 수 있습니다.
-
-
-|cff2eb7e4< 예시 >|r
-[namecolor][name] [difficultycolor][smartlevel] [shortclassification]
-
-[healthcolor][health:current-max]
-
-[powercolor][power:current]
-
-
-|cff2eb7e4< health(생명력) / power(자원) 형식 >|r
-|cffceff00current|r : 현재 수치
-
-|cffceff00percent|r : 현재 양을 %로 표시
-
-|cffceff00current-max|r : [현재 수치]-[최대값]
-
-|cffceff00current-percent|r : [현재 수치]-[%]
-
-|cffceff00current-max-percent|r : [현재 수치]-[최대값]-[%]
-
-|cffceff00deficit|r : 손실치만 표시하며 현재 수치가 최대치이면 표시하지 않음
-
-
-|cff2eb7e4< name(이름) 형식 >|r
-|cffceff00name:short|r : 최대 10글자
-|cffceff00name:medium|r : 최대 15글자
-|cffceff00name:long|r : 최대 20글자
-
-표시하고 싶지 않으면 빈칸으로 두면 되며, 자세한 정보는 |cff2eb7e4www.tukui.org|r 에서 확인하세요.]=]
 
 L[ [=[This works like a macro, you can run different situations to get the actionbar to page differently.
  Example: '[combat] 2;']=] ] = [=[이곳에 작성한 조건(예를 들어 전투여부)에 따라 이 행동단축바의 페이지를 자동으로 전환시킬 수 있습니다.

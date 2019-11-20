@@ -60,12 +60,17 @@ E.myrealm = GetRealmName()
 E.version = GetAddOnMetadata('ElvUI', 'Version')
 E.wowpatch, E.wowbuild = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
+E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
 E.resolution = ({GetScreenResolutions()})[GetCurrentResolution()] or GetCVar('gxWindowedResolution') --only used for now in our install.lua line 779
 E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.isMacClient = IsMacClient()
 E.NewSign = '|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:14:14|t' -- not used by ElvUI yet, but plugins like BenikUI and MerathilisUI use it.
 E.InfoColor = '|cfffe7b2c'
 E.TexturePath = [[Interface\\AddOns\\ElvUI_Classic\\Media\\Textures\\]]
+
+-- oUF Defines
+E.oUF.Tags.Vars.E = E
+E.oUF.Tags.Vars.L = L
 
 --Tables
 E.media = {}
@@ -139,12 +144,17 @@ E.ClassRole = {
 }
 
 E.DispelClasses = {
+	DRUID = { Curse = true, Poison = true },
+	MAGE = { Curse = true },
+	PALADIN = { Magic = true, Poison = true, Disease = true },
 	PRIEST = { Magic = true, Disease = true },
-	SHAMAN = { Magic = false, Curse = true },
-	PALADIN = { Poison = true, Magic = false, Disease = true },
-	DRUID = { Magic = false, Curse = true, Poison = true, Disease = false },
-	MONK = { Magic = false, Disease = true, Poison = true },
-	MAGE = { Curse = true }
+	SHAMAN = { Poison = true, Disease = true },
+	WARLOCK = { Magic = true }
+}
+
+E.BadDispels = {
+	[34914] = 'Vampiric Touch', --horrifies
+	[233490] = 'Unstable Affliction' --silences
 }
 
 --Workaround for people wanting to use white and it reverting to their class color.

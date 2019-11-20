@@ -17,16 +17,23 @@ local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 
 function UF:Construct_PlayerFrame(frame)
 	frame.Health = self:Construct_HealthBar(frame, true, true, 'RIGHT')
-	frame.Health.frequentUpdates = true;
 	frame.Power = self:Construct_PowerBar(frame, true, true, 'LEFT')
 	frame.Power.frequentUpdates = true;
+	frame.Castbar = self:Construct_Castbar(frame, L["Player Castbar"])
+	frame.InfoPanel = self:Construct_InfoPanel(frame)
 	frame.Name = self:Construct_NameText(frame)
-	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
-	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
 	frame.Buffs = self:Construct_Buffs(frame)
 	frame.Debuffs = self:Construct_Debuffs(frame)
+	frame.RestingIndicator = self:Construct_RestingIndicator(frame)
+	frame.CombatIndicator = self:Construct_CombatIndicator(frame)
+	frame.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(frame)
+	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
 	frame.DebuffHighlight = self:Construct_DebuffHighlight(frame)
-	frame.Castbar = self:Construct_Castbar(frame, L["Player Castbar"])
+	frame.ThreatIndicator = self:Construct_Threat(frame)
+	frame.PvPIndicator = self:Construct_PvPIcon(frame)
+
+	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
+	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
 
 	--Create a holder frame all "classbars" can be positioned into
 	frame.ClassBarHolder = CreateFrame("Frame", nil, frame)
@@ -45,24 +52,17 @@ function UF:Construct_PlayerFrame(frame)
 		end
 	end
 
-	frame.PowerPrediction = self:Construct_PowerPrediction(frame) -- must be AFTER Power & AdditionalPower
-	frame.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(frame)
-	frame.MouseGlow = self:Construct_MouseGlow(frame)
-	frame.TargetGlow = self:Construct_TargetGlow(frame)
-	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.RestingIndicator = self:Construct_RestingIndicator(frame)
-	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
-	frame.CombatIndicator = self:Construct_CombatIndicator(frame)
-	--frame.HealthPrediction = self:Construct_HealComm(frame)
-	frame.PvPText = self:Construct_PvPIndicator(frame)
 	frame.AuraBars = self:Construct_AuraBarHeader(frame)
-	frame.InfoPanel = self:Construct_InfoPanel(frame)
-	frame.PvPIndicator = self:Construct_PvPIcon(frame)
-	frame.Cutaway = self:Construct_Cutaway(frame)
-	frame.Fader = self:Construct_Fader()
 	frame.customTexts = {}
-
+	frame.Cutaway = self:Construct_Cutaway(frame)
 	frame.EnergyManaRegen = self:Construct_EnergyManaRegen(frame)
+	frame.Fader = self:Construct_Fader()
+	frame.HealthPrediction = self:Construct_HealComm(frame)
+	frame.MouseGlow = self:Construct_MouseGlow(frame)
+	frame.PowerPrediction = self:Construct_PowerPrediction(frame) -- must be AFTER Power & AdditionalPower
+	frame.PvPText = self:Construct_PvPIndicator(frame)
+	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
+	frame.TargetGlow = self:Construct_TargetGlow(frame)
 
 	frame:Point('BOTTOMLEFT', E.UIParent, 'BOTTOM', -413, 68) --Set to default position
 	E:CreateMover(frame, frame:GetName()..'Mover', L["Player Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,player,generalGroup')
@@ -83,7 +83,7 @@ function UF:Update_PlayerFrame(frame, db)
 		frame.POWERBAR_DETACHED = db.power.detachFromFrame
 		frame.USE_INSET_POWERBAR = not frame.POWERBAR_DETACHED and db.power.width == 'inset' and frame.USE_POWERBAR
 		frame.USE_MINI_POWERBAR = (not frame.POWERBAR_DETACHED and db.power.width == 'spaced' and frame.USE_POWERBAR)
-		frame.USE_POWERBAR_OFFSET = db.power.offset ~= 0 and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
+		frame.USE_POWERBAR_OFFSET = db.power.width == 'offset' and db.power.offset ~= 0 and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
 		frame.POWERBAR_OFFSET = frame.USE_POWERBAR_OFFSET and db.power.offset or 0
 
 		frame.POWERBAR_HEIGHT = not frame.USE_POWERBAR and 0 or db.power.height
@@ -118,49 +118,13 @@ function UF:Update_PlayerFrame(frame, db)
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 	_G[frame:GetName()..'Mover']:Size(frame:GetSize())
 
-	UF:Configure_InfoPanel(frame)
-
-	--Rest Icon
-	UF:Configure_RestingIndicator(frame)
-
-	--Combat Icon
-	UF:Configure_CombatIndicator(frame)
-
-	--Resource Bars
-	UF:Configure_ClassBar(frame)
-
-	--Health
 	UF:Configure_HealthBar(frame)
-
-	--Name
+	UF:Configure_Power(frame)
+	UF:Configure_InfoPanel(frame)
 	UF:UpdateNameSettings(frame)
 
-	--PvP
-	UF:Configure_PVPIndicator(frame)
-
-	--Power
-	UF:Configure_Power(frame)
-
-	-- Power Predicition
-	UF:Configure_PowerPrediction(frame)
-
-	--Portrait
-	UF:Configure_Portrait(frame)
-
-	--Auras
-	UF:EnableDisable_Auras(frame)
-	UF:Configure_Auras(frame, 'Buffs')
-	UF:Configure_Auras(frame, 'Debuffs')
-
-	-- Resurrect
-	UF:Configure_ResurrectionIcon(frame)
-
-	--Castbar
 	frame:DisableElement('Castbar')
 	UF:Configure_Castbar(frame)
-
-	--Raid Icon
-	UF:Configure_RaidIcon(frame)
 
 	if (not db.enable and not E.private.unitframe.disabledBlizzardFrames.player) then
 		CastingBarFrame_OnLoad(_G.CastingBarFrame, 'player', true, false)
@@ -170,35 +134,33 @@ function UF:Update_PlayerFrame(frame, db)
 		CastingBarFrame_SetUnit(_G.PetCastingBarFrame, nil)
 	end
 
-	--Fader
-	UF:Configure_Fader(frame)
+	UF:EnableDisable_Auras(frame)
+	UF:Configure_Auras(frame, 'Buffs')
+	UF:Configure_Auras(frame, 'Debuffs')
 
-	--OverHealing
-	--UF:Configure_HealComm(frame)
+	UF:Configure_ClassBar(frame)
+	UF:Configure_CombatIndicator(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_PVPIndicator(frame)
+	UF:Configure_RestingIndicator(frame)
+	UF:Configure_ResurrectionIcon(frame)
 
-	--Debuff Highlight
-	UF:Configure_DebuffHighlight(frame)
-
-	--AuraBars
+	UF:Configure_Threat(frame)
 	UF:Configure_AuraBars(frame)
-	--We need to update Target AuraBars if attached to Player AuraBars
-	--mainly because of issues when using power offset on player and switching to/from middle orientation
+	UF:Configure_CustomTexts(frame)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_EnergyManaRegen(frame)
+	UF:Configure_Fader(frame)
+	UF:Configure_HealComm(frame)
+	UF:Configure_PowerPrediction(frame)
+	UF:Configure_PVPIcon(frame)
+	UF:Configure_RaidIcon(frame)
+	UF:Configure_RaidRoleIcons(frame)
+
 	if E.db.unitframe.units.target.aurabar.attachTo == "PLAYER_AURABARS" and ElvUF_Target then
 		UF:Configure_AuraBars(ElvUF_Target)
 	end
-
-	UF:Configure_RaidRoleIcons(frame)
-
-	UF:Configure_EnergyManaRegen(frame)
-
-	--PvP & Prestige Icon
-	UF:Configure_PVPIcon(frame)
-
-	--Cutaway
-	UF:Configure_Cutaway(frame)
-
-	--CustomTexts
-	UF:Configure_CustomTexts(frame)
 
 	E:SetMoverSnapOffset(frame:GetName()..'Mover', -(12 + db.castbar.height))
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")

@@ -647,7 +647,6 @@ DF.CrowdControlSpells = {
 	[2637] = "DRUID", --Hibernate
 	[61391] = "DRUID", --Typhoon
 	[102359] = "DRUID", --Mass Entanglement
-	[99] = "DRUID", --Incapacitating Roar
 	[236748] = "DRUID", --Intimidating Roar
 	[5211] = "DRUID", --Mighty Bash
 	[45334] = "DRUID", --Immobilized

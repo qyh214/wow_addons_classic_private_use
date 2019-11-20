@@ -358,11 +358,19 @@ function worldmapProvider:RemovePinsByRef(ref)
     end
 end
 
-function worldmapProvider:RefreshAllData(fromOnShow)
-    self:RemoveAllData()
 
-    for icon, data in pairs(worldmapPins) do
-        self:HandlePin(icon, data)
+local lastUiMapId = -1;
+worldmapProvider.forceUpdate = false;
+function worldmapProvider:RefreshAllData(fromOnShow)
+    local mapId = self:GetMap():GetMapID()
+    if(lastUiMapId ~= mapId or worldmapProvider.forceUpdate) then
+        self:RemoveAllData()
+        for icon, data in pairs(worldmapPins) do
+            self:HandlePin(icon, data)
+        end
+        --DEFAULT_CHAT_FRAME:AddMessage(mapId .. " - " .. lastUiMapId .. " : " .. tostring(worldmapProvider.forceUpdate));
+        lastUiMapId = mapId;
+        worldmapProvider.forceUpdate = false;
     end
 end
 
@@ -372,13 +380,13 @@ function worldmapProvider:HandlePin(icon, data)
     -- check for a valid map
     if not uiMapID then return end
 
+    --Questie Modification
+    if(uiMapID ~= data.uiMapID and data.worldMapShowFlag == HBD_PINS_WORLDMAP_SHOW_CURRENT) then
+        return;
+    end
+
     local x, y
     if uiMapID == WORLD_MAP_ID then
-        -- Questie modifications!
-        if(data.worldMapShowFlag == HBD_PINS_WORLDMAP_SHOW_CURRENT) then
-            -- We show the icon when the mapid corresponds.
-            icon:Hide();
-        end
 
         -- should this pin show on the world map?
         if uiMapID ~= data.uiMapID and data.worldMapShowFlag ~= HBD_PINS_WORLDMAP_SHOW_WORLD then return end
@@ -415,8 +423,6 @@ function worldmapProvider:HandlePin(icon, data)
                         elseif data.worldMapShowFlag == HBD_PINS_WORLDMAP_SHOW_CURRENT then
                             -- Questie modifications!
                             show = false
-                            -- We hide it when it is not part of the current map.
-                            icon:Hide();
                         end
                         break
                         -- worldmap is handled above already
@@ -427,18 +433,13 @@ function worldmapProvider:HandlePin(icon, data)
 
                 if not show then return end
             end
-        else
-            -- Questie modifications!
-            if(data.worldMapShowFlag == HBD_PINS_WORLDMAP_SHOW_CURRENT) then
-                -- We show the icon when the mapid corresponds.
-                icon:Show();
-            end
         end
 
         -- translate coordinates
         x, y = HBD:GetZoneCoordinatesFromWorld(data.x, data.y, uiMapID)
     end
     if x and y then
+        worldmapProvider.forceUpdate = true;
         self:GetMap():AcquirePin("HereBeDragonsPinsTemplateQuestie", icon, x, y, data.frameLevelType)
     end
 end
@@ -742,6 +743,8 @@ function pins:RemoveWorldMapIcon(ref, icon)
         worldmapPins[icon] = nil
     end
     worldmapProvider:RemovePinByIcon(icon)
+
+    worldmapProvider.forceUpdate = true;
 end
 
 --- Remove all worldmap icons belonging to your addon (as tracked by "ref")
@@ -754,6 +757,8 @@ function pins:RemoveAllWorldMapIcons(ref)
     end
     worldmapProvider:RemovePinsByRef(ref)
     wipe(worldmapPinRegistry[ref])
+
+    worldmapProvider.forceUpdate = true;
 end
 
 --- Return the angle and distance from the player to the specified pin

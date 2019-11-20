@@ -20,15 +20,18 @@ function UF:Construct_PartyFrames()
 	self.RaisedElementParent = CreateFrame('Frame', nil, self)
 	self.RaisedElementParent.TextureParent = CreateFrame('Frame', nil, self.RaisedElementParent)
 	self.RaisedElementParent:SetFrameLevel(self:GetFrameLevel() + 100)
+
 	self.BORDER = E.Border
 	self.SPACING = E.Spacing
 	self.SHADOW_SPACING = 3
+
 	if self.isChild then
 		self.Health = UF:Construct_HealthBar(self, true)
-		self.MouseGlow = UF:Construct_MouseGlow(self)
-		self.TargetGlow = UF:Construct_TargetGlow(self)
 		self.Name = UF:Construct_NameText(self)
+
+		self.MouseGlow = UF:Construct_MouseGlow(self)
 		self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
+		self.TargetGlow = UF:Construct_TargetGlow(self)
 
 		self.originalParent = self:GetParent()
 
@@ -42,26 +45,27 @@ function UF:Construct_PartyFrames()
 		self.Health = UF:Construct_HealthBar(self, true, true, 'RIGHT')
 		self.Power = UF:Construct_PowerBar(self, true, true, 'LEFT')
 		self.Power.frequentUpdates = false;
-		self.PowerPrediction = UF:Construct_PowerPrediction(self)
-
-		self.Portrait3D = UF:Construct_Portrait(self, 'model')
-		self.Portrait2D = UF:Construct_Portrait(self, 'texture')
 		self.InfoPanel = UF:Construct_InfoPanel(self)
 		self.Name = UF:Construct_NameText(self)
 		self.Buffs = UF:Construct_Buffs(self)
 		self.Debuffs = UF:Construct_Debuffs(self)
+
 		self.AuraWatch = UF:Construct_AuraWatch(self)
-		self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
+		self.customTexts = {}
 		self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
-		self.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(self)
-		self.ResurrectIndicator = UF:Construct_ResurrectionIcon(self)
+		self.HealthPrediction = UF:Construct_HealComm(self)
 		self.MouseGlow = UF:Construct_MouseGlow(self)
 		self.PhaseIndicator = UF:Construct_PhaseIcon(self)
-		self.TargetGlow = UF:Construct_TargetGlow(self)
+		self.Portrait2D = UF:Construct_Portrait(self, 'texture')
+		self.Portrait3D = UF:Construct_Portrait(self, 'model')
+		self.PowerPrediction = UF:Construct_PowerPrediction(self)
+		self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
+		self.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(self)
 		self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
 		self.ReadyCheckIndicator = UF:Construct_ReadyCheckIcon(self)
-		--self.HealthPrediction = UF:Construct_HealComm(self)
-		self.customTexts = {}
+		self.ResurrectIndicator = UF:Construct_ResurrectionIcon(self)
+		self.TargetGlow = UF:Construct_TargetGlow(self)
+		self.ThreatIndicator = UF:Construct_Threat(self)
 
 		self.Sparkle = CreateFrame("Frame", nil, self)
 		self.Sparkle:SetAllPoints(self.Health)
@@ -189,70 +193,47 @@ function UF:Update_PartyFrames(frame, db)
 		end
 		frame.originalParent.childList[frame] = true;
 
-		if not InCombatLockdown() then
-			if childDB.enable then
-				frame:SetParent(frame.originalParent)
-				frame:Size(childDB.width, childDB.height)
-				frame:ClearAllPoints()
-				frame:Point(E.InversePoints[childDB.anchorPoint], frame.originalParent, childDB.anchorPoint, childDB.xOffset, childDB.yOffset)
-			else
-				frame:SetParent(E.HiddenFrame)
-			end
+		if childDB.enable then
+			frame:SetParent(frame.originalParent)
+			frame:Size(childDB.width, childDB.height)
+			frame:ClearAllPoints()
+			frame:Point(E.InversePoints[childDB.anchorPoint], frame.originalParent, childDB.anchorPoint, childDB.xOffset, childDB.yOffset)
+		else
+			frame:SetParent(E.HiddenFrame)
 		end
 
-		--Health
 		UF:Configure_HealthBar(frame)
+		UF:UpdateNameSettings(frame, frame.childType)
 
 		UF:Configure_RaidIcon(frame)
-
-		--Name
-		UF:UpdateNameSettings(frame, frame.childType)
 	else
-		if not InCombatLockdown() then
-			frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
-		end
+		frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 
-		UF:Configure_InfoPanel(frame)
 		UF:Configure_HealthBar(frame)
-
-		UF:UpdateNameSettings(frame)
-
-		UF:Configure_PhaseIcon(frame)
-
 		UF:Configure_Power(frame)
-
-		-- Power Predicition
-		UF:Configure_PowerPrediction(frame)
-
-		UF:Configure_Portrait(frame)
+		UF:Configure_InfoPanel(frame)
+		UF:UpdateNameSettings(frame)
 
 		UF:EnableDisable_Auras(frame)
 		UF:Configure_Auras(frame, 'Buffs')
 		UF:Configure_Auras(frame, 'Debuffs')
 
-		UF:Configure_ResurrectionIcon(frame)
-
-		UF:Configure_RaidDebuffs(frame)
-
-		UF:Configure_RaidIcon(frame)
-
-		UF:Configure_DebuffHighlight(frame)
-
-		--UF:Configure_HealComm(frame)
-
-		UF:Configure_RaidRoleIcons(frame)
-
 		UF:Configure_AuraWatch(frame)
-
-		UF:Configure_ReadyCheckIcon(frame)
-
 		UF:Configure_CustomTexts(frame)
+		UF:Configure_DebuffHighlight(frame)
+		UF:Configure_HealComm(frame)
+		UF:Configure_PhaseIcon(frame)
+		UF:Configure_Portrait(frame)
+		UF:Configure_PowerPrediction(frame)
+		UF:Configure_RaidDebuffs(frame)
+		UF:Configure_RaidIcon(frame)
+		UF:Configure_RaidRoleIcons(frame)
+		UF:Configure_ReadyCheckIcon(frame)
+		UF:Configure_ResurrectionIcon(frame)
+		UF:Configure_Threat(frame)
 	end
 
-	--Fader
 	UF:Configure_Fader(frame)
-
-	--Cutaway
 	UF:Configure_Cutaway(frame)
 
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")
