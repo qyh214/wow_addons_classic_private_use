@@ -42,6 +42,7 @@
 	local CONST_CLOUD_DATARQ = "CD"
 	local CONST_CLOUD_DATARC = "CE"
 	local CONST_CLOUD_EQUALIZE = "EQ"
+	local CONST_CLOUD_UNEQUALIZED = "NQ"
 	
 	local CONST_CLOUD_SHAREDATA = "SD"
 	local CONST_PVP_ENEMY = "PP"
@@ -60,6 +61,7 @@
 		["CLOUD_DATARQ"] = CONST_CLOUD_DATARQ,
 		["CLOUD_DATARC"] = CONST_CLOUD_DATARC,
 		["CLOUD_EQUALIZE"] = CONST_CLOUD_EQUALIZE,
+		["CLOUD_UNEQUALIZED"] = CONST_CLOUD_UNEQUALIZED,
 		["WIPE_CALL"] = CONST_WIPE_CALL,
 		["GUILD_SYNC"] = CONST_GUILD_SYNC,
 		["PVP_ENEMY"] = CONST_PVP_ENEMY,
@@ -353,6 +355,20 @@
 		end
 	end
 	
+	function _detalhes.network.Cloud_UnEqualized (player, realm, core_version, data)
+		if (core_version ~= _detalhes.realversion) then
+			return
+		end
+
+		_detalhes.last_combat_unequalized = _detalhes.last_combat_unequalized or {}
+		local uTable = _detalhes.last_combat_unequalized
+
+		for playerName, unEqualizedDamage in pairs (data) do
+			uTable [playerName] = uTable [playerName] or {}
+			uTable [playerName] [unEqualizedDamage] = (uTable [playerName] [unEqualizedDamage] or 0) + 1
+		end
+	end
+
 	function _detalhes.network.Cloud_Equalize (player, realm, core_version, data)
 		if (not _detalhes.in_combat) then
 			if (core_version ~= _detalhes.realversion) then
@@ -507,6 +523,7 @@
 		[CONST_CLOUD_DATARQ] = _detalhes.network.Cloud_DataRequest,
 		[CONST_CLOUD_DATARC] = _detalhes.network.Cloud_DataReceived,
 		[CONST_CLOUD_EQUALIZE] = _detalhes.network.Cloud_Equalize,
+		[CONST_CLOUD_UNEQUALIZED] = _detalhes.network.Cloud_UnEqualized,
 		[CONST_WIPE_CALL] = _detalhes.network.Wipe_Call,
 		
 		[CONST_GUILD_SYNC] = _detalhes.network.GuildSync,

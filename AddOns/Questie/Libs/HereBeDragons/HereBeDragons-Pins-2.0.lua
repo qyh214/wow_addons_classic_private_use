@@ -151,7 +151,10 @@ local function drawMinimapPin(pin, data)
         diffY = diffY/dist
     end
 
-    if dist <= 1 or data.floatOnEdge then
+    -- Questie Modification.
+    -- data.floatOnEdge is replaced by (data.floatOnEdge and ((pin.texture and pin.texture.a and pin.texture.a ~= 0) or pin.texture == nil))
+    -- icons will now only float on edge if they have an opacity which is not 0 or if no texture exist.
+    if dist <= 1 or (data.floatOnEdge and ((pin.texture and pin.texture.a and pin.texture.a ~= 0) or pin.texture == nil)) then
         pin:Show()
         pin:ClearAllPoints()
         pin:SetPoint("CENTER", pins.Minimap, "CENTER", diffX * minimapWidth, -diffY * minimapHeight)
@@ -360,7 +363,7 @@ end
 
 
 local lastUiMapId = -1;
-worldmapProvider.forceUpdate = false;
+worldmapProvider.forceUpdate = false; --Put into worldmapProvider to allow addons to force update from outside of HBD.
 function worldmapProvider:RefreshAllData(fromOnShow)
     local mapId = self:GetMap():GetMapID()
     if(lastUiMapId ~= mapId or worldmapProvider.forceUpdate) then

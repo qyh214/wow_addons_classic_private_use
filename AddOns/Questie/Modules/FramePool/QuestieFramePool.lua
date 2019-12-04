@@ -84,7 +84,9 @@ StaticPopupDialogs["QUESTIE_CONFIRMHIDE"] = {
 }
 
 -- Global Functions --
+---@return IconFrame
 function QuestieFramePool:GetFrame()
+    ---@type IconFrame
     local returnFrame = nil--tremove(_QuestieFramePool.unusedFrames)
 
     -- im not sure its this, but using string keys for the table prevents double-adding to _QuestieFramePool.unusedFrames, calling unload() twice could double-add it maybe?
@@ -212,7 +214,6 @@ function _QuestieFramePool:UnloadFrame(frame)
   frame.loaded = nil;
     tinsert(_QuestieFramePool.unusedFrames, frame)
 end]]--
----@class IconFrame
 function _QuestieFramePool:QuestieCreateFrame()
     _QuestieFramePool.numberOfFrames = _QuestieFramePool.numberOfFrames + 1
     local newFrame = QuestieFramePool.Qframe:New(_QuestieFramePool.numberOfFrames, _QuestieFramePool.Questie_Tooltip)
@@ -457,6 +458,10 @@ function _QuestieFramePool:GetObjectiveTooltip(icon)
                 local playerInfo = QuestiePlayer:GetPartyMemberByName(playerName)
                 if playerInfo then
                     local objectiveEntry = objectiveData[iconData.ObjectiveIndex]
+                    if not objectiveEntry then
+                        Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:GetObjectiveTooltip]", "No objective data for quest", quest.Id)
+                        objectiveEntry = {} -- This will make "GetRGBForObjective" return default color
+                    end
                     local remoteColor = QuestieLib:GetRGBForObjective(objectiveEntry)
                     local colorizedPlayerName = " (|c"..playerInfo.colorHex..playerName.."|r"..remoteColor..")|r"
                     local remoteText = iconData.ObjectiveData.Description

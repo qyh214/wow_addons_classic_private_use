@@ -1872,17 +1872,17 @@ function _G._detalhes:Start()
 		C_Timer.After (2, function()
 			_detalhes:RefreshPlaterIntegration()
 		end)
-
+	
 	--> override the overall data flag on this release only (remove on the next release)
 	--Details.overall_flag = 0x10
 	
 	--show warning message about classic beta
 	if (not DetailsFramework.IsClassicWow()) then
-		print ("|CFFFFFF00[Details!]: you're using the classic version of Details! on the 8.2.0 patch. If you need help, see our Discord (/details discord)")
+		print ("|CFFFFFF00[Details!]: you're using the classic version of Details! on the 8.2.5 patch. If you need help, see our Discord (/details discord)")
 	else
 		if (math.random (0, 2) == 0) then
-			print ("|CFFFFFF00[Details!]: Tiny Threat (aggro meter) plugin is updated to classic (cogwheel > raid plugins > Tiny Threat).")
-			print ("|CFFFFFF00[Details!]: Tiny Threat won't show users which does not have their Details! updated.")
+			print ("|CFFFFFF00[Details!]: To use Tiny Threat: cogwheel > raid plugins > Tiny Threat.")
+			print ("|CFFFFFF00[Details!]: To help with the BUG of '50 yard' combatlog limit INSIDE raids, try: /details sync.")
 		end
 	end
 

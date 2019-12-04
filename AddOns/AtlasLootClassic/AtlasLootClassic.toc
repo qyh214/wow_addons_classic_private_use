@@ -1,6 +1,6 @@
 ﻿## Interface: 11302
 ## Author: Lag
-## Version: v1.3.4
+## Version: v1.4.1
 ## SavedVariables: AtlasLootClassicDB
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDBIcon-1.0, LibDataBroker-1.1, LibClassicItemSets-1.0
 ## DefaultState: Enabled
@@ -70,6 +70,7 @@ Data\Mount.lua
 Data\ContentPhase.lua
 Data\Droprate.lua
 Data\AutoSelect.lua
+Data\Requirements.lua
 
 ItemDB\ItemDB.lua
 ItemDB\SoundData.lua

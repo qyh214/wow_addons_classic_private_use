@@ -10,6 +10,19 @@ local CSC_ScanTooltip = CreateFrame("GameTooltip", "CSC_ScanTooltip", nil, "Game
 CSC_ScanTooltip:SetOwner(WorldFrame, "ANCHOR_NONE");
 local CSC_ScanTooltipPrefix = "CSC_ScanTooltip";
 
+local weaponStringByWeaponId = {
+	[LE_ITEM_WEAPON_AXE1H] 		= CSC_WEAPON_AXE1H_TXT,
+	[LE_ITEM_WEAPON_AXE2H] 		= CSC_WEAPON_AXE2H_TXT,
+	[LE_ITEM_WEAPON_MACE1H] 	= CSC_WEAPON_MACE1H_TXT,
+	[LE_ITEM_WEAPON_MACE2H] 	= CSC_WEAPON_MACE2H_TXT,
+	[LE_ITEM_WEAPON_POLEARM] 	= CSC_WEAPON_POLEARM_TXT,
+	[LE_ITEM_WEAPON_SWORD1H] 	= CSC_WEAPON_SWORD1H_TXT,
+	[LE_ITEM_WEAPON_SWORD2H] 	= CSC_WEAPON_SWORD2H_TXT,
+	[LE_ITEM_WEAPON_STAFF] 		= CSC_WEAPON_STAFF_TXT,
+	[LE_ITEM_WEAPON_UNARMED] 	= CSC_WEAPON_UNARMED_TXT,
+	[LE_ITEM_WEAPON_DAGGER] 	= CSC_WEAPON_DAGGER_TXT
+};
+
 -- GENERAL UTIL FUNCTIONS --
 local function CSC_GetAppropriateDamage(unit, category)
 	if category == PLAYERSTAT_MELEE_COMBAT then
@@ -107,6 +120,70 @@ local function CSC_GetMP5FromGear(unit)
 	end
 
 	return mp5;
+end
+
+local function CSC_GetSkillRankAndModifier(skillHeader, skillName)
+	local numSkills = GetNumSkillLines();
+	local skillIndex = 0;
+	local currentHeader = nil;
+
+	for i = 1, numSkills do
+		local currentSkillName = select(1, GetSkillLineInfo(i));
+		local isHeader = select(2, GetSkillLineInfo(i));
+
+		if isHeader ~= nil and isHeader then
+			currentHeader = currentSkillName;
+		else
+			if (currentHeader == skillHeader and currentSkillName == skillName) then
+				skillIndex = i;
+				break;
+			end
+		end
+	end
+
+	local skillRank = nil;
+	local skillModifier = nil;
+	if (skillIndex > 0) then
+		skillRank = select(4, GetSkillLineInfo(skillIndex));
+		skillModifier = select(6, GetSkillLineInfo(skillIndex));
+	end
+
+	return skillRank, skillModifier;
+end
+
+local function CSC_GetBonusHitFromWeaponSkill(unit)
+
+	local bonusHit = 0;
+	local mainHandItemId = 16;
+
+	local itemId = GetInventoryItemID(unit, mainHandItemId);
+	if (itemId) then
+		local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
+		if itemSubtypeId then
+			local weaponString = weaponStringByWeaponId[itemSubtypeId];
+			if weaponString then
+				local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
+				if skillRank and skillModifier then
+					local weaponSkillMin = 300;
+					local weaponSkillBorder = 305;
+					
+					-- Weapon skill from racials should be already in skillRank
+					local totalWeaponSkill = skillRank + skillModifier;
+					
+					if totalWeaponSkill >= weaponSkillMin and totalWeaponSkill <= weaponSkillBorder then
+						local hitMult = 0.44; -- 0.44% per skill point
+						bonusHit = (totalWeaponSkill - weaponSkillMin) * hitMult;
+					elseif totalWeaponSkill > weaponSkillBorder then
+						local hitMult = 0.14; -- 0.14% per skill point
+						local skillDiff = totalWeaponSkill - weaponSkillBorder;
+						bonusHit = skillDiff * hitMult + 2.2; -- 5*0.44
+					end
+				end
+			end
+		end
+	end
+
+	return bonusHit;
 end
 -- GENERAL UTIL FUNCTIONS END --
 
@@ -442,6 +519,11 @@ function CSC_PaperDollFrame_SetHitChance(statFrame, unit)
 		hitChance = 0;
 	end
 
+	if CharacterStatsClassicDB.shouldAddWeaponSkillToHit then
+		local bonusHit = CSC_GetBonusHitFromWeaponSkill(unit);
+		hitChance = hitChance + bonusHit;
+	end
+
 	local hitChanceText = hitChance;
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_HIT_CHANCE, hitChanceText, true, hitChance);
 	statFrame.tooltip = STAT_HIT_CHANCE.." "..hitChanceText;
@@ -455,23 +537,12 @@ local function CSC_GetHitFromBiznicksAccurascope(unit)
 	local hitFromScope = 0;
 	local rangedIndex = 18;
 
-	local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, rangedIndex);
-	if hasItem then
-		local maxLines = CSC_ScanTooltip:NumLines();
-		for line=1, maxLines do
-			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
-			if leftText:GetText() then
-				local valueTxt = string.match(leftText:GetText(), "+%d+%% "..CSC_HIT_BIZNICKS_TXT);
-				if valueTxt then
-					valueTxt = string.match(valueTxt, "%d+");
-					if valueTxt then
-						local numValue = tonumber(valueTxt);
-						if numValue then
-							hitFromScope = numValue;
-							break;
-						end
-					end
-				end
+	local itemLink = GetInventoryItemLink(unit, rangedIndex);
+	if itemLink then
+		local itemId, enchantId = itemLink:match("item:(%d+):(%d*)");
+		if enchantId then
+			if tonumber(enchantId) == 2523 then
+				hitFromScope = hitFromScope + 3;
 			end
 		end
 	end

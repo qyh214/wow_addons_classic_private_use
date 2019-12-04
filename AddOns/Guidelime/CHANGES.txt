@@ -1,86 +1,18 @@
-tag 755852d7d6049431889c30b9f1cbdd53b6c7fb51 v1.037
-Author:	max-ri <max_r_@web.de>
-Date:	Tue Nov 19 17:30:59 2019 +0100
+tag f5dc7d5f7471c5ea557320fad65d9bbbc021b204 v1.040
+Author:	max-ri <51713394+max-ri@users.noreply.github.com>
+Date:	Fri Nov 29 12:21:19 2019 +0100
 
-v1.037
+v1.040
 
-commit bb994919e54fed4bdf40b931762224dbf52c48cd
-Author: max-ri <max_r_@web.de>
-Date:   Tue Nov 19 17:30:58 2019 +0100
-
-    v1.037
-
-commit 3b1ddabdd9ae84eb57190d17c7b8ca50cf540de1
-Author: max-ri <max_r_@web.de>
-Date:   Tue Nov 19 17:30:22 2019 +0100
-
-    wip: preparing new feature for quest log
-
-commit e05cb7568e9e8c19ed399a9218516885aafce73f
-Author: max-ri <max_r_@web.de>
-Date:   Tue Nov 19 17:29:30 2019 +0100
-
-    bugfix: an error occurs when the current guide has next guide
-
-commit ec61112c2a8f5915c28666064e42435b1cca5f70
-Author: max-ri <max_r_@web.de>
-Date:   Fri Nov 8 12:29:12 2019 +0100
-
-    unavailable steps should still be skippable
-
-commit 103354813ca2b88a5d3cdf73a6f8a8e8b6644a96
-Author: max-ri <max_r_@web.de>
-Date:   Fri Nov 8 12:28:34 2019 +0100
-
-    bugfix: whenever you have multiple guides listed under the [NX] tag, after you finish the current guide, all guides listed are available and clickable even if that guide doesn't apply to your class or race
-
-commit ff565150a28ce8d03e2a22b57fe129d67b36e462
-Author: max-ri <max_r_@web.de>
-Date:   Wed Nov 6 14:59:48 2019 +0100
-
-    display quest level and id in quest log
-    
-    when corresponding options are selected
-
-commit a46d964f29fd3935e08048f0c8b3ff86c7369515
-Author: max-ri <max_r_@web.de>
-Date:   Wed Nov 6 14:54:57 2019 +0100
-
-    corrections to quests db
-    
-    - wrong quest name "Thunderbrew Lager" changed to "Thunderbrew"
-    - prequests corrected for Commander Gor'shak, Secret of the Circle
-    - second possible quest giver added for Elmore's Task
-
-commit 0e29dc5d30df88bffeeb402357389c7e3d6ff205
-Author: max-ri <max_r_@web.de>
-Date:   Wed Nov 6 12:28:37 2019 +0100
-
-    bugfix: an error can occurs with certain quests
-    
-    eg 4201 The Love Potion
-
-commit c84122fb7e68fb322674f80e2624804e4ca5dc85
-Author: max-ri <max_r_@web.de>
-Date:   Wed Nov 6 12:22:48 2019 +0100
-
-    when option "Show suggested level for a quest" is selected also show D/R for dungeon/raid quests
-
-commit 7f4804b5274cade9c938720c6f64cc693ec7e7c4
-Author: max-ri <max_r_@web.de>
-Date:   Fri Oct 18 17:32:52 2019 +0200
-
-    wip: started work on displaying things in quest log
-
-commit 67af57b90299ee8630cf27c23a4574b3f5504438
-Author: max-ri <max_r_@web.de>
-Date:   Fri Oct 18 17:31:22 2019 +0200
-
-    scan guide script: added error message for unrecognized flight points
-
-commit 8d38474efabef28b8fdd2dc7a24e41b37b331c81
+commit d635da35afee1b1207c60a6b8270ef43ed246a90
 Author: max-ri <51713394+max-ri@users.noreply.github.com>
-Date:   Thu Oct 17 21:48:51 2019 +0200
+Date:   Fri Nov 29 12:21:19 2019 +0100
 
-    Update .gitignore
+    v1.040
+
+commit be9e00bee845b8ff6e3ae6a9e2f92965de24a954
+Author: max-ri <51713394+max-ri@users.noreply.github.com>
+Date:   Fri Nov 29 12:21:08 2019 +0100
+
+    bugfix: wrong default size for second arrow
 

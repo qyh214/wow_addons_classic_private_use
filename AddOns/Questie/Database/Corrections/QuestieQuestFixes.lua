@@ -269,6 +269,9 @@ function QuestieQuestFixes:Load()
         [1470] = {
             [QuestieDB.questKeys.exclusiveTo] = {1485}, -- #999
         },
+        [1471] = {
+            [QuestieDB.questKeys.exclusiveTo] = {1504}, -- #1542
+        },
         [1473] = {
             [QuestieDB.questKeys.exclusiveTo] = {1501},
         },
@@ -280,6 +283,9 @@ function QuestieQuestFixes:Load()
         },
         [1501] = {
             [QuestieDB.questKeys.exclusiveTo] = {1473},
+        },
+        [1504] = {
+            [QuestieDB.questKeys.exclusiveTo] = {1471}, -- #1542
         },
         [1506] = {
             [QuestieDB.questKeys.exclusiveTo] = {1478}, -- #1427
@@ -377,12 +383,21 @@ function QuestieQuestFixes:Load()
         [2358] = { -- bad race data
             [QuestieDB.questKeys.requiredRaces] = 77,
         },
+        [2501] = {
+            [QuestieDB.questKeys.preQuestGroup] = {2500,17}, -- #1541
+        },
         [2781] = {
             [QuestieDB.questKeys.startedBy] = {nil,{142122,150075,},nil,}, -- #1081
         },
         [2861] = {
             [QuestieDB.questKeys.startedBy] = {{4568,5144,5497,5885,},nil,nil,}, -- #1152
             [QuestieDB.questKeys.exclusiveTo] = {2846},
+        },
+        [2872] = {
+            [QuestieDB.questKeys.exclusiveTo] = {2873}, -- #1566
+        },
+        [2873] = {
+            [QuestieDB.questKeys.preQuestSingle] = {}, -- #1566
         },
         [2922] = {
             [QuestieDB.questKeys.preQuestSingle] = {}, -- Save Techbot's Brain doesn't need the Tinkmaster Overspark breadcrumb #687
@@ -660,6 +675,12 @@ function QuestieQuestFixes:Load()
         [6073] = {
             [QuestieDB.questKeys.startedBy] = {{5515,},nil,nil,},
         },
+        [6136] = {
+            [QuestieDB.questKeys.preQuestSingle] = {6133}, -- #1572
+        },
+        [6144] = {
+            [QuestieDB.questKeys.preQuestSingle] = {6135,6136}, -- #1572
+        },
         [6608] = {
             [QuestieDB.questKeys.exclusiveTo] = {6607}, -- #1186
         },
@@ -837,6 +858,9 @@ function QuestieQuestFixes:Load()
         },
         [8550] = { -- bad race data
             [QuestieDB.questKeys.requiredRaces] = 178,
+        },
+        [8552] = {
+            [QuestieDB.questKeys.startedBy] = {{1493},nil,{3985,},},
         },
         [8581] = { -- bad race data
             [QuestieDB.questKeys.requiredRaces] = 178,

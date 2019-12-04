@@ -270,7 +270,10 @@ function SlashCmdList.DETAILS (msg, editbox)
 			texture:SetTexCoord (math.random(), math.random(), math.random(), math.random(), math.random(), math.random(), math.random(), math.random())
 		end)
 		
-	
+	elseif (msg == "sync") then
+		_detalhes.data_sync = not _detalhes.data_sync
+		Details:Msg ("Sync: ", _detalhes.data_sync and "turned ON" or "turned OFF")
+
 	elseif (msg == "realmsync") then
 		
 		_detalhes.realm_sync = not _detalhes.realm_sync
