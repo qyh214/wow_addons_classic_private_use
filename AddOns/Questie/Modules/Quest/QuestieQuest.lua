@@ -320,7 +320,6 @@ function QuestieQuest:AcceptQuest(questId)
     if(QuestiePlayer.currentQuestlog[questId] == nil) then
         Questie:Debug(DEBUG_INFO, "[QuestieQuest]: ".. QuestieLocale:GetUIString('DEBUG_ACCEPT_QUEST', questId));
 
-
         --Get all the Frames for the quest and unload them, the available quest icon for example.
         QuestieMap:UnloadQuestFrames(questId);
         QuestieHash:AddNewQuestHash(questId)
@@ -367,6 +366,7 @@ function QuestieQuest:CompleteQuest(quest)
     QuestiePlayer.currentQuestlog[questId] = nil;
     -- Only quests that aren't repeatable should be marked complete, otherwise objectives for repeatable quests won't track correctly - #1433
     Questie.db.char.complete[questId] = not quest.Repeatable
+
     QuestieHash:RemoveQuestHash(questId)
 
     --This should probably be done first, because DrawAllAvailableQuests looks at QuestieMap.questIdFrames[QuestId] to add available
@@ -395,6 +395,7 @@ function QuestieQuest:AbandonedQuest(questId)
     QuestieTooltips:RemoveQuest(questId)
     if(QuestiePlayer.currentQuestlog[questId]) then
         QuestiePlayer.currentQuestlog[questId] = nil
+
         QuestieHash:RemoveQuestHash(questId)
 
         --Unload all the quest frames from the map.
@@ -424,23 +425,25 @@ function QuestieQuest:AbandonedQuest(questId)
     end
 end
 
-function QuestieQuest:UpdateQuest(QuestId)
-    local quest = QuestieDB:GetQuest(QuestId);
-    if quest and not Questie.db.char.complete[QuestId] then
+function QuestieQuest:UpdateQuest(questId)
+    local quest = QuestieDB:GetQuest(questId)
+    if quest and not Questie.db.char.complete[questId] then
         QuestieQuest:PopulateQuestLogInfo(quest)
         QuestieQuest:GetAllQuestObjectives(quest) -- update quest log values in quest object
         QuestieQuest:UpdateObjectiveNotes(quest)
-        if QuestieQuest:IsComplete(quest) or QuestieQuest:isCompleteByQuestId(QuestId) or IsQuestComplete(QuestId) then
-            --DEFAULT_CHAT_FRAME:AddMessage("Finished " .. QuestId);
-            QuestieMap:UnloadQuestFrames(QuestId);
+        local isComplete = QuestieQuest:IsComplete(quest)
+        if isComplete == 1 then -- Quest is complete
+            QuestieMap:UnloadQuestFrames(questId)
             QuestieQuest:AddFinisher(quest)
-
+        elseif isComplete == -1 then -- Failed quests should be shown as available again
+            QuestieMap:UnloadQuestFrames(questId)
+            _QuestieQuest:DrawAvailableQuest(quest)
         else
             --DEFAULT_CHAT_FRAME:AddMessage("Still not finished " .. QuestId);
         end
         QuestieTracker:Update()
 
-        Questie:SendMessage("QC_ID_BROADCAST_QUEST_UPDATE", QuestId);
+        Questie:SendMessage("QC_ID_BROADCAST_QUEST_UPDATE", questId)
     end
 end
 --Run this if you want to update the entire table
@@ -499,38 +502,25 @@ local function Counthack(tab) -- according to stack overflow, # and table.getn a
     return count
 end
 
-function QuestieQuest:_IsCompleteHack(Quest) -- adding this because I hit my threshold of 3 hours trying to debug why .isComplete isnt working properly-- we can fix this later
-    local logID = GetQuestLogIndexByID(Quest.Id);
-    if logID ~= 0 then
-        _, _, _, _, _, Quest.isComplete, _, _, _, _, _, _, _, _, _, Quest.isHidden = GetQuestLogTitle(logID)
-        if Quest.isComplete and Quest.isComplete == 1 then
-            return true;
-        end
+--@param quest QuestieQuest @The quest to check for completion
+--@return integer @Complete = 1, Failed = -1, Incomplete = 0
+function QuestieQuest:IsComplete(quest)
+    local questId = quest.Id
+    local questLogIndex = GetQuestLogIndexByID(questId)
+    local _, _, _, _, _, isComplete, _, _, _, _, _, _, _, _, _, _, _ = GetQuestLogTitle(questLogIndex)
+
+    if isComplete ~= nil then
+        return isComplete -- 1 if the quest is completed, -1 if the quest is failed
     end
+
+    isComplete = IsQuestComplete(questId) -- true if the quest is both in the quest log and complete, false otherwise
+    if isComplete then
+        return 1
+    end
+
+    return 0
 end
 
-function QuestieQuest:isCompleteByQuestId(questId)
-    local logID = GetQuestLogIndexByID(questId);
-    local _, _, _, _, _, isComplete, _, questID, _, _, _, _, _, _, _, _, _ = GetQuestLogTitle(logID)
-
-    local allComplete = true;
-    local numQuestLogLeaderBoards = GetNumQuestLeaderBoards(questId)
-    for index=1, numQuestLogLeaderBoards do
-        local desc, type, done = GetQuestLogLeaderBoard(index, questId)
-        if(done == false) then
-            allComplete = false;
-        end
-    end
-    if(isComplete == 1 and allComplete == true) then
-        return true;
-    else
-        return nil;
-    end
-end
-
-function QuestieQuest:IsComplete(Quest)
-    return Quest.Objectives == nil or Counthack(Quest.Objectives) == 0 or Quest.isComplete or QuestieQuest:_IsCompleteHack(Quest);
-end
 -- iterate all notes, update / remove as needed
 function QuestieQuest:UpdateObjectiveNotes(quest)
     Questie:Debug(DEBUG_SPAM, "[QuestieQuest]: UpdateObjectiveNotes:", quest.Id)
@@ -563,9 +553,9 @@ function QuestieQuest:AddFinisher(quest)
             Questie:Debug(DEBUG_SPAM, "[QuestieQuest]: ".. QuestieLocale:GetUIString('DEBUG_NO_FINISH', questId, quest.name))
         end
         if(finisher ~= nil and finisher.spawns ~= nil) then
-            for Zone, Spawns in pairs(finisher.spawns) do
-                if(Zone ~= nil and Spawns ~= nil) then
-                    for _, coords in ipairs(Spawns) do
+            for finisherZone, spawns in pairs(finisher.spawns) do
+                if(finisherZone ~= nil and spawns ~= nil) then
+                    for _, coords in ipairs(spawns) do
                         local data = {}
                         data.Id = questId;
                         data.Icon = ICON_TYPE_COMPLETE;
@@ -576,19 +566,19 @@ function QuestieQuest:AddFinisher(quest)
                         data.Name = finisher.name
                         data.IsObjectiveNote = false
                         if(coords[1] == -1 or coords[2] == -1) then
-                            if(instanceData[Zone] ~= nil) then
-                                for index, value in ipairs(instanceData[Zone]) do
+                            if(InstanceLocations[finisherZone] ~= nil) then
+                                for _, value in ipairs(InstanceLocations[finisherZone]) do
                                     --QuestieMap:DrawWorldIcon(data, value[1], value[2], value[3])
                                     --Questie:Debug(DEBUG_SPAM, "Conv:", Zone, "To:", ZoneDataAreaIDToUiMapID[value[1]])
                                     --local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, value[1], value[2], value[3])
-                                    local z = value[1];
+                                    local zone = value[1];
                                     local x = value[2];
                                     local y = value[3];
 
                                     -- Calculate mid point if waypoints exist, we need to do this before drawing the lines
                                     -- as we need the icon handle for the lines.
-                                    if(finisher.waypoints and finisher.waypoints[z]) then
-                                        local midX, midY = QuestieLib:CalculateWaypointMidPoint(finisher.waypoints[z]);
+                                    if(finisher.waypoints and finisher.waypoints[zone]) then
+                                        local midX, midY = QuestieLib:CalculateWaypointMidPoint(finisher.waypoints[zone]);
                                         x = midX or x;
                                         y = midY or y;
                                         -- The above code should do the same... remove this after testing it.
@@ -598,14 +588,10 @@ function QuestieQuest:AddFinisher(quest)
                                         --end
                                     end
 
-                                    local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, z, x, y)
+                                    local icon, _ = QuestieMap:DrawWorldIcon(data, zone, x, y)
 
-                                    if(finisher.waypoints and finisher.waypoints[z]) then
-                                        local lineFrames = QuestieFramePool:CreateWaypoints(icon, finisher.waypoints[z]);
-                                        for index, lineFrame in ipairs(lineFrames) do
-                                            QuestieMap:DrawLineIcon(lineFrame, z, x, y);
-                                            --HBDPins:AddWorldMapIconMap(Questie, lineFrame, ZoneDataAreaIDToUiMapID[z], x, y, HBD_PINS_WORLDMAP_SHOW_CURRENT)
-                                        end
+                                    if(finisher.waypoints and finisher.waypoints[zone]) then
+                                        QuestieMap:DrawWaypoints(icon, finisher.waypoints[zone], zone, x, y)
                                     end
                                 end
                             end
@@ -616,8 +602,8 @@ function QuestieQuest:AddFinisher(quest)
 
                             -- Calculate mid point if waypoints exist, we need to do this before drawing the lines
                             -- as we need the icon handle for the lines.
-                            if(finisher.waypoints and finisher.waypoints[Zone]) then
-                                local midX, midY = QuestieLib:CalculateWaypointMidPoint(finisher.waypoints[Zone]);
+                            if(finisher.waypoints and finisher.waypoints[finisherZone]) then
+                                local midX, midY = QuestieLib:CalculateWaypointMidPoint(finisher.waypoints[finisherZone]);
                                 x = midX or x;
                                 y = midY or y;
                                 -- The above code should do the same... remove this after testing it.
@@ -627,14 +613,10 @@ function QuestieQuest:AddFinisher(quest)
                                 --end
                             end
 
-                            local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, Zone, x, y)
+                            local icon, _ = QuestieMap:DrawWorldIcon(data, finisherZone, x, y)
 
-                            if(finisher.waypoints and finisher.waypoints[Zone]) then
-                                local lineFrames = QuestieFramePool:CreateWaypoints(icon, finisher.waypoints[Zone]);
-                                for index, lineFrame in ipairs(lineFrames) do
-                                    QuestieMap:DrawLineIcon(lineFrame, Zone, x, y);
-                                    --HBDPins:AddWorldMapIconMap(Questie, lineFrame, ZoneDataAreaIDToUiMapID[Zone], x, y, HBD_PINS_WORLDMAP_SHOW_CURRENT)
-                                end
+                            if(finisher.waypoints and finisher.waypoints[finisherZone]) then
+                                QuestieMap:DrawWaypoints(icon, finisher.waypoints[finisherZone], finisherZone, x, y)
                             end
                         end
                     end
@@ -643,7 +625,6 @@ function QuestieQuest:AddFinisher(quest)
         end
     end
 end
-
 
 
 -- this is for forcing specific things on to the map (That aren't quest related)
@@ -862,7 +843,7 @@ end
 function QuestieQuest:PopulateObjectiveNotes(quest) -- this should be renamed to PopulateNotes as it also handles finishers now
     Questie:Debug(DEBUG_DEVELOP, "[QuestieQuest:PopulateObjectiveNotes]", "Populating objectives for:", quest.Id)
     if not quest then return; end
-    if QuestieQuest:IsComplete(quest) then
+    if QuestieQuest:IsComplete(quest) == 1 then
         QuestieQuest:AddFinisher(quest)
         return
     end
@@ -1203,34 +1184,6 @@ end
 
 --Draw a single available quest, it is used by the DrawAllAvailableQuests function.
 function _QuestieQuest:DrawAvailableQuest(questObject) -- prevent recursion
-    return _QuestieQuest:DrawAvailableQuest(questObject, false)
-end
-
-function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
-
-    --If the object is nil we just return
-    if (questObject == nil) then
-        return false;
-    end
-
-    -- recheck IsDoable (shouldn't be needed)
-    if not _QuestieQuest:IsDoable(questObject) then return false; end
-
-    -- where applicable, make the exclusivegroup quests available again (TESTED)
-    if questObject.ExclusiveQuestGroup and (not noChildren) then
-        for k, v in pairs(questObject.ExclusiveQuestGroup) do
-            local quest = QuestieDB:GetQuest(v)
-            if _QuestieQuest:IsDoable(quest) then
-                _QuestieQuest:DrawAvailableQuest(quest, true);
-            end
-        end
-    end
-
-    --If we have it in the questlog already, we should not draw any available icons for that shidazzle.
-    if QuestiePlayer.currentQuestlog and QuestiePlayer.currentQuestlog[questObject.Id] then
-        return false;
-    end
-
 
     --TODO More logic here, currently only shows NPC quest givers.
     if questObject.Starts["GameObject"] ~= nil then
@@ -1251,8 +1204,8 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
 
                             data.IsObjectiveNote = false
                             if(coords[1] == -1 or coords[2] == -1) then
-                                if(instanceData[Zone] ~= nil) then
-                                    for index, value in ipairs(instanceData[Zone]) do
+                                if(InstanceLocations[Zone] ~= nil) then
+                                    for index, value in ipairs(InstanceLocations[Zone]) do
                                         QuestieMap:DrawWorldIcon(data, value[1], value[2], value[3])
                                     end
                                 end
@@ -1269,8 +1222,8 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
             local NPC = QuestieDB:GetNPC(NPCID)
             if (NPC ~= nil and NPC.spawns ~= nil and NPC.friendly) then
                 --Questie:Debug(DEBUG_DEVELOP,"Adding Quest:", questObject.Id, "StarterNPC:", NPC.Id)
-                for Zone, Spawns in pairs(NPC.spawns) do
-                    if(Zone ~= nil and Spawns ~= nil) then
+                for npcZone, Spawns in pairs(NPC.spawns) do
+                    if(npcZone ~= nil and Spawns ~= nil) then
                         --Questie:Debug("Zone", Zone)
                         --Questie:Debug("Qid:", questid)
                         for _, coords in ipairs(Spawns) do
@@ -1288,18 +1241,18 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
                             --    return {QuestieLib:PrintDifficultyColor(data.QuestData.Level, "[" .. data.QuestData.Level .. "] " .. data.QuestData.Name), "|cFFFFFFFFStarted by: |r|cFF22FF22" .. data.QuestData.NPCName, "QuestId:"..data.QuestData.Id}
                             --end
                             if(coords[1] == -1 or coords[2] == -1) then
-                                if(instanceData[Zone] ~= nil) then
-                                    for index, value in ipairs(instanceData[Zone]) do
+                                if(InstanceLocations[npcZone] ~= nil) then
+                                    for _, value in ipairs(InstanceLocations[npcZone]) do
                                         --Questie:Debug(DEBUG_SPAM, "Conv:", Zone, "To:", ZoneDataAreaIDToUiMapID[value[1]])
                                         --local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, value[1], value[2], value[3])
-                                        local z = value[1];
+                                        local zone = value[1];
                                         local x = value[2];
                                         local y = value[3];
 
                                         -- Calculate mid point if waypoints exist, we need to do this before drawing the lines
                                         -- as we need the icon handle for the lines.
-                                        if(NPC.waypoints and NPC.waypoints[z]) then
-                                            local midX, midY = QuestieLib:CalculateWaypointMidPoint(NPC.waypoints[z]);
+                                        if(NPC.waypoints and NPC.waypoints[zone]) then
+                                            local midX, midY = QuestieLib:CalculateWaypointMidPoint(NPC.waypoints[zone]);
                                             x = midX or x;
                                             y = midY or y;
                                             -- The above code should do the same... remove this after testing it.
@@ -1309,16 +1262,11 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
                                             --end
                                         end
 
-                                        local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, z, x, y)
+                                        local icon, _ = QuestieMap:DrawWorldIcon(data, zone, x, y)
 
-                                        if(NPC.waypoints and NPC.waypoints[z]) then
-                                            local lineFrames = QuestieFramePool:CreateWaypoints(icon, NPC.waypoints[z]);
-                                            for index, lineFrame in ipairs(lineFrames) do
-                                                QuestieMap:DrawLineIcon(lineFrame, z, x, y);
-                                                --HBDPins:AddWorldMapIconMap(Questie, lineFrame, ZoneDataAreaIDToUiMapID[z], x, y, HBD_PINS_WORLDMAP_SHOW_CURRENT)
-                                            end
+                                        if(NPC.waypoints and NPC.waypoints[zone]) then
+                                            QuestieMap:DrawWaypoints(icon, NPC.waypoints[zone], zone, x, y)
                                         end
-
                                     end
                                 end
                             else
@@ -1327,8 +1275,8 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
 
                                 -- Calculate mid point if waypoints exist, we need to do this before drawing the lines
                                 -- as we need the icon handle for the lines.
-                                if(NPC.waypoints and NPC.waypoints[Zone]) then
-                                    local midX, midY = QuestieLib:CalculateWaypointMidPoint(NPC.waypoints[Zone]);
+                                if(NPC.waypoints and NPC.waypoints[npcZone]) then
+                                    local midX, midY = QuestieLib:CalculateWaypointMidPoint(NPC.waypoints[npcZone]);
                                     x = midX or x;
                                     y = midY or y;
                                     -- The above code should do the same... remove this after testing it.
@@ -1338,14 +1286,10 @@ function _QuestieQuest:DrawAvailableQuest(questObject, noChildren)
                                     --end
                                 end
 
-                                local icon, minimapIcon = QuestieMap:DrawWorldIcon(data, Zone, x, y)
+                                local icon, _ = QuestieMap:DrawWorldIcon(data, npcZone, x, y)
 
-                                if(NPC.waypoints and NPC.waypoints[Zone]) then
-                                  local lineFrames = QuestieFramePool:CreateWaypoints(icon, NPC.waypoints[Zone]);
-                                  for index, lineFrame in ipairs(lineFrames) do
-                                    QuestieMap:DrawLineIcon(lineFrame, Zone, x, y);
-                                    --HBDPins:AddWorldMapIconMap(Questie, lineFrame, ZoneDataAreaIDToUiMapID[Zone], x, y, HBD_PINS_WORLDMAP_SHOW_CURRENT)
-                                  end
+                                if(NPC.waypoints and NPC.waypoints[npcZone]) then
+                                    QuestieMap:DrawWaypoints(icon, NPC.waypoints[npcZone], npcZone, x, y)
                                 end
                             end
                         end
@@ -1360,10 +1304,8 @@ function QuestieQuest:DrawAllAvailableQuests()--All quests between
     --This should probably be called somewhere else!
     --QuestieFramePool:UnloadAll()
 
-    local playerLevel = QuestiePlayer:GetPlayerLevel();
-
     local count = 0
-    for questId, qid in pairs(QuestieQuest.availableQuests) do
+    for questId, _ in pairs(QuestieQuest.availableQuests) do
 
         --If the quest is not drawn draw the quest, otherwise skip.
         if(not QuestieMap.questIdFrames[questId]) then
@@ -1372,7 +1314,7 @@ function QuestieQuest:DrawAllAvailableQuests()--All quests between
             _QuestieQuest:DrawAvailableQuest(quest)
         else
             --We might have to update the icon in this situation (config changed/level up)
-            for index, frame in ipairs(QuestieMap:GetFramesForQuest(questId)) do
+            for _, frame in ipairs(QuestieMap:GetFramesForQuest(questId)) do
                 if frame and frame.data then
                     local newIcon = _QuestieQuest:GetQuestIcon(frame.data.QuestData)
                     if newIcon ~= frame.data.Icon then
@@ -1448,65 +1390,21 @@ function _QuestieQuest:IsDoable(quest)
         return false
     end
 
-    if not QuestieProfessions:HasReputation(quest.requiredMinRep, quest.requiredMaxRep) then
+    if not QuestieReputation:HasReputation(quest.requiredMinRep, quest.requiredMaxRep) then
         return false
     end
 
     -- Check the preQuestGroup field where every required quest has to be complete for a quest to show up
     if quest.preQuestGroup ~= nil and next(quest.preQuestGroup) ~= nil then
-        return _QuestieQuest:IsPreQuestGroupFulfilled(quest.preQuestGroup)
+        return quest:IsPreQuestGroupFulfilled()
     end
 
     -- Check the preQuestSingle field where just one of the required quests has to be complete for a quest to show up
     if quest.preQuestSingle ~= nil and next(quest.preQuestSingle) ~= nil then
-        return _QuestieQuest:IsPreQuestSingleFulfilled(quest.preQuestSingle)
+        return quest:IsPreQuestSingleFulfilled()
     end
 
     return true
-end
-
-function _QuestieQuest:IsPreQuestGroupFulfilled(preQuestGroup)
-    for _, preQuestId in pairs(preQuestGroup) do
-        -- If a quest is not complete and no exlusive quest is complete, the requirement is not fulfilled
-        if not Questie.db.char.complete[preQuestId] then
-            local preQuest = QuestieDB:GetQuest(preQuestId);
-            if preQuest == nil or preQuest.ExclusiveQuestGroup == nil then
-                return false
-            end
-
-            local anyExlusiveFinished = false
-            for _, v in pairs(preQuest.ExclusiveQuestGroup) do
-                if Questie.db.char.complete[v] then
-                    anyExlusiveFinished = true
-                end
-            end
-            if not anyExlusiveFinished then
-                return false
-            end
-        end
-    end
-    -- All preQuests are complete
-    return true
-end
-
-function _QuestieQuest:IsPreQuestSingleFulfilled(preQuestSingle)
-    for _, preQuestId in pairs(preQuestSingle) do
-        local preQuest = QuestieDB:GetQuest(preQuestId);
-
-        -- If a quest is complete the requirement is fulfilled
-        if Questie.db.char.complete[preQuestId] then
-            return true
-        -- If one of the quests in the exclusive group is complete the requirement is fulfilled
-        elseif preQuest and preQuest.ExclusiveQuestGroup then
-            for _, v in pairs(preQuest.ExclusiveQuestGroup) do
-                if Questie.db.char.complete[v] then
-                    return true
-                end
-            end
-        end
-    end
-    -- No preQuest is complete
-    return false
 end
 
 --TODO Check that this function does what it is supposed to...
@@ -1528,7 +1426,7 @@ function QuestieQuest:CalculateAvailableQuests()
         --Check if we've already completed the quest and that it is not "manually" hidden and that the quest is not currently in the questlog.
         if(
             (not Questie.db.char.complete[questID]) and -- Don't show completed quests
-            (not QuestiePlayer.currentQuestlog[questID]) and -- Don't show quests if they're already in the quest log
+            ((not QuestiePlayer.currentQuestlog[questID]) or QuestieQuest:IsComplete(quest) == -1) and -- Don't show quests if they're already in the quest log
             (not QuestieCorrections.hiddenQuests[questID]) and -- Don't show blacklisted quests
             ((not quest.Repeatable) or (quest.Repeatable and showRepeatableQuests))) then -- Show repeatable quests if the quest is repeatable and the option is enabled
 

@@ -11,6 +11,7 @@ local SetCVar = SetCVar
 E.Options.args.maps = {
 	type = "group",
 	name = L["Maps"],
+	order = 2,
 	childGroups = "tab",
 	args = {
 		worldMap = {
@@ -67,7 +68,7 @@ E.Options.args.maps = {
 							get = function(info) return E.global.general.fadeMapWhenMoving end,
 							set = function(info, value)
 								E.global.general.fadeMapWhenMoving = value;
-								SetCVar("mapFade", (value == true and 1 or 0))
+								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
 							end,
 						},
 						mapAlphaWhenMoving = {
@@ -79,8 +80,18 @@ E.Options.args.maps = {
 							get = function(info) return E.global.general.mapAlphaWhenMoving end,
 							set = function(info, value)
 								E.global.general.mapAlphaWhenMoving = value;
-								WORLD_MAP_MIN_ALPHA = value;
-								SetCVar("mapAnimMinAlpha", value)
+								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
+							end,
+						},
+						fadeMapDuration = {
+							order = 7,
+							type = "range",
+							name = L["Fade Duration"],
+							min = 0, max = 1, step = 0.01,
+							get = function(info) return E.global.general.fadeMapDuration end,
+							set = function(info, value)
+								E.global.general.fadeMapDuration = value;
+								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
 							end,
 						},
 					},
@@ -434,6 +445,52 @@ E.Options.args.maps = {
 							name = L["Open Ticket"],
 							get = function(info) return E.db.general.minimap.icons.ticket[info[#info]] end,
 							set = function(info, value) E.db.general.minimap.icons.ticket[info[#info]] = value; MM:UpdateSettings() end,
+							args = {
+								position = {
+									order = 1,
+									type = "select",
+									name = L["Position"],
+									disabled = function() return not E.private.general.minimap.enable end,
+									values = {
+										["LEFT"] = L["Left"],
+										["RIGHT"] = L["Right"],
+										["TOP"] = L["Top"],
+										["BOTTOM"] = L["Bottom"],
+										["TOPLEFT"] = L["Top Left"],
+										["TOPRIGHT"] = L["Top Right"],
+										["BOTTOMLEFT"] = L["Bottom Left"],
+										["BOTTOMRIGHT"] = L["Bottom Right"],
+									},
+								},
+								scale = {
+									order = 2,
+									type = "range",
+									name = L["Scale"],
+									min = 0.5, max = 2, step = 0.05,
+									disabled = function() return not E.private.general.minimap.enable end,
+								},
+								xOffset = {
+									order = 3,
+									type = "range",
+									name = L["X-Offset"],
+									min = -50, max = 50, step = 1,
+									disabled = function() return not E.private.general.minimap.enable end,
+								},
+								yOffset = {
+									order = 4,
+									type = "range",
+									name = L["Y-Offset"],
+									min = -50, max = 50, step = 1,
+									disabled = function() return not E.private.general.minimap.enable end,
+								},
+							},
+						},
+						battlefield = {
+							order = 5,
+							type = "group",
+							name = L["Battlefield"],
+							get = function(info) return E.db.general.minimap.icons.battlefield[info[#info]] end,
+							set = function(info, value) E.db.general.minimap.icons.battlefield[info[#info]] = value; MM:UpdateSettings() end,
 							args = {
 								position = {
 									order = 1,

@@ -19,7 +19,6 @@ local GetPetActionSlotUsable = GetPetActionSlotUsable
 local SetDesaturation = SetDesaturation
 local PetActionBar_UpdateCooldowns = PetActionBar_UpdateCooldowns
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
--- GLOBALS: ElvUI_Bar4
 
 local Masque = E.Masque
 local MasqueGroup = Masque and Masque:Group("ElvUI", "Pet Bar")
@@ -190,6 +189,7 @@ function AB:PositionAndSizeBarPet()
 		button:SetParent(bar)
 		button:ClearAllPoints()
 		button:Size(size)
+		button:Show()
 
 		autoCast:SetOutside(button, autoCastSize, autoCastSize)
 
@@ -271,10 +271,10 @@ function AB:UpdatePetBindings()
 end
 
 function AB:CreateBarPet()
-	bar:CreateBackdrop()
+	bar:CreateBackdrop(self.db.transparent and 'Transparent')
 	bar.backdrop:SetAllPoints()
 	if self.db.bar4.enabled then
-		bar:Point('RIGHT', ElvUI_Bar4, 'LEFT', -4, 0)
+		bar:Point('RIGHT', _G.ElvUI_Bar4, 'LEFT', -4, 0)
 	else
 		bar:Point('RIGHT', E.UIParent, 'RIGHT', -4, 0)
 	end
@@ -296,6 +296,11 @@ function AB:CreateBarPet()
 			end
 		end
 	end)
+
+	-- dont let blizzard mess with the grid
+	_G.PetActionBarFrame:UnregisterEvent("PET_BAR_SHOWGRID")
+	_G.PetActionBarFrame:UnregisterEvent("PET_BAR_HIDEGRID")
+	_G.PetActionBarFrame.showgrid = nil
 
 	self:RegisterEvent('PET_BAR_UPDATE', 'UpdatePet')
 	self:RegisterEvent('PLAYER_CONTROL_GAINED', 'UpdatePet')

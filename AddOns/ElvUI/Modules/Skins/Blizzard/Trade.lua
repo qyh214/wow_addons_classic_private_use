@@ -68,6 +68,14 @@ local function LoadSkin()
 		Highlight:StripTextures()
 	end
 
+	_G.TradeFrame:HookScript("OnShow", function()
+		_G.TradePlayerItemsInset:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		_G.TradePlayerEnchantInset:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		_G.TradeRecipientItemsInset:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		_G.TradeRecipientEnchantInset:SetBackdropBorderColor(unpack(E.media.bordercolor))
+		_G.TradeRecipientMoneyInset:SetBackdropBorderColor(unpack(E.media.bordercolor))
+	end)
+
 	hooksecurefunc('TradeFrame_SetAcceptState', function(playerState, targetState)
 		if ( playerState == 1 ) then
 			_G.TradePlayerItemsInset:SetBackdropBorderColor(0, 1, 0)

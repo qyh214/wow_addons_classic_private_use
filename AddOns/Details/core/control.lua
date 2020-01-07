@@ -817,7 +817,7 @@
 				--8.0.1 miss data isn't required at the moment, spells like akari's soul has been removed from the game
 				--_detalhes:CanSendMissData()
 				
-				if (_detalhes.data_sync) then
+				if (_detalhes.data_sync and zoneType == "raid") then
 					_detalhes:SendRaidDataNonEqualizedSchedule()
 					_detalhes:EqualizeActorsSchedule (false)
 				end
@@ -1242,6 +1242,15 @@
 			--if (true) then --> disabled for testing
 				--return
 			--end
+
+			local ZoneName, InstanceType, DifficultyID, _, _, _, _, ZoneMapID = _GetInstanceInfo()
+			if (InstanceType ~= "raid") then
+				return
+			end
+
+			if (not IsInRaid()) then
+				return
+			end
 			
 			local result, errorText = pcall (function()
 
@@ -1444,6 +1453,11 @@
 
 			if (not IsInRaid() and not IsInGroup()) then
 				return
+			end
+
+			local ZoneName, InstanceType, DifficultyID, _, _, _, _, ZoneMapID = _GetInstanceInfo()
+			if (InstanceType ~= "raid") then
+				return;
 			end
 		
 			if (_detalhes.debug) then

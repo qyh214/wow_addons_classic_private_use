@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11303
 ## X-Min-Interface: 11302
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Dungeons (Classic)|r
 ## Title-deDE:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Gruppe-Classic|r
@@ -33,6 +33,7 @@ localization.de.lua
 localization.kr.lua
 localization.tw.lua
 localization.es.lua
+localization.mx.lua
 localization.cn.lua
 
 BlackfathomDeeps\GhamooRa.lua

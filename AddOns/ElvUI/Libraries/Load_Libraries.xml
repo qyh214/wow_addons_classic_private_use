@@ -4,7 +4,6 @@
 	<Include file="Ace3\AceAddon-3.0\AceAddon-3.0.xml"/>
 	<Include file="Ace3\AceEvent-3.0\AceEvent-3.0.xml"/>
 	<Include file="Ace3\AceTimer-3.0\AceTimer-3.0.xml"/>
-	<Include file="Ace3\AceBucket-3.0\AceBucket-3.0.xml"/>
 	<Include file="Ace3\AceHook-3.0\AceHook-3.0.xml"/>
 	<Include file="Ace3\AceDB-3.0\AceDB-3.0.xml"/>
 	<Include file="Ace3\AceLocale-3.0\AceLocale-3.0.xml"/>
@@ -14,7 +13,6 @@
 
 	<Include file="LibClassicDurations\LibClassicDurations.xml"/>
 	<Script file="LibClassicCasterino-1.0\LibClassicCasterino.lua"/>
-	<Include file="LibThreatClassic\lib.xml"/>
 	<Script file="LibHealComm-4.0\LibHealComm-4.0.lua"/>
 
 	<Include file="LibSharedMedia-3.0\lib.xml"/>

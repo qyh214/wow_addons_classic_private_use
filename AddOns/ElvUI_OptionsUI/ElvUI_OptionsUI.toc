@@ -1,4 +1,4 @@
-## Interface: 11302
+## Interface: 11303
 ## Author: Elv
 ## Version: 1.06
 ## Title: |cfffe7b2cElvUI|r |cff1784d1Classic|r |cfffe7b2cOptionsUI|r

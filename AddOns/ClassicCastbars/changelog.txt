@@ -1,3 +1,41 @@
+v1.2.2:
+- Casting speed buff detection is now also always included for enemies if you have the addon ClassicAuraDurations enabled and "Full Aura Replacement" toggled on.
+- Fix rare lua error on castbar stopped.
+- Minor code cleanup & optimizations.
+
+
+v1.2.1:
+- Add Teleport & Recall casts to be stopped on damage received.
+- Add Snowball & Earthshaker stun to crowd control list to stop castbar on.
+- Replace UIFrameFadeOut with AnimationGroup.
+
+
+v1.2.0:
+- Update for WoW patch 1.13.3.
+- Fix Furbolg Form cast being stopped on movement.
+- Fix custom border for castbar not updating size when castbar height is changed.
+
+
+v1.1.8:
+- Hotfix for a minor oversight in v1.1.7.
+- Added blacklist for spells that can't have its cast time modified.
+
+
+v1.1.7:
+- The spell "Dark Mending" now shows a 2.0s default cast time instead of 3.5s since this one is the most used.
+- Mind Quickening Gem, Berserking and Blinding Light cast speed increases are now taken into account when target buffs are visible. (friendly units/Detect Magic)
+  Note that Berserking is set to always use 10% speed as the actual percentage can't really be tracked accurately.
+- Castbar will now be stopped for hearthstone, resurrection and summon mount abilities when the caster receives non-DoT attacks.
+- Castbar will now be stopped on any new ability used if the addon failed to detect a fakecast earlier.
+- Adjusted castbar border and flash animation to be more pixel perfect. (Might still be off for certain sizes but should be way better now hopefully)
+- Add War Stomp to pushback ignore list.
+- Fix "Sacrifice" cast not showing up for certain locales like Deutsch.
+- Fix Nature's Grace reducing cast time for channels.
+- Fix incorrect cast time for Dark Iron Bomb.
+- Fix incorrect cast times for targets when you have a cast time slow modifier debuff on yourself, and you also have the spell the enemy is casting in your spellbook.
+  Big thanks to Millanzarreta for helping troubleshoot cast time modifier issues!
+
+
 v1.1.6:
 - Add Gnomish Death Ray & Escape Artist to pushback ignore list.
 - Minor bug fixes & performance improvements.

@@ -2,6 +2,27 @@
 
 This mod is distributed under Version 2 of the GPL.  A copy of the GPL is included in this zip file with links to non-english translations.
 
+## v1.4.3 (Dec. 15, 2019)
+
+- Update content phases
+- Update much crafting min skill
+- Fix alliance druid rare pvp set
+- Fix lua error when in combat
+
+## v1.4.2 (Dec. 11, 2019)
+
+- Set Phase 2.5
+- Add PvP Ranks overview
+- Fix missing random enchants on gear
+
+## v1.4.1 (Dec. 02, 2019)
+
+- Items for Sets now show PvP Rank requirements
+- Set Sack of Gems for every Dragon (Ony, Nef,...)
+- Add some missing Class requirements
+- Fix bug with selected boss reset after every reopen
+- Translation updates. Big thanks to all the translators!!!
+
 ## v1.4.0 (Dec. 01, 2019)
 
 - New: Items now show class / PvP rank icons

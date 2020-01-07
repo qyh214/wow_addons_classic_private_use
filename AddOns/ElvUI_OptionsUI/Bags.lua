@@ -12,6 +12,7 @@ E.Options.args.bags = {
 	type = 'group',
 	name = L["BAGSLOT"],
 	childGroups = "tab",
+	order = 2,
 	get = function(info) return E.db.bags[info[#info]] end,
 	set = function(info, value) E.db.bags[info[#info]] = value end,
 	args = {
@@ -578,6 +579,11 @@ E.Options.args.bags = {
 							type = "toggle",
 							name = L["Bag 4"],
 						},
+						['bag-2'] = {
+							order = 6,
+							type = "toggle",
+							name = L["Key Ring"],
+						}
 					},
 					disabled = function() return not E.db.bags.split.player end,
 				},

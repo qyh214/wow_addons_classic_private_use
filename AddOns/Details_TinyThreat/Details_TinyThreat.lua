@@ -48,7 +48,11 @@ local ThreatMeterFrame = ThreatMeter.Frame
 ThreatMeter:SetPluginDescription ("Small tool for track the threat you and other raid members have in your current target.")
 
 --threat stuff from: https://github.com/EsreverWoW/ClassicThreatMeter by EsreverWoW
-local ThreatLib = LibStub:GetLibrary ("ThreatClassic-1.0")
+--EsreverWoW is MIA at the moment
+--local ThreatLib = LibStub:GetLibrary ("ThreatClassic-1.0")
+
+--threat stuff from: https://github.com/dfherr/LibThreatClassic2 by dfherr
+local ThreatLib = LibStub:GetLibrary("LibThreatClassic2")
 
 local _UnitThreatSituation = function (unit, mob)
     return ThreatLib:UnitThreatSituation (unit, mob)
@@ -59,7 +63,6 @@ local _UnitDetailedThreatSituation = function (unit, mob)
 end
 
 --[=
-
 	local CheckStatus = function(...)
 		--print (...)
 	end

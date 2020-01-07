@@ -1,10 +1,12 @@
 local E = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local AddOnName, Engine = ...
+local D = E:GetModule("Distributor")
 
+local Engine = select(2, ...)
 Engine[1] = {}
-Engine[2] = E.Libs.ACL:GetLocale("ElvUI", E.global.general.locale or "enUS")
-
+Engine[2] = E.Libs.ACL:GetLocale('ElvUI', E.global.general.locale)
 local C, L = Engine[1], Engine[2]
+
+local _G, format, sort, tinsert = _G, format, sort, tinsert
 
 C.Values = {
 	FontFlags = {
@@ -15,16 +17,11 @@ C.Values = {
 	}
 }
 
-local D = E:GetModule("Distributor")
-local format = format
-local sort, tinsert = sort, tinsert
-
-local _G = _G
-E.Libs.AceGUI = _G.LibStub("AceGUI-3.0")
-E.Libs.AceConfig = _G.LibStub("AceConfig-3.0-ElvUI")
-E.Libs.AceConfigDialog = _G.LibStub("AceConfigDialog-3.0-ElvUI")
-E.Libs.AceConfigRegistry = _G.LibStub("AceConfigRegistry-3.0-ElvUI")
-E.Libs.AceDBOptions = _G.LibStub("AceDBOptions-3.0")
+E:AddLib('AceGUI', 'AceGUI-3.0')
+E:AddLib('AceConfig', 'AceConfig-3.0-ElvUI')
+E:AddLib('AceConfigDialog', 'AceConfigDialog-3.0-ElvUI')
+E:AddLib('AceConfigRegistry', 'AceConfigRegistry-3.0-ElvUI')
+E:AddLib('AceDBOptions', 'AceDBOptions-3.0')
 
 local UnitName = UnitName
 local UnitExists = UnitExists
@@ -57,17 +54,7 @@ E.Options.args = {
 		desc = L["Reset the size and position of this frame."],
 		customWidth = 175,
 		func = function()
-			if E.GUIFrame then
-				local status = E.GUIFrame.obj and E.GUIFrame.obj.status
-				if status then
-					E:ResetConfigSettings()
-
-					status.top, status.left = E:GetConfigPosition()
-					status.width, status.height = E:GetConfigDefaultSize()
-
-					E.GUIFrame.obj:ApplyStatus()
-				end
-			end
+			E:UpdateConfigSize(true)
 		end
 	},
 	ToggleTutorial = {
@@ -122,7 +109,21 @@ E.Options.args = {
 		set = function(info, value)
 			E.db.general.loginmessage = value
 		end
-	}
+	},
+	Info_Separate = {
+		order = 3,
+		type = "group",
+		name = "  ------ "..L["Info/Controls"].." ------",
+		disabled = true,
+		args = {},
+	},
+	Plugin_Separate = {
+		order = 6,
+		type = "group",
+		name = "  --------- "..L["Plugins"].." ---------",
+		disabled = true,
+		args = {},
+	},
 }
 
 local DONATOR_STRING = ""
@@ -180,8 +181,9 @@ local DEVELOPERS = {
 	"Blazeflack",
 	"NihilisticPandemonium",
 	"|cffff7d0aMerathilis|r",
-	"|cFF8866ccSimpy|r",
-	"|cFF0070DEAzilroka|r",
+	"|cff4fd8d1S|cff50dabfi|cff51ddaem|cff52df9dp|cff53e18cy|cff5ae27b, |cff91de5bb|cffaddb4bu|cffc8d93bt |cffd8c73dm|cffdabc44y |cffdda652n|cffe09e59a|cffe39861m|cffe69268e |cffed8777n|cffef828ae|cfff17d9ce|cfff378aed|cfff573c0s |cffe668d2t|cffd962d5o |cffbe57dcb|cffac62dce |cff8099d7l|cff6ab5d4o|cff54d1d1n|cff4fd8d1g|cff4fd8d1e|cff4fd8d1r|cff4fd8d1.",
+	"|cff0070DEAzilroka|r",
+	"|cff9482c9Darth Predator|r",
 	"Luckyone",
 	"thurin",
 	"catskull",
@@ -198,7 +200,6 @@ local TESTERS = {
 	"Phima",
 	"Veiled",
 	"Repooc",
-	"Darth Predator",
 	"Alex",
 	"Nidra",
 	"Kurhyus",
@@ -231,7 +232,7 @@ end
 E.Options.args.credits = {
 	type = "group",
 	name = L["Credits"],
-	order = -1,
+	order = 5,
 	args = {
 		text = {
 			order = 1,
@@ -493,7 +494,7 @@ end
 --Create Profiles Table
 E.Options.args.profiles = E.Libs.AceDBOptions:GetOptionsTable(E.data)
 E.Libs.AceConfig:RegisterOptionsTable("ElvProfiles", E.Options.args.profiles)
-E.Options.args.profiles.order = -10
+E.Options.args.profiles.order = 4
 
 if not E.Options.args.profiles.plugins then
 	E.Options.args.profiles.plugins = {}

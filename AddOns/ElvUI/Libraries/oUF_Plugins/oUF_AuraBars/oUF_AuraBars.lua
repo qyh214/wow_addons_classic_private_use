@@ -7,19 +7,25 @@ local HIDDEN = 0
 local LCD = LibStub('LibClassicDurations', true)
 local infinity = math.huge
 local myClass = select(2, UnitClass('player'))
+local format = format
+local floor = floor
+local tinsert = tinsert
+local min = min
+local UnitIsUnit = UnitIsUnit
+local UnitAura = UnitAura
 
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 local function FormatTime(s)
 	if s == infinity then return end
 
 	if s < MINUTE then
-		return ("%.1fs"):format(s)
+		return format("%.1fs", s)
 	elseif s < HOUR then
-		return ("%dm %ds"):format(s/60%60, s%60)
+		return format("%dm %ds", s/60%60, s%60)
 	elseif s < DAY then
-		return ("%dh %dm"):format(s/(60*60), s/60%60)
+		return format("%dh %dm", s/(60*60), s/60%60)
 	else
-		return ("%dd %dh"):format(s/DAY, (s / HOUR) - (floor(s/DAY) * 24))
+		return format("%dd %dh", s/DAY, (s / HOUR) - (floor(s/DAY) * 24))
 	end
 end
 
@@ -39,15 +45,12 @@ local function onUpdate(self, elapsed)
 	if self.elapsed >= 0.01 then
 		if self.noTime then
 			self:SetValue(1)
-			self.timeText:SetText('')
+			self.timeText:SetText()
 			self:SetScript("OnUpdate", nil)
 		else
 			local timeNow = GetTime()
 			self:SetValue((self.expiration - timeNow) / self.duration)
 			self.timeText:SetText(FormatTime(self.expiration - timeNow))
-			if self.sparkEnabled then
-				self.spark:Show()
-			end
 		end
 		self.elapsed = 0
 	end
@@ -117,7 +120,7 @@ local function updateBar(element, unit, index, offset, filter, isDebuff, visible
 		local statusBar = element[position]
 		if(not statusBar) then
 			statusBar = (element.CreateBar or createAuraBar) (element, position)
-			table.insert(element, statusBar)
+			tinsert(element, statusBar)
 			element.createdBars = element.createdBars + 1
 		end
 
@@ -134,8 +137,6 @@ local function updateBar(element, unit, index, offset, filter, isDebuff, visible
 
 		if(show) then
 			statusBar.icon:SetTexture(texture)
-			statusBar.spark:Hide()
-
 			if count > 1 then
 				statusBar.nameText:SetFormattedText('[%d] %s', count, name)
 			else
@@ -144,10 +145,15 @@ local function updateBar(element, unit, index, offset, filter, isDebuff, visible
 
 			statusBar.duration = duration
 			statusBar.expiration = expiration
-			statusBar.sparkEnabled = element.sparkEnabled
 			statusBar.spellID = spellID
 			statusBar.spell = name
 			statusBar.noTime = (duration == 0 and expiration == 0)
+
+			if not statusBar.noTime and element.sparkEnabled then
+				statusBar.spark:Show()
+			else
+				statusBar.spark:Hide()
+			end
 
 			local r, g, b = .2, .6, 1
 			if element.buffColor then r, g, b = unpack(element.buffColor) end
@@ -226,7 +232,7 @@ local function UpdateAuras(self, event, unit)
 		local isFriend = UnitIsFriend('player', unit)
 		local filter = (isFriend and (element.friendlyAuraType or 'HELPFUL') or (element.enemyAuraType or 'HARMFUL'))
 
-		local visible, hidden = filterBars(element, unit, filter, element.maxBars, nil, 0)
+		local visible, hidden = filterBars(element, unit, filter, element.maxBars, filter == 'HARMFUL', 0)
 
 		local fromRange, toRange
 
@@ -267,7 +273,6 @@ local function Enable(self)
 
 	if(element) then
 		self:RegisterEvent('UNIT_AURA', UpdateAuras)
-		self:RegisterEvent('PLAYER_TOTEM_UPDATE', UpdateAuras, true)
 
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate

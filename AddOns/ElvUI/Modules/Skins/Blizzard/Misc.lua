@@ -40,10 +40,6 @@ local function LoadSkin()
 
 	-- Blizzard frame we want to reskin
 	local skins = {
-		'StaticPopup1',
-		'StaticPopup2',
-		'StaticPopup3',
-		'StaticPopup4',
 		'InterfaceOptionsFrame',
 		'VideoOptionsFrame',
 		'AudioOptionsFrame',
@@ -60,33 +56,11 @@ local function LoadSkin()
 
 	if not IsAddOnLoaded('ConsolePortUI_Menu') then
 		-- reskin all esc/menu buttons
-		local BlizzardMenuButtons = {
-			_G.GameMenuButtonOptions,
-			_G.GameMenuButtonSoundOptions,
-			_G.GameMenuButtonUIOptions,
-			_G.GameMenuButtonKeybindings,
-			_G.GameMenuButtonMacros,
-			_G.GameMenuButtonAddOns,
-			_G.GameMenuButtonWhatsNew,
-			_G.GameMenuButtonRatings,
-			_G.GameMenuButtonAddons,
-			_G.GameMenuButtonLogout,
-			_G.GameMenuButtonQuit,
-			_G.GameMenuButtonContinue,
-			_G.GameMenuButtonMacOptions,
-			_G.GameMenuButtonStore,
-			_G.GameMenuButtonHelp
-		}
-
-		for i = 1, #BlizzardMenuButtons do
-			local menuButton = BlizzardMenuButtons[i]
-			if menuButton then
-				S:HandleButton(menuButton)
+		for _, Button in pairs({_G.GameMenuFrame:GetChildren()}) do
+			if Button.IsObjectType and Button:IsObjectType("Button") then
+				S:HandleButton(Button)
 			end
 		end
-
-		-- Skin the ElvUI Menu Button
-		S:HandleButton(_G.GameMenuFrame.ElvUI)
 
 		_G.GameMenuFrame:StripTextures()
 		_G.GameMenuFrame:SetTemplate('Transparent')
@@ -153,6 +127,9 @@ local function LoadSkin()
 				hooksecurefunc(_G['StaticPopup'..i], 'UpdateRecapButton', S.UpdateRecapButton)
 			end
 		end)
+		StaticPopup:StripTextures()
+		StaticPopup:SetTemplate('Transparent')
+
 		for j = 1, 4 do
 			local button = StaticPopup['button'..j]
 			S:HandleButton(button)
@@ -167,6 +144,7 @@ local function LoadSkin()
 			anim1:SetTarget(button.shadow)
 			anim2:SetTarget(button.shadow)
 		end
+
 		_G['StaticPopup'..i..'EditBox']:SetFrameLevel(_G['StaticPopup'..i..'EditBox']:GetFrameLevel()+1)
 		S:HandleEditBox(_G['StaticPopup'..i..'EditBox'])
 		S:HandleEditBox(_G['StaticPopup'..i..'MoneyInputFrameGold'])
@@ -245,8 +223,6 @@ local function LoadSkin()
 			local highlight = _G['DropDownList'..level..'Button'..i..'Highlight']
 			local text = _G['DropDownList'..level..'Button'..i..'NormalText']
 
-			S:HandlePointXY(text, 5)
-
 			highlight:SetTexture(E.Media.Textures.Highlight)
 			highlight:SetBlendMode('BLEND')
 			highlight:SetDrawLayer('BACKGROUND')
@@ -259,6 +235,8 @@ local function LoadSkin()
 			button.backdrop:Hide()
 
 			if not button.notCheckable then
+				S:HandlePointXY(text, 5)
+
 				uncheck:SetTexture()
 				local _, co = check:GetTexCoord()
 				if co == 0 then

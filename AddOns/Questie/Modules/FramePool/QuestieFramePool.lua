@@ -28,6 +28,9 @@ _QuestieFramePool.usedFrames = {};
 
 _QuestieFramePool.allFrames = {}
 
+_QuestieFramePool.wayPointColor = {1,0.72,0,0.5}
+_QuestieFramePool.wayPointColorHover = {0.93,0.46,0.13,0.8}
+
 local HBDPins = LibStub("HereBeDragonsQuestie-Pins-2.0")
 
 -- set pins parent to QuestieFrameGroup for easier compatibility with other addons
@@ -261,14 +264,9 @@ function QuestieFramePool:CreateWaypoints(iconFrame, waypointTable, lineWidth, c
     local lastPos = nil
     --Set defaults if needed.
     local lWidth = lineWidth or 1.5;
-    local col = color or {1,0.72,0,0.3};
-    -- local col = color or {0,0.5,1,0.3};
-    -- local col = color or {0.06,0.31,0.55,0.3};
-    -- local col = color or {0.14,0.14,0.56,0.3};
-    -- local col = color or {0.4,0,0,0.3};
-    -- local col = color or {0.4,0.8,0,0.3};
+    local col = color or _QuestieFramePool.wayPointColor
 
-    for index, waypoint in pairs(waypointTable) do
+    for _, waypoint in pairs(waypointTable) do
         if(lastPos == nil) then
             lastPos = waypoint;
         else
@@ -390,15 +388,6 @@ function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, line
     --Keep a total lineFrame count for names.
     lineFrames = lineFrames + 1;
     return lineFrame
-end
-
-function _QuestieFramePool:Questie_Tooltip_line(self)
-    local Tooltip = GameTooltip;
-    Tooltip:SetOwner(self, "ANCHOR_CURSOR"); --"ANCHOR_CURSOR" or (self, self)
-    Tooltip:AddLine("Test");
-    Tooltip:SetFrameStrata("TOOLTIP");
-    Tooltip:Show();
-    --_QuestieFramePool:Questie_Tooltip(self.iconFrame)
 end
 
 function _QuestieFramePool:GetAvailableOrCompleteTooltip(icon)
@@ -555,7 +544,10 @@ function _QuestieFramePool:Questie_Tooltip()
 
     --Highlight waypoints if they exist.
     for k, lineFrame in pairs(self.data.lineFrames or {}) do
-      lineFrame.line:SetColorTexture(math.min(lineFrame.line.dR*1.3, 1), math.min(lineFrame.line.dG*1.3, 1), math.min(lineFrame.line.dB*1.3, 1), math.min(lineFrame.line.dA*1.3, 1))
+      lineFrame.line:SetColorTexture(
+        unpack(_QuestieFramePool.wayPointColorHover)
+        --   math.min(lineFrame.line.dR*1.4, 1), math.min(lineFrame.line.dG*1.4, 1), math.min(lineFrame.line.dB*1.4, 1), math.min(lineFrame.line.dA*1.4, 1)
+        )
     end
 
     -- FIXME: `data` can be nil here which leads to an error, will have to debug:
@@ -576,8 +568,22 @@ function _QuestieFramePool:Questie_Tooltip()
     local questOrder = {};
     local manualOrder = {}
 
-    for _, icon in pairs(_QuestieFramePool.usedFrames) do -- I added "_QuestieFramePool.usedFrames" because I think its a bit more efficient than using _G but I might be wrong
+    self.data.touchedPins = {};
+    for pin in HBDPins.worldmapProvider:GetMap():EnumeratePinsByTemplate("HereBeDragonsPinsTemplateQuestie") do -- I added "_QuestieFramePool.usedFrames" because I think its a bit more efficient than using _G but I might be wrong
+        ---@type IconFrame
+        local icon = pin.icon;
         local iconData = icon.data
+        if(self.data.Id == iconData.Id) then -- Recolor hovered icons
+            local entry = {}
+            entry.color = {icon.texture.r, icon.texture.g, icon.texture.b, icon.texture.a};
+            entry.icon = icon;
+            if Questie.db.global.questObjectiveColors then
+                icon.texture:SetVertexColor(1, 1, 1, 1); -- If different colors are active simply change it to the regular icon color
+            else
+                icon.texture:SetVertexColor(0.6, 1, 1, 1); -- Without colors make it blueish
+            end
+            tinsert(self.data.touchedPins, entry);
+        end
         if icon and iconData and icon.x and icon.AreaID == self.AreaID then
             local dist = QuestieLib:Maxdist(icon.x, icon.y, self.x, self.y);
             if dist < maxDistCluster then
@@ -654,9 +660,19 @@ function _QuestieFramePool:Questie_Tooltip()
             end
             for k2, questData in pairs(quests) do
                 if questData.title ~= nil then
-                    local quest = QuestieDB:GetQuest(questData.questId);
-                    if(quest and shift and QuestiePlayer:GetPlayerLevel() ~= 60) then
-                        self:AddDoubleLine("   " .. questData.title, QuestieLib:PrintDifficultyColor(quest.level, "("..GetQuestLogRewardXP(questData.questId)..xpString..") ")..questData.type, 1, 1, 1, 1, 1, 0);
+                    local quest = QuestieDB:GetQuest(questData.questId)
+                    if(quest and shift) then
+                        local rewardString = ""
+                        local rewardXP = GetQuestLogRewardXP(questData.questId)
+                        if rewardXP > 0 then -- Quest rewards XP
+                            rewardString = QuestieLib:PrintDifficultyColor(quest.level, "(".. rewardXP .. xpString .. ") ")
+                        end
+
+                        local moneyReward = GetQuestLogRewardMoney(questData.questId)
+                        if moneyReward > 0 then -- Quest rewards money
+                            rewardString = rewardString .. Questie:Colorize("("..GetCoinTextureString(moneyReward)..") ", "white")
+                        end
+                        self:AddDoubleLine("   " .. questData.title, rewardString .. questData.type, 1, 1, 1, 1, 1, 0);
                     else
                         self:AddDoubleLine("   " .. questData.title, questData.type, 1, 1, 1, 1, 1, 0);
                     end
@@ -664,7 +680,7 @@ function _QuestieFramePool:Questie_Tooltip()
                 if questData.subData and shift then
                     local dataType = type(questData.subData)
                     if dataType == "table" then
-                        for _,line in pairs(questData.subData) do
+                        for _, line in pairs(questData.subData) do
                             self:AddLine("      " .. line, 0.86, 0.86, 0.86);
                         end
                     elseif dataType == "string" then
@@ -674,7 +690,9 @@ function _QuestieFramePool:Questie_Tooltip()
                 end
             end
         end
+        ---@param questId QuestId
         for questId, textList in pairs(self.questOrder) do -- this logic really needs to be improved
+            ---@type Quest
             local quest = QuestieDB:GetQuest(questId);
             local questTitle = quest:GetColoredQuestName();
             if haveGiver then
@@ -694,25 +712,49 @@ function _QuestieFramePool:Questie_Tooltip()
                 end
             end
 
+            local function _GetLevelString(creatureLevels, name)
+                local levelString = name
+                if creatureLevels[name] then
+                    local minLevel = creatureLevels[name][1]
+                    local maxLevel = creatureLevels[name][2]
+                    local rank = creatureLevels[name][3]
+                    if minLevel == maxLevel then
+                        levelString = name .. " (" .. minLevel
+                    else
+                        levelString = name .. " (" .. minLevel .. "-" .. maxLevel
+                    end
+
+                    if rank and rank == 1 then
+                        levelString = levelString .. "+"
+                    end
+
+                    levelString = levelString .. ")"
+                end
+                return levelString
+            end
+
             -- Used to get the white color for the quests which don't have anything to collect
             local defaultQuestColor = QuestieLib:GetRGBForObjective({})
             if shift then
-                for index, textData in pairs(textList) do
+                local creatureLevels = QuestieDB:GetCreatureLevels(quest) -- Data for min and max level
+                for _, textData in pairs(textList) do
                     for textLine, nameData in pairs(textData) do
                         local dataType = type(nameData)
                         if dataType == "table" then
                             for name in pairs(nameData) do
+                                name = _GetLevelString(creatureLevels, name)
                                 self:AddLine("   |cFFDDDDDD" .. name);
                             end
                         elseif dataType == "string" then
+                            nameData = _GetLevelString(creatureLevels, nameData)
                             self:AddLine("   |cFFDDDDDD" .. nameData);
                         end
                         self:AddLine("      " .. defaultQuestColor .. textLine);
                     end
                 end
             else
-                for index, textData in pairs(textList) do
-                    for textLine, v2 in pairs(textData) do
+                for _, textData in pairs(textList) do
+                    for textLine, _ in pairs(textData) do
                         self:AddLine("   " .. defaultQuestColor .. textLine);
                     end
                 end

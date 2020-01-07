@@ -1,4 +1,4 @@
-if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
+if GetLocale() ~= "esES" then return end
 local L
 
 --------------------------------
@@ -60,7 +60,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(369)
 
 L:SetGeneralLocalization{
-	name 		= "Alta interrogadora Gerstahn"
+	name 		= "Alto Interrogador Gerstahn"
 }
 -----------------
 -- Lord Roccor --
@@ -108,15 +108,15 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(375)
 
 L:SetGeneralLocalization{
-	name 		= "Depositario Stilgiss"
+	name 		= "Guarda Stilgiss"
 }
 ----------------------
--- Finoso Vironegro --
+-- Finoso Virunegro --
 ----------------------
 L = DBM:GetModLocalization(376)
 
 L:SetGeneralLocalization{
-	name 		= "Finoso Vironegro"
+	name 		= "Finoso Virunegro"
 }
 --------------
 -- Bael'Gar --
@@ -206,7 +206,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(388)
 
 L:SetGeneralLocalization{
-	name 		= "Alto señor Omokk"
+	name 		= "Alto Señor Omokk"
 }
 -----------------------------
 --  Shadow Hunter Vosh'gajin  --
@@ -281,7 +281,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("PyroguardEmberseer")
 
 L:SetGeneralLocalization{
-	name 		= "Piroguardia Brasadivino"
+	name 		= "Piroguardián brasadivino"
 }
 -----------------------------
 --  Solakar Flamewreath  --
@@ -305,7 +305,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("JedRunewatcher")
 
 L:SetGeneralLocalization{
-	name 		= "Jed Vigía de las Runas"
+	name 		= "Jed Observarrunas"
 }
 -----------------------------
 --  Warchief Rend Blackhand  --
@@ -561,7 +561,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(418)
 
 L:SetGeneralLocalization{
-	name 		= "Golpeamasa 9-60"
+	name 		= "Gopleamasa 9-60"
 }
 -----------------------------
 --  Mekgineer Thermaplugg  --
@@ -799,7 +799,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("EarthcallerHalmgar")
 
 L:SetGeneralLocalization{
-	name 		= "Clamatierras Halmgar"
+	name 		= "Clamor de Tierra Halmgar"
 }
 
 -----------------------------
@@ -1038,7 +1038,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("OdotheBlindwatcher")
 
 L:SetGeneralLocalization{
-	name 		= "Odo el vigía ciego"
+	name 		= "Odo el Cegato"
 }
 
 -----------------------------
@@ -1117,7 +1117,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("DextrenWard")
 
 L:SetGeneralLocalization{
-	name 		= "Dextren Ward"
+	name 		= "Dextren Tutor"
 }
 -----------------------------
 --  Bruegal Ironknuckle  --
@@ -1342,7 +1342,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(470)
 
 L:SetGeneralLocalization{
-	name 		= "Vigilante pétreo anciano"
+	name 		= "Vigilante de piedra anciano"
 }
 -----------------------------
 --  Galgann Firehammer  --
@@ -1449,7 +1449,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("DeviateFaerie")
 
 L:SetGeneralLocalization{
-	name 		= "Dragón férico descarriado"
+	name 		= "Dragón feérico descarriado"
 }
 
 -------------------------
@@ -1478,7 +1478,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization(485)
 
 L:SetGeneralLocalization{
-	name 		= "Theka la Mártir"
+	name 		= "Theka el Mártir"
 }
 
 -----------------------------

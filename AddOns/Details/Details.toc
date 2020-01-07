@@ -1,5 +1,5 @@
 
-## Interface: 11302
+## Interface: 11303
 
 ## Title: Details! Damage Meter
 ## Notes: Essential tool to impress that chick in your raid.

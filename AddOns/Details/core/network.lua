@@ -304,7 +304,9 @@
 			local actor = container:PegarCombatente (nil, name)
 			
 			if (not actor) then
-				if (IsInRaid()) then
+				local zoneName, zoneType = GetInstanceInfo()
+
+				if (IsInRaid() and zoneType == "raid") then
 					for i = 1, GetNumGroupMembers() do 
 						if (name:find ("-")) then --> other realm
 							local nname, server = _UnitName ("raid"..i)
@@ -323,7 +325,8 @@
 						end
 
 					end
-				elseif (IsInGroup()) then
+
+				elseif (IsInGroup() and zoneType == "party") then
 					for i = 1, GetNumGroupMembers()-1 do
 						if (name:find ("-")) then --> other realm
 							local nname, server = _UnitName ("party"..i)

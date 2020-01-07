@@ -44,6 +44,8 @@ function UF:Configure_Threat(frame)
 			frame:EnableElement('ThreatIndicator')
 		end
 
+		threat.feedbackUnit = frame.unit
+
 		if db.threatStyle == "GLOW" then
 			threat:SetFrameStrata('BACKGROUND')
 			threat.glow:SetFrameStrata('BACKGROUND')
@@ -101,7 +103,7 @@ function UF:UpdateThreat(unit, status, r, g, b)
 	local db = parent.db
 	if not db then return end
 
-	if status and status > 1 then
+	if status and db.threatStyle ~= 'NONE' and db.threatStyle ~= nil then
 		if db.threatStyle == 'GLOW' then
 			self.glow:Show()
 			self.glow:SetBackdropBorderColor(r, g, b)

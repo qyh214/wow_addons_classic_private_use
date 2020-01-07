@@ -595,18 +595,16 @@ local function getTagFunc(tagstr)
 				end
 			end
 
+			-- ElvUI changed
 			if(tagFunc) then
 				tinsert(args, tagFunc)
 			else
-				-- return error(string.format('Attempted to use invalid tag %s.', bracket), 3)
-
-				-- ElvUI changed
 				numTags = -1
 				func = function(self)
 					return self:SetText(bracket)
 				end
-				-- end block
 			end
+			-- end block
 		end
 
 		if(numTags == 1) then

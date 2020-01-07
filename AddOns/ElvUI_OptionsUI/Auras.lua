@@ -115,6 +115,7 @@ E.Options.args.auras = {
 	type = 'group',
 	name = L["BUFFOPTIONS_LABEL"],
 	childGroups = "tab",
+	order = 2,
 	get = function(info) return E.db.auras[info[#info]] end,
 	set = function(info, value) E.db.auras[info[#info]] = value; A:UpdateHeader(ElvUIPlayerBuffs); A:UpdateHeader(ElvUIPlayerDebuffs) end,
 	args = {
@@ -213,7 +214,7 @@ E.Options.args.auras = {
 						barShow = {
 							order = 0,
 							type = 'toggle',
-							name = L['Enable'],
+							name = L["Enable"],
 						},
 						barNoDuration = {
 							order = 0,
@@ -275,10 +276,10 @@ E.Options.args.auras = {
 							name = L["Position"],
 							disabled = function() return not E.db.auras.barShow end,
 							values = {
-								['TOP'] = L['TOP'],
-								['BOTTOM'] = L['BOTTOM'],
-								['LEFT'] = L['LEFT'],
-								['RIGHT'] = L['RIGHT'],
+								['TOP'] = L["TOP"],
+								['BOTTOM'] = L["BOTTOM"],
+								['LEFT'] = L["LEFT"],
+								['RIGHT'] = L["RIGHT"],
 							},
 						},
 					},

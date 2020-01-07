@@ -112,7 +112,6 @@ local function LoadSkin()
 	_G.HelpFrameKnowledgebaseNavBar:StripTextures()
 
 	S:HandleFrame(BrowserSettingsTooltip, true)
-	S:HandleButton(BrowserSettingsTooltip.CacheButton)
 	S:HandleButton(BrowserSettingsTooltip.CookiesButton)
 
 	local HelpFrame = _G.HelpFrame

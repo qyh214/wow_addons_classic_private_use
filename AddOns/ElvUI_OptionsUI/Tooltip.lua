@@ -11,6 +11,7 @@ E.Options.args.tooltip = {
 	type = "group",
 	name = L["Tooltip"],
 	childGroups = "tab",
+	order = 2,
 	get = function(info) return E.db.tooltip[info[#info]] end,
 	set = function(info, value) E.db.tooltip[info[#info]] = value; end,
 	args = {
@@ -103,26 +104,32 @@ E.Options.args.tooltip = {
 					name = L["Target Info"],
 					desc = L["When in a raid group display if anyone in your raid is targeting the current tooltip unit."],
 				},
-				playerTitles = {
+				alwaysShowRealm = {
 					order = 9,
+					type = 'toggle',
+					name = L["Always Show Realm"],
+					desc = L["Always show the server name. Disabled: Only show while holding shift."]
+				},
+				playerTitles = {
+					order = 10,
 					type = 'toggle',
 					name = L["Player Titles"],
 					desc = L["Display player titles."],
 				},
 				guildRanks = {
-					order = 10,
+					order = 11,
 					type = 'toggle',
 					name = L["Guild Ranks"],
 					desc = L["Display guild ranks if a unit is guilded."],
 				},
 				spellID = {
-					order = 11,
+					order = 12,
 					type = 'toggle',
 					name = L["Spell/Item IDs"],
 					desc = L["Display the spell or item ID when mousing over a spell or item tooltip."],
 				},
 				npcID = {
-					order = 12,
+					order = 13,
 					type = 'toggle',
 					name = L["NPC IDs"],
 					desc = L["Display the npc ID when mousing over a npc tooltip."],

@@ -182,53 +182,49 @@ function M:ADDON_LOADED(_, addon)
 	end
 end
 
-do
-	local _
-	local bestValue, totalValue, bestItem, itemSellPrice
-	local questLink, amount, numQuests
+function M:QUEST_COMPLETE()
+	if not E.db.general.questRewardMostValueIcon then return end
 
-	function M:QUEST_COMPLETE()
-		if not E.db.general.questRewardMostValueIcon then return end
+	local firstItem = _G.QuestInfoRewardsFrameQuestInfoItem1
+	if not firstItem then return end
 
-		bestValue = 0
-		numQuests = GetNumQuestChoices()
+	local bestValue, bestItem = 0
+	local numQuests = GetNumQuestChoices()
 
-		if numQuests <= 0 then
-			return -- no choices, quick exit
+	if not self.QuestRewardGoldIconFrame then
+		local frame = CreateFrame("Frame", nil, firstItem)
+		frame:SetFrameStrata("HIGH")
+		frame:Size(20)
+		frame.Icon = frame:CreateTexture(nil, "OVERLAY")
+		frame.Icon:SetAllPoints(frame)
+		frame.Icon:SetTexture("Interface\\MONEYFRAME\\UI-GoldIcon")
+		self.QuestRewardGoldIconFrame = frame
+	end
+
+	self.QuestRewardGoldIconFrame:Hide()
+
+	if numQuests < 2 then
+		return
+	end
+
+	for i = 1, numQuests do
+		local questLink = GetQuestItemLink('choice', i)
+		local _, _, amount = GetQuestItemInfo('choice', i)
+		local itemSellPrice = questLink and select(11, GetItemInfo(questLink))
+
+		local totalValue = (itemSellPrice and itemSellPrice * amount) or 0
+		if totalValue > bestValue then
+			bestValue = totalValue
+			bestItem = i
 		end
+	end
 
-		if not self.QuestRewardGoldIconFrame then
-			local frame = CreateFrame("Frame", nil, _G.QuestInfoRewardsFrameQuestInfoItem1)
-			frame:SetFrameStrata("HIGH")
-			frame:Size(20)
-			frame.Icon = frame:CreateTexture(nil, "OVERLAY")
-			frame.Icon:SetAllPoints(frame)
-			frame.Icon:SetTexture("Interface\\MONEYFRAME\\UI-GoldIcon")
-			frame:Hide()
-			self.QuestRewardGoldIconFrame = frame
-		end
-
-		self.QuestRewardGoldIconFrame:Hide()
-
-		for i = 1, numQuests do
-			questLink = GetQuestItemLink('choice', i)
-			_,_, amount = GetQuestItemInfo('choice', i)
-			itemSellPrice = questLink and select(11, GetItemInfo(questLink))
-
-			totalValue = (itemSellPrice and itemSellPrice * amount) or 0
-			if totalValue > bestValue then
-				bestValue = totalValue
-				bestItem = i
-			end
-		end
-
-		if bestItem then
-			local btn = _G['QuestInfoRewardsFrameQuestInfoItem'..bestItem]
-			if btn.type == 'choice' then
-				self.QuestRewardGoldIconFrame:ClearAllPoints()
-				self.QuestRewardGoldIconFrame:Point("TOPRIGHT", btn, "TOPRIGHT", -2, -2)
-				self.QuestRewardGoldIconFrame:Show()
-			end
+	if bestItem then
+		local btn = _G['QuestInfoRewardsFrameQuestInfoItem'..bestItem]
+		if btn and btn.type == 'choice' then
+			self.QuestRewardGoldIconFrame:ClearAllPoints()
+			self.QuestRewardGoldIconFrame:Point("TOPRIGHT", btn, "TOPRIGHT", -2, -2)
+			self.QuestRewardGoldIconFrame:Show()
 		end
 	end
 end
@@ -251,7 +247,8 @@ function M:Initialize()
 	self:RegisterEvent('GROUP_ROSTER_UPDATE', 'AutoInvite')
 	self:RegisterEvent('CVAR_UPDATE', 'ForceCVars')
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-	self:RegisterEvent("QUEST_COMPLETE")
+	self:RegisterEvent('QUEST_COMPLETE')
+
 --[[
 	if IsAddOnLoaded("Blizzard_InspectUI") then
 		M:SetupInspectPageInfo()

@@ -1872,17 +1872,82 @@ function _G._detalhes:Start()
 		C_Timer.After (2, function()
 			_detalhes:RefreshPlaterIntegration()
 		end)
-	
+
 	--> override the overall data flag on this release only (remove on the next release)
 	--Details.overall_flag = 0x10
 	
 	--show warning message about classic beta
 	if (not DetailsFramework.IsClassicWow()) then
-		print ("|CFFFFFF00[Details!]: you're using the classic version of Details! on the 8.2.5 patch. If you need help, see our Discord (/details discord)")
+		print ("|CFFFFFF00[Details!]: you're using the classic version of Details! on the 8.2.0 patch. If you need help, see our Discord (/details discord)")
 	else
 		if (math.random (0, 2) == 0) then
 			print ("|CFFFFFF00[Details!]: To use Tiny Threat: cogwheel > raid plugins > Tiny Threat.")
-			print ("|CFFFFFF00[Details!]: To help with the BUG of '50 yard' combatlog limit INSIDE raids, try: /details sync.")
+			print ("|CFFFFFF00[Details!]: To fix the '50 yard' issue try: /details sync.")
+		end
+	end
+
+	--> queue workaround: when pressing 'enter battle' for battlegrounds
+	--> the client blocks the action due to some no sense taint, this taint has been fixed 5 years ago on retail
+	--> and it's up again on the client client
+
+	local originalPosition
+	local isOnOriginalPosition = true
+
+	local taintWarning = CreateFrame ("frame")
+	taintWarning:SetSize (400, 35)
+	taintWarning:SetFrameStrata ("low")
+
+	taintWarning:SetBackdrop ({edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border", 
+	edgeSize = 16, bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background-Dark", tileSize = 64, tile = true, insets={left=4, right=4, top=4, bottom=4}})
+
+	local warningMessage = taintWarning:CreateFontString (nil, "overlay", "GameFontNormal")
+	warningMessage:SetText ("< right click and choose enter if they try to blame addons")
+
+	C_Timer.NewTicker(1, function()
+		if (StaticPopup1:IsShown()) then
+			if (StaticPopup1.which == "CONFIRM_BATTLEFIELD_ENTRY") then
+
+				taintWarning:Show()
+				taintWarning:SetPoint ("topleft", StaticPopup1, "bottomleft", 0, -10)
+				if (MiniMapBattlefieldFrame:IsShown())then
+					if (not originalPosition) then
+						local a = {}
+						for i = 1, MiniMapBattlefieldFrame:GetNumPoints() do
+							a[#a + 1] = {MiniMapBattlefieldFrame:GetPoint(i)}
+						end
+						originalPosition = a
+					end
+
+					MiniMapBattlefieldFrame:ClearAllPoints()
+					MiniMapBattlefieldFrame:SetPoint("left", taintWarning, "left", 10, -2)
+					warningMessage:SetPoint ("left", MiniMapBattlefieldFrame, "right", 9, 0)
+
+					isOnOriginalPosition = false
+				end
+			end
+		else
+			if (originalPosition and not isOnOriginalPosition) then
+				MiniMapBattlefieldFrame:ClearAllPoints()
+				for i = 1, #originalPosition do
+					MiniMapBattlefieldFrame:SetPoint(unpack (originalPosition[i]))
+				end
+				taintWarning:Hide()
+				isOnOriginalPosition = true
+			end
+		end
+	end)
+
+	local gameLocale = GetLocale()
+	if gameLocale == "enGB" then
+		gameLocale = "enUS"
+	end
+
+	if (gameLocale ~= "zhTW" and  gameLocale ~= "koKR" and gameLocale ~= "zhCN") then
+		for classFile, colorTable in pairs (Details.class_colors) do
+			local classNameUncap = classFile:gsub ("(%a)([%w_']*)", function (first, rest) return first:upper() .. rest:lower() end)
+			if (classNameUncap) then
+				Details.class_colors [classNameUncap] = colorTable
+			end
 		end
 	end
 

@@ -15,6 +15,12 @@ function QuestieItemFixes:Load()
     _AddMissingItemIDs()
 
     return {
+        [730] = {
+            [QuestieDB.itemKeys.npcDrops] = {1418,127,2206,2207,517,2203,456,1958,2202,2205,1027,513,2208,2204,2201,126,515,458,1028,171,1767,1025,3739,1024,3737,1026,3742,3740,422,578,545,548,1083,544},
+        },
+        [3173] = {
+            [QuestieDB.itemKeys.npcDrops] = {2163,2164,1188,1189,1186,2165,1797,1778},
+        },
         [5475] = {
             [QuestieDB.itemKeys.name] = "Wooden Key",
             [QuestieDB.itemKeys.relatedQuests] = {},
@@ -40,6 +46,12 @@ function QuestieItemFixes:Load()
         [3829] = {
             [QuestieDB.itemKeys.relatedQuests] = {713,1193},
             [QuestieDB.itemKeys.npcDrops] = {},
+        },
+        [14645] = {
+            [QuestieDB.itemKeys.name] = "Unfinished Skeleton Key",
+            [QuestieDB.itemKeys.relatedQuests] = {5801,5802},
+            [QuestieDB.itemKeys.npcDrops] = {},
+            [QuestieDB.itemKeys.objectDrops] = {4004},
         },
         [15843] = {
             [QuestieDB.itemKeys.name] = "Filled Dreadmist Peak Sampler",
@@ -479,8 +491,7 @@ function QuestieItemFixes:Load()
             [QuestieDB.itemKeys.objectDrops] = {},
         },
         [10575] = {
-            [QuestieDB.itemKeys.npcDrops] = {}, -- #1216
-            [QuestieDB.itemKeys.objectDrops] = {10569},
+            [QuestieDB.itemKeys.npcDrops] = {9461}, -- #1216
         },
         [9594] = { -- #1227
             [QuestieDB.itemKeys.name] = "Wildkin Muisek",
@@ -562,6 +573,9 @@ function QuestieItemFixes:Load()
             [QuestieDB.itemKeys.relatedQuests] = {2203,2501},
             [QuestieDB.itemKeys.npcDrops] = {2726},
             [QuestieDB.itemKeys.objectDrops] = {},
+        },
+        [17309] = {
+            [QuestieDB.itemKeys.npcDrops] = {8519,8520,8521,8522,},
         },
         [18956] = {
             [QuestieDB.itemKeys.npcDrops] = {5357,5358,5359,5360,5361,14603,14604,14638,14639,14640}, -- #1470
@@ -881,6 +895,7 @@ _AddMissingItemIDs = function()
         16968,
         16969,
         3713,
+        14645,
     }
 
     for _, id in pairs(missingItemIDs) do

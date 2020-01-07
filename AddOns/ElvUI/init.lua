@@ -22,6 +22,7 @@ local InCombatLockdown = InCombatLockdown
 local IsAddOnLoaded = IsAddOnLoaded
 local issecurevariable = issecurevariable
 local LoadAddOn = LoadAddOn
+local DisableAddOn = DisableAddOn
 local ReloadUI = ReloadUI
 
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
@@ -30,7 +31,7 @@ local GameMenuButtonLogout = GameMenuButtonLogout
 local GameMenuFrame = GameMenuFrame
 -- GLOBALS: ElvCharacterDB, ElvPrivateDB, ElvDB, ElvCharacterData, ElvPrivateData, ElvData
 
-_G.BINDING_HEADER_ELVUI = GetAddOnMetadata(..., "Title")
+_G.BINDING_HEADER_ELVUI = GetAddOnMetadata(..., 'Title')
 
 local AceAddon, AceAddonMinor = _G.LibStub('AceAddon-3.0')
 local CallbackHandler = _G.LibStub('CallbackHandler-1.0')
@@ -39,7 +40,7 @@ local AddOnName, Engine = ...
 local AddOn = AceAddon:NewAddon(AddOnName, 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0', 'AceHook-3.0')
 AddOn.callbacks = AddOn.callbacks or CallbackHandler:New(AddOn)
 AddOn.DF = {profile = {}, global = {}}; AddOn.privateVars = {profile = {}} -- Defaults
-AddOn.Options = {type = "group", name = AddOnName, args = {}}
+AddOn.Options = {type = 'group', name = AddOnName, args = {}}
 
 Engine[1] = AddOn
 Engine[2] = {}
@@ -55,13 +56,6 @@ do
 
 	function AddOn:GetLocale()
 		return gameLocale
-	end
-end
-
-do
-	local arg1,arg2 = '([%(%)%.%%%+%-%*%?%[%^%$])','%%%1'
-	function AddOn:EscapeString(str)
-		return gsub(str,arg1,arg2)
 	end
 end
 
@@ -139,6 +133,14 @@ do
 	end
 end
 
+do
+	DisableAddOn("ElvUI_VisualAuraTimers")
+	DisableAddOn("ElvUI_ExtraActionBars")
+	DisableAddOn("ElvUI_CastBarOverlay")
+	DisableAddOn("ElvUI_EverySecondCounts")
+	DisableAddOn("ElvUI_AuraBarsMovers")
+end
+
 function AddOn:OnInitialize()
 	if not ElvCharacterDB then
 		ElvCharacterDB = {}
@@ -182,7 +184,7 @@ function AddOn:OnInitialize()
 	end
 
 	self.twoPixelsPlease = false
-	self.ScanTooltip = CreateFrame("GameTooltip", "ElvUI_ScanTooltip", _G.UIParent, "GameTooltipTemplate")
+	self.ScanTooltip = CreateFrame('GameTooltip', 'ElvUI_ScanTooltip', _G.UIParent, 'GameTooltipTemplate')
 	self.PixelMode = self.twoPixelsPlease or self.private.general.pixelPerfect -- keep this over `UIScale`
 	self:UIScale(true)
 	self:UpdateMedia()
@@ -192,23 +194,26 @@ function AddOn:OnInitialize()
 
 	if self.private.general.minimap.enable then
 		self.Minimap:SetGetMinimapShape()
+		_G.Minimap:SetMaskTexture('Interface\\ChatFrame\\ChatFrameBackground')
+	else
+		_G.Minimap:SetMaskTexture('Interface\\CharacterFrame\\TempPortraitAlphaMask')
 	end
 
-	if GetAddOnEnableState(self.myname, "Tukui") == 2 then
-		self:StaticPopup_Show("TUKUI_ELVUI_INCOMPATIBLE")
+	if GetAddOnEnableState(self.myname, 'Tukui') == 2 then
+		self:StaticPopup_Show('TUKUI_ELVUI_INCOMPATIBLE')
 	end
 
-	local GameMenuButton = CreateFrame("Button", nil, GameMenuFrame, "GameMenuButtonTemplate")
-	GameMenuButton:SetText(format("|cfffe7b2c%s|r", AddOnName))
-	GameMenuButton:SetScript("OnClick", function()
+	local GameMenuButton = CreateFrame('Button', nil, GameMenuFrame, 'GameMenuButtonTemplate')
+	GameMenuButton:SetText(format('|cfffe7b2c%s|r', AddOnName))
+	GameMenuButton:SetScript('OnClick', function()
 		AddOn:ToggleOptionsUI()
 		HideUIPanel(GameMenuFrame)
 	end)
 	GameMenuFrame[AddOnName] = GameMenuButton
 
-	if not IsAddOnLoaded("ConsolePortUI_Menu") then -- #390
+	if not IsAddOnLoaded('ConsolePortUI_Menu') then -- #390
 		GameMenuButton:Size(GameMenuButtonLogout:GetWidth(), GameMenuButtonLogout:GetHeight())
-		GameMenuButton:Point("TOPLEFT", GameMenuButtonAddons, "BOTTOMLEFT", 0, -1)
+		GameMenuButton:Point('TOPLEFT', GameMenuButtonAddons, 'BOTTOMLEFT', 0, -1)
 		hooksecurefunc('GameMenuFrame_UpdateVisibleButtons', self.PositionGameMenuButton)
 	end
 
@@ -220,15 +225,15 @@ function AddOn:PositionGameMenuButton()
 	local _, relTo, _, _, offY = GameMenuButtonLogout:GetPoint()
 	if relTo ~= GameMenuFrame[AddOnName] then
 		GameMenuFrame[AddOnName]:ClearAllPoints()
-		GameMenuFrame[AddOnName]:Point("TOPLEFT", relTo, "BOTTOMLEFT", 0, -1)
+		GameMenuFrame[AddOnName]:Point('TOPLEFT', relTo, 'BOTTOMLEFT', 0, -1)
 		GameMenuButtonLogout:ClearAllPoints()
-		GameMenuButtonLogout:Point("TOPLEFT", GameMenuFrame[AddOnName], "BOTTOMLEFT", 0, offY)
+		GameMenuButtonLogout:Point('TOPLEFT', GameMenuFrame[AddOnName], 'BOTTOMLEFT', 0, offY)
 	end
 end
 
-local LoadUI=CreateFrame("Frame")
-LoadUI:RegisterEvent("PLAYER_LOGIN")
-LoadUI:SetScript("OnEvent", function()
+local LoadUI=CreateFrame('Frame')
+LoadUI:RegisterEvent('PLAYER_LOGIN')
+LoadUI:SetScript('OnEvent', function()
 	AddOn:Initialize()
 end)
 
@@ -240,7 +245,7 @@ end
 function AddOn:PLAYER_REGEN_DISABLED()
 	local err
 
-	if IsAddOnLoaded("ElvUI_OptionsUI") then
+	if IsAddOnLoaded('ElvUI_OptionsUI') then
 		local ACD = self.Libs.AceConfigDialog
 		if ACD and ACD.OpenFrames and ACD.OpenFrames[AddOnName] then
 			self:RegisterEvent('PLAYER_REGEN_ENABLED')
@@ -281,7 +286,7 @@ function AddOn:ResetProfile()
 end
 
 function AddOn:OnProfileReset()
-	self:StaticPopup_Show("RESET_PROFILE_PROMPT")
+	self:StaticPopup_Show('RESET_PROFILE_PROMPT')
 end
 
 function AddOn:ResetConfigSettings()
@@ -295,6 +300,36 @@ end
 
 function AddOn:GetConfigSize()
 	return AddOn.global.general.AceGUI.width, AddOn.global.general.AceGUI.height
+end
+
+function AddOn:UpdateConfigSize(reset)
+	local frame = self.GUIFrame
+	if not frame then return end
+
+	local maxWidth, maxHeight = self.UIParent:GetSize()
+	frame:SetMinResize(600, 500)
+	frame:SetMaxResize(maxWidth-50, maxHeight-50)
+
+	self.Libs.AceConfigDialog:SetDefaultSize(AddOnName, self:GetConfigDefaultSize())
+
+	local status = frame.obj and frame.obj.status
+	if status then
+		if reset then
+			self:ResetConfigSettings()
+
+			status.top, status.left = self:GetConfigPosition()
+			status.width, status.height = self:GetConfigDefaultSize()
+
+			frame.obj:ApplyStatus()
+		else
+			local top, left = self:GetConfigPosition()
+			if top and left then
+				status.top, status.left = top, left
+
+				frame.obj:ApplyStatus()
+			end
+		end
+	end
 end
 
 function AddOn:GetConfigDefaultSize()
@@ -319,27 +354,27 @@ function AddOn:ToggleOptionsUI(msg)
 		return
 	end
 
-	if not IsAddOnLoaded("ElvUI_OptionsUI") then
+	if not IsAddOnLoaded('ElvUI_OptionsUI') then
 		local noConfig
-		local _, _, _, _, reason = GetAddOnInfo("ElvUI_OptionsUI")
-		if reason ~= "MISSING" and reason ~= "DISABLED" then
+		local _, _, _, _, reason = GetAddOnInfo('ElvUI_OptionsUI')
+		if reason ~= 'MISSING' and reason ~= 'DISABLED' then
 			self.GUIFrame = false
-			LoadAddOn("ElvUI_OptionsUI")
+			LoadAddOn('ElvUI_OptionsUI')
 
-			--For some reason, GetAddOnInfo reason is "DEMAND_LOADED" even if the addon is disabled.
+			--For some reason, GetAddOnInfo reason is 'DEMAND_LOADED' even if the addon is disabled.
 			--Workaround: Try to load addon and check if it is loaded right after.
-			if not IsAddOnLoaded("ElvUI_OptionsUI") then noConfig = true end
+			if not IsAddOnLoaded('ElvUI_OptionsUI') then noConfig = true end
 
 			-- version check elvui options if it's actually enabled
-			if (not noConfig) and GetAddOnMetadata("ElvUI_OptionsUI", "Version") ~= "1.06" then
-				self:StaticPopup_Show("CLIENT_UPDATE_REQUEST")
+			if (not noConfig) and GetAddOnMetadata('ElvUI_OptionsUI', 'Version') ~= '1.06' then
+				self:StaticPopup_Show('CLIENT_UPDATE_REQUEST')
 			end
 		else
 			noConfig = true
 		end
 
 		if noConfig then
-			self:Print("|cffff0000Error -- Addon 'ElvUI_OptionsUI' not found or is disabled.|r")
+			self:Print('|cffff0000Error -- Addon "ElvUI_OptionsUI" not found or is disabled.|r')
 			return
 		end
 	end
@@ -348,9 +383,9 @@ function AddOn:ToggleOptionsUI(msg)
 	local ConfigOpen = ACD and ACD.OpenFrames and ACD.OpenFrames[AddOnName]
 
 	local pages, msgStr
-	if msg and msg ~= "" then
+	if msg and msg ~= '' then
 		pages = {strsplit(',', msg)}
-		msgStr = gsub(msg, ',','\001')
+		msgStr = gsub(msg, ',', '\001')
 	end
 
 	local mode = 'Close'
@@ -404,21 +439,8 @@ function AddOn:ToggleOptionsUI(msg)
 				self.GUIFrame = frame
 				_G.ElvUIGUIFrame = self.GUIFrame
 
-				local maxWidth, maxHeight = self.UIParent:GetSize()
-				frame:SetMinResize(600, 500)
-				frame:SetMaxResize(maxWidth-50, maxHeight-50)
-
-				local status = frame.obj and frame.obj.status
-				if status then
-					local top, left = self:GetConfigPosition()
-					if top and left then
-						status.top, status.left = top, left
-
-						ConfigOpen:ApplyStatus()
-					end
-				end
-
-				hooksecurefunc(frame, "StopMovingOrSizing", AddOn.ConfigStopMovingOrSizing)
+				self:UpdateConfigSize()
+				hooksecurefunc(frame, 'StopMovingOrSizing', AddOn.ConfigStopMovingOrSizing)
 			end
 		end
 

@@ -3,6 +3,21 @@ if not TMW then return end
 TMW.CHANGELOG_LASTVER="7.4.0"
 
 TMW.CHANGELOG = [==[
+## v8.7.3
+* Added a new "Any Totem" condition that will check all totem slots.
+* Updated totem checking to account for removal of totem APIs in 1.13.3. Totem deaths cannot be accounted for.
+
+### Bug Fixes
+* Fix #1742 - Errors related to improper escaping of user input for the suggestion list.
+* Fixed error `bad argument #1 to 'strlower' (string expected, got boolean)` when using Diminishing Returns icons
+* Fix #1755 - Swing Timer conditions with durations other than zero seconds were not triggering updates at the proper moment.
+* Fixed error `PlayerNames.lua:96: attempt to concatenate field "?" (a nil value)`
+
+## v8.7.2
+### Bug Fixes
+* Fixed handling of spell names in French that have a space before a colon.
+* Classic: Fixed detection of weapon imbues with charges.
+
 ## v8.7.1
 * Classic: Added a pet happiness condition.
 

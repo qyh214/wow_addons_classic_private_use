@@ -19,7 +19,7 @@ local MapUtil = MapUtil
 E.MapInfo = {}
 
 function E:MapInfo_Update()
-	local mapID = C_Map_GetBestMapForUnit("player")
+	local mapID = C_Map_GetBestMapForUnit('player')
 
 	local mapInfo = mapID and C_Map_GetMapInfo(mapID)
 	E.MapInfo.name = (mapInfo and mapInfo.name) or nil
@@ -40,11 +40,11 @@ function E:MapInfo_Update()
 	E:MapInfo_CoordsUpdate()
 end
 
-local coordsWatcher = CreateFrame("Frame")
+local coordsWatcher = CreateFrame('Frame')
 function E:MapInfo_CoordsStart()
 	E.MapInfo.coordsWatching = true
 	E.MapInfo.coordsFalling = nil
-	coordsWatcher:SetScript("OnUpdate", E.MapInfo_OnUpdate)
+	coordsWatcher:SetScript('OnUpdate', E.MapInfo_OnUpdate)
 
 	if E.MapInfo.coordsStopTimer then
 		E:CancelTimer(E.MapInfo.coordsStopTimer)
@@ -55,17 +55,17 @@ end
 function E:MapInfo_CoordsStopWatching()
 	E.MapInfo.coordsWatching = nil
 	E.MapInfo.coordsStopTimer = nil
-	coordsWatcher:SetScript("OnUpdate", nil)
+	coordsWatcher:SetScript('OnUpdate', nil)
 end
 
 function E:MapInfo_CoordsStop(event)
-	if (event == "PLAYER_STOPPED_MOVING" or event == "PLAYER_CONTROL_GAINED") and IsFalling() then
+	if (event == 'PLAYER_STOPPED_MOVING' or event == 'PLAYER_CONTROL_GAINED') and IsFalling() then
 		E.MapInfo.coordsFalling = true
 		return
 	end
 
 	if not E.MapInfo.coordsStopTimer then
-		E.MapInfo.coordsStopTimer = E:ScheduleTimer("MapInfo_CoordsStopWatching", 0.5)
+		E.MapInfo.coordsStopTimer = E:ScheduleTimer('MapInfo_CoordsStopWatching', 0.5)
 	end
 end
 
@@ -96,7 +96,7 @@ end
 -- Fix stolen from NDui (and modified by Simpy). Credit: siweia.
 local mapRects, tempVec2D = {}, CreateVector2D(0, 0)
 function E:GetPlayerMapPos(mapID)
-	tempVec2D.x, tempVec2D.y = UnitPosition("player")
+	tempVec2D.x, tempVec2D.y = UnitPosition('player')
 	if not tempVec2D.x then return end
 
 	local mapRect = mapRects[mapID]
@@ -115,13 +115,13 @@ end
 -- Code taken from LibTourist-3.0 and rewritten to fit our purpose
 local localizedMapNames = {}
 local ZoneIDToContinentName = {
-	[104] = "Outland",
-	[107] = "Outland",
+	[104] = 'Outland',
+	[107] = 'Outland',
 }
 local MapIdLookupTable = {
-	[101] = "Outland",
-	[104] = "Shadowmoon Valley",
-	[107] = "Nagrand",
+	[101] = 'Outland',
+	[104] = 'Shadowmoon Valley',
+	[107] = 'Nagrand',
 }
 local function LocalizeZoneNames()
 	local mapInfo
@@ -135,29 +135,29 @@ local function LocalizeZoneNames()
 end
 LocalizeZoneNames()
 
---Add " (Outland)" to the end of zone name for Nagrand and Shadowmoon Valley, if mapID matches Outland continent.
+--Add ' (Outland)' to the end of zone name for Nagrand and Shadowmoon Valley, if mapID matches Outland continent.
 --We can then use this function when we need to compare the players own zone against return values from stuff like GetFriendInfo and GetGuildRosterInfo,
---which adds the " (Outland)" part unlike the GetRealZoneText() API.
+--which adds the ' (Outland)' part unlike the GetRealZoneText() API.
 function E:GetZoneText(mapID)
 	if not (mapID and E.MapInfo.name) then return end
 
 	local continent, zoneName = ZoneIDToContinentName[mapID]
-	if continent and continent == "Outland" then
-		if E.MapInfo.name == localizedMapNames.Nagrand or E.MapInfo.name == "Nagrand"  then
-			zoneName = localizedMapNames.Nagrand.." ("..localizedMapNames.Outland..")"
-		elseif E.MapInfo.name == localizedMapNames["Shadowmoon Valley"] or E.MapInfo.name == "Shadowmoon Valley"  then
-			zoneName = localizedMapNames["Shadowmoon Valley"].." ("..localizedMapNames.Outland..")"
+	if continent and continent == 'Outland' then
+		if E.MapInfo.name == localizedMapNames.Nagrand or E.MapInfo.name == 'Nagrand'  then
+			zoneName = localizedMapNames.Nagrand..' ('..localizedMapNames.Outland..')'
+		elseif E.MapInfo.name == localizedMapNames['Shadowmoon Valley'] or E.MapInfo.name == 'Shadowmoon Valley'  then
+			zoneName = localizedMapNames['Shadowmoon Valley']..' ('..localizedMapNames.Outland..')'
 		end
 	end
 
 	return zoneName or E.MapInfo.name
 end
 
-E:RegisterEvent("PLAYER_STARTED_MOVING", "MapInfo_CoordsStart")
-E:RegisterEvent("PLAYER_STOPPED_MOVING", "MapInfo_CoordsStop")
-E:RegisterEvent("PLAYER_CONTROL_LOST", "MapInfo_CoordsStart")
-E:RegisterEvent("PLAYER_CONTROL_GAINED", "MapInfo_CoordsStop")
-E:RegisterEventForObject("LOADING_SCREEN_DISABLED", E.MapInfo, E.MapInfo_Update)
-E:RegisterEventForObject("ZONE_CHANGED_NEW_AREA", E.MapInfo, E.MapInfo_Update)
-E:RegisterEventForObject("ZONE_CHANGED_INDOORS", E.MapInfo, E.MapInfo_Update)
-E:RegisterEventForObject("ZONE_CHANGED", E.MapInfo, E.MapInfo_Update)
+E:RegisterEvent('PLAYER_STARTED_MOVING', 'MapInfo_CoordsStart')
+E:RegisterEvent('PLAYER_STOPPED_MOVING', 'MapInfo_CoordsStop')
+E:RegisterEvent('PLAYER_CONTROL_LOST', 'MapInfo_CoordsStart')
+E:RegisterEvent('PLAYER_CONTROL_GAINED', 'MapInfo_CoordsStop')
+E:RegisterEventForObject('LOADING_SCREEN_DISABLED', E.MapInfo, E.MapInfo_Update)
+E:RegisterEventForObject('ZONE_CHANGED_NEW_AREA', E.MapInfo, E.MapInfo_Update)
+E:RegisterEventForObject('ZONE_CHANGED_INDOORS', E.MapInfo, E.MapInfo_Update)
+E:RegisterEventForObject('ZONE_CHANGED', E.MapInfo, E.MapInfo_Update)

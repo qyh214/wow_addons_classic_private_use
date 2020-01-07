@@ -27,6 +27,7 @@ local UnitIsUnit = UnitIsUnit
 local UnitLevel = UnitLevel
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
+local UnitIsCivilian = UnitIsCivilian
 
 local hooksecurefunc = hooksecurefunc
 local C_Timer_NewTimer = C_Timer.NewTimer
@@ -637,6 +638,11 @@ function mod:StyleFilterConditionCheck(frame, filter, trigger)
 		if (trigger.isTapDenied and tapDenied) or (trigger.isNotTapDenied and not tapDenied) then passed = true else return end
 	end
 
+	if trigger.isCivilian or trigger.isNotCivilian then
+		local civilian = UnitIsCivilian(frame.unit)
+		if (trigger.isCivilian and civilian) or (trigger.isNotCivilian and not civilian) then passed = true else return end
+	end
+
 	-- Player Can Attack
 	if trigger.playerCanAttack or trigger.playerCanNotAttack then
 		local canAttack = UnitCanAttack("player", frame.unit)
@@ -962,6 +968,10 @@ function mod:StyleFilterConfigure()
 
 				if t.inCombat or t.outOfCombat or t.inCombatUnit or t.outOfCombatUnit then
 					mod.StyleFilterTriggerEvents.UNIT_FLAGS = true
+				end
+
+				if t.isCivilian or t.isNotCivilian then
+					mod.StyleFilterTriggerEvents.UNIT_NAME_UPDATE = 1
 				end
 
 				if t.names and next(t.names) then

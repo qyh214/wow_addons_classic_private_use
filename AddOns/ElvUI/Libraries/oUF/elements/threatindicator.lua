@@ -31,7 +31,6 @@ A default texture will be applied if the widget is a Texture and doesn't have a 
 local _, ns = ...
 local oUF = ns.oUF
 local Private = oUF.Private
-local LCT = LibStub("ThreatClassic-1.0", true)
 
 local unitExists = Private.unitExists
 
@@ -47,25 +46,28 @@ local function Update(self, event, unit)
 	--]]
 	if(element.PreUpdate) then element:PreUpdate(unit) end
 
-	local feedbackUnit = element.feedbackUnit
 	unit = unit or self.unit
 
 	local status
-	-- BUG: Non-existent '*target' or '*pet' units cause UnitThreatSituation() errors
-	if(unitExists(unit)) then
-		if(feedbackUnit and feedbackUnit ~= unit and unitExists(feedbackUnit)) then
-			status = LCT:UnitThreatSituation(feedbackUnit, unit)
-		else
-			status = LCT:UnitThreatSituation('player', unit)
+
+	if(unitExists(unit) and UnitIsFriend("player", unit)) then
+		if(UnitIsUnit(unit, "targettarget") and UnitIsEnemy("player", "target")) then
+			status = true
+		end
+		if(IsInGroup() and not status) then
+			for i=1,GetNumGroupMembers() do
+				local target = IsInRaid() and "raid"..i.."target" or "party"..i.."target"
+				if(UnitIsUnit(unit, target.."target") and UnitIsEnemy("player", target)) then
+					status = true
+					break
+				end
+			end
 		end
 	end
 
-	local r, g, b
-	if(status and status > 0) then
-		r, g, b = unpack(self.colors.threat[status])
-
+	if(status) then
 		if(element.SetVertexColor) then
-			element:SetVertexColor(r, g, b)
+			element:SetVertexColor(1, 0, 0)
 		end
 
 		element:Show()
@@ -84,7 +86,7 @@ local function Update(self, event, unit)
 	* b      - the blue color component based on the unit's threat status (number?)[0-1]
 	--]]
 	if(element.PostUpdate) then
-		return element:PostUpdate(unit, status, r, g, b)
+		return element:PostUpdate(unit, status, 1, 0, 0)
 	end
 end
 
@@ -109,7 +111,7 @@ local function Enable(self)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
-		LCT.RegisterCallback(element, 'ThreatUpdated', function(unit_id, target_guid, threat) Path(self, nil, self.unit) end)
+		self:RegisterEvent("UNIT_TARGET", Path)
 
 		if(element:IsObjectType('Texture') and not element:GetTexture()) then
 			element:SetTexture([[Interface\RAIDFRAME\UI-RaidFrame-Threat]])
@@ -123,7 +125,8 @@ local function Disable(self)
 	local element = self.ThreatIndicator
 	if(element) then
 		element:Hide()
-		LCT.UnregisterCallback(element, 'ThreatUpdated', Path)
+
+		self:UnregisterEvent("UNIT_TARGET", Path)
 	end
 end
 

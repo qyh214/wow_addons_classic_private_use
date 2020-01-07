@@ -98,7 +98,9 @@ function B:SizeAndPositionBagBar()
 			end
 		end
 		if i ~= 1 then
-			button.IconBorder:SetSize(bagBarSize, bagBarSize)
+			if button.IconBorder then
+				button.IconBorder:SetSize(bagBarSize, bagBarSize)
+			end
 		end
 	end
 
@@ -139,7 +141,7 @@ function B:LoadBagBar()
 	tinsert(ElvUIBags.buttons, _G.MainMenuBarBackpackButton)
 	B:SkinBag(_G.MainMenuBarBackpackButton)
 
-	for i=0, NUM_BAG_FRAMES-1 do
+	for i = 0, NUM_BAG_FRAMES-1 do
 		local b = _G["CharacterBag"..i.."Slot"]
 		b:SetParent(ElvUIBags)
 		b.SetParent = E.dummy
@@ -149,6 +151,22 @@ function B:LoadBagBar()
 		B:SkinBag(b)
 		tinsert(ElvUIBags.buttons, b)
 	end
+
+	_G.KeyRingButton:SetParent(ElvUIBags)
+	_G.KeyRingButton.SetParent = E.dummy
+	_G.KeyRingButton:HookScript('OnEnter', OnEnter)
+	_G.KeyRingButton:HookScript('OnLeave', OnLeave)
+	_G.KeyRingButton:HookScript('OnClick', B.HandleKeyRing)
+	_G.KeyRingButton:StripTextures()
+	_G.KeyRingButton:SetTemplate(nil, true)
+	_G.KeyRingButton:StyleButton(true)
+	_G.KeyRingButton:SetNormalTexture("Interface\\ICONS\\INV_Misc_Key_03")
+	_G.KeyRingButton:GetNormalTexture():SetTexCoord(unpack(E.TexCoords))
+	_G.KeyRingButton:GetNormalTexture():SetInside()
+	_G.KeyRingButton:SetPushedTexture("Interface\\ICONS\\INV_Misc_Key_03")
+	_G.KeyRingButton:GetPushedTexture():SetTexCoord(unpack(E.TexCoords))
+	_G.KeyRingButton:GetPushedTexture():SetInside()
+	tinsert(ElvUIBags.buttons, _G.KeyRingButton)
 
 --[=[
 	--Item assignment

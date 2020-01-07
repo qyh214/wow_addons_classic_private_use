@@ -260,6 +260,16 @@ function M:UpdateSettings()
 		MiniMapMailFrame:Point(pos, Minimap, pos, E.db.general.minimap.icons.mail.xOffset or 3, E.db.general.minimap.icons.mail.yOffset or 4)
 		MiniMapMailFrame:SetScale(scale)
 	end
+	
+	local MiniMapBattlefieldFrame = _G.MiniMapBattlefieldFrame
+	if MiniMapBattlefieldFrame then
+		local pos = E.db.general.minimap.icons.battlefield.position or "BOTTOMLEFT"
+		local scale = E.db.general.minimap.icons.battlefield.scale or 1
+		MiniMapBattlefieldFrame:ClearAllPoints()
+		MiniMapBattlefieldFrame:Point(pos, Minimap, pos, E.db.general.minimap.icons.battlefield.xOffset or -2, E.db.general.minimap.icons.battlefield.yOffset or -2)
+		MiniMapBattlefieldFrame:SetScale(scale)
+		MiniMapBattlefieldFrame:SetParent(Minimap)
+	end
 
 	local MiniMapTrackingFrame = _G.MiniMapTrackingFrame
 	if (MiniMapTrackingFrame) then
@@ -316,10 +326,7 @@ end
 function M:Initialize()
 	self.Initialized = true
 
-	if not E.private.general.minimap.enable then
-		Minimap:SetMaskTexture([[Interface\CharacterFrame\TempPortraitAlphaMask]])
-		return
-	end
+	if not E.private.general.minimap.enable then return end
 
 	menuFrame:SetTemplate("Transparent", true)
 
@@ -331,7 +338,6 @@ function M:Initialize()
 
 	Minimap:ClearAllPoints()
 	Minimap:Point("TOPRIGHT", mmholder, "TOPRIGHT", -E.Border, -E.Border)
-	Minimap:SetMaskTexture('Interface\\ChatFrame\\ChatFrameBackground')
 	Minimap:CreateBackdrop()
 	Minimap:SetFrameLevel(Minimap:GetFrameLevel() + 2)
 	Minimap:HookScript('OnEnter', function(mm)

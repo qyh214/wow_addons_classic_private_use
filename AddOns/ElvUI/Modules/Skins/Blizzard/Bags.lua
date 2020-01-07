@@ -63,7 +63,6 @@ local function LoadSkin()
 			portraitButton:Point('TOPLEFT', 12, -7)
 			portraitButton:StyleButton(nil, true)
 			portraitButton.hover:SetAllPoints()
-			portraitButton.Highlight:StripTextures()
 
 			frame.BagIcon = portraitButton:CreateTexture()
 			frame.BagIcon:SetTexCoord(unpack(E.TexCoords))
@@ -74,7 +73,7 @@ local function LoadSkin()
 	end
 
 	local bagIconCache = {
-		[-2] = 'Interface\\ContainerFrame\\KeyRing-Bag-Icon',
+		[-2] = 'Interface\\ICONS\\INV_Misc_Key_03',
 		[0] = 'Interface\\Buttons\\Button-Backpack-Up'
 	}
 

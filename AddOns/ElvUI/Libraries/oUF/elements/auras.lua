@@ -81,10 +81,8 @@ local CreateFrame = CreateFrame
 local GetSpellInfo = GetSpellInfo
 local UnitAura = UnitAura
 local UnitIsUnit = UnitIsUnit
-local UnitIsEnemy = UnitIsEnemy
 local floor, min = math.floor, math.min
 local LCD = LibStub('LibClassicDurations', true)
-local myClass = select(2, UnitClass('player'))
 
 -- GLOBALS: GameTooltip
 -- end block

@@ -208,9 +208,9 @@ local castSpellIDs = {
     21048, -- Curse of the Tribes
     5267, -- Dalaran Wizard Disguise
     27723, -- Dark Desire
-    19799, -- Dark Iron Bomb
+    19784, -- Dark Iron Bomb
     5268, -- Dark Iron Dwarf Disguise
-    16588, -- Dark Mending
+    19775, -- Dark Mending
     7106, -- Dark Restore
     3335, -- Dark Sludge
     16587, -- Dark Whispers
@@ -1141,7 +1141,8 @@ local castSpellIDs = {
     24422, -- Zandalar Signet of Might
     24421, -- Zandalar Signet of Mojo
     24420, -- Zandalar Signet of Serenity
-    1050, -- Sacrifice (needs to be last for german clients, see issue #26)
+    1050, -- Sacrifice
+    22651, -- Sacrifice 2 (On German client this is named Opfern but other Sacrifice is named Opferung)
     10181, -- Frostbolt (needs to be last for chinese clients, see issue #16)
 
     -- Channeled casts in random order. These are used to retrieve spell icon later on (namespace.channeledSpells only stores spell name)
@@ -1302,7 +1303,7 @@ namespace.castTimeIncreases = {
 }
 
 -- Store both spellID and spell name in this table since UnitAura returns spellIDs but combat log doesn't.
-C_Timer.After(10, function()
+C_Timer.After(15, function()
     for spellID, slowPercentage in pairs(namespace.castTimeIncreases) do
         if GetSpellInfo(spellID) then
             namespace.castTimeIncreases[GetSpellInfo(spellID)] = slowPercentage
@@ -1339,195 +1340,208 @@ namespace.castTimeTalentDecreases = {
 -- List of crowd controls.
 -- We want to stop the castbar when these auras are detected
 -- as SPELL_CAST_FAILED is not triggered when an unit gets CC'ed.
-namespace.crowdControls = {
-    [GetSpellInfo(5211)] = 1,       -- Bash
-    [GetSpellInfo(24394)] = 1,      -- Intimidation
-    [GetSpellInfo(853)] = 1,        -- Hammer of Justice
-    [GetSpellInfo(22703)] = 1,      -- Inferno Effect (Summon Infernal)
-    [GetSpellInfo(408)] = 1,        -- Kidney Shot
-    [GetSpellInfo(12809)] = 1,      -- Concussion Blow
-    [GetSpellInfo(20253)] = 1,      -- Intercept Stun
-    [GetSpellInfo(20549)] = 1,      -- War Stomp
-    [GetSpellInfo(2637)] = 1,       -- Hibernate
-    [GetSpellInfo(3355)] = 1,       -- Freezing Trap
-    [GetSpellInfo(19386)] = 1,      -- Wyvern Sting
-    [GetSpellInfo(118)] = 1,        -- Polymorph
-    [GetSpellInfo(28271)] = 1,      -- Polymorph: Turtle
-    [GetSpellInfo(28272)] = 1,      -- Polymorph: Pig
-    [GetSpellInfo(20066)] = 1,      -- Repentance
-    [GetSpellInfo(1776)] = 1,       -- Gouge
-    [GetSpellInfo(6770)] = 1,       -- Sap
-    [GetSpellInfo(1513)] = 1,       -- Scare Beast
-    [GetSpellInfo(8122)] = 1,       -- Psychic Scream
-    [GetSpellInfo(2094)] = 1,       -- Blind
-    [GetSpellInfo(5782)] = 1,       -- Fear
-    [GetSpellInfo(5484)] = 1,       -- Howl of Terror
-    [GetSpellInfo(6358)] = 1,       -- Seduction
-    [GetSpellInfo(5246)] = 1,       -- Intimidating Shout
-    [GetSpellInfo(6789)] = 1,       -- Death Coil
-    [GetSpellInfo(9005)] = 1,       -- Pounce
-    [GetSpellInfo(1833)] = 1,       -- Cheap Shot
-    [GetSpellInfo(16922)] = 1,      -- Improved Starfire
-    [GetSpellInfo(19410)] = 1,      -- Improved Concussive Shot
-    [GetSpellInfo(12355)] = 1,      -- Impact
-    [GetSpellInfo(20170)] = 1,      -- Seal of Justice Stun
-    [GetSpellInfo(15269)] = 1,      -- Blackout
-    [GetSpellInfo(18093)] = 1,      -- Pyroclasm
-    [GetSpellInfo(12798)] = 1,      -- Revenge Stun
-    [GetSpellInfo(5530)] = 1,       -- Mace Stun
-    [GetSpellInfo(19503)] = 1,      -- Scatter Shot
-    [GetSpellInfo(605)] = 1,        -- Mind Control
-    [GetSpellInfo(7922)] = 1,       -- Charge Stun
-    [GetSpellInfo(18469)] = 1,      -- Counterspell - Silenced
-    [GetSpellInfo(15487)] = 1,      -- Silence
-    [GetSpellInfo(18425)] = 1,      -- Kick - Silenced
-    [GetSpellInfo(24259)] = 1,      -- Spell Lock
-    [GetSpellInfo(18498)] = 1,      -- Shield Bash - Silenced
-    [GetSpellInfo(2878)] = 1,       -- Turn Undead
-    [GetSpellInfo(710)] = 1,        -- Banish
+namespace.crowdControls = {}
+local crowdControls = {
+    5211,       -- Bash
+    24394,      -- Intimidation
+    853,        -- Hammer of Justice
+    22703,      -- Inferno Effect (Summon Infernal)
+    408,        -- Kidney Shot
+    12809,      -- Concussion Blow
+    20253,      -- Intercept Stun
+    20549,      -- War Stomp
+    2637,       -- Hibernate
+    3355,       -- Freezing Trap
+    19386,      -- Wyvern Sting
+    118,        -- Polymorph
+    28271,      -- Polymorph: Turtle
+    28272,      -- Polymorph: Pig
+    20066,      -- Repentance
+    1776,       -- Gouge
+    6770,       -- Sap
+    1513,       -- Scare Beast
+    8122,       -- Psychic Scream
+    2094,       -- Blind
+    5782,       -- Fear
+    5484,       -- Howl of Terror
+    6358,       -- Seduction
+    5246,       -- Intimidating Shout
+    6789,       -- Death Coil
+    9005,       -- Pounce
+    1833,       -- Cheap Shot
+    16922,      -- Improved Starfire
+    19410,      -- Improved Concussive Shot
+    12355,      -- Impact
+    20170,      -- Seal of Justice Stun
+    15269,      -- Blackout
+    18093,      -- Pyroclasm
+    12798,      -- Revenge Stun
+    5530,       -- Mace Stun
+    19503,      -- Scatter Shot
+    605,        -- Mind Control
+    7922,       -- Charge Stun
+    18469,      -- Counterspell - Silenced
+    15487,      -- Silence
+    18425,      -- Kick - Silenced
+    24259,      -- Spell Lock
+    18498,      -- Shield Bash - Silenced
+    2878,       -- Turn Undead
+    710,        -- Banish
 
     -- ITEMS
-    [GetSpellInfo(13327)] = 1,      -- Reckless Charge
-    [GetSpellInfo(1090)] = 1,       -- Sleep
-    [GetSpellInfo(5134)] = 1,       -- Flash Bomb Fear
-    [GetSpellInfo(19821)] = 1,      -- Arcane Bomb Silence
-    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
-    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
-    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
-    [GetSpellInfo(4069)] = 1,       -- Big Iron Bomb
-    [GetSpellInfo(12543)] = 1,      -- Hi-Explosive Bomb
-    [GetSpellInfo(4064)] = 1,       -- Rough Copper Bomb
-    [GetSpellInfo(12421)] = 1,      -- Mithril Frag Bomb
-    [GetSpellInfo(19784)] = 1,      -- Dark Iron Bomb
-    [GetSpellInfo(4067)] = 1,       -- Big Bronze Bomb
-    [GetSpellInfo(4066)] = 1,       -- Small Bronze Bomb
-    [GetSpellInfo(4065)] = 1,       -- Large Copper Bomb
-    [GetSpellInfo(13237)] = 1,      -- Goblin Mortar
-    [GetSpellInfo(835)] = 1,        -- Tidal Charm
-    [GetSpellInfo(13181)] = 1,      -- Gnomish Mind Control Cap
-    [GetSpellInfo(12562)] = 1,      -- The Big One
-    [GetSpellInfo(15283)] = 1,      -- Stunning Blow (Weapon Proc)
-    [GetSpellInfo(56)] = 1,         -- Stun (Weapon Proc)
-    [GetSpellInfo(26108)] = 1,      -- Glimpse of Madness
-    [GetSpellInfo(8345)] = 1,       -- Control Machine (Gnomish Universal Remote trinket)
-    [GetSpellInfo(13235)] = 1,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
-    [GetSpellInfo(15753)] = 1,      -- Linken's Boomerang (trinket)
-    [GetSpellInfo(15535)] = 1,      -- Enveloping Winds (Six Demon Bag trinket)
-    [GetSpellInfo(28406)] = 1,      -- Polymorph Backfire
-    [GetSpellInfo(16600)] = 1,      -- Might of Shahram (Blackblade of Shahram sword)
-    [GetSpellInfo(13907)] = 1,      -- Smite Demon (Enchant Weapon - Demonslaying)
-    [GetSpellInfo(15822)] = 1,      -- Dreamless Sleep Potion
-    [GetSpellInfo(16053)] = 1,      -- Dominion of Soul (Orb of Draconic Energy)
-    [GetSpellInfo(21330)] = 1,      -- Corrupted Fear (Deathmist Raiment set)
+    21167,      -- Snowball
+    13327,      -- Reckless Charge
+    1090,       -- Sleep
+    5134,       -- Flash Bomb Fear
+    19821,      -- Arcane Bomb Silence
+    4068,       -- Iron Grenade
+    19769,      -- Thorium Grenade
+    13808,      -- M73 Frag Grenade
+    4069,       -- Big Iron Bomb
+    12543,      -- Hi-Explosive Bomb
+    4064,       -- Rough Copper Bomb
+    12421,      -- Mithril Frag Bomb
+    19784,      -- Dark Iron Bomb
+    4067,       -- Big Bronze Bomb
+    4066,       -- Small Bronze Bomb
+    4065,       -- Large Copper Bomb
+    13237,      -- Goblin Mortar
+    835,        -- Tidal Charm
+    13181,      -- Gnomish Mind Control Cap
+    12562,      -- The Big One
+    15283,      -- Stunning Blow (Weapon Proc)
+    56,         -- Stun (Weapon Proc)
+    21152,      -- Earthshaker (Weapon Proc)
+    26108,      -- Glimpse of Madness
+    8345,       -- Control Machine (Gnomish Universal Remote trinket)
+    13235,      -- Forcefield Collapse (Gnomish Harm Prevention Belt)
+    15753,      -- Linken's Boomerang (trinket)
+    15535,      -- Enveloping Winds (Six Demon Bag trinket)
+    28406,      -- Polymorph Backfire
+    16600,      -- Might of Shahram (Blackblade of Shahram sword)
+    13907,      -- Smite Demon (Enchant Weapon - Demonslaying)
+    15822,      -- Dreamless Sleep Potion
+    16053,      -- Dominion of Soul (Orb of Draconic Energy)
+    21330,      -- Corrupted Fear (Deathmist Raiment set)
 
     -- NPCS
-    [GetSpellInfo(3242)] = 1,       -- Ravage
-    [GetSpellInfo(3271)] = 1,       -- Fatigued
-    [GetSpellInfo(5708)] = 1,       -- Swoop
-    [GetSpellInfo(11430)] = 1,      -- Slam
-    [GetSpellInfo(17276)] = 1,      -- Scald
-    [GetSpellInfo(18812)] = 1,      -- Knockdown
-    [GetSpellInfo(3442)] = 1,       -- Enslave
-    [GetSpellInfo(20683)] = 1,      -- Highlord's Justice
-    [GetSpellInfo(17286)] = 1,      -- Crusader's Hammer
-    [GetSpellInfo(3109)] = 1,       -- Presence of Death
-    [GetSpellInfo(3143)] = 1,       -- Glacial Roar
-    [GetSpellInfo(3263)] = 1,       -- Touch of Ravenclaw
-    [GetSpellInfo(5106)] = 1,       -- Crystal Flash
-    [GetSpellInfo(6266)] = 1,       -- Kodo Stomp
-    [GetSpellInfo(6730)] = 1,       -- Head Butt
-    [GetSpellInfo(6982)] = 1,       -- Gust of Wind
-    [GetSpellInfo(7961)] = 1,       -- Azrethoc's Stomp
-    [GetSpellInfo(8151)] = 1,       -- Surprise Attack
-    [GetSpellInfo(3635)] = 1,       -- Crystal Gaze
-    [GetSpellInfo(21188)] = 1,      -- Stun Bomb Attack
-    [GetSpellInfo(16451)] = 1,      -- Judge's Gavel
-    [GetSpellInfo(3589)] = 1,       -- Deafening Screech
-    [GetSpellInfo(4320)] = 1,       -- Trelane's Freezing Touch
-    [GetSpellInfo(6942)] = 1,       -- Overwhelming Stench
-    [GetSpellInfo(8715)] = 1,       -- Terrifying Howl
-    [GetSpellInfo(8817)] = 1,       -- Smoke Bomb
-    [GetSpellInfo(25772)] = 1,      -- Mental Domination
-    [GetSpellInfo(15859)] = 1,      -- Dominate Mind
-    [GetSpellInfo(24753)] = 1,      -- Trick
-    [GetSpellInfo(19408)] = 1,      -- Panic
-    [GetSpellInfo(23364)] = 1,      -- Tail Lash
-    [GetSpellInfo(19364)] = 1,      -- Ground Stomp
-    [GetSpellInfo(19369)] = 1,      -- Ancient Despair
-    [GetSpellInfo(19641)] = 1,      -- Pyroclast Barrage
-    [GetSpellInfo(19393)] = 1,      -- Soul Burn
-    [GetSpellInfo(20277)] = 1,      -- Fist of Ragnaros
-    [GetSpellInfo(19780)] = 1,      -- Hand of Ragnaros
-    [GetSpellInfo(18431)] = 1,      -- Bellowing Roar
-    [GetSpellInfo(22289)] = 1,      -- Brood Power: Green
-    [GetSpellInfo(22291)] = 1,      -- Brood Power: Bronze
-    [GetSpellInfo(22561)] = 1,      -- Brood Power: Green
-    [GetSpellInfo(19872)] = 1,      -- Calm Dragonkin
-    [GetSpellInfo(22274)] = 1,      -- Greater Polymorph
-    [GetSpellInfo(23310)] = 1,      -- Time Lapse
-    [GetSpellInfo(23174)] = 1,      -- Chromatic Mutation
-    [GetSpellInfo(23171)] = 1,      -- Time Stop (Brood Affliction: Bronze)
-    [GetSpellInfo(22667)] = 1,      -- Shadow Command
-    [GetSpellInfo(23603)] = 1,      -- Wild Polymorph
-    [GetSpellInfo(23182)] = 1,      -- Mark of Frost
-    [GetSpellInfo(25043)] = 1,      -- Aura of Nature
-    [GetSpellInfo(24811)] = 1,      -- Draw Spirit
-    [GetSpellInfo(25806)] = 1,      -- Creature of Nightmare
-    [GetSpellInfo(6253)] = 1,       -- Backhand
-    [GetSpellInfo(6466)] = 1,       -- Axe Toss
-    [GetSpellInfo(8242)] = 1,       -- Shield Slam
-    [GetSpellInfo(8285)] = 1,       -- Rampage
-    [GetSpellInfo(6524)] = 1,       -- Ground Tremor
-    [GetSpellInfo(6607)] = 1,       -- Lash
-    [GetSpellInfo(7399)] = 1,       -- Terrify
-    [GetSpellInfo(8150)] = 1,       -- Thundercrack
-    [GetSpellInfo(11020)] = 1,      -- Petrify
-    [GetSpellInfo(11641)] = 1,      -- Hex
-    [GetSpellInfo(17307)] = 1,      -- Knockout
-    [GetSpellInfo(16075)] = 1,      -- Throw Axe
-    [GetSpellInfo(16104)] = 1,      -- Crystallize
-    [GetSpellInfo(11836)] = 1,      -- Freeze Solid
-    [GetSpellInfo(29419)] = 1,      -- Flash Bomb
-    [GetSpellInfo(6304)] = 1,       -- Rhahk'Zor Slam
-    [GetSpellInfo(6435)] = 1,       -- Smite Slam
-    [GetSpellInfo(6432)] = 1,       -- Smite Stomp
-    [GetSpellInfo(228)] = 1,        -- Polymorph: Chicken
-    [GetSpellInfo(8040)] = 1,       -- Druid's Slumber
-    [GetSpellInfo(7967)] = 1,       -- Naralex's Nightmare
-    [GetSpellInfo(7139)] = 1,       -- Fel Stomp
-    [GetSpellInfo(7621)] = 1,       -- Arugal's Curse
-    [GetSpellInfo(7803)] = 1,       -- Thundershock
-    [GetSpellInfo(7074)] = 1,       -- Screams of the Past
-    [GetSpellInfo(8281)] = 1,       -- Sonic Burst
-    [GetSpellInfo(8359)] = 1,       -- Left for Dead
-    [GetSpellInfo(9256)] = 1,       -- Deep Sleep
-    [GetSpellInfo(12946)] = 1,      -- Putrid Stench
-    [GetSpellInfo(3636)] = 1,       -- Crystalline Slumber
-    [GetSpellInfo(10093)] = 1,      -- Harsh Winds
-    [GetSpellInfo(21808)] = 1,      -- Summon Shardlings
-    [GetSpellInfo(21869)] = 1,      -- Repulsive Gaze
-    [GetSpellInfo(12888)] = 1,      -- Cause Insanity
-    [GetSpellInfo(12480)] = 1,      -- Hex of Jammal'an
-    [GetSpellInfo(12890)] = 1,      -- Deep Slumber
-    [GetSpellInfo(25774)] = 1,      -- Mind Shatter
-    [GetSpellInfo(15471)] = 1,      -- Enveloping Web
-    [GetSpellInfo(3609)] = 1,       -- Paralyzing Poison
-    [GetSpellInfo(17492)] = 1,      -- Hand of Thaurissan
-    [GetSpellInfo(14870)] = 1,      -- Drunken Stupor
-    [GetSpellInfo(13902)] = 1,      -- Fist of Ragnaros
-    [GetSpellInfo(6945)] = 1,       -- Chest Pains
-    [GetSpellInfo(3551)] = 1,       -- Skull Crack
-    [GetSpellInfo(15618)] = 1,      -- Snap Kick
-    [GetSpellInfo(16508)] = 1,      -- Intimidating Roar
-    [GetSpellInfo(16497)] = 1,      -- Stun Bomb
-    [GetSpellInfo(17405)] = 1,      -- Domination
-    [GetSpellInfo(16798)] = 1,      -- Enchanting Lullaby
-    [GetSpellInfo(12734)] = 1,      -- Ground Smash
-    [GetSpellInfo(17293)] = 1,      -- Burning Winds
-    [GetSpellInfo(16869)] = 1,      -- Ice Tomb
-    [GetSpellInfo(22856)] = 1,      -- Ice Lock
-    [GetSpellInfo(16838)] = 1,      -- Banshee Shriek
+    3242,       -- Ravage
+    3271,       -- Fatigued
+    5708,       -- Swoop
+    11430,      -- Slam
+    17276,      -- Scald
+    18812,      -- Knockdown
+    3442,       -- Enslave
+    20683,      -- Highlord's Justice
+    17286,      -- Crusader's Hammer
+    3109,       -- Presence of Death
+    3143,       -- Glacial Roar
+    3263,       -- Touch of Ravenclaw
+    5106,       -- Crystal Flash
+    6266,       -- Kodo Stomp
+    6730,       -- Head Butt
+    6982,       -- Gust of Wind
+    7961,       -- Azrethoc's Stomp
+    8151,       -- Surprise Attack
+    3635,       -- Crystal Gaze
+    21188,      -- Stun Bomb Attack
+    16451,      -- Judge's Gavel
+    3589,       -- Deafening Screech
+    4320,       -- Trelane's Freezing Touch
+    6942,       -- Overwhelming Stench
+    8715,       -- Terrifying Howl
+    8817,       -- Smoke Bomb
+    25772,      -- Mental Domination
+    15859,      -- Dominate Mind
+    24753,      -- Trick
+    19408,      -- Panic
+    23364,      -- Tail Lash
+    19364,      -- Ground Stomp
+    19369,      -- Ancient Despair
+    19641,      -- Pyroclast Barrage
+    19393,      -- Soul Burn
+    20277,      -- Fist of Ragnaros
+    19780,      -- Hand of Ragnaros
+    18431,      -- Bellowing Roar
+    22289,      -- Brood Power: Green
+    22291,      -- Brood Power: Bronze
+    22561,      -- Brood Power: Green
+    19872,      -- Calm Dragonkin
+    22274,      -- Greater Polymorph
+    23310,      -- Time Lapse
+    23174,      -- Chromatic Mutation
+    23171,      -- Time Stop (Brood Affliction: Bronze)
+    22667,      -- Shadow Command
+    23603,      -- Wild Polymorph
+    23182,      -- Mark of Frost
+    25043,      -- Aura of Nature
+    24811,      -- Draw Spirit
+    25806,      -- Creature of Nightmare
+    6253,       -- Backhand
+    6466,       -- Axe Toss
+    8242,       -- Shield Slam
+    8285,       -- Rampage
+    6524,       -- Ground Tremor
+    6607,       -- Lash
+    7399,       -- Terrify
+    8150,       -- Thundercrack
+    11020,      -- Petrify
+    11641,      -- Hex
+    17307,      -- Knockout
+    16075,      -- Throw Axe
+    16104,      -- Crystallize
+    11836,      -- Freeze Solid
+    29419,      -- Flash Bomb
+    6304,       -- Rhahk'Zor Slam
+    6435,       -- Smite Slam
+    6432,       -- Smite Stomp
+    228,        -- Polymorph: Chicken
+    8040,       -- Druid's Slumber
+    7967,       -- Naralex's Nightmare
+    7139,       -- Fel Stomp
+    7621,       -- Arugal's Curse
+    7803,       -- Thundershock
+    7074,       -- Screams of the Past
+    8281,       -- Sonic Burst
+    8359,       -- Left for Dead
+    9256,       -- Deep Sleep
+    12946,      -- Putrid Stench
+    3636,       -- Crystalline Slumber
+    10093,      -- Harsh Winds
+    21808,      -- Summon Shardlings
+    21869,      -- Repulsive Gaze
+    12888,      -- Cause Insanity
+    12480,      -- Hex of Jammal'an
+    12890,      -- Deep Slumber
+    25774,      -- Mind Shatter
+    15471,      -- Enveloping Web
+    3609,       -- Paralyzing Poison
+    17492,      -- Hand of Thaurissan
+    14870,      -- Drunken Stupor
+    13902,      -- Fist of Ragnaros
+    6945,       -- Chest Pains
+    3551,       -- Skull Crack
+    15618,      -- Snap Kick
+    16508,      -- Intimidating Roar
+    16497,      -- Stun Bomb
+    17405,      -- Domination
+    16798,      -- Enchanting Lullaby
+    12734,      -- Ground Smash
+    17293,      -- Burning Winds
+    16869,      -- Ice Tomb
+    22856,      -- Ice Lock
+    16838,      -- Banshee Shriek
 }
+
+C_Timer.After(11, function()
+    for i = 1, #crowdControls do
+        local name = GetSpellInfo(crowdControls[i])
+        if name then
+            namespace.crowdControls[name] = 1
+        end
+    end
+    crowdControls = nil
+end)
 
 -- Skip pushback calculation for these spells since they
 -- have chance to ignore pushback when talented, or is always immune.
@@ -1548,6 +1562,171 @@ namespace.pushbackBlacklist = {
     [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
     [GetSpellInfo(13278)] = 1,      -- Gnomish Death Ray
     [GetSpellInfo(20589)] = 1,      -- Escape Artist
+    [GetSpellInfo(20549)] = 1,      -- War Stomp
+}
+
+-- Casts that should be stopped on damage received
+namespace.stopCastOnDamageList = {
+    [GetSpellInfo(8690)] = 1, -- Hearthstone
+    [GetSpellInfo(5784)] = 1, -- Summon Felsteed
+    [GetSpellInfo(23161)] = 1, -- Summon Dreadsteed
+    [GetSpellInfo(13819)] = 1, -- Summon Warhorse
+    [GetSpellInfo(23214)] = 1, -- Summon Charger
+    [GetSpellInfo(2006)] = 1, -- Resurrection
+    [GetSpellInfo(2008)] = 1, -- Ancestral Spirit
+    [GetSpellInfo(7328)] = 1, -- Redemption
+    [GetSpellInfo(22999)] = 1, -- Defibrillate
+    [GetSpellInfo(3565)] = 1, -- Teleport: Darnassus
+    [GetSpellInfo(3562)] = 1, -- Teleport: Ironforge
+    [GetSpellInfo(18960)] = 1, -- Teleport: Moonglade
+    [GetSpellInfo(3567)] = 1, -- Teleport: Orgrimmar
+    [GetSpellInfo(3561)] = 1, -- Teleport: Stormwind
+    [GetSpellInfo(3566)] = 1, -- Teleport: Thunder Bluff
+    [GetSpellInfo(3563)] = 1, -- Teleport: Undercity
+    [GetSpellInfo(556)] = 1, -- Astrall Recall
+    [GetSpellInfo(22563)] = 1, -- Recall
+    -- First Aid not included here since we track aura removed
+}
+
+-- Player spells that shouldn't be stopped on movement
+namespace.castStopBlacklist = {
+    [GetSpellInfo(4068)] = 1,       -- Iron Grenade
+    [GetSpellInfo(19769)] = 1,      -- Thorium Grenade
+    [GetSpellInfo(13808)] = 1,      -- M73 Frag Grenade
+    [GetSpellInfo(6405)] = 1,       -- Furgbolg Form
+}
+
+-- Spells that can't be slowed or speed up
+namespace.unaffectedCastModsSpells = {
+    -- Player Spells
+    [11605] = 1, -- Slam
+    [6651] = 1, -- Instant Toxin
+    [1842] = 1, -- Disarm Trap
+    [6461] = 1, -- Pick Lock
+    [20904] = 1, -- Aimed Shot
+    [2641] = 1, -- Dismiss Pet
+    [2480] = 1, -- Shoot Bow
+    [7918] = 1, -- Shoot Gun
+    [20549] = 1, -- War Stomp
+    [20589] = 1, -- Escape Artist
+    [22027] = 1, -- Remove Insignia
+    [6510] = 1, -- Blinding Powder
+    [7355] = 1, -- Stuck
+
+    -- NPCs and Others
+    [2835] = 1, -- Deadly Poison
+    [3131] = 1, -- Frost Breath
+    [15664] = 1, -- Venom Spit
+    [7068] = 1, -- Veil of Shadow
+    [16247] = 1, -- Curse of Thorns
+    [14030] = 1, -- Hooked Net
+    [20716] = 1, -- Sand Breath
+    [8275] = 1, -- Poisoned Shot
+    [1980] = 1, -- Bombard
+    [3015] = 1, -- Bombard II
+    [1536] = 1, -- Longshot II
+    [3007] = 1, -- Longshot III
+    [1540] = 1, -- Volley
+    [3013] = 1, -- Volley II
+    [4164] = 1, -- Throw Rock
+    [4165] = 1, -- Throw Rock II
+    [3537] = 1, -- Minions of Malathrom
+    [5567] = 1, -- Miring Mud
+    [28352] = 1, -- Breath of Sargeras
+    [7106] = 1, -- Dark Restore
+    [4075] = 1, -- Large Seaforium Charge
+    [5106] = 1, -- Crystal Flash
+    [22979] = 1, -- Shadow Flame
+    [3611] = 1, -- Minion of Morganth
+    [27794] = 1, -- Cleave
+    [25247] = 1, -- Longsight
+    [5208] = 1, -- Poisoned Harpoon
+    [14532] = 1, -- Creeper Venom
+    [3132] = 1, -- Chilling Breath
+    [3650] = 1, -- Sling Mud
+    [3651] = 1, -- Shield of Reflection
+    [3143] = 1, -- Glacial Roar
+    [6296] = 1, -- Enchant: Fiery Blaze
+    [24194] = 1, -- Uther's Tribute
+    [7364] = 1, -- Light Torch
+    [12684] = 1, -- Kadrak's Flag
+    [7919] = 1, -- Shoot Crossbow
+    [6907] = 1, -- Diseased Slime
+    [3204] = 1, -- Sapper Explode
+    [26234] = 1, -- Submerge Visual
+    [26063] = 1, -- Ouro Submerge Visual
+    [6925] = 1, -- Gift of the Xavian
+    [7951] = 1, -- Toxic Spit
+    [24195] = 1, -- Grom's Tribute
+    [16554] = 1, -- Toxic Bolt
+    [15495] = 1, -- Explosive Shot
+    [6530] = 1, -- Sling Dirt
+    [26072] = 1, -- Dust Cloud
+    [5514] = 1, -- Darken Vision
+    [11016] = 1, -- Soul Bite
+    [21050] = 1, -- Melodious Rapture
+    [4520] = 1, -- Wide Sweep
+    [4526] = 1, -- Mass Dispell
+    [6576] = 1, -- Intimidating Growl
+    [20627] = 1, -- Lightning Breath
+    [25793] = 1, -- Demon Summoning Torch
+    [23254] = 1, -- Redeeming the Soul
+    [18711] = 1, -- Forging
+    [12198] = 1, -- Marksman Hit
+    [8153] = 1, -- Owl Form
+    [6626] = 1, -- Set NG-5 Charge (Blue)
+    [6630] = 1, -- Set NG-5 Charge (Red)
+    [30081] = 1, -- Retching Plague
+    [6656] = 1, -- Remote Detonate
+    [10254] = 1, -- Stone Dwarf Awaken Visual
+    [3359] = 1, -- Drink Potion
+    [17618] = 1, -- Summon Risen Lackey
+    [8286] = 1, -- Summon Boar Spirit
+    [17235] = 1, -- Raise Undead Scarab
+    [8386] = 1, -- Attacking
+    [28311] = 1, -- Slime Bolt
+    [1698] = 1, -- Shockwave
+    [23008] = 1, -- Powerful Seaforium Charge
+    [6951] = 1, -- Decayed Strength
+    [28732] = 1, -- Widow's Embrace
+    [28995] = 1, -- Stoneskin
+    [24706] = 1, -- Toss Stink Bomb
+    [6257] = 1, -- Torch Toss
+    [7359] = 1, -- Bright Campfire
+    [16590] = 1, -- Summon Zombie
+    [9612] = 1, -- Ink Spray
+    [3436] = 1, -- Wandering Plague
+    [9636] = 1, -- Summon Swamp Spirit
+    [17204] = 1, -- Summon Skeleton
+    [7896] = 1, -- Exploding Shot
+    [23392] = 1, -- Boulder
+    [7920] = 1, -- Mebok Smart Drink
+    [8682] = 1, -- Fake Shot
+    [28614] = 1, -- Pointy Spike
+    [8016] = 1, -- Spirit Decay
+    [26102] = 1, -- Sand Blast
+    [3477] = 1, -- Spirit Steal
+    [5395] = 1, -- Death Capsule
+    [5159] = 1, -- Melt Ore
+    [5403] = 1, -- Crash of Waves
+    [8256] = 1, -- Lethal Toxin
+    [6441] = 1, -- Explosive Shells
+    [10850] = 1, -- Powerful Smelling Salts
+    [3488] = 1, -- Felstrom Resurrection
+    [10346] = 1, -- Machine Gun
+    [12740] = 1, -- Summon Infernal Servant
+    [6469] = 1, -- Skeletal Miner Explode
+    [11397] = 1, -- Diseased Shot
+    [4950] = 1, -- Summon Helcular's Puppets
+    [8363] = 1, -- Parasite
+    [16531] = 1, -- Summon Frail Skeleton
+    [16072] = 1, -- Purify and Place Food
+    [20629] = 1, -- Corrosive Venom Spit
+    [28615] = 1, -- Spike Volley
+    [19566] = 1, -- Salt Shaker
+    [7901] = 1, -- Decayed Agility
+    [7054] = 1, -- Forsaken Skills
+    [24189] = 1, -- Force Punch
 }
 
 -- Addon Savedvariables
@@ -1599,33 +1778,6 @@ namespace.defaultConfig = {
         castBorder = "Interface\\CastingBar\\UI-CastingBar-Border-Small",
         hideIconBorder = false,
         position = { "CENTER", -18, -87 },
-        iconPositionX = -5,
-        iconPositionY = 0,
-        borderColor = { 1, 1, 1, 1 },
-        statusColor = { 1, 0.7, 0, 1 },
-        statusColorChannel = { 0, 1, 0, 1 },
-        textColor = { 1, 1, 1, 1 },
-        textPositionX = 0,
-        textPositionY = 0,
-        frameLevel = 10,
-        statusBackgroundColor = { 0, 0, 0, 0.535 },
-    },
-
-    focus = {
-        enabled = false,
-        width = 150,
-        height = 15,
-        iconSize = 16,
-        showCastInfoOnly = false,
-        showTimer = false,
-        showIcon = true,
-        autoPosition = true,
-        castFont = _G.STANDARD_TEXT_FONT,
-        castFontSize = 10,
-        castStatusBar = "Interface\\TargetingFrame\\UI-StatusBar",
-        castBorder = "Interface\\CastingBar\\UI-CastingBar-Border-Small",
-        hideIconBorder = false,
-        position = { "CENTER", -30, 90 },
         iconPositionX = -5,
         iconPositionY = 0,
         borderColor = { 1, 1, 1, 1 },

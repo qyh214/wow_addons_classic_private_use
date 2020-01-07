@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local LSM = E.Libs.LSM
 local M = [[Interface\AddOns\ElvUI\Media\]]
 
@@ -65,16 +65,16 @@ E.Media = {
 		ZZZ = M..[[ChatEmojis\ZZZ.tga]]
 	},
 	ChatLogos = {
-		Bathrobe = M..[[ChatLogos\Bathrobe.tga]],
+		ElvRainbow = M..[[ChatLogos\ElvRainbow.tga]],
+		ElvMelon = M..[[ChatLogos\ElvMelon.tga]],
 		ElvBlue = M..[[ChatLogos\ElvBlue.tga]],
 		ElvGreen = M..[[ChatLogos\ElvGreen.tga]],
-		ElvMelon = M..[[ChatLogos\ElvMelon.tga]],
 		ElvOrange = M..[[ChatLogos\ElvOrange.tga]],
 		ElvPink = M..[[ChatLogos\ElvPink.tga]],
 		ElvPurple = M..[[ChatLogos\ElvPurple.tga]],
-		ElvRainbow = M..[[ChatLogos\ElvRainbow.tga]],
-		ElvRed = M..[[ChatLogos\ElvRed.tga]],
 		ElvYellow = M..[[ChatLogos\ElvYellow.tga]],
+		ElvRed = M..[[ChatLogos\ElvRed.tga]],
+		Bathrobe = M..[[ChatLogos\Bathrobe.tga]],
 		HelloKitty = M..[[ChatLogos\HelloKitty.tga]],
 		Illuminati = M..[[ChatLogos\Illuminati.tga]],
 		MrHankey = M..[[ChatLogos\MrHankey.tga]],
@@ -88,8 +88,9 @@ E.Media = {
 		BagJunkIcon = M..[[Textures\BagJunkIcon.blp]],
 		BagNewItemGlow = M..[[Textures\BagNewItemGlow.tga]],
 		BagQuestIcon = M..[[Textures\BagQuestIcon.tga]],
-		BagUpgradeIcon = M..[[Textures\BagUpgradeIcon.tga]],
 		Black8x8 = M..[[Textures\Black8x8.tga]],
+		White8x8 = M..[[Textures\White8x8.tga]],
+		BagUpgradeIcon = M..[[Textures\BagUpgradeIcon.tga]],
 		BubbleTex = M..[[Textures\BubbleTex.tga]],
 		ChatEmojis = M..[[Textures\ChatEmojis]],
 		ChatLogos = M..[[Textures\ChatLogos]],
@@ -98,7 +99,6 @@ E.Media = {
 		Copy = M..[[Textures\Copy.tga]],
 		Cross = M..[[Textures\Cross.tga]],
 		DPS = M..[[Textures\DPS.tga]],
-		ExitVehicle = M..[[Textures\ExitVehicle.tga]],
 		GlowTex = M..[[Textures\GlowTex.tga]],
 		Healer = M..[[Textures\Healer.tga]],
 		HelloKitty = M..[[Textures\HelloKitty.tga]],
@@ -127,18 +127,17 @@ E.Media = {
 		Spark = M..[[Textures\Spark.tga]],
 		Tank = M..[[Textures\Tank.tga]],
 		TukuiLogo = M..[[Textures\TukuiLogo.tga]],
-		White8x8 = [[Interface\BUTTONS\WHITE8X8]] -- not elvui
+		ExitVehicle = M..[[Textures\ExitVehicle.tga]]
 	}
 }
 
-LSM:Register('background','ElvUI Blank',E.Media.Textures.White8x8)
 LSM:Register('border','ElvUI GlowBorder',E.Media.Textures.GlowTex)
-LSM:Register('font','Action Man',E.Media.Fonts.ActionMan)
 LSM:Register('font','Continuum Medium',E.Media.Fonts.ContinuumMedium)
 LSM:Register('font','Die Die Die!',E.Media.Fonts.DieDieDie)
+LSM:Register('font','Action Man',E.Media.Fonts.ActionMan)
 LSM:Register('font','Expressway',E.Media.Fonts.Expressway,LSM.LOCALE_BIT_ruRU+LSM.LOCALE_BIT_western)
-LSM:Register('font','Homespun',E.Media.Fonts.Homespun,LSM.LOCALE_BIT_ruRU+LSM.LOCALE_BIT_western)
 LSM:Register('font','PT Sans Narrow',E.Media.Fonts.PTSansNarrow,LSM.LOCALE_BIT_ruRU+LSM.LOCALE_BIT_western)
+LSM:Register('font','Homespun',E.Media.Fonts.Homespun,LSM.LOCALE_BIT_ruRU+LSM.LOCALE_BIT_western)
 LSM:Register('sound','Awww Crap',E.Media.Sounds.AwwCrap)
 LSM:Register('sound','BBQ Ass',E.Media.Sounds.BbqAss)
 LSM:Register('sound','Big Yankie Devil',E.Media.Sounds.YankieBangBang)
@@ -148,8 +147,9 @@ LSM:Register('sound','Runaway Fast',E.Media.Sounds.RunFast)
 LSM:Register('sound','Stop Running',E.Media.Sounds.StopRunningSlimeBall)
 LSM:Register('sound','Warning',E.Media.Sounds.Warning)
 LSM:Register('sound','Whisper Alert',E.Media.Sounds.Whisper)
-LSM:Register('statusbar','ElvUI Blank',E.Media.Textures.White8x8)
+LSM:Register('statusbar','Melli',E.Media.Textures.Melli)
 LSM:Register('statusbar','ElvUI Gloss',E.Media.Textures.NormTex)
 LSM:Register('statusbar','ElvUI Norm',E.Media.Textures.NormTex2)
-LSM:Register('statusbar','Melli',E.Media.Textures.Melli)
 LSM:Register('statusbar','Minimalist',E.Media.Textures.Minimalist)
+LSM:Register('statusbar','ElvUI Blank',E.Media.Textures.White8x8)
+LSM:Register('background','ElvUI Blank',E.Media.Textures.White8x8)

@@ -1964,7 +1964,7 @@ data["Zul'Farrak"] = {
 	AtlasMapFile = "ZulFarrak",
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {39, 42, 46},
+	LevelRange = {39, 44, 54},
 	items = {
 		{ -- ZFAntusul
 			name = AL["Antu'sul"],
@@ -3652,7 +3652,7 @@ data["DireMaulWest"] = {
 	AtlasMapFile = {"DireMaulWest", "DireMaulEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {31, 55, 60},
+	LevelRange = {31, 58, 60},
 	items = {
 		{ -- DMWTendrisWarpwood
 			name = AL["Tendris Warpwood"],
@@ -3803,7 +3803,7 @@ data["DireMaulNorth"] = {
 	AtlasMapFile = {"DireMaulNorth", "DireMaulEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {31, 55, 60},
+	LevelRange = {31, 58, 60},
 	items = {
 		{ -- DMNGuardMoldar
 			name = AL["Guard Mol'dar"],
@@ -3891,6 +3891,7 @@ data["DireMaulNorth"] = {
 		{ -- DMNThimblejack
 			name = AL["Knot Thimblejack's Cache"],
 			AtlasMapBossID = 4,
+			npcID = 14338,
 			ObjectID = 179501,
 			[NORMAL_DIFF] = {
 				{ 1,  18414 }, -- Pattern: Belt of the Archmage
@@ -3979,8 +3980,7 @@ data["DireMaulNorth"] = {
 				{ 21, 18476 }, -- Mud Stained Boots
 				{ 22, 18482 }, -- Ogre Toothpick Shooter
 				{ 23, 18481 }, -- Skullcracking Mace
-				{ 24, 18637 }, -- Major Recombobulator
-				{ 26, 18655 }, -- Schematic: Major Recombobulator
+				{ 25, 18655 }, -- Schematic: Major Recombobulator
 			},
 		},
 		{ -- DMNTrash
@@ -4468,8 +4468,8 @@ data["Stratholme"] = {
 		32319, 32320, 32367, 32331, 32357, 32281, 32285, 32277,
 		-- Undead
 		32342, 32322, 32303, 32301, 32352,
-			-- Ziggurats
-			32344, 32345, 32349,
+		-- Ziggurats
+		32344, 32345, 32349,
 	},
 	AtlasMapID = "Stratholme",
 	AtlasMapFile = "Stratholme",

@@ -33,10 +33,10 @@ if not wow_classic then
 	return
 end
 
-TELLMEWHEN_VERSION = "8.7.1"
+TELLMEWHEN_VERSION = "8.7.3"
 
 TELLMEWHEN_VERSION_MINOR = ""
-local projectVersion = "8.7.1-classic" -- comes out like "6.2.2-21-g4e91cee"
+local projectVersion = "8.7.3-classic" -- comes out like "6.2.2-21-g4e91cee"
 if projectVersion:find("project%-version") then
 	TELLMEWHEN_VERSION_MINOR = "dev"
 elseif strmatch(projectVersion, "%-%d+%-") then
@@ -44,7 +44,7 @@ elseif strmatch(projectVersion, "%-%d+%-") then
 end
 
 TELLMEWHEN_VERSION_FULL = TELLMEWHEN_VERSION .. " Classic " .. TELLMEWHEN_VERSION_MINOR
-TELLMEWHEN_VERSIONNUMBER = 87101 -- NEVER DECREASE THIS NUMBER (duh?).  IT IS ALSO ONLY INTERNAL (for versioning of)
+TELLMEWHEN_VERSIONNUMBER = 87305 -- NEVER DECREASE THIS NUMBER (duh?).  IT IS ALSO ONLY INTERNAL (for versioning of)
 
 TELLMEWHEN_FORCECHANGELOG = 86005 -- if the user hasn't seen the changelog until at least this version, show it to them.
 
@@ -2514,7 +2514,13 @@ do	-- TMW:OnUpdate()
 
 	TMW:RegisterEvent("UNIT_FLAGS", function(event, unit)
 		if unit == "player" then
+			local old = inCombatLockdown
 			inCombatLockdown = InCombatLockdown()
+			if not old and inCombatLockdown then
+				TMW:Fire("TMW_COMBAT_LOCKDOWN_STARTED")
+			elseif old and not inCombatLockdown then
+				TMW:Fire("TMW_COMBAT_LOCKDOWN_ENDED")
+			end
 		end
 	end)
 

@@ -40,16 +40,12 @@ function UF:Construct_PlayerFrame(frame)
 	frame.ClassBarHolder:Point("BOTTOM", E.UIParent, "BOTTOM", 0, 150)
 
 	--Combo points was moved to the ClassPower element, so all classes need to have a ClassBar now.
-	if E.myclass == "SHAMAN" then
-		frame.Totems = self:Construct_Totems(frame)
-	else
-		frame.ClassPower = self:Construct_ClassBar(frame)
-		frame.ClassBar = 'ClassPower'
+	frame.ClassPower = self:Construct_ClassBar(frame)
+	frame.ClassBar = 'ClassPower'
 
-		--Some classes need another set of different classbars.
-		if E.myclass == "DRUID" then
-			frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
-		end
+	--Some classes need another set of different classbars.
+	if E.myclass == "DRUID" then
+		frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
 	end
 
 	frame.AuraBars = self:Construct_AuraBarHeader(frame)

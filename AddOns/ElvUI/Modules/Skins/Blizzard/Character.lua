@@ -281,11 +281,19 @@ local function LoadSkin()
 	_G.SkillDetailStatusBarUnlearnButton:SetHitRectInsets(0, 0, 0, 0)
 
 	-- Honor Frame
-	_G.HonorFrame:StripTextures()
+	local HonorFrame = _G.HonorFrame
+	S:HandleFrame(HonorFrame, true, nil, 18, -105, -39, 83)
+	HonorFrame.backdrop:SetFrameLevel(HonorFrame:GetFrameLevel())
 
-	_G.HonorFrameProgressButton:CreateBackdrop()
-	_G.HonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
-	E:RegisterStatusBar(_G.HonorFrameProgressBar)
+	_G.HonorFrameProgressButton:CreateBackdrop('Transparent')
+
+	local HonorFrameProgressBar = _G.HonorFrameProgressBar
+	HonorFrameProgressBar:Width(325)
+	HonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
+
+	S:HandlePointXY(HonorFrameProgressBar, 19, -74)
+
+	E:RegisterStatusBar(HonorFrameProgressBar)
 end
 
 S:AddCallback('Character', LoadSkin)

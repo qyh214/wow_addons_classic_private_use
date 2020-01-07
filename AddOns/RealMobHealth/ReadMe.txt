@@ -17,6 +17,21 @@ Clears all recorded health data.
 
 ===============================================================================
 Versions:
+2.17	(2019-12-13)
+	-Added usage of INSTANCE_CHAT as a fallback for BATTLEGROUND. (Reports are saying BATTLEGROUND is defunct)
+
+2.16	(2019-12-12)
+	-Added usage of BATTLEGROUND addon channel
+	-RAID/PARTY addon channels now check specifically for the home group category instead of all
+
+2.15	(2019-12-11)
+	-Implemented an anti-spam measure to help mitigate Blizzard's throttle bug of the YELL channel
+	-TextStatusBar_UpdateTextString() code moved to a secure hook to mitigate Blizzard taint bug
+
+2.14	(2019-12-10)
+	-The YELL addon channel has been added to the list of broadcast channels
+	-Some internal functions are now metatable-aware (opens possibilities for future features?)
+
 2.13	(2019-09-25)
 	-Removed lingering debug message that was hiding in the aura scanner
 

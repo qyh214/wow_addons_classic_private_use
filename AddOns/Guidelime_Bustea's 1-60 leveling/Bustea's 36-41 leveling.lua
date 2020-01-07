@@ -144,7 +144,7 @@ Turn in [QT1424]
 Fly to [F Kargath]
 Turn in [QT1418] and accept [QA1420]
 Accept [QA1419][QA2258][QA782]
-Kill Coyotes and Buzzards for [QC1419][QC2258]
+Kill Coyotes and Buzzards for [QC1419][QC2258] Keep the *Buzzard Wings*
 Accept [QA711]
 Turn in [QT1106] and accept [QA1108]
 Accept [QA703] if your quest log is full before accepting everything, drop some Dungeon Quests, you can always pick them up later.

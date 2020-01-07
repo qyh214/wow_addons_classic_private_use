@@ -27,7 +27,7 @@ local isNumber = TMW.isNumber
 local strlowerCache = TMW.strlowerCache
 local OnGCD = TMW.OnGCD
 
-local GetTotemInfo = GetTotemInfo
+local GetTotemInfo = TMW.GetTotemInfo
 local UnitGUID = UnitGUID
 local max, strfind, format = max, strfind, format
 local bit_band = bit.band
@@ -60,6 +60,13 @@ function Env.SwingDuration(slot)
 		return max(SwingTimer.duration - (TMW.time - SwingTimer.startTime), 0)
 	end
 	return 0
+end
+function Env.SwingInfo(slot)
+	local SwingTimer = SwingTimers[slot]
+	if SwingTimer then
+		return SwingTimer.startTime, SwingTimer.duration
+	end
+	return nil, nil
 end
 
 local ConditionCategory = CNDT:GetCategory("SPELLSABILITIES", 4, L["CNDTCAT_SPELLSABILITIES"], true, false)
@@ -533,7 +540,7 @@ ConditionCategory:RegisterCondition(19,	 "MHSWING", {
 	end,
 	hidden = not TMW.COMMON.SwingTimerMonitor,
 	anticipate = [[
-		local start, duration = SwingDuration(]] .. GetInventorySlotInfo("MainHandSlot") .. [[)
+		local start, duration = SwingInfo(]] .. GetInventorySlotInfo("MainHandSlot") .. [[)
 		local VALUE = duration and start + (duration - c.Level) or huge
 	]],
 })
@@ -556,7 +563,7 @@ ConditionCategory:RegisterCondition(19.5,	 "OHSWING", {
 	end,
 	hidden = not TMW.COMMON.SwingTimerMonitor,
 	anticipate = [[
-		local start, duration = SwingDuration(]] .. GetInventorySlotInfo("SecondaryHandSlot") .. [[)
+		local start, duration = SwingInfo(]] .. GetInventorySlotInfo("SecondaryHandSlot") .. [[)
 		local VALUE = duration and start + (duration - c.Level) or huge
 	]],
 })
@@ -573,6 +580,57 @@ function Env.TotemHelper(slot, nameString)
 	end
 	return duration and duration ~= 0 and (duration - (TMW.time - start)) or 0
 end
+
+function Env.TotemHelperAny(nameString)
+	for slot = 1, 10 do
+		local have, name, start, duration = GetTotemInfo(slot)
+		if have == nil then
+			return 0 -- `have` will be nil if the slot doesn't exist.
+		end
+
+		if
+			have and (
+				-- If we're not filtering by name,
+				(not nameString or nameString == "" or nameString == ";")
+				-- Or we are filtering by name and the name matches
+				or (name and strfind(nameString, Env.SemicolonConcatCache[name]))
+			)
+		then
+			-- Then return the time of this totem as the result.
+			return duration and duration ~= 0 and (duration - (TMW.time - start)) or 0
+		end
+		-- If the above condition didn't succeeed, continue on to the next totem.
+	end
+
+	-- No results were found.
+	return 0
+end
+
+
+ConditionCategory:RegisterCondition(20.1,	 "TOTEM_ANY", {
+	text = L["GENERICTOTEM_ANY"],
+	tooltip = L["ICONMENU_TOTEM_DESC"],
+	min = 0,
+	range = 60,
+	unit = false,
+	name = function(editbox)
+		editbox:SetTexts(L["CNDT_TOTEMNAME"], L["CNDT_TOTEMNAME_DESC"])
+		editbox:SetLabel(L["CNDT_TOTEMNAME"] .. " " .. L["ICONMENU_CHOOSENAME_ORBLANK"])
+	end,
+	useSUG = true,
+	allowMultipleSUGEntires = true,
+	formatter = TMW.C.Formatter.TIME_0ABSENT,
+	icon = "Interface\\ICONS\\spell_nature_brilliance",
+	tcoords = CNDT.COMMON.standardtcoords,
+	funcstr = [[TotemHelperAny(c.NameStrings) c.Operator c.Level]],
+	events = function(ConditionObject, c)
+		return
+			ConditionObject:GenerateNormalEventString("TMW_TOTEM_UPDATE")
+	end,
+	anticipate = function(c)
+		return [[local VALUE = time + TotemHelperAny(c.NameStrings) - c.Level]]
+	end,
+})
 
 for i = 1, 5 do
 	local totem = totemData[i]
@@ -591,10 +649,10 @@ for i = 1, 5 do
 		formatter = TMW.C.Formatter.TIME_0ABSENT,
 		icon = totem and totem.texture or "Interface\\ICONS\\ability_shaman_tranquilmindtotem",
 		tcoords = CNDT.COMMON.standardtcoords,
-		funcstr = [[TotemHelper(]] .. i .. ((not totem or totem.hasVariableNames) and [[, c.Name]] or "") .. [[) c.Operator c.Level]],
+		funcstr = [[TotemHelper(]] .. i .. ((not totem or totem.hasVariableNames) and [[, c.NameString]] or "") .. [[) c.Operator c.Level]],
 		events = function(ConditionObject, c)
 			return
-				ConditionObject:GenerateNormalEventString("PLAYER_TOTEM_UPDATE")
+				ConditionObject:GenerateNormalEventString("TMW_TOTEM_UPDATE")
 		end,
 		anticipate = function(c)
 			return [[local VALUE = time + TotemHelper(]] .. i .. [[) - c.Level]]
