@@ -7,8 +7,8 @@ local _G = _G
 --WoW API / Variables
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.tabard then return end
+function S:TabardFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.tabard) then return end
 
 	local TabardFrame = _G.TabardFrame
 	S:HandleFrame(TabardFrame, true, nil, 10, -12, -32, 74)
@@ -70,4 +70,4 @@ local function LoadSkin()
 	end)
 end
 
-S:AddCallback('Skin_Tabard', LoadSkin)
+S:AddCallback('TabardFrame')

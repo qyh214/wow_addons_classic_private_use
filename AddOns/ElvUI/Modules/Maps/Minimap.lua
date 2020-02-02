@@ -269,6 +269,18 @@ function M:UpdateSettings()
 		MiniMapBattlefieldFrame:Point(pos, Minimap, pos, E.db.general.minimap.icons.battlefield.xOffset or -2, E.db.general.minimap.icons.battlefield.yOffset or -2)
 		MiniMapBattlefieldFrame:SetScale(scale)
 		MiniMapBattlefieldFrame:SetParent(Minimap)
+
+		if (_G.BattlegroundShine) then
+			_G.BattlegroundShine:Hide()
+		end
+
+		if (_G.MiniMapBattlefieldBorder) then
+			_G.MiniMapBattlefieldBorder:Hide()
+		end
+
+		if (_G.MiniMapBattlefieldIcon) then
+			_G.MiniMapBattlefieldIcon:SetTexCoord(unpack(E.TexCoords))
+		end
 	end
 
 	local MiniMapTrackingFrame = _G.MiniMapTrackingFrame

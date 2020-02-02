@@ -239,6 +239,7 @@ end
 function NP:UpdatePlate(nameplate)
 	NP:Update_Tags(nameplate)
 	NP:Update_Highlight(nameplate)
+	NP:Update_RaidTargetIndicator(nameplate)
 
 	if (nameplate.VisibilityChanged or nameplate.NameOnlyChanged) or (not NP.db.units[nameplate.frameType].enable) or NP.db.units[nameplate.frameType].nameOnly then
 		NP:DisablePlate(nameplate, nameplate.NameOnlyChanged or (NP.db.units[nameplate.frameType].nameOnly and not nameplate.VisibilityChanged))
@@ -253,7 +254,6 @@ function NP:UpdatePlate(nameplate)
 		NP:Update_Portrait(nameplate)
 		NP:Update_PvPIndicator(nameplate) -- Horde / Alliance / HonorInfo
 		NP:Update_TargetIndicator(nameplate)
-		NP:Update_RaidTargetIndicator(nameplate)
 		NP:Update_Cutaway(nameplate)
 
 		if nameplate == _G.ElvNP_Player then
@@ -276,6 +276,7 @@ function NP:DisablePlate(nameplate, nameOnly)
 	if nameplate:IsElementEnabled('Castbar') then nameplate:DisableElement('Castbar') end
 	if nameplate:IsElementEnabled('Portrait') then nameplate:DisableElement('Portrait') end
 	if nameplate:IsElementEnabled('ClassPower') then nameplate:DisableElement('ClassPower') end
+	if nameplate:IsElementEnabled('TargetIndicator') then nameplate:DisableElement('TargetIndicator') end
 	if nameplate:IsElementEnabled('PvPIndicator') then nameplate:DisableElement('PvPIndicator') end
 	if nameplate:IsElementEnabled('Auras') then nameplate:DisableElement('Auras') end
 

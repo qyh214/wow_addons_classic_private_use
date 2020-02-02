@@ -109,6 +109,9 @@ function NP:Update_Health(nameplate)
 		nameplate.Health:Point('LEFT')
 		nameplate.Health:Point('RIGHT')
 
+		nameplate:SetHealthUpdateMethod(E.global.nameplate.effectiveHealth)
+		nameplate:SetHealthUpdateSpeed(E.global.nameplate.effectiveHealthSpeed)
+
 		E:SetSmoothing(nameplate.Health, NP.db.smoothbars)
 	else
 		if nameplate:IsElementEnabled('Health') then

@@ -4,9 +4,10 @@ local Skins = E:GetModule('Skins')
 
 --Lua functions
 local _G = _G
+local strmatch = strmatch
 local unpack, select, ipairs = unpack, select, ipairs
 local wipe, tinsert, tconcat = wipe, tinsert, table.concat
-local floor, tonumber = floor, tonumber
+local floor, tonumber, strlower = floor, tonumber, strlower
 local strfind, format, strsub = strfind, format, strsub
 --WoW API / Variables
 local CanInspect = CanInspect
@@ -16,8 +17,13 @@ local GetCreatureDifficultyColor = GetCreatureDifficultyColor
 local GetGuildInfo = GetGuildInfo
 local GetInspectSpecialization = GetInspectSpecialization
 local GetItemCount = GetItemCount
+local GetItemInfo = GetItemInfo
+local GetItemQualityColor = GetItemQualityColor
 local GetMouseFocus = GetMouseFocus
 local GetNumGroupMembers = GetNumGroupMembers
+local GetSpecialization = GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo
+local GetSpecializationInfoByID = GetSpecializationInfoByID
 local GetTime = GetTime
 local InCombatLockdown = InCombatLockdown
 local IsAltKeyDown = IsAltKeyDown
@@ -29,27 +35,32 @@ local NotifyInspect = NotifyInspect
 local SetTooltipMoney = SetTooltipMoney
 local UnitAura = UnitAura
 local UnitClass = UnitClass
+local UnitClassification = UnitClassification
+local UnitCreatureType = UnitCreatureType
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitIsAFK = UnitIsAFK
 local UnitIsDeadOrGhost = UnitIsDeadOrGhost
 local UnitIsDND = UnitIsDND
 local UnitIsPlayer = UnitIsPlayer
+local UnitIsPVP = UnitIsPVP
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitIsUnit = UnitIsUnit
 local UnitLevel = UnitLevel
 local UnitName = UnitName
+local UnitPlayerControlled = UnitPlayerControlled
 local UnitPVPName = UnitPVPName
 local UnitRace = UnitRace
 local UnitReaction = UnitReaction
-local UnitPlayerControlled = UnitPlayerControlled
+local UnitRealmRelationship = UnitRealmRelationship
 local PRIEST_COLOR = RAID_CLASS_COLORS.PRIEST
+local UNKNOWN = UNKNOWN
 
--- GLOBALS: ElvUI_KeyBinder, ElvUI_ContainerFrame
+-- GLOBALS: ElvUF, ElvUI_KeyBinder, ElvUI_ContainerFrame
 
 -- Custom to find LEVEL string on tooltip
-local LEVEL1 = _G.TOOLTIP_UNIT_LEVEL:gsub('%s?%%s%s?%-?','')
-local LEVEL2 = _G.TOOLTIP_UNIT_LEVEL_CLASS:gsub('^%%2$s%s?(.-)%s?%%1$s','%1'):gsub('^%-?г?о?%s?',''):gsub('%s?%%s%s?%-?','')
+local LEVEL1 = strlower(_G.TOOLTIP_UNIT_LEVEL:gsub('%s?%%s%s?%-?',''))
+local LEVEL2 = strlower(_G.TOOLTIP_UNIT_LEVEL_CLASS:gsub('^%%2$s%s?(.-)%s?%%1$s','%1'):gsub('^%-?г?о?%s?',''):gsub('%s?%%s%s?%-?',''))
 
 local GameTooltip, GameTooltipStatusBar = _G.GameTooltip, _G.GameTooltipStatusBar
 local targetList = {}
@@ -158,8 +169,8 @@ function TT:GetLevelLine(tt, offset)
 	if tt:IsForbidden() then return end
 	for i=offset, tt:NumLines() do
 		local tipLine = _G["GameTooltipTextLeft"..i]
-		local tipText = tipLine and tipLine.GetText and tipLine:GetText()
-		if tipText and (tipText:find(LEVEL1) or tipText:find(LEVEL2)) then
+		local tipText = tipLine and tipLine.GetText and tipLine:GetText() and strlower(tipLine:GetText())
+		if tipText and (strfind(tipText, LEVEL1) or strfind(tipText, LEVEL2)) then
 			return tipLine
 		end
 	end
@@ -174,6 +185,7 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 		local name, realm = UnitName(unit)
 		local guildName, guildRankName = GetGuildInfo(unit)
 		local pvpName = UnitPVPName(unit)
+		local relationship = UnitRealmRelationship(unit)
 
 		color = E:ClassColor(class) or PRIEST_COLOR
 
@@ -430,9 +442,9 @@ function TT:GameTooltip_OnTooltipSetUnit(tt)
 	-- NPC ID's
 	if unit and self.db.npcID and not isPlayerUnit then
 		local guid = UnitGUID(unit) or ""
-		local id = tonumber(guid:match("%-(%d-)%-%x-$"), 10)
+		local id = tonumber(strmatch(guid, "%-(%d-)%-%x-$"), 10)
 		if id then
-			tt:AddLine(("|cFFCA3C3C%s|r %d"):format(_G.ID, id))
+			tt:AddLine(format("|cFFCA3C3C%s|r %d", _G.ID, id))
 		end
 	end
 
@@ -497,21 +509,19 @@ function TT:GameTooltip_OnTooltipSetItem(tt)
 		local _, link = tt:GetItem()
 		local num = GetItemCount(link)
 		local numall = GetItemCount(link,true)
-		local left = " "
-		local right = " "
-		local bankCount = " "
+		local left, right, bankCount = " ", " ", " "
 
 		if link ~= nil and self.db.spellID then
-			left = (("|cFFCA3C3C%s|r %s"):format(_G.ID, link)):match(":(%w+)")
+			left = format("|cFFCA3C3C%s|r %s", _G.ID, strmatch(link, ":(%w+)"))
 		end
 
 		if self.db.itemCount == "BAGS_ONLY" then
-			right = ("|cFFCA3C3C%s|r %d"):format(L["Count"], num)
+			right = format("|cFFCA3C3C%s|r %d", L["Count"], num)
 		elseif self.db.itemCount == "BANK_ONLY" then
-			bankCount = ("|cFFCA3C3C%s|r %d"):format(L["Bank"],(numall - num))
+			bankCount = format("|cFFCA3C3C%s|r %d", L["Bank"],(numall - num))
 		elseif self.db.itemCount == "BOTH" then
-			right = ("|cFFCA3C3C%s|r %d"):format(L["Count"], num)
-			bankCount = ("|cFFCA3C3C%s|r %d"):format(L["Bank"],(numall - num))
+			right = format("|cFFCA3C3C%s|r %d", L["Count"], num)
+			bankCount = format("|cFFCA3C3C%s|r %d", L["Bank"],(numall - num))
 		end
 
 		if left ~= " " or right ~= " " then
@@ -627,9 +637,9 @@ function TT:SetUnitAura(tt, unit, index, filter)
 				local name = UnitName(caster)
 				local _, class = UnitClass(caster)
 				local color = E:ClassColor(class) or PRIEST_COLOR
-				tt:AddDoubleLine(("|cFFCA3C3C%s|r %d"):format(_G.ID, id), format("|c%s%s|r", color.colorStr, name))
+				tt:AddDoubleLine(format("|cFFCA3C3C%s|r %d", _G.ID, id), format("|c%s%s|r", color.colorStr, name))
 			else
-				tt:AddLine(("|cFFCA3C3C%s|r %d"):format(_G.ID, id))
+				tt:AddLine(format("|cFFCA3C3C%s|r %d", _G.ID, id))
 			end
 		end
 
@@ -642,12 +652,12 @@ function TT:GameTooltip_OnTooltipSetSpell(tt)
 	local id = select(2, tt:GetSpell())
 	if not id or not self.db.spellID then return end
 
-	local displayString = ("|cFFCA3C3C%s|r %d"):format(_G.ID, id)
+	local displayString = format("|cFFCA3C3C%s|r %d", _G.ID, id)
 	local lines = tt:NumLines()
 	local isFound
 	for i= 1, lines do
-		local line = _G[("GameTooltipTextLeft%d"):format(i)]
-		if line and line:GetText() and line:GetText():find(displayString) then
+		local line = _G[format("GameTooltipTextLeft%d", i)]
+		if line and line:GetText() and strfind(line:GetText(), displayString) then
 			isFound = true;
 			break
 		end
@@ -662,7 +672,7 @@ end
 function TT:SetItemRef(link)
 	if strfind(link,"^spell:") and self.db.spellID then
 		local id = strsub(link,7)
-		_G.ItemRefTooltip:AddLine(("|cFFCA3C3C%s|r %d"):format(_G.ID, id))
+		_G.ItemRefTooltip:AddLine(format("|cFFCA3C3C%s|r %d", _G.ID, id))
 		_G.ItemRefTooltip:Show()
 	end
 end

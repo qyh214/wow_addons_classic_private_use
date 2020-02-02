@@ -8,8 +8,8 @@ local select = select
 --WoW API / Variables
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.timemanager then return end
+function S:Blizzard_TimeManager()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.timemanager) then return end
 
 	local TimeManagerFrame = _G.TimeManagerFrame
 	S:HandleFrame(TimeManagerFrame, true)
@@ -84,4 +84,4 @@ local function LoadSkin()
 	hooksecurefunc('Stopwatch_Clear', SetPlayTexture)
 end
 
-S:AddCallbackForAddon('Blizzard_TimeManager', 'Skin_Blizzard_TimeManager', LoadSkin)
+S:AddCallbackForAddon('Blizzard_TimeManager')

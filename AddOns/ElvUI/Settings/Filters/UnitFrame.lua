@@ -527,7 +527,7 @@ G.unitframe.aurafilters.RaidBuffsElvUI = {
 E.ReverseTimer = {}
 
 -- BuffWatch: List of personal spells to show on unitframes as icon
-function UF:AuraWatch_AddSpell(id, point, color, anyUnit, onlyShowMissing, displayText, textThreshold, xOffset, yOffset, sizeOverride)
+function UF:AuraWatch_AddSpell(id, point, color, anyUnit, onlyShowMissing, displayText, textThreshold, xOffset, yOffset)
 
 	local r, g, b = 1, 1, 1
 	if color then r, g, b = unpack(color) end
@@ -541,15 +541,15 @@ function UF:AuraWatch_AddSpell(id, point, color, anyUnit, onlyShowMissing, displ
 		name = GetSpellInfo(id),
 		rank = spellRank,
 		point = point or 'TOPLEFT',
-		color = {r = r, g = g, b = b},
+		color = { r = r, g = g, b = b },
 		anyUnit = anyUnit or false,
 		onlyShowMissing = onlyShowMissing or false,
-		styleOverride = 'Default',
-		displayText = displayText or true,
+		style = 'coloredIcon',
+		displayText = displayText or false,
 		textThreshold = textThreshold or -1,
 		xOffset = xOffset or 0,
 		yOffset = yOffset or 0,
-		sizeOverride = sizeOverride or 0,
+		size = 8,
 	}
 end
 
@@ -725,12 +725,15 @@ G.unitframe.buffwatch = {
 		[8455] = UF:AuraWatch_AddSpell(8455, "TOPRIGHT", {0.2, 0.8, 0.2}, true), --Amplify Magic(Rank 2)
 		[10169] = UF:AuraWatch_AddSpell(10169, "TOPRIGHT", {0.2, 0.8, 0.2}, true), --Amplify Magic(Rank 3)
 		[10170] = UF:AuraWatch_AddSpell(10170, "TOPRIGHT", {0.2, 0.8, 0.2}, true), --Amplify Magic(Rank 4)
-		[12438] = UF:AuraWatch_AddSpell(12438, "CENTER", {0.00, 0.00, 0.50}, true), --Slow Fall
+		[130] = UF:AuraWatch_AddSpell(130, "CENTER", {0.00, 0.00, 0.50}, true), --Slow Fall
 	},
 	HUNTER = {
 		[19506] = UF:AuraWatch_AddSpell(19506, "TOPLEFT", {0.89, 0.09, 0.05}), --Trueshot Aura (Rank 1)
 		[20905] = UF:AuraWatch_AddSpell(20905, "TOPLEFT", {0.89, 0.09, 0.05}), --Trueshot Aura (Rank 2)
 		[20906] = UF:AuraWatch_AddSpell(20906, "TOPLEFT", {0.89, 0.09, 0.05}), --Trueshot Aura (Rank 3)
+		[13159] = UF:AuraWatch_AddSpell(13159, "BOTTOMLEFT", {0.00, 0.00, 0.85}), --Aspect of the Pack
+		[20043] = UF:AuraWatch_AddSpell(20043, "BOTTOMLEFT", {0.33, 0.93, 0.79}), --Aspect of the Wild (Rank 1)
+		[20190] = UF:AuraWatch_AddSpell(20190, "BOTTOMLEFT", {0.33, 0.93, 0.79}), --Aspect of the Wild (Rank 2)
 	},
 	WARLOCK = {
 		[5597] = UF:AuraWatch_AddSpell(5597, "TOPLEFT", {0.89, 0.09, 0.05}, true), --Unending Breath
@@ -765,6 +768,7 @@ P.unitframe.filters = {
 G.unitframe.ChannelTicks = {
 	--First Aid
 	[23567] = 8, --Warsong Gulch Runecloth Bandage
+	[23696] = 8, --Alterac Heavy Runecloth Bandage
 	[24414] = 8, --Arathi Basin Runecloth Bandage
 	[18610] = 8, --Heavy Runecloth Bandage
 	[18608] = 8, --Runecloth Bandage

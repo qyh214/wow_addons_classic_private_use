@@ -40,12 +40,16 @@ function UF:Construct_PlayerFrame(frame)
 	frame.ClassBarHolder:Point("BOTTOM", E.UIParent, "BOTTOM", 0, 150)
 
 	--Combo points was moved to the ClassPower element, so all classes need to have a ClassBar now.
-	frame.ClassPower = self:Construct_ClassBar(frame)
-	frame.ClassBar = 'ClassPower'
+	if E.myclass == "SHAMAN" then
+		frame.Totems = self:Construct_Totems(frame)
+	else
+		frame.ClassPower = self:Construct_ClassBar(frame)
+		frame.ClassBar = 'ClassPower'
 
-	--Some classes need another set of different classbars.
-	if E.myclass == "DRUID" then
-		frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
+		--Some classes need another set of different classbars.
+		if E.myclass == "DRUID" then
+			frame.AdditionalPower = self:Construct_AdditionalPowerBar(frame)
+		end
 	end
 
 	frame.AuraBars = self:Construct_AuraBarHeader(frame)
@@ -79,7 +83,7 @@ function UF:Update_PlayerFrame(frame, db)
 		frame.POWERBAR_DETACHED = db.power.detachFromFrame
 		frame.USE_INSET_POWERBAR = not frame.POWERBAR_DETACHED and db.power.width == 'inset' and frame.USE_POWERBAR
 		frame.USE_MINI_POWERBAR = (not frame.POWERBAR_DETACHED and db.power.width == 'spaced' and frame.USE_POWERBAR)
-		frame.USE_POWERBAR_OFFSET = db.power.width == 'offset' and db.power.offset ~= 0 and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
+		frame.USE_POWERBAR_OFFSET = (db.power.width == 'offset' and db.power.offset ~= 0) and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
 		frame.POWERBAR_OFFSET = frame.USE_POWERBAR_OFFSET and db.power.offset or 0
 
 		frame.POWERBAR_HEIGHT = not frame.USE_POWERBAR and 0 or db.power.height
@@ -109,7 +113,6 @@ function UF:Update_PlayerFrame(frame, db)
 	end
 
 	frame.colors = ElvUF.colors
-	frame.Portrait = frame.Portrait or (db.portrait.style == '2D' and frame.Portrait2D or frame.Portrait3D)
 	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 	_G[frame:GetName()..'Mover']:Size(frame:GetSize())

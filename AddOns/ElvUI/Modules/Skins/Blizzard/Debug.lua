@@ -83,14 +83,14 @@ local function SkinTableAttributeDisplay(frame)
 	S:HandleScrollBar(frame.LinesScrollFrame.ScrollBar)
 end
 
-local function LoadErrorFrameSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.debug then return end
+function S:ScriptErrorsFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.debug) then return end
 
 	S:SecureHookScript(_G.ScriptErrorsFrame, 'OnShow', SkinOnShow)
 end
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.debug then return end
+function S:Blizzard_DebugTools()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.debug) then return end
 
 	-- Tooltips
 	if E.private.skins.blizzard.tooltip then
@@ -125,11 +125,11 @@ local function LoadSkin()
 end
 
 -- ScriptErrorsFrame Skin
-S:AddCallback('ScriptErrorsFrame', LoadErrorFrameSkin)
+S:AddCallback('ScriptErrorsFrame')
 
 -- EventTrace, FrameStack, TableInspect Skins
 if _G.IsAddOnLoaded('Blizzard_DebugTools') then
-	S:AddCallback('Skin_Blizzard_DebugTools', LoadSkin)
+	S:AddCallback('Blizzard_DebugTools')
 else
-	S:AddCallbackForAddon('Blizzard_DebugTools', 'Skin_Blizzard_DebugTools', LoadSkin)
+	S:AddCallbackForAddon('Blizzard_DebugTools')
 end

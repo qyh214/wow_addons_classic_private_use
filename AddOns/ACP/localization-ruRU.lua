@@ -60,8 +60,7 @@ L = {
 	["ReloadUI"] = "Перез. ПИ",
 	["Remove from current selection"] = "Убрать из текущего выделения",
 	["Rename"] = "Переименовать",
-	--[[Translation missing --]]
-	["Resurse-ToolTip"] = "When enabling an addon, attempt to enable any addons the addon depends on",
+	["Resurse-ToolTip"] = "При включении аддона пытаться включить любые аддоны зависящие от него",
 	["Save"] = "Сохранить",
 	["Save the current addon list to [%s]?"] = "Сохранить текущий список модификаций в [%s]?",
 	["Set "] = "Набор ",

@@ -30,6 +30,7 @@ local ChatEdit_SetLastTellTarget = ChatEdit_SetLastTellTarget
 local ChatFrame_CanChatGroupPerformExpressionExpansion = ChatFrame_CanChatGroupPerformExpressionExpansion
 local ChatFrame_ConfigEventHandler = ChatFrame_ConfigEventHandler
 local ChatFrame_GetMobileEmbeddedTexture = ChatFrame_GetMobileEmbeddedTexture
+local ChatFrame_ResolvePrefixedChannelName = ChatFrame_ResolvePrefixedChannelName
 local ChatFrame_SendTell = ChatFrame_SendTell
 local ChatFrame_SystemEventHandler = ChatFrame_SystemEventHandler
 local ChatHistory_GetAccessID = ChatHistory_GetAccessID
@@ -45,6 +46,7 @@ local FCFManager_ShouldSuppressMessageFlash = FCFManager_ShouldSuppressMessageFl
 local FCFTab_UpdateAlpha = FCFTab_UpdateAlpha
 local FlashClientIcon = FlashClientIcon
 local FloatingChatFrame_OnEvent = FloatingChatFrame_OnEvent
+local GetBNPlayerCommunityLink = GetBNPlayerCommunityLink
 local GetBNPlayerLink = GetBNPlayerLink
 local GetChannelName = GetChannelName
 local GetCursorPosition = GetCursorPosition
@@ -53,6 +55,7 @@ local GetGuildRosterMOTD = GetGuildRosterMOTD
 local GetInstanceInfo = GetInstanceInfo
 local GetMouseFocus = GetMouseFocus
 local GetNumGroupMembers = GetNumGroupMembers
+local GetPlayerCommunityLink = GetPlayerCommunityLink
 local GetPlayerInfoByGUID = GetPlayerInfoByGUID
 local GetPlayerLink = GetPlayerLink
 local GetRaidRosterInfo = GetRaidRosterInfo
@@ -70,21 +73,18 @@ local PlaySoundFile = PlaySoundFile
 local RemoveExtraSpaces = RemoveExtraSpaces
 local RemoveNewlines = RemoveNewlines
 local ScrollFrameTemplate_OnMouseWheel = ScrollFrameTemplate_OnMouseWheel
-local ShowUIPanel, HideUIPanel = ShowUIPanel, HideUIPanel
 local StaticPopup_Visible = StaticPopup_Visible
 local ToggleFrame = ToggleFrame
 local ToggleQuickJoinPanel = ToggleQuickJoinPanel
 local UnitName = UnitName
 local UnitRealmRelationship = UnitRealmRelationship
 
-local BNET_CLIENT_WOW = BNET_CLIENT_WOW
 local C_Club_GetInfoFromLastCommunityChatLine = C_Club.GetInfoFromLastCommunityChatLine
-local ChatFrame_ResolvePrefixedChannelName = ChatFrame_ResolvePrefixedChannelName
-local GetBNPlayerCommunityLink = GetBNPlayerCommunityLink
-local GetPlayerCommunityLink = GetPlayerCommunityLink
+local SOUNDKIT_TELL_MESSAGE = SOUNDKIT.TELL_MESSAGE
+
 local LE_REALM_RELATION_SAME = LE_REALM_RELATION_SAME
 local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
-local SOUNDKIT = SOUNDKIT
+local BNET_CLIENT_WOW = BNET_CLIENT_WOW
 
 -- GLOBALS: ElvCharacterDB
 
@@ -107,15 +107,18 @@ local DEFAULT_STRINGS = {
 }
 
 local hyperlinkTypes = {
-	['item'] = true,
-	['spell'] = true,
-	['unit'] = true,
-	['quest'] = true,
+	['achievement'] = true,
+	['apower'] = true,
+	['currency'] = true,
 	['enchant'] = true,
-	['instancelock'] = true,
-	['talent'] = true,
 	['glyph'] = true,
-	["currency"] = true,
+	['instancelock'] = true,
+	['item'] = true,
+	['keystone'] = true,
+	['quest'] = true,
+	['spell'] = true,
+	['talent'] = true,
+	['unit'] = true
 }
 
 local tabTexs = {
@@ -169,7 +172,7 @@ do --this can save some main file locals
 		--- gradient text, ignoring hyperlinks and keywords
 		local e, f, g = {'|%x+|H.-|h.-|h|r', '|H.-|h.-|h', '|T.-|t', '|c.-|r'}, {}, {}
 		local gradient = function(t) return gsub(gsub(E:TextGradient(gsub(gsub(t,'%%%%','\27'),'\124\124','\26'), 0.31,0.85,0.82, 0.33,0.89,0.50, 0.84,0.85,0.20, 0.87,0.64,0.33, 0.93,0.53,0.47, 0.97,0.44,0.81, 0.72,0.33,0.87, 0.31,0.85,0.82),'\27','%%%%'),'\26','||') end
-		local protect = function(t, u, v) local w = E:EscapeString(v) local r, s = strfind(u, w) while f[r] do r = strfind(u, w, s) end tinsert(g, r) f[r] = w return gsub(t, w, '\24') end
+		local protect = function(t, u, v) local w = E:EscapeString(v) local r, s = strfind(u, w) while f[r] do r, s = strfind(u, w, s) end tinsert(g, r) f[r] = w return gsub(t, w, '\24') end
 		SimpysText = function(t) local u = t
 			for _, w in ipairs(e) do for k in gmatch(t, w) do t = protect(t, u, k) end end
 			t = gradient(t) --Light Spring: '50dad3','56e580','d8da33','dfa455','ee8879','f972d1','b855df','50dad3'
@@ -180,6 +183,7 @@ do --this can save some main file locals
 
 	specialChatIcons = {
 		-- Simpy
+		["Simpy-Atiesh"]		= itsSimpy, -- Warlock
 		["Simpy-Myzrael"]		= itsSimpy, -- Warlock
 		["Cutepally-Myzrael"]	= itsSimpy, -- Paladin
 		["Imsocheesy-Myzrael"]	= itsSimpy, -- [Horde] Priest
@@ -956,33 +960,26 @@ function CH:OnHyperlinkEnter(frame, refString)
 	if InCombatLockdown() then return; end
 	local linkToken = strmatch(refString, "^([^:]+)")
 	if hyperlinkTypes[linkToken] then
-		ShowUIPanel(_G.GameTooltip)
 		_G.GameTooltip:SetOwner(frame, "ANCHOR_CURSOR")
 		_G.GameTooltip:SetHyperlink(refString)
-		hyperLinkEntered = frame
 		_G.GameTooltip:Show()
+		hyperLinkEntered = frame
 	end
 end
 
-function CH:OnHyperlinkLeave() -- frame, refString
-	-- local linkToken = refString:match("^([^:]+)")
-	-- if hyperlinkTypes[linkToken] then
-		-- HideUIPanel(GameTooltip)
-		-- hyperLinkEntered = nil
-	-- end
-
+function CH:OnHyperlinkLeave()
 	if hyperLinkEntered then
-		HideUIPanel(_G.GameTooltip)
 		hyperLinkEntered = nil
+		_G.GameTooltip:Hide()
 	end
 end
 
--- function CH:OnMessageScrollChanged(frame)
-	-- if hyperLinkEntered == frame then
-		-- HideUIPanel(GameTooltip)
-		-- hyperLinkEntered = false
-	-- end
--- end
+function CH:OnMouseWheel(frame)
+	if hyperLinkEntered == frame then
+		hyperLinkEntered = false
+		_G.GameTooltip:Hide()
+	end
+end
 
 function CH:EnableHyperlink()
 	for _, frameName in pairs(_G.CHAT_FRAMES) do
@@ -990,7 +987,7 @@ function CH:EnableHyperlink()
 		if (not self.hooks or not self.hooks[frame] or not self.hooks[frame].OnHyperlinkEnter) then
 			self:HookScript(frame, 'OnHyperlinkEnter')
 			self:HookScript(frame, 'OnHyperlinkLeave')
-			-- self:HookScript(frame, 'OnMessageScrollChanged')
+			self:HookScript(frame, 'OnMouseWheel')
 		end
 	end
 end
@@ -1001,7 +998,7 @@ function CH:DisableHyperlink()
 		if self.hooks and self.hooks[frame] and self.hooks[frame].OnHyperlinkEnter then
 			self:Unhook(frame, 'OnHyperlinkEnter')
 			self:Unhook(frame, 'OnHyperlinkLeave')
-			-- self:Unhook(frame, 'OnMessageScrollChanged')
+			self:Unhook(frame, 'OnMouseWheel')
 		end
 	end
 end
@@ -1457,7 +1454,7 @@ function CH:ChatFrame_MessageEventHandler(frame, event, arg1, arg2, arg3, arg4, 
 			-- Player Flags
 			local pflag, chatIcon, pluginChatIcon = "", specialChatIcons[playerName], CH:GetPluginIcon(playerName)
 			if type(chatIcon) == 'function' then
-				if chatIcon == itsSimpy then
+				if chatIcon == itsSimpy and not CH:MessageIsProtected(message) then
 					message = SimpysText(message)
 				end
 
@@ -1536,7 +1533,7 @@ function CH:ChatFrame_MessageEventHandler(frame, event, arg1, arg2, arg3, arg4, 
 			--BN_WHISPER FIXME
 			ChatEdit_SetLastTellTarget(arg2, chatType)
 			if ( frame.tellTimer and (GetTime() > frame.tellTimer) ) then
-				PlaySound(SOUNDKIT.TELL_MESSAGE)
+				PlaySound(SOUNDKIT_TELL_MESSAGE)
 			end
 			frame.tellTimer = GetTime() + _G.CHAT_TELL_ALERT_TIME
 			--FCF_FlashTab(frame)

@@ -47,6 +47,8 @@ local L = WeakAuras.L
 	--[[Translation missing --]]
 	L["|c%02x%02x%02x%02xColor|r"] = "|c%02x%02x%02x%02xColor|r"
 	--[[Translation missing --]]
+	L["|cFFFF0000Note:|r The unit '%s' is not a trackable unit."] = "|cFFFF0000Note:|r The unit '%s' is not a trackable unit."
+	--[[Translation missing --]]
 	L["|cFFffcc00Anchors:|r Anchored |cFFFF0000%s|r to frame's |cFFFF0000%s|r"] = "|cFFffcc00Anchors:|r Anchored |cFFFF0000%s|r to frame's |cFFFF0000%s|r"
 	--[[Translation missing --]]
 	L["|cFFffcc00Anchors:|r Anchored |cFFFF0000%s|r to frame's |cFFFF0000%s|r with offset |cFFFF0000%s/%s|r"] = "|cFFffcc00Anchors:|r Anchored |cFFFF0000%s|r to frame's |cFFFF0000%s|r with offset |cFFFF0000%s/%s|r"
@@ -155,8 +157,6 @@ Si la duración de la animación es |cFF00CC0010%|r, y el disparador del aura es
 	--[[Translation missing --]]
 	L["Backdrop in Front"] = "Backdrop in Front"
 	L["Backdrop Style"] = "Estilo de fondo"
-	--[[Translation missing --]]
-	L["Background"] = "Background"
 	L["Background Color"] = "Color de fondo"
 	L["Background Offset"] = "Desplazamiento del fondo"
 	L["Background Texture"] = "Textura de fondo"
@@ -314,8 +314,6 @@ UNIT_POWER, UNIT_AURA PLAYER_TARGET_CHANGED]=]
 	L["Determines how many entries can be in the table."] = "Determines how many entries can be in the table."
 	--[[Translation missing --]]
 	L["Differences"] = "Differences"
-	--[[Translation missing --]]
-	L["Disable Import"] = "Disable Import"
 	L["Disabled"] = "Desactivado"
 	--[[Translation missing --]]
 	L["Disallow Entry Reordering"] = "Disallow Entry Reordering"
@@ -415,11 +413,11 @@ UNIT_POWER, UNIT_AURA PLAYER_TARGET_CHANGED]=]
 	L["From version "] = "From version "
 	--[[Translation missing --]]
 	L["Global Conditions"] = "Global Conditions"
+	--[[Translation missing --]]
+	L["Glow %s"] = "Glow %s"
 	L["Glow Action"] = "Acción de resplandor"
 	--[[Translation missing --]]
 	L["Glow Color"] = "Glow Color"
-	--[[Translation missing --]]
-	L["Glow Settings"] = "Glow Settings"
 	--[[Translation missing --]]
 	L["Glow Type"] = "Glow Type"
 	L["Green Rune"] = "Runa verde"
@@ -460,6 +458,8 @@ Con |cFF00CC00>= 0|r se activará siempre.]=]
 	L["Grow"] = "Crecer"
 	L["Hawk"] = "Halcón"
 	L["Height"] = "Alto"
+	--[[Translation missing --]]
+	L["Help"] = "Help"
 	L["Hide"] = "Ocultar"
 	--[[Translation missing --]]
 	L["Hide Cooldown Text"] = "Hide Cooldown Text"
@@ -492,8 +492,6 @@ Con |cFF00CC00>= 0|r se activará siempre.]=]
 	L["If checked, then this separator will include text. Otherwise, it will be just a horizontal line."] = "If checked, then this separator will include text. Otherwise, it will be just a horizontal line."
 	--[[Translation missing --]]
 	L["If checked, then this space will span across multiple lines."] = "If checked, then this space will span across multiple lines."
-	--[[Translation missing --]]
-	L["If this option is enabled, you are no longer able to import auras."] = "If this option is enabled, you are no longer able to import auras."
 	--[[Translation missing --]]
 	L["If Trigger %s"] = "If Trigger %s"
 	--[[Translation missing --]]
@@ -545,6 +543,8 @@ Con |cFF00CC00>= 0|r se activará siempre.]=]
 	--[[Translation missing --]]
 	L["Loop"] = "Loop"
 	L["Low Mana"] = "Maná insuficiente"
+	--[[Translation missing --]]
+	L["Magnetically Align"] = "Magnetically Align"
 	L["Main"] = "Principal"
 	L["Manage displays defined by Addons"] = "Administra las auras definidas por los Addons"
 	--[[Translation missing --]]
@@ -597,7 +597,8 @@ Sólo un valor coincidente puede ser escogido.]=]
 	L["Nameplates"] = "Nameplates"
 	L["Negator"] = "Negar"
 	L["Never"] = "Nunca"
-	L["New"] = "Nuevo"
+	--[[Translation missing --]]
+	L["New Aura"] = "New Aura"
 	--[[Translation missing --]]
 	L["New Value"] = "New Value"
 	L["No"] = "No"
@@ -623,8 +624,6 @@ Sólo un valor coincidente puede ser escogido.]=]
 	--[[Translation missing --]]
 	L["Only match auras cast by the player or his pet"] = "Only match auras cast by the player or his pet"
 	L["Operator"] = "Operador"
-	--[[Translation missing --]]
-	L["Option #%i"] = "Option #%i"
 	--[[Translation missing --]]
 	L["Option %i"] = "Option %i"
 	--[[Translation missing --]]
@@ -676,6 +675,8 @@ Sólo un valor coincidente puede ser escogido.]=]
 	--[[Translation missing --]]
 	L["Preferred Match"] = "Preferred Match"
 	L["Preset"] = "Predefinido"
+	--[[Translation missing --]]
+	L["Press Ctrl+C to copy"] = "Press Ctrl+C to copy"
 	L["Processed %i chars"] = "%i Personajes procesados"
 	L["Progress Bar"] = "Barra de progreso"
 	--[[Translation missing --]]
@@ -779,6 +780,8 @@ Sólo un valor coincidente puede ser escogido.]=]
 	--[[Translation missing --]]
 	L["Shows a border"] = "Shows a border"
 	L["Shows a custom texture"] = "Muestra una textura personalizada"
+	--[[Translation missing --]]
+	L["Shows a glow"] = "Shows a glow"
 	--[[Translation missing --]]
 	L["Shows a model"] = "Shows a model"
 	L["Shows a progress bar with name, timer, and icon"] = "Muestra la barra de progreso con el nombre, el temporizador y el icono"
@@ -901,6 +904,8 @@ Sólo un valor coincidente puede ser escogido.]=]
 	L["Top Left"] = "Top Left"
 	--[[Translation missing --]]
 	L["Top Right"] = "Top Right"
+	--[[Translation missing --]]
+	L["Total Time"] = "Total Time"
 	L["Total Time Precision"] = "Precisión del tiempo total"
 	L["Trigger"] = "Desencadenador"
 	L["Trigger %d"] = "Desencadenador %d"

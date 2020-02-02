@@ -6,8 +6,8 @@ local S = E:GetModule('Skins')
 local _G = _G
 local unpack = unpack
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.talent then return end
+function S:Blizzard_TalentUI()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.talent) then return end
 
 	local TalentFrame = _G.TalentFrame
 	S:HandleFrame(TalentFrame, true, nil, 11, -12, -32, 76)
@@ -48,4 +48,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallbackForAddon('Blizzard_TalentUI', 'Skin_Blizzard_TalentUI', LoadSkin)
+S:AddCallbackForAddon('Blizzard_TalentUI')

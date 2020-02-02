@@ -173,7 +173,9 @@ local function Update(self, event, unit)
 	end
 end
 
-local function Path(self, ...)
+local function Path(self, event, ...)
+	if (self.isForced and event ~= 'ElvUI_UpdateAllElements') then return end -- ElvUI changed
+
 	--[[ Override: Health.Override(self, event, unit)
 	Used to completely override the internal update function.
 
@@ -181,9 +183,9 @@ local function Path(self, ...)
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	(self.Health.Override or Update) (self, ...);
+	(self.Health.Override or Update) (self, event, ...);
 
-	ColorPath(self, ...)
+	ColorPath(self, event, ...)
 end
 
 local function ForceUpdate(element)
@@ -224,6 +226,37 @@ local function SetColorTapping(element, state)
 	end
 end
 
+local onUpdateElapsed, onUpdateWait = 0, 0.25
+local function onUpdateHealth(self, elapsed)
+	if onUpdateElapsed > onUpdateWait then
+		Path(self.__owner, 'OnUpdate', self.__owner.unit)
+
+		onUpdateElapsed = 0
+	else
+		onUpdateElapsed = onUpdateElapsed + elapsed
+	end
+end
+
+local function SetHealthUpdateSpeed(self, state)
+	onUpdateWait = state
+end
+
+local function SetHealthUpdateMethod(self, state, force)
+	if self.effectiveHealth ~= state or force then
+		self.effectiveHealth = state
+
+		if state then
+			self.Health:SetScript('OnUpdate', onUpdateHealth)
+			self:UnregisterEvent('UNIT_HEALTH_FREQUENT', Path)
+			self:UnregisterEvent('UNIT_MAXHEALTH', Path)
+		else
+			self.Health:SetScript('OnUpdate', nil)
+			self:RegisterEvent('UNIT_HEALTH_FREQUENT', Path)
+			self:RegisterEvent('UNIT_MAXHEALTH', Path)
+		end
+	end
+end
+
 local function Enable(self, unit)
 	local element = self.Health
 	if(element) then
@@ -232,6 +265,10 @@ local function Enable(self, unit)
 		element.SetColorDisconnected = SetColorDisconnected
 		element.SetColorTapping = SetColorTapping
 
+		self.SetHealthUpdateSpeed = SetHealthUpdateSpeed
+		self.SetHealthUpdateMethod = SetHealthUpdateMethod
+		SetHealthUpdateMethod(self, self.effectiveHealth, true)
+
 		if(element.colorDisconnected) then
 			self:RegisterEvent('UNIT_CONNECTION', ColorPath)
 		end
@@ -239,9 +276,6 @@ local function Enable(self, unit)
 		if(element.colorTapping) then
 			self:RegisterEvent('UNIT_FACTION', ColorPath)
 		end
-
-		self:RegisterEvent('UNIT_HEALTH_FREQUENT', Path)
-		self:RegisterEvent('UNIT_MAXHEALTH', Path)
 
 		if(element:IsObjectType('StatusBar') and not element:GetStatusBarTexture()) then
 			element:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
@@ -258,8 +292,10 @@ local function Disable(self)
 	if(element) then
 		element:Hide()
 
+		element:SetScript('OnUpdate', nil)
 		self:UnregisterEvent('UNIT_HEALTH_FREQUENT', Path)
 		self:UnregisterEvent('UNIT_MAXHEALTH', Path)
+
 		self:UnregisterEvent('UNIT_CONNECTION', ColorPath)
 		self:UnregisterEvent('UNIT_FACTION', ColorPath)
 	end

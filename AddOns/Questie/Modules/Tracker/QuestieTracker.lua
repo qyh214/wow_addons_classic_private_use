@@ -217,7 +217,7 @@ function QuestieTracker:Initialize()
         end
 
         frm:EnableMouse(true)
-        frm:RegisterForDrag("LeftButton", "RightButton")
+        frm:RegisterForDrag("LeftButton")
         frm:RegisterForClicks("RightButtonUp", "LeftButtonUp")
 
         -- hack for click-through
@@ -358,7 +358,7 @@ function QuestieTracker:CreateBaseFrame()
 
     frm:SetMovable(true)
     frm:EnableMouse(true)
-    frm:RegisterForDrag("LeftButton", "RightButton")
+    frm:RegisterForDrag("LeftButton")
 
     frm:SetScript("OnDragStart", _QuestieTracker.OnDragStart)
     frm:SetScript("OnDragStop", _QuestieTracker.OnDragStop)
@@ -386,8 +386,9 @@ function _QuestieTracker:CreateActiveQuestsFrame()
     frm.label:SetText(QuestieLocale:GetUIString("TRACKER_ACTIVE_QUESTS") .. tostring(numQuests) .. "/20")
     frm:SetWidth(frm.label:GetWidth())
 
+    frm:SetMovable(true)
     frm:EnableMouse(true)
-    frm:RegisterForDrag("LeftButton", "RightButton")
+    frm:RegisterForDrag("LeftButton")
 
     -- hack for click-through
     frm:SetScript("OnDragStart", _QuestieTracker.OnDragStart)
@@ -452,6 +453,18 @@ end
 
 function QuestieTracker:GetActiveQuestsFrame()
     return _QuestieTracker.activeQuestsFrame
+end
+
+function QuestieTracker:Collapse()
+    if _QuestieTracker.expandButton and Questie.db.char.isTrackerExpanded then
+        _QuestieTracker.expandButton:Click()
+    end
+end
+
+function QuestieTracker:Expand()
+    if _QuestieTracker.expandButton and (not Questie.db.char.isTrackerExpanded) then
+        _QuestieTracker.expandButton:Click()
+    end
 end
 
 function QuestieTracker:GetBackgroundPadding()
@@ -590,14 +603,17 @@ function QuestieTracker:Update()
             trackerWidth = math.max(trackerWidth, line.label:GetWidth())
 
             -- Add quest timer
+            line = _QuestieTracker:GetNextLine()
             local seconds = QuestieQuestTimers:GetQuestTimerByQuestId(questId, line)
             if seconds then
-                line = _QuestieTracker:GetNextLine()
                 line:SetMode("header")
                 line:SetQuest(quest)
                 line.label:SetText("    " .. seconds)
                 line:Show()
                 line.label:Show()
+            else
+                -- We didn't need the line so we can reuse it
+                lineIndex = lineIndex - 1
             end
 
             if quest.Objectives and complete == 0 then
@@ -655,7 +671,9 @@ function QuestieTracker:Update()
     end
 
     -- adjust base frame size for dragging
-    if line then
+    if not Questie.db.char.isTrackerExpanded then
+        _QuestieTracker.baseFrame:SetHeight(1)
+    elseif line then
         QuestieCombatQueue:Queue(function(line)
             _QuestieTracker.baseFrame:SetWidth(trackerWidth + trackerBackgroundPadding*2 + Questie.db.global.trackerFontSizeHeader*2)
             _QuestieTracker.baseFrame:SetHeight((_QuestieTracker.baseFrame:GetTop() - line:GetBottom()) + trackerBackgroundPadding*2 - Questie.db.global.trackerQuestPadding*2)
@@ -687,12 +705,12 @@ function QuestieTracker:Update()
                     end
                 end
                 if quest.SpecialObjectives then
-                    for _,Objective in pairs(quest.SpecialObjectives) do
-                        if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(Objective.Index)] then
-                            Objective.HideIcons = true
+                    for _, objective in pairs(quest.SpecialObjectives) do
+                        if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(objective.Index)] then
+                            objective.HideIcons = true
                         end
-                        if  Questie.db.char.TrackerFocus and type(Questie.db.char.TrackerFocus) == "string" and Questie.db.char.TrackerFocus == tostring(quest.Id) .. " " .. tostring(Objective.Index) then
-                            QuestieTracker:FocusObjective(quest, Objective)
+                        if  Questie.db.char.TrackerFocus and type(Questie.db.char.TrackerFocus) == "string" and Questie.db.char.TrackerFocus == tostring(quest.Id) .. " " .. tostring(objective.Index) then
+                            QuestieTracker:FocusObjective(quest, objective)
                         end
                     end
                 end
@@ -702,11 +720,11 @@ function QuestieTracker:Update()
     end
 
     if hasQuest then
-        QuestieCombatQueue:Queue(function() 
+        QuestieCombatQueue:Queue(function()
             _QuestieTracker.baseFrame:Show()
         end)
     else
-        QuestieCombatQueue:Queue(function() 
+        QuestieCombatQueue:Queue(function()
             _QuestieTracker.baseFrame:Hide()
         end)
     end
@@ -778,23 +796,23 @@ function QuestieTracker:UnFocus() -- reset HideIcons to match savedvariable stat
                     quest.HideIcons = nil
                     quest.FadeIcons = nil
                 end
-                for _,Objective in pairs(quest.Objectives) do
-                    if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(Objective.Index)] then
-                        Objective.HideIcons = true
-                        Objective.FadeIcons = nil
+                for _, objective in pairs(quest.Objectives) do
+                    if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(objective.Index)] then
+                        objective.HideIcons = true
+                        objective.FadeIcons = nil
                     else
-                        Objective.HideIcons = nil
-                        Objective.FadeIcons = nil
+                        objective.HideIcons = nil
+                        objective.FadeIcons = nil
                     end
                 end
                 if quest.SpecialObjectives then
-                    for _,Objective in pairs(quest.SpecialObjectives) do
-                        if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(Objective.Index)] then
-                            Objective.HideIcons = true
-                            Objective.FadeIcons = nil
+                    for _, objective in pairs(quest.SpecialObjectives) do
+                        if Questie.db.char.TrackerHiddenObjectives[tostring(questId) .. " " .. tostring(objective.Index)] then
+                            objective.HideIcons = true
+                            objective.FadeIcons = nil
                         else
-                            Objective.HideIcons = nil
-                            Objective.FadeIcons = nil
+                            objective.HideIcons = nil
+                            objective.FadeIcons = nil
                         end
                     end
                 end
@@ -824,12 +842,12 @@ function QuestieTracker:FocusObjective(TargetQuest, TargetObjective, isSpecial)
                     end
                 end
                 if quest.SpecialObjectives then
-                    for _,Objective in pairs(quest.SpecialObjectives) do
-                        if Objective.Index == TargetObjective.Index then
-                            Objective.HideIcons = nil
-                            Objective.FadeIcons = nil
+                    for _, objective in pairs(quest.SpecialObjectives) do
+                        if objective.Index == TargetObjective.Index then
+                            objective.HideIcons = nil
+                            objective.FadeIcons = nil
                         else
-                            Objective.FadeIcons = true
+                            objective.FadeIcons = true
                         end
                     end
                 end
@@ -933,6 +951,11 @@ function QuestieTracker:HookBaseTracker()
 end
 
 _OnClick = function(self, button)
+    Questie:Debug(DEBUG_DEVELOP, "[QuestieTracker:_OnClick]")
+    if _QuestieTracker.isMoving == true then
+        Questie:Debug(DEBUG_DEVELOP, "[QuestieTracker:_OnClick]", "Tracker is being dragged. Don't show the menu")
+        return
+    end
     if QuestieTracker.utils:IsBindTrue(Questie.db.global.trackerbindSetTomTom, button) then
         local spawn, zone, name = QuestieMap:GetNearestQuestSpawn(self.Quest)
 

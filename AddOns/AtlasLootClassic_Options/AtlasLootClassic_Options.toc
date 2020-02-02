@@ -1,6 +1,6 @@
 ﻿## Interface: 11303
 ## Author: Lag
-## Version: v1.4.4
+## Version: v1.4.5
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
@@ -24,7 +24,7 @@
 ## Notes-koKR: AtlasLoot 설정 모듈
 ## Notes-ptBR: AtlasLoot options module
 ## Notes-ruRU: Настройки модулей AtlasLoot
-## Notes-zhCN: AtlasLoo t选项模块
+## Notes-zhCN: AtlasLoot t选项模块
 ## Notes-zhTW: 副本戰利品查詢的選項設定。
 
 ## X-Category: Map

@@ -35,8 +35,8 @@ function S.AudioOptionsVoicePanel_InitializeCommunicationModeUI(btn)
 	HandlePushToTalkButton(btn.PushToTalkKeybindButton)
 end
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.BlizzardOptions then return end
+function S:BlizzardOptions()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.BlizzardOptions) then return end
 
 	-- here we reskin all 'normal' buttons
 	S:HandleButton(_G.ReadyCheckFrameYesButton)
@@ -355,4 +355,4 @@ local function LoadSkin()
 	S:HandleSliderFrame(_G.UnitPopupVoiceUserVolume.Slider)
 end
 
-S:AddCallback('Skin_Blizzard', LoadSkin)
+S:AddCallback('BlizzardOptions')

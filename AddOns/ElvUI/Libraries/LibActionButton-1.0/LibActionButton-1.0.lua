@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 local MAJOR_VERSION = "LibActionButton-1.0-ElvUI"
-local MINOR_VERSION = 17 -- the real minor version is 74
+local MINOR_VERSION = 18 -- the real minor version is 76
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
@@ -55,6 +55,8 @@ local KeyBound = LibStub("LibKeyBound-1.0", true)
 local CBH = LibStub("CallbackHandler-1.0")
 local LBG = LibStub("LibButtonGlow-1.0", true)
 local Masque = LibStub("Masque", true)
+
+local WoWClassic = select(4, GetBuildInfo()) < 20000
 
 lib.eventFrame = lib.eventFrame or CreateFrame("Frame")
 lib.eventFrame:UnregisterAllEvents()
@@ -692,14 +694,15 @@ function InitializeEventHandler()
 	lib.eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_SHOWGRID")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_HIDEGRID")
-	lib.eventFrame:RegisterEvent("PET_BAR_SHOWGRID")
-	lib.eventFrame:RegisterEvent("PET_BAR_HIDEGRID")
 	--lib.eventFrame:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
 	--lib.eventFrame:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	lib.eventFrame:RegisterEvent("UPDATE_BINDINGS")
 	lib.eventFrame:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	lib.eventFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
+	if not WoWClassic then
+		lib.eventFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
+	end
 
 	lib.eventFrame:RegisterEvent("ACTIONBAR_UPDATE_STATE")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
@@ -707,6 +710,7 @@ function InitializeEventHandler()
 	lib.eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 	lib.eventFrame:RegisterEvent("TRADE_SKILL_SHOW")
 	lib.eventFrame:RegisterEvent("TRADE_SKILL_CLOSE")
+
 	lib.eventFrame:RegisterEvent("PLAYER_ENTER_COMBAT")
 	lib.eventFrame:RegisterEvent("PLAYER_LEAVE_COMBAT")
 	lib.eventFrame:RegisterEvent("START_AUTOREPEAT_SPELL")
@@ -717,6 +721,15 @@ function InitializeEventHandler()
 	lib.eventFrame:RegisterEvent("PET_STABLE_SHOW")
 	lib.eventFrame:RegisterEvent("SPELL_UPDATE_CHARGES")
 	lib.eventFrame:RegisterEvent("SPELL_UPDATE_ICON")
+	if not WoWClassic then
+		lib.eventFrame:RegisterEvent("ARCHAEOLOGY_CLOSED")
+		lib.eventFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
+		lib.eventFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+		lib.eventFrame:RegisterEvent("COMPANION_UPDATE")
+		lib.eventFrame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
+		lib.eventFrame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
+		lib.eventFrame:RegisterEvent("UPDATE_SUMMONPETS_ACTION")
+	end
 
 	-- With those two, do we still need the ACTIONBAR equivalents of them?
 	lib.eventFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
@@ -1576,6 +1589,18 @@ Action.GetSpellId              = function(self)
 end
 Action.GetLossOfControlCooldown = function(self) return GetActionLossOfControlCooldown(self._state_action) end
 
+-- Classic overrides for item count breakage
+if WoWClassic then
+	-- if the library is present, simply use it to override action counts
+	local LibClassicSpellActionCount = LibStub("LibClassicSpellActionCount-1.0", true)
+	if LibClassicSpellActionCount then
+		Action.GetCount = function(self) return LibClassicSpellActionCount:GetActionCount(self._state_action) end
+	else
+		-- if we don't have the library, only show count for items, like the default UI
+		Action.IsConsumableOrStackable = function(self) return IsItemAction(self._state_action) and (IsConsumableAction(self._state_action) or IsStackableAction(self._state_action)) end
+	end
+end
+
 -----------------------------------------------------------
 --- Spell Button
 Spell.HasAction               = function(self) return true end
@@ -1671,6 +1696,11 @@ Custom.IsUnitInRange           = function(self, unit) return nil end
 Custom.SetTooltip              = function(self) return GameTooltip:SetText(self._state_action.tooltip) end
 Custom.GetSpellId              = function(self) return nil end
 Custom.RunCustom               = function(self, unit, button) return self._state_action.func(self, unit, button) end
+
+--- WoW Classic overrides
+if WoWClassic then
+	UpdateOverlayGlow = function() end
+end
 
 -----------------------------------------------------------
 --- Update old Buttons

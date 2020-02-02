@@ -29,8 +29,8 @@ local MAX_NUM_QUESTS = MAX_NUM_QUESTS
 local MAX_REQUIRED_ITEMS = MAX_REQUIRED_ITEMS
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.quest then return end
+function S:BlizzardQuestFrames()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.quest) then return end
 
 	local QuestStrip = {
 		'EmptyQuestLogFrame',
@@ -519,4 +519,4 @@ local function LoadSkin()
 	end)
 end
 
-S:AddCallback('Skin_Quest', LoadSkin)
+S:AddCallback('BlizzardQuestFrames')

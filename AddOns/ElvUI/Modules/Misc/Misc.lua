@@ -35,21 +35,22 @@ local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitInRaid = UnitInRaid
 local UnitName = UnitName
+local PlaySound = PlaySound
 
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY = LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY
 local LE_GAME_ERR_NOT_ENOUGH_MONEY = LE_GAME_ERR_NOT_ENOUGH_MONEY
 local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS
-local UIErrorsFrame = UIErrorsFrame
 
+local BOOST_THANKSFORPLAYING_SMALLER = SOUNDKIT.UI_70_BOOST_THANKSFORPLAYING_SMALLER
 local INTERRUPT_MSG = INTERRUPTED.." %s's [%s]!"
 
 function M:ErrorFrameToggle(event)
 	if not E.db.general.hideErrorFrame then return end
 	if event == 'PLAYER_REGEN_DISABLED' then
-		UIErrorsFrame:UnregisterEvent('UI_ERROR_MESSAGE')
+		_G.UIErrorsFrame:UnregisterEvent('UI_ERROR_MESSAGE')
 	else
-		UIErrorsFrame:RegisterEvent('UI_ERROR_MESSAGE')
+		_G.UIErrorsFrame:RegisterEvent('UI_ERROR_MESSAGE')
 	end
 end
 
@@ -176,6 +177,12 @@ function M:PLAYER_ENTERING_WORLD()
 	self:ToggleChatBubbleScript()
 end
 
+function M:RESURRECT_REQUEST()
+	if E.db.general.resurrectSound then
+		PlaySound(BOOST_THANKSFORPLAYING_SMALLER, 'Master')
+	end
+end
+
 function M:ADDON_LOADED(_, addon)
 	if addon == "Blizzard_InspectUI" then
 		M:SetupInspectPageInfo()
@@ -237,6 +244,7 @@ function M:Initialize()
 	self:LoadLoot()
 	--self:ToggleItemLevelInfo(true)
 	self:RegisterEvent('MERCHANT_SHOW')
+	self:RegisterEvent('RESURRECT_REQUEST')
 	self:RegisterEvent('PLAYER_REGEN_DISABLED', 'ErrorFrameToggle')
 	self:RegisterEvent('PLAYER_REGEN_ENABLED', 'ErrorFrameToggle')
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")

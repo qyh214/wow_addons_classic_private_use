@@ -156,7 +156,14 @@ function B:LoadBagBar()
 	_G.KeyRingButton.SetParent = E.dummy
 	_G.KeyRingButton:HookScript('OnEnter', OnEnter)
 	_G.KeyRingButton:HookScript('OnLeave', OnLeave)
-	_G.KeyRingButton:HookScript('OnClick', B.HandleKeyRing)
+
+	if E.private.bags.enable then
+		_G.KeyRingButton:HookScript('PostClick', function()
+			B.ShowKeyRing = not B.ShowKeyRing
+			B:Layout()
+		end)
+	end
+
 	_G.KeyRingButton:StripTextures()
 	_G.KeyRingButton:SetTemplate(nil, true)
 	_G.KeyRingButton:StyleButton(true)

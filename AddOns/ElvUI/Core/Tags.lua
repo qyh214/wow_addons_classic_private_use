@@ -920,88 +920,6 @@ ElvUF.Tags.Methods['pvp:icon'] = function(unit)
 	end
 end
 
-ElvUF.Tags.SharedEvents.QUEST_LOG_UPDATE = true
-
-ElvUF.Tags.Events['quest:title'] = 'QUEST_LOG_UPDATE'
-ElvUF.Tags.Methods['quest:title'] = function(unit)
-	if UnitIsPlayer(unit) then
-		return
-	end
-
-	E.ScanTooltip:SetOwner(_G.UIParent, 'ANCHOR_NONE')
-	E.ScanTooltip:SetUnit(unit)
-	E.ScanTooltip:Show()
-
-	local QuestName
-
-	if E.ScanTooltip:NumLines() >= 3 then
-		for i = 3, E.ScanTooltip:NumLines() do
-			local QuestLine = _G['ElvUI_ScanTooltipTextLeft' .. i]
-			local QuestLineText = QuestLine and QuestLine:GetText()
-
-			local PlayerName, ProgressText = strmatch(QuestLineText, '^ ([^ ]-) ?%- (.+)$')
-
-			if not ( PlayerName and PlayerName ~= '' and PlayerName ~= UnitName('player') ) then
-				if ProgressText then
-					QuestName = _G['ElvUI_ScanTooltipTextLeft' .. i - 1]:GetText()
-				end
-			end
-		end
-		for i = 1, GetNumQuestLogEntries() do
-			local title, level, _, isHeader = GetQuestLogTitle(i)
-			if not isHeader and title == QuestName then
-				local colors = GetQuestDifficultyColor(level)
-				return Hex(colors.r, colors.g, colors.b)..QuestName..'|r'
-			end
-		end
-	end
-end
-
-ElvUF.Tags.Events['quest:info'] = 'QUEST_LOG_UPDATE'
-ElvUF.Tags.Methods['quest:info'] = function(unit)
-	if UnitIsPlayer(unit) then
-		return
-	end
-
-	E.ScanTooltip:SetOwner(_G.UIParent, 'ANCHOR_NONE')
-	E.ScanTooltip:SetUnit(unit)
-	E.ScanTooltip:Show()
-
-	local ObjectiveCount = 0
-	local QuestName
-
-	if E.ScanTooltip:NumLines() >= 3 then
-		for i = 3, E.ScanTooltip:NumLines() do
-			local QuestLine = _G['ElvUI_ScanTooltipTextLeft' .. i]
-			local QuestLineText = QuestLine and QuestLine:GetText()
-
-			local PlayerName, ProgressText = strmatch(QuestLineText, '^ ([^ ]-) ?%- (.+)$')
-			if (not PlayerName or PlayerName == '' or PlayerName == UnitName('player')) and ProgressText then
-				local x, y
-				if not QuestName and ProgressText then
-					QuestName = _G['ElvUI_ScanTooltipTextLeft' .. i - 1]:GetText()
-				end
-				if ProgressText then
-					x, y = strmatch(ProgressText, '(%d+)/(%d+)')
-					if x and y then
-						local NumLeft = y - x
-						if NumLeft > ObjectiveCount then -- track highest number of objectives
-							ObjectiveCount = NumLeft
-							if ProgressText then
-								return ProgressText
-							end
-						end
-					else
-						if ProgressText then
-							return QuestName .. ': ' .. ProgressText
-						end
-					end
-				end
-			end
-		end
-	end
-end
-
 E.TagInfo = {
 	--Colors
 	['namecolor'] = { category = 'Colors', description = "Colors names by player class or NPC reaction" },
@@ -1018,6 +936,7 @@ E.TagInfo = {
 	['shortclassification'] = { category = 'Classification', description = "Displays the unit's classification in short form (e.g. '+' for ELITE and 'R' for RARE)" },
 	['classification:icon'] = { category = 'Classification', description = "Displays the unit's classification in icon form (golden icon for 'ELITE' silver icon for 'RARE')" },
 	['rare'] = { category = 'Classification', description = "Displays 'Rare' when the unit is a rare or rareelite" },
+	['plus'] = { category = 'Classification', description = "Displays '+' when the unit is an elite or rareelite" },
 	--Guild
 	['guild'] = { category = 'Guild', description = "Displays the guild name" },
 	['guild:brackets'] = { category = 'Guild', description = "Displays the guild name with < > brackets (e.g. <GUILD>)" },
@@ -1137,9 +1056,7 @@ E.TagInfo = {
 	['pvp:title'] = { category = 'PvP', description = "Displays player pvp title" },
 	['pvp:rank'] = { category = 'PvP', description = "Displays player pvp rank number" },
 	['pvp:icon'] = { category = 'PvP', description = "Displays player pvp rank icon" },
-	--Quest
-	['quest:info'] = { category = 'Quest', description = "Displays the quest objectives" },
-	['quest:title'] = { category = 'Quest', description = "Displays the quest title" },
+	['pvp'] = { category = 'PvP', description = "Displays 'PvP' if the unit is pvp flagged" },
 	--Realm
 	['realm'] = { category = 'Realm', description = "Displays the server name" },
 	['realm:translit'] = { category = 'Realm', description = "Displays the server name with transliteration for cyrillic letters" },
@@ -1153,7 +1070,6 @@ E.TagInfo = {
 	['afk'] = { category = 'Status', description = "Displays <AFK> if the unit is afk" },
 	['dead'] = { category = 'Status', description = "Displays <DEAD> if the unit is dead" },
 	['resting'] = { category = 'Status', description = "Displays 'zzz' if the unit is resting" },
-	['pvp'] = { category = 'Status', description = "Displays 'PvP' if the unit is pvp flagged" },
 	['offline'] = { category = 'Status', description = "Displays 'OFFLINE' if the unit is disconnected" },
 	--Speed
 	['speed:percent'] = { category = 'Speed', description = "" },
@@ -1178,7 +1094,6 @@ E.TagInfo = {
 	--Miscellanous
 	['affix'] = { category = 'Miscellanous', description = "Displays low level critter mobs" },
 	['class'] = { category = 'Miscellanous', description = "Displays the class of the unit, if that unit is a player" },
-	['plus'] = { category = 'Miscellanous', description = "Displays the character '+' if the unit is an elite or rare-elite" },
 	['race'] = { category = 'Miscellanous', description = "Displays the race" },
 	--Range
 	['nearbyplayers:8'] = { category = 'Range', description = "Displays all players within 8 yards" },

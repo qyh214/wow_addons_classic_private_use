@@ -18,8 +18,8 @@ local NUM_FACTIONS_DISPLAYED = NUM_FACTIONS_DISPLAYED
 local CHARACTERFRAME_SUBFRAMES = CHARACTERFRAME_SUBFRAMES
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.character then return end
+function S:CharacterFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.character) then return end
 
 	-- Character Frame
 	local CharacterFrame = _G.CharacterFrame
@@ -126,7 +126,7 @@ local function LoadSkin()
 	local function updHappiness(self)
 		local happiness = GetPetHappiness()
 		local _, isHunterPet = HasPetUI()
-		if not happiness or not isHunterPet then return end
+		if not (happiness and isHunterPet) then return end
 
 		local texture = self:GetRegions()
 		if happiness == 1 then
@@ -296,4 +296,4 @@ local function LoadSkin()
 	E:RegisterStatusBar(HonorFrameProgressBar)
 end
 
-S:AddCallback('Character', LoadSkin)
+S:AddCallback('CharacterFrame')

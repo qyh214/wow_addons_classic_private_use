@@ -5,8 +5,8 @@ local S = E:GetModule('Skins')
 --Lua functions
 local _G = _G
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.guildregistrar then return end
+function S:GuildRegistrarFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.guildregistrar) then return end
 
 	local GuildRegistrarFrame = _G.GuildRegistrarFrame
 	S:HandleFrame(GuildRegistrarFrame, true, nil, 12, -17, -28, 65)
@@ -40,4 +40,4 @@ local function LoadSkin()
 	_G.AvailableServicesText:SetTextColor(1, 1, 0)
 end
 
-S:AddCallback('Skin_GuildRegistrar', LoadSkin)
+S:AddCallback('GuildRegistrarFrame')

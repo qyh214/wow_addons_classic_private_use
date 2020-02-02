@@ -5,13 +5,13 @@ local S = E:GetModule('Skins')
 --Lua functions
 local _G = _G
 local unpack = unpack
+local select = select
 --WoW API / Variables
-local SpellBook_GetCurrentPage = SpellBook_GetCurrentPage
-local BOOKTYPE_SPELL = BOOKTYPE_SPELL
-local MAX_SKILLLINE_TABS = MAX_SKILLLINE_TABS
+local CreateFrame = CreateFrame
+local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.spellbook then return end
+function S:SpellBookFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.spellbook) then return end
 
 	S:HandleFrame(_G.SpellBookFrame, true, nil, 11, -12, -32, 76)
 
@@ -33,7 +33,7 @@ local function LoadSkin()
 	_G.SpellBookNextPageButton:Point('TOPLEFT', _G.SpellBookPrevPageButton, 'TOPLEFT', 30, 0)
 	_G.SpellBookNextPageButton:Size(24)
 
-	S:HandleCloseButton(_G.SpellBookCloseButton, SpellBookFrame.backdrop)
+	S:HandleCloseButton(_G.SpellBookCloseButton, _G.SpellBookFrame.backdrop)
 
 	for i = 1, 3 do
 		local tab = _G['SpellBookFrameTabButton'..i]
@@ -140,4 +140,5 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallback('Skin_Spellbook', LoadSkin)
+S:AddCallback('SpellBookFrame')
+

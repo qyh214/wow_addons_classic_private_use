@@ -670,7 +670,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("Jergosh")
 
 L:SetGeneralLocalization{
-	name 		= "Jergosh el Convocador"
+	name 		= "Jergosh el Conjurador"
 }
 -----------------------------
 --  Bazzalan  --

@@ -5,8 +5,8 @@ local S = E:GetModule('Skins')
 --Lua functions
 local _G = _G
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.mirrorTimers then return end
+function S:MirrorTimers()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.mirrorTimers) then return end
 
 	local function MirrorTimer_OnUpdate(frame, elapsed)
 		if frame.paused then return end
@@ -52,4 +52,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallback('Skin_MirrorTimers', LoadSkin)
+S:AddCallback('MirrorTimers')

@@ -7,7 +7,6 @@ local _G = _G
 local strfind = strfind
 local unpack, select = unpack, select
 --WoW API / Variables
-local CreateFrame = CreateFrame
 local GetItemInfo = GetItemInfo
 local GetTradeSkillNumReagents = GetTradeSkillNumReagents
 local GetTradeSkillInfo = GetTradeSkillInfo
@@ -17,8 +16,8 @@ local GetTradeSkillReagentInfo = GetTradeSkillReagentInfo
 local GetTradeSkillReagentItemLink = GetTradeSkillReagentItemLink
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.tradeskill then return end
+function S:Blizzard_TradeSkillUI()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.tradeskill) then return end
 
 	local TradeSkillFrame = _G.TradeSkillFrame
 	S:HandleFrame(TradeSkillFrame, true, nil, 11, -12, -32, 76)
@@ -181,4 +180,5 @@ local function LoadSkin()
 	end)
 end
 
-S:AddCallbackForAddon('Blizzard_TradeSkillUI', 'Skin_Blizzard_TradeSkillUI', LoadSkin)
+S:AddCallbackForAddon('Blizzard_TradeSkillUI')
+

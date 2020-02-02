@@ -20,7 +20,7 @@ local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 
 local tinsert = table.insert
 local tremove = table.remove;
-local _QuestieFramePool = {...} --Local Functions
+local _QuestieFramePool = QuestieFramePool.private
 _QuestieFramePool.numberOfFrames = 0
 
 _QuestieFramePool.unusedFrames = {}
@@ -89,22 +89,20 @@ StaticPopupDialogs["QUESTIE_CONFIRMHIDE"] = {
 -- Global Functions --
 ---@return IconFrame
 function QuestieFramePool:GetFrame()
-    ---@type IconFrame
-    local returnFrame = nil--tremove(_QuestieFramePool.unusedFrames)
+    Questie:Debug(DEBUG_SPAM, "[QuestieFramePool:GetFrame]")
 
-    -- im not sure its this, but using string keys for the table prevents double-adding to _QuestieFramePool.unusedFrames, calling unload() twice could double-add it maybe?
-    for frameId, frame in pairs(_QuestieFramePool.unusedFrames) do -- yikes (why is tremove broken? is there a better to get the first key of a non-indexed table?)
-        returnFrame = frame
-        _QuestieFramePool.unusedFrames[frameId] = nil
-        break
-    end
+    ---@type IconFrame
+    local returnFrame = tremove(_QuestieFramePool.unusedFrames)
 
     if returnFrame and returnFrame.frameId and _QuestieFramePool.usedFrames[returnFrame.frameId] then
         -- something went horribly wrong (desync bug?) don't use this frame since its already in use
+        Questie:Debug(DEBUG_SPAM, "[QuestieFramePool:GetFrame] Tried to reuse frame, but that frame is already in use")
         returnFrame = nil
     end
     if not returnFrame then
         returnFrame = _QuestieFramePool:QuestieCreateFrame()
+    else
+        Questie:Debug(DEBUG_SPAM, "[QuestieFramePool:GetFrame] Reusing frame")
     end
     if returnFrame ~= nil and returnFrame.hidden and returnFrame._show ~= nil and returnFrame._hide ~= nil then -- restore state to normal (toggle questie)
         returnFrame.hidden = false
@@ -118,13 +116,11 @@ function QuestieFramePool:GetFrame()
     returnFrame.miniMapIcon = nil
     returnFrame._hidden_toggle_hack = nil -- TODO: this will be removed later, see QuestieQuest:UpdateHiddenNotes()
 
-    --if f.IsShowing ~= nil and f:IsShowing() then
-    returnFrame.data = {} -- this should probably be nil but QuestieCreateFrame sets it to an empty table for some reason
+    returnFrame.data = nil
     returnFrame.x = nil;
     returnFrame.y = nil;
     returnFrame.AreaID = nil;
-    returnFrame:Hide();
-    --end
+    returnFrame.UiMapID = nil
 
     if returnFrame.texture then
         returnFrame.texture:SetVertexColor(1, 1, 1, 1)
@@ -199,11 +195,9 @@ function QuestieFramePool:UpdateColorConfig(mini, enable)
 end
 
 function QuestieFramePool:RecycleFrame(frame)
-    local id = frame.frameId
-    if _QuestieFramePool.usedFrames[id] then
-        _QuestieFramePool.usedFrames[id] = nil
-        _QuestieFramePool.unusedFrames[id] = frame--tinsert(_QuestieFramePool.unusedFrames, self)
-    end
+    Questie:Debug(DEBUG_SPAM, "[QuestieFramePool:RecycleFrame]")
+    _QuestieFramePool.usedFrames[frame.frameId] = nil
+    tinsert(_QuestieFramePool.unusedFrames, frame)
 end
 
 -- Local Functions --
@@ -218,8 +212,9 @@ function _QuestieFramePool:UnloadFrame(frame)
     tinsert(_QuestieFramePool.unusedFrames, frame)
 end]]--
 function _QuestieFramePool:QuestieCreateFrame()
+    Questie:Debug(DEBUG_SPAM, "[QuestieFramePool:QuestieCreateFrame]")
     _QuestieFramePool.numberOfFrames = _QuestieFramePool.numberOfFrames + 1
-    local newFrame = QuestieFramePool.Qframe:New(_QuestieFramePool.numberOfFrames, _QuestieFramePool.Questie_Tooltip)
+    local newFrame = QuestieFramePool.Qframe:New(_QuestieFramePool.numberOfFrames, _QuestieFramePool.QuestieTooltip)
 
     tinsert(_QuestieFramePool.allFrames, newFrame)
     return newFrame
@@ -513,13 +508,16 @@ function _QuestieFramePool:AddTooltipsForQuest(icon, tip, quest, usedText)
     end
 end
 
-function _QuestieFramePool:Questie_Tooltip()
-    Questie:Debug(DEBUG_SPAM, "[_QuestieFramePool:Questie_Tooltip]")
+function _QuestieFramePool:QuestieTooltip()
+    Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:QuestieTooltip]", "minimapIcon =", self.miniMapIcon)
+
     local r, g, b, a = self.texture:GetVertexColor();
     if(a == 0) then
+        Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:QuestieTooltip]", "Alpha of texture is 0, nothing to show")
         return
     end
     if GetTime() - _QuestieFramePool.lastTooltipShowHack < 0.05 and GameTooltip:IsShown() then
+        Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:QuestieTooltip]", "Call has been too fast, not showing again")
         return
     end
     _QuestieFramePool.lastTooltipShowHack = GetTime()
@@ -568,12 +566,17 @@ function _QuestieFramePool:Questie_Tooltip()
     local questOrder = {};
     local manualOrder = {}
 
-    self.data.touchedPins = {};
-    for pin in HBDPins.worldmapProvider:GetMap():EnumeratePinsByTemplate("HereBeDragonsPinsTemplateQuestie") do -- I added "_QuestieFramePool.usedFrames" because I think its a bit more efficient than using _G but I might be wrong
-        ---@type IconFrame
-        local icon = pin.icon;
+    self.data.touchedPins = {}
+    ---@param icon IconFrame
+    local function handleMapIcon(icon)
         local iconData = icon.data
-        if(self.data.Id == iconData.Id) then -- Recolor hovered icons
+
+        if iconData == nil then
+            Questie:Error("[_QuestieFramePool:QuestieTooltip] handleMapIcon - iconData is nil! self.data.Id =", self.data.Id, "- Aborting!")
+            return
+        end
+
+        if not icon.miniMapIcon and self.data.Id == iconData.Id then -- Recolor hovered icons
             local entry = {}
             entry.color = {icon.texture.r, icon.texture.g, icon.texture.b, icon.texture.a};
             entry.icon = icon;
@@ -584,7 +587,7 @@ function _QuestieFramePool:Questie_Tooltip()
             end
             tinsert(self.data.touchedPins, entry);
         end
-        if icon and iconData and icon.x and icon.AreaID == self.AreaID then
+        if icon.x and icon.AreaID == self.AreaID then
             local dist = QuestieLib:Maxdist(icon.x, icon.y, self.x, self.y);
             if dist < maxDistCluster then
                 if iconData.Type == "available" or iconData.Type == "complete" then
@@ -637,11 +640,23 @@ function _QuestieFramePool:Questie_Tooltip()
             end
         end
     end
+
+    if self.miniMapIcon then
+        for icon, _ in pairs(HBDPins.activeMinimapPins) do
+            handleMapIcon(icon)
+        end
+    else
+        for pin in HBDPins.worldmapProvider:GetMap():EnumeratePinsByTemplate("HereBeDragonsPinsTemplateQuestie") do
+            handleMapIcon(pin.icon)
+        end
+    end
+
     Tooltip.npcOrder = npcOrder
     Tooltip.questOrder = questOrder
     Tooltip.manualOrder = manualOrder
     Tooltip.miniMapIcon = self.miniMapIcon
     Tooltip._Rebuild = function(self)
+        Questie:Debug(DEBUG_SPAM, "[Tooltip:_Rebuild]")
         local xpString = QuestieLocale:GetUIString('XP');
         local shift = IsShiftKeyDown()
         local haveGiver = false -- hack

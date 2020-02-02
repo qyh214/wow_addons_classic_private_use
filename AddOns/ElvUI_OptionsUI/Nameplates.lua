@@ -2486,10 +2486,10 @@ local function GetUnitSettings(unit, name)
 								end,
 								stateSwitchGetText = function(_, TEXT)
 									local friend, enemy = strmatch(TEXT, "^Friendly:([^,]*)"), strmatch(TEXT, "^Enemy:([^,]*)")
-									local text = friend or enemy or TEXT
+									local text, blockB, blockS, blockT = friend or enemy or TEXT
 									local SF, localized = E.global.unitframe.specialFilters[text], L[text]
-									local blockText = SF and localized and strmatch(text, "^block") and gsub(localized, "^%[.-]%s?", "")
-									local filterText = (blockText and format("|cFF999999%s|r %s", _G.BLOCK, blockText)) or localized or text
+									if SF and localized and text:match("^block") then blockB, blockS, blockT = localized:match("^%[(.-)](%s?)(.+)") end
+									local filterText = (blockB and format("|cFF999999%s|r%s%s", blockB, blockS, blockT)) or localized or text
 									return (friend and format("|cFF33FF33%s|r %s", _G.FRIEND, filterText)) or (enemy and format("|cFFFF3333%s|r %s", _G.ENEMY, filterText)) or filterText
 								end,
 								stateSwitchOnClick = function()
@@ -2779,10 +2779,10 @@ local function GetUnitSettings(unit, name)
 								end,
 								stateSwitchGetText = function(_, TEXT)
 									local friend, enemy = strmatch(TEXT, "^Friendly:([^,]*)"), strmatch(TEXT, "^Enemy:([^,]*)")
-									local text = friend or enemy or TEXT
+									local text, blockB, blockS, blockT = friend or enemy or TEXT
 									local SF, localized = E.global.unitframe.specialFilters[text], L[text]
-									local blockText = SF and localized and strmatch(text, "^block") and gsub(localized, "^%[.-]%s?", "")
-									local filterText = (blockText and format("|cFF999999%s|r %s", _G.BLOCK, blockText)) or localized or text
+									if SF and localized and text:match("^block") then blockB, blockS, blockT = localized:match("^%[(.-)](%s?)(.+)") end
+									local filterText = (blockB and format("|cFF999999%s|r%s%s", blockB, blockS, blockT)) or localized or text
 									return (friend and format("|cFF33FF33%s|r %s", _G.FRIEND, filterText)) or (enemy and format("|cFFFF3333%s|r %s", _G.ENEMY, filterText)) or filterText
 								end,
 								stateSwitchOnClick = function(info)
@@ -3453,8 +3453,16 @@ E.Options.args.nameplate = {
 			childGroups = "tab",
 			disabled = function() return not E.NamePlates.Initialized end,
 			args = {
-				resetcvars = {
+				resetFilters = {
 					order = 1,
+					name = L["Reset Aura Filters"],
+					type = "execute",
+					func = function()
+						E:StaticPopup_Show("RESET_NP_AF") --reset nameplate aurafilters
+					end,
+				},
+				resetcvars = {
+					order = 2,
 					type = "execute",
 					name = L["Reset CVars"],
 					desc = L["Reset Nameplate CVars to the ElvUI recommended defaults."],
@@ -3462,14 +3470,6 @@ E.Options.args.nameplate = {
 						NP:CVarReset()
 					end,
 					confirm = true,
-				},
-				resetFilters = {
-					order = 2,
-					name = L["Reset Aura Filters"],
-					type = "execute",
-					func = function()
-						E:StaticPopup_Show("RESET_NP_AF") --reset nameplate aurafilters
-					end,
 				},
 				general = {
 					order = 10,
@@ -3540,21 +3540,21 @@ E.Options.args.nameplate = {
 							get = function() return tonumber(GetCVar('nameplateOverlapH')) end,
 							set = function(_, value) SetCVar('nameplateOverlapH', value) end,
 						},
-						otherAtBase = {
-							order = 9,
-							type = "toggle",
-							name = L["Nameplate At Base"],
-							desc = L["Position other Nameplates at the base, rather than overhead."],
-							get = function() return GetCVarBool('nameplateOtherAtBase') end,
-							set = function(_, value) SetCVar('nameplateOtherAtBase', value and 2 or 0) end,
-						},
 						lowHealthThreshold = {
-							order = 10,
+							order = 9,
 							name = L["Low Health Threshold"],
 							desc = L["Make the unitframe glow yellow when it is below this percent of health, it will glow red when the health value is half of this value."],
 							type = "range",
 							isPercent = true,
 							min = 0, softMax = 0.5, max = 0.8, step = 0.01,
+						},
+						otherAtBase = {
+							order = 10,
+							type = "toggle",
+							name = L["Nameplate At Base"],
+							desc = L["Position other Nameplates at the base, rather than overhead."],
+							get = function() return GetCVarBool('nameplateOtherAtBase') end,
+							set = function(_, value) SetCVar('nameplateOtherAtBase', value and 2 or 0) end,
 						},
 						spacer1 = {
 							order = 11,
@@ -3717,8 +3717,83 @@ E.Options.args.nameplate = {
 								},
 							}
 						},
-						clickThrough = {
+						effectiveGroup = {
 							order = 51,
+							type = "group",
+							childGroups = "tab",
+							name = L["Effective Updates"],
+							args = {
+								warning = {
+									order = 0,
+									type = "description",
+									fontSize = 'medium',
+									name = L["|cffFF0000Warning:|r This causes updates to happen at a fraction of a second."].."\n"..
+									L["Enabling this has the potential to make updates faster, though setting a speed value that is too high may cause it to actually run slower than the default scheme, which use Blizzard events only with no update loops provided."]
+								},
+								effectiveHealth = {
+									order = 1,
+									type = "toggle",
+									name = L["Health"],
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+								effectivePower = {
+									order = 2,
+									type = "toggle",
+									name = L["Power"],
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+								effectiveAura = {
+									order = 3,
+									type = "toggle",
+									name = L["Aura"],
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+								spacer1 = {
+									order = 4,
+									type = "description",
+									name = " ",
+									width = "full"
+								},
+								effectiveHealthSpeed = {
+									order = 5,
+									name = L["Health Speed"],
+									type = "range",
+									min = 0.1,
+									max = 0.5,
+									step = 0.05,
+									disabled = function() return not E.global.nameplate.effectiveHealth end,
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+								effectivePowerSpeed = {
+									order = 6,
+									name = L["Power Speed"],
+									type = "range",
+									min = 0.1,
+									max = 0.5,
+									step = 0.05,
+									disabled = function() return not E.global.nameplate.effectivePower end,
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+								effectiveAuraSpeed = {
+									order = 7,
+									name = L["Aura Speed"],
+									type = "range",
+									min = 0.1,
+									max = 0.5,
+									step = 0.05,
+									disabled = function() return not E.global.nameplate.effectiveAura end,
+									get = function(info) return E.global.nameplate[info[#info]] end,
+									set = function(info, value) E.global.nameplate[info[#info]] = value; NP:ConfigureAll() end
+								},
+							},
+						},
+						clickThrough = {
+							order = 52,
 							type = "group",
 							childGroups = "tab",
 							name = L["Click Through"],
@@ -3745,7 +3820,7 @@ E.Options.args.nameplate = {
 							},
 						},
 						clickableRange = {
-							order = 52,
+							order = 53,
 							type = "group",
 							childGroups = "tab",
 							name = L["Clickable Size"],
@@ -3825,7 +3900,7 @@ E.Options.args.nameplate = {
 							},
 						},
 						cutaway = {
-							order = 53,
+							order = 54,
 							type = 'group',
 							childGroups = "tab",
 							name = L["Cutaway Bars"],

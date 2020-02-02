@@ -35,8 +35,8 @@ local function SkinNavBarButtons(self)
 	end
 end
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.misc then return end
+function S:BlizzardMiscFrames()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.misc) then return end
 
 	-- Blizzard frame we want to reskin
 	local skins = {
@@ -76,14 +76,14 @@ local function LoadSkin()
 	-- since we cant hook `CinematicFrame_OnShow` or `CinematicFrame_OnEvent` directly
 	-- we can just hook onto this function so that we can get the correct `self`
 	-- this is called through `CinematicFrame_OnShow` so the result would still happen where we want
-	hooksecurefunc('CinematicFrame_OnDisplaySizeChanged', function(self)
-		if self and self.closeDialog and not self.closeDialog.template then
-			self.closeDialog:StripTextures()
-			self.closeDialog:SetTemplate('Transparent')
-			self:SetScale(_G.UIParent:GetScale())
-			local dialogName = self.closeDialog.GetName and self.closeDialog:GetName()
-			local closeButton = self.closeDialog.ConfirmButton or (dialogName and _G[dialogName..'ConfirmButton'])
-			local resumeButton = self.closeDialog.ResumeButton or (dialogName and _G[dialogName..'ResumeButton'])
+	hooksecurefunc('CinematicFrame_OnDisplaySizeChanged', function(s)
+		if s and s.closeDialog and not s.closeDialog.template then
+			s.closeDialog:StripTextures()
+			s.closeDialog:SetTemplate('Transparent')
+			s:SetScale(_G.UIParent:GetScale())
+			local dialogName = s.closeDialog.GetName and s.closeDialog:GetName()
+			local closeButton = s.closeDialog.ConfirmButton or (dialogName and _G[dialogName..'ConfirmButton'])
+			local resumeButton = s.closeDialog.ResumeButton or (dialogName and _G[dialogName..'ResumeButton'])
 			if closeButton then S:HandleButton(closeButton) end
 			if resumeButton then S:HandleButton(resumeButton) end
 		end
@@ -92,13 +92,13 @@ local function LoadSkin()
 	-- same as above except `MovieFrame_OnEvent` and `MovieFrame_OnShow`
 	-- cant be hooked directly so we can just use this
 	-- this is called through `MovieFrame_OnEvent` on the event `PLAY_MOVIE`
-	hooksecurefunc('MovieFrame_PlayMovie', function(self)
-		if self and self.CloseDialog and not self.CloseDialog.template then
-			self:SetScale(_G.UIParent:GetScale())
-			self.CloseDialog:StripTextures()
-			self.CloseDialog:SetTemplate('Transparent')
-			S:HandleButton(self.CloseDialog.ConfirmButton)
-			S:HandleButton(self.CloseDialog.ResumeButton)
+	hooksecurefunc('MovieFrame_PlayMovie', function(s)
+		if s and s.CloseDialog and not s.CloseDialog.template then
+			s:SetScale(_G.UIParent:GetScale())
+			s.CloseDialog:StripTextures()
+			s.CloseDialog:SetTemplate('Transparent')
+			S:HandleButton(s.CloseDialog.ConfirmButton)
+			S:HandleButton(s.CloseDialog.ResumeButton)
 		end
 	end)
 
@@ -306,4 +306,4 @@ local function LoadSkin()
 	hooksecurefunc('NavBar_AddButton', SkinNavBarButtons)
 end
 
-S:AddCallback('Skin_Misc', LoadSkin)
+S:AddCallback('BlizzardMiscFrames')

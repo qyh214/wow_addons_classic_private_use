@@ -1,12 +1,9 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
-
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.addonManager then return end
+function S:AddonList()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.addonManager) then return end
 
 	local AddonList = _G.AddonList
 	S:HandleFrame(AddonList, true)
@@ -31,4 +28,4 @@ local function LoadSkin()
 	end
 end
 
-S:AddCallback('Skin_AddonManager', LoadSkin)
+S:AddCallback('AddonList')

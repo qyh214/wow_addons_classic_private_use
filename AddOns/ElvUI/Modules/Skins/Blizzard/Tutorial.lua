@@ -5,8 +5,8 @@ local S = E:GetModule('Skins')
 --Lua functions
 local _G = _G
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.tutorial then return end
+function S:SkinTutorial()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.tutorial) then return end
 
 	S:HandleFrame(_G.TutorialFrame, false)
 
@@ -27,4 +27,4 @@ local function LoadSkin()
 	S:HandleButton(_G.TutorialFrameOkayButton)
 end
 
-S:AddCallback('Skin_Tutorial', LoadSkin)
+S:AddCallback('SkinTutorial')

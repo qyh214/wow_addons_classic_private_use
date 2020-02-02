@@ -1,6 +1,8 @@
 # Addon Control Panel
 
-## [3.5.6](https://github.com/sylvanaar/addon-control-panel/tree/3.5.6) (2019-08-28)
-[Full Changelog](https://github.com/sylvanaar/addon-control-panel/compare/3.5.5...3.5.6)
+## [3.5.7](https://github.com/sylvanaar/addon-control-panel/tree/3.5.7) (2020-01-19)
+[Full Changelog](https://github.com/sylvanaar/addon-control-panel/compare/3.5.6...3.5.7)
 
-- Fix localization issues  
+- Update TOC for retail and classic  
+- Update README.md  
+- Update README.md  

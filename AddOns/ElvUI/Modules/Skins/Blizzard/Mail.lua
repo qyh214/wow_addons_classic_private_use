@@ -13,8 +13,8 @@ local GetSendMailItem = GetSendMailItem
 local GetItemQualityColor = GetItemQualityColor
 local hooksecurefunc = hooksecurefunc
 
-local function LoadSkin()
-	if not E.private.skins.blizzard.enable or not E.private.skins.blizzard.mail then return end
+function S:MailFrame()
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.mail) then return end
 
 	-- Mail Frame / Inbox Frame
 	local MailFrame = _G.MailFrame
@@ -267,4 +267,4 @@ local function LoadSkin()
 	_G.OpenMailMoneyButtonCount:SetDrawLayer('OVERLAY')
 end
 
-S:AddCallback('Skin_Mail', LoadSkin)
+S:AddCallback('MailFrame')

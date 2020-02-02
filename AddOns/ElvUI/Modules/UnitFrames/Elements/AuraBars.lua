@@ -123,6 +123,14 @@ function UF:Configure_AuraBars(frame)
 		auraBars.spacing = db.aurabar.spacing
 		auraBars.width = frame.UNIT_WIDTH - auraBars.height - (frame.BORDER * 4)
 
+		local colors = UF.db.colors.auraBarBuff
+		if E:CheckClassColor(colors.r, colors.g, colors.b) then
+			local classColor = E:ClassColor(E.myclass, true)
+			colors.r = classColor.r
+			colors.g = classColor.g
+			colors.b = classColor.b
+		end
+
 		if not auraBars.Holder then
 			local holder = CreateFrame('Frame', nil, auraBars)
 			holder:Point("BOTTOM", frame, "TOP", 0, 0)
