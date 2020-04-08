@@ -252,7 +252,7 @@ data["WailingCaverns"] = {
 	AtlasMapFile = {"WailingCaverns", "WailingCavernsEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {10, 17, 24},
+	LevelRange = {10, 15, 25},
 	items = {
 		{ -- WCLordCobrahn
 			name = AL["Lord Cobrahn"],
@@ -382,7 +382,7 @@ data["TheDeadmines"] = {
 	AtlasMapFile = {"TheDeadmines", "TheDeadminesEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {10, 17, 26},
+	LevelRange = {10, 18, 23},
 	items = {
 		{	--DMRhahkZor
 			name = AL["Rhahk'Zor"],
@@ -806,7 +806,7 @@ data["TheStockade"] = {
 	AtlasMapFile = "TheStockade",
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {15, 24, 32},
+	LevelRange = {15, 22, 30},
 	items = {
 		{ -- SWStKamDeepfury
 			name = AL["Kam Deepfury"],
@@ -974,7 +974,7 @@ data["RazorfenKraul"] = {
 	AtlasMapFile = "RazorfenKraul",
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {25, 29, 38},
+	LevelRange = {25, 30, 40},
 	items = {
 		{ -- RFKAggem
 			name = AL["Aggem Thorncurse"],
@@ -1096,7 +1096,7 @@ data["ScarletMonasteryGraveyard"] = {
 	AtlasMapFile = {"SMGraveyard", "SMEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {20, 26, 36},
+	LevelRange = {20, 28, 38},
 	items = {
 		-- Graveyard
 		{ -- SMVishas
@@ -1663,7 +1663,7 @@ data["RazorfenDowns"] = {
 	AtlasMapFile = "RazorfenDowns",
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {35, 37, 46},
+	LevelRange = {35, 40, 50},
 	items = {
 		{ -- RFDTutenkash
 			name = AL["Tuten'kash"],
@@ -1787,7 +1787,7 @@ data["Uldaman"] = {
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
 	AtlasMapFile = {"Uldaman", "UldamanEnt"},
-	LevelRange = {30, 41, 51},
+	LevelRange = {30, 44, 54},
 	items = {
 		{ -- UldEric
 			name = AL["Eric \"The Swift\""],
@@ -1988,6 +1988,18 @@ data["Zul'Farrak"] = {
 			specialType = "quest",
 			[NORMAL_DIFF] = {
 				{ 1,  10660 }, -- First Mosh'aru Tablet
+			},
+		},
+		{ -- ZFSandarrDunereaver
+			name = AL["Sandarr Dunereaver"],
+			npcID = 10080,
+			Level = 45,
+			DisplayIDs = {{9291}},
+			IgnoreAsSource = true,
+			--AtlasMapBossID = 2,
+			specialType = "rare",
+			[NORMAL_DIFF] = {
+				{ 1,  9523, [ATLASLOOT_IT_AMOUNT1] = "2-4" }, -- First Mosh'aru Tablet
 			},
 		},
 		{ -- ZFWitchDoctorZumrah
@@ -2283,16 +2295,16 @@ data["Maraudon"] = {
 				{ 1,  17757 }, -- Amulet of Spirits
 			},
 		},
-		{ -- MaraKhanMagra
-			name = AL["Magra"],
-			npcID = 13740,
-			DisplayIDs = {{9433}},
+		{ -- MaraKhanKolk
+			name = AL["Kolk"],
+			npcID = 13742,
+			DisplayIDs = {{4860}},
 			AtlasMapFile = "MaraudonEnt",
 			AtlasMapBossID = "*1",
 			ExtraList = true,
 			specialType = "quest",
 			[NORMAL_DIFF] = {
-				{ 1,  17763 }, -- Gem of the Third Khan
+				{ 1,  17761 }, -- Gem of the First Khan
 			},
 		},
 		{ -- MaraKhanGelk
@@ -2307,16 +2319,16 @@ data["Maraudon"] = {
 				{ 1,  17762 }, -- Gem of the Second Khan
 			},
 		},
-		{ -- MaraKhanKolk
-			name = AL["Kolk"],
-			npcID = 13742,
-			DisplayIDs = {{4860}},
+		{ -- MaraKhanMagra
+			name = AL["Magra"],
+			npcID = 13740,
+			DisplayIDs = {{9433}},
 			AtlasMapFile = "MaraudonEnt",
 			AtlasMapBossID = "*3",
 			ExtraList = true,
 			specialType = "quest",
 			[NORMAL_DIFF] = {
-				{ 1,  17761 }, -- Gem of the First Khan
+				{ 1,  17763 }, -- Gem of the Third Khan
 			},
 		},
 	},
@@ -2329,7 +2341,7 @@ data["TheTempleOfAtal'Hakkar"] = {
 	AtlasMapFile = { "TheSunkenTemple", "TheSunkenTempleEnt" },
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {45, 50, 56},
+	LevelRange = {45, 50, 60},
 	items = {
 		{ -- STBalconyMinibosses
 			name = AL["Balcony Minibosses"],
@@ -3315,7 +3327,7 @@ data["UpperBlackrockSpire"] = {
 	AtlasMapFile = {"BlackrockSpireUpper", "BlackrockMountainEnt"},
 	ContentType = DUNGEON_CONTENT,
 	LoadDifficulty = NORMAL_DIFF,
-	LevelRange = {48, 55, 60},
+	LevelRange = {48, 58, 60},
 	items = {
 		{ -- UBRSEmberseer
 			name = AL["Pyroguard Emberseer"],
@@ -4425,20 +4437,6 @@ data["Scholomance"] = {
 				{ 26, 15773 }, -- Pattern: Wicked Leather Armor
 				{ 27, 15776 }, -- Pattern: Runic Leather Armor
 				{ 29, 13920 }, -- Healthy Dragon Scale
-			},
-		},
-		{ -- SCHOLODeathKnight
-			name = AL["Death Knight Darkreaver"],
-			npcID = 14516,
-			ExtraList = true,
-			SubAreaID = 32577,
-			DisplayIDs = {{14591}},
-			AtlasMapBossID = 5,
-			[NORMAL_DIFF] = {
-				{ 1,  18760 }, -- Necromantic Band
-				{ 2,  18761 }, -- Oblivion's Touch
-				{ 3,  18758 }, -- Specter's Blade
-				{ 4,  18759 }, -- Malicious Axe
 			},
 		},
 		{ -- SCHOLOKormok

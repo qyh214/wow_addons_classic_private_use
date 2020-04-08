@@ -28,39 +28,13 @@ E.Options.args.general = {
 	get = function(info) return E.db.general[info[#info]] end,
 	set = function(info, value) E.db.general[info[#info]] = value end,
 	args = {
-		intro = {
-			order = 3,
-			type = "description",
-			name = L["ELVUI_DESC"],
-		},
 		general = {
-			order = 4,
+			order = 5,
 			type = "group",
 			name = L["General"],
 			args = {
-				generalHeader = {
-					order = 0,
-					type = "header",
-					name = L["General"],
-				},
-				messageRedirect = {
-					order = 1,
-					name = L["Chat Output"],
-					desc = L["This selects the Chat Frame to use as the output of ElvUI messages."],
-					type = 'select',
-					values = GetChatWindowInfo()
-				},
-				AutoScale = {
-					order = 2,
-					type = 'execute',
-					name = L["Auto Scale"],
-					func = function()
-						E.global.general.UIScale = E:PixelBestSize()
-						E:PixelScaleChanged()
-					end,
-				},
 				UIScale = {
-					order = 3,
+					order = 1,
 					type = "range",
 					name = L["UI_SCALE"],
 					min = 0.1, max = 1.25, step = 0.000000000000001,
@@ -73,51 +47,102 @@ E.Options.args.general = {
 						end
 					end
 				},
+				AutoScale = {
+					order = 2,
+					type = 'execute',
+					name = L["Auto Scale"],
+					func = function()
+						E.global.general.UIScale = E:PixelBestSize()
+						E:PixelScaleChanged()
+					end,
+				},
 				pixelPerfect = {
-					order = 4,
+					order = 3,
 					name = L["Thin Border Theme"],
 					desc = L["The Thin Border Theme option will change the overall apperance of your UI. Using Thin Border Theme is a slight performance increase over the traditional layout."],
 					type = 'toggle',
 					get = function(info) return E.private.general.pixelPerfect end,
 					set = function(info, value) E.private.general.pixelPerfect = value; E:StaticPopup_Show("PRIVATE_RL") end
 				},
-				eyefinity = {
-					order = 5,
-					name = L["Multi-Monitor Support"],
-					desc = L["Attempt to support eyefinity/nvidia surround."],
+				loginmessage = {
+					order = 4,
 					type = "toggle",
-					get = function(info) return E.global.general.eyefinity end,
-					set = function(info, value) E.global.general.eyefinity = value; E:StaticPopup_Show("GLOBAL_RL") end
+					name = L["Login Message"],
 				},
 				taintLog = {
-					order = 6,
+					order = 5,
 					type = "toggle",
 					name = L["Log Taints"],
 					desc = L["Send ADDON_ACTION_BLOCKED errors to the Lua Error frame. These errors are less important in most cases and will not effect your game performance. Also a lot of these errors cannot be fixed. Please only report these errors if you notice a Defect in gameplay."],
 				},
 				bottomPanel = {
-					order = 7,
+					order = 6,
 					type = 'toggle',
 					name = L["Bottom Panel"],
 					desc = L["Display a panel across the bottom of the screen. This is for cosmetic only."],
 					set = function(info, value) E.db.general.bottomPanel = value; Layout:BottomPanelVisibility() end
 				},
 				topPanel = {
-					order = 8,
+					order = 7,
 					type = 'toggle',
 					name = L["Top Panel"],
 					desc = L["Display a panel across the top of the screen. This is for cosmetic only."],
 					set = function(info, value) E.db.general.topPanel = value; Layout:TopPanelVisibility() end
 				},
 				afk = {
-					order = 9,
+					order = 8,
 					type = 'toggle',
 					name = L["AFK Mode"],
 					desc = L["When you go AFK display the AFK screen."],
 					set = function(info, value) E.db.general.afk = value; AFK:Toggle() end
 				},
-				decimalLength = {
+				eyefinity = {
+					order = 9,
+					name = L["Multi-Monitor Support"],
+					desc = L["Attempt to support eyefinity/nvidia surround."],
+					type = "toggle",
+					get = function(info) return E.global.general.eyefinity end,
+					set = function(info, value) E.global.general.eyefinity = value; E:StaticPopup_Show("GLOBAL_RL") end
+				},
+				autoAcceptInvite = {
 					order = 10,
+					name = L["Accept Invites"],
+					desc = L["Automatically accept invites from guild/friends."],
+					type = 'toggle',
+				},
+				questRewardMostValueIcon = {
+					order = 12,
+					type = "toggle",
+					name = L["Mark Quest Reward"],
+					desc = L["Marks the most valuable quest reward with a gold coin."],
+				},
+				messageRedirect = {
+					order = 13,
+					name = L["Chat Output"],
+					desc = L["This selects the Chat Frame to use as the output of ElvUI messages."],
+					type = 'select',
+					values = GetChatWindowInfo()
+				},
+				numberPrefixStyle = {
+					order = 14,
+					type = "select",
+					name = L["Unit Prefix Style"],
+					desc = L["The unit prefixes you want to use when values are shortened in ElvUI. This is mostly used on UnitFrames."],
+					set = function(info, value)
+						E.db.general.numberPrefixStyle = value
+						E:BuildPrefixValues()
+						E:StaticPopup_Show("CONFIG_RL")
+					end,
+					values = {
+						["CHINESE"] = "Chinese (万, 亿)",
+						["ENGLISH"] = "English (K, M, B)",
+						["GERMAN"] = "German (Tsd, Mio, Mrd)",
+						["KOREAN"] = "Korean (천, 만, 억)",
+						["METRIC"] = "Metric (k, M, G)"
+					},
+				},
+				decimalLength = {
+					order = 15,
 					type = "range",
 					name = L["Decimal Length"],
 					desc = L["Controls the amount of decimals used in values displayed on elements like NamePlates and UnitFrames."],
@@ -128,26 +153,8 @@ E.Options.args.general = {
 						E:StaticPopup_Show("CONFIG_RL")
 					end,
 				},
-				numberPrefixStyle = {
-					order = 11,
-					type = "select",
-					name = L["Unit Prefix Style"],
-					desc = L["The unit prefixes you want to use when values are shortened in ElvUI. This is mostly used on UnitFrames."],
-					set = function(info, value)
-						E.db.general.numberPrefixStyle = value
-						E:BuildPrefixValues()
-						E:StaticPopup_Show("CONFIG_RL")
-					end,
-					values = {
-						["CHINESE"] = "Chinese (W, Y)",
-						["ENGLISH"] = "English (K, M, B)",
-						["GERMAN"] = "German (Tsd, Mio, Mrd)",
-						["KOREAN"] = "Korean (천, 만, 억)",
-						["METRIC"] = "Metric (k, M, G)"
-					},
-				},
 				smoothingAmount = {
-					order = 12,
+					order = 16,
 					type = "range",
 					isPercent = true,
 					name = L["Smoothing Amount"],
@@ -159,7 +166,7 @@ E.Options.args.general = {
 					end,
 				},
 				locale = {
-					order = 13,
+					order = 17,
 					type = "select",
 					name = L["LANGUAGE"],
 					get = function(info) return E.global.general.locale end,
@@ -179,7 +186,36 @@ E.Options.args.general = {
 						["koKR"] = "한국어",
 						["itIT"] = "Italiano",
 					},
-				}
+				},
+				interruptAnnounce = {
+					order = 18,
+					name = L["Announce Interrupts"],
+					desc = L["Announce when you interrupt a spell to the specified chat channel."],
+					type = 'select',
+					values = {
+						['NONE'] = L["NONE"],
+						['SAY'] = L["SAY"],
+						['YELL'] = L["YELL"],
+						['PARTY'] = L["Party Only"],
+						['RAID'] = L["Party / Raid"],
+						['RAID_ONLY'] = L["Raid Only"],
+						["EMOTE"] = L["CHAT_MSG_EMOTE"],
+					},
+					set = function(info, value)
+						E.db.general[info[#info]] = value
+						if value == 'NONE' then
+							Misc:UnregisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+						else
+							Misc:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+						end
+					end,
+				},
+				autoRepair = {
+					order = 19,
+					name = L["Auto Repair"],
+					desc = L["Automatically repair using the following method when visiting a merchant."],
+					type = 'toggle',
+				},
 			},
 		},
 		media = {
@@ -189,13 +225,8 @@ E.Options.args.general = {
 			get = function(info) return E.db.general[info[#info]] end,
 			set = function(info, value) E.db.general[info[#info]] = value end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Media"],
-				},
 				fontGroup = {
-					order = 1,
+					order = 50,
 					name = L["Font"],
 					type = 'group',
 					guiInline = true,
@@ -259,7 +290,7 @@ E.Options.args.general = {
 					},
 				},
 				textureGroup = {
-					order = 2,
+					order = 51,
 					name = L["Textures"],
 					type = 'group',
 					guiInline = true,
@@ -312,7 +343,7 @@ E.Options.args.general = {
 					},
 				},
 				colorsGroup = {
-					order = 3,
+					order = 52,
 					name = L["Colors"],
 					type = 'group',
 					guiInline = true,
@@ -380,71 +411,13 @@ E.Options.args.general = {
 						},
 					},
 				},
-			},
-		},
-		chatBubblesGroup = {
-			order = 7,
-			type = "group",
-			name = L["Chat Bubbles"],
-			get = function(info) return E.private.general[info[#info]] end,
-			set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end,
-			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["Chat Bubbles"],
-				},
-				chatBubbles = {
-					order = 2,
-					type = "select",
-					name = L["Chat Bubbles Style"],
-					desc = L["Skin the blizzard chat bubbles."],
-					values = {
-						['backdrop'] = L["Skin Backdrop"],
-						['nobackdrop'] = L["Remove Backdrop"],
-						['backdrop_noborder'] = L["Skin Backdrop (No Borders)"],
-						['disabled'] = L["DISABLE"],
-					}
-				},
-				chatBubbleFont = {
-					order = 3,
-					type = "select",
-					name = L["Font"],
-					dialogControl = 'LSM30_Font',
-					values = AceGUIWidgetLSMlists.font,
-				},
-				chatBubbleFontSize = {
-					order = 4,
-					type = "range",
-					name = L["FONT_SIZE"],
-					min = 4, max = 212, step = 1,
-				},
-				chatBubbleFontOutline = {
-					order = 5,
-					type = "select",
-					name = L["Font Outline"],
-					values = C.Values.FontFlags,
-				},
-				chatBubbleName = {
-					order = 6,
-					type = "toggle",
-					name = L["Chat Bubble Names"],
-					desc = L["Display the name of the unit on the chat bubble. This will not work if backdrop is disabled or when you are in an instance."],
-				},
-			},
+			}
 		},
 		blizzUIImprovements = {
-			order = 11,
+			order = 20,
 			type = "group",
 			name = L["BlizzUI Improvements"],
-			get = function(info) return E.db.general[info[#info]] end,
-			set = function(info, value) E.db.general[info[#info]] = value end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["BlizzUI Improvements"],
-				},
 				loot = {
 					order = 1,
 					type = "toggle",
@@ -473,6 +446,14 @@ E.Options.args.general = {
 					name = L["Enhanced PVP Messages"],
 					desc = L["Display battleground messages in the middle of the screen."],
 				},
+				showMissingTalentAlert = {
+					order = 5,
+					type = "toggle",
+					name = L["Missing Talent Alert"],
+					desc = L["Show an alert frame if you have unspend talent points."],
+					get = function(info) return E.global.general.showMissingTalentAlert end,
+					set = function(info, value) E.global.general.showMissingTalentAlert = value; E:StaticPopup_Show("GLOBAL_RL") end,
+				},
 				raidUtility = {
 					order = 6,
 					type = "toggle",
@@ -481,157 +462,168 @@ E.Options.args.general = {
 					get = function(info) return E.private.general.raidUtility end,
 					set = function(info, value) E.private.general.raidUtility = value; E:StaticPopup_Show("PRIVATE_RL") end
 				},
-				objectiveTracker = {
-					order = 8,
-					type = 'toggle',
-					name = L["ObjectiveTracker Enhancements"],
-				},
-				resurrectSound = {
-					order = 9,
-					type = 'toggle',
-					name = L["Resurrect Sound"],
-					desc = L["Enable to hear sound if you receive a resurrect."],
+				voiceOverlay = {
+					order = 7,
+					type = "toggle",
+					name = L["Voice Overlay"],
+					desc = L["Replace Blizzard's Voice Overlay."],
+					get = function(info) return E.private.general.voiceOverlay end,
+					set = function(info, value) E.private.general.voiceOverlay = value; E:StaticPopup_Show("PRIVATE_RL") end
 				},
 				durabilityScale = {
-					order = 10,
+					order = 11,
 					type = "range",
 					name = L["Durability Scale"],
 					min = 0.5, max = 8, step = 0.5,
 					get = function(info) return E.db.general.durabilityScale end,
 					set = function(info, value) E.db.general.durabilityScale = value; E:StaticPopup_Show("PRIVATE_RL") end,
 				},
---[=[
-				itemLevelInfo = {
-					order = 11,
-					name = L["Item Level"],
-					type = 'group',
+				--itemLevelInfo = {
+				--	order = 13,
+				--	name = L["Item Level"],
+				--	type = 'group',
+				--	guiInline = true,
+				--	get = function(info) return E.db.general.itemLevel[info[#info]] end,
+				--	args = {
+				--		displayCharacterInfo = {
+				--			order = 1,
+				--			type = "toggle",
+				--			name = L["Display Character Info"],
+				--			desc = L["Shows item level of each item, enchants, and gems on the character page."],
+				--			set = function(info, value)
+				--				E.db.general.itemLevel.displayCharacterInfo = value;
+				--				Misc:ToggleItemLevelInfo()
+				--			end
+				--		},
+				--		displayInspectInfo = {
+				--			order = 2,
+				--			type = "toggle",
+				--			name = L["Display Inspect Info"],
+				--			desc = L["Shows item level of each item, enchants, and gems when inspecting another player."],
+				--			set = function(info, value)
+				--				E.db.general.itemLevel.displayInspectInfo = value;
+				--				Misc:ToggleItemLevelInfo()
+				--			end
+				--		},
+				--		fontGroup = {
+				--			order = 3,
+				--			type = 'group',
+				--			name = L["Fonts"],
+				--			disabled = function() return not E.db.general.itemLevel.displayCharacterInfo and not E.db.general.itemLevel.displayInspectInfo end,
+				--			get = function(info) return E.db.general.itemLevel[info[#info]] end,
+				--			set = function(info, value)
+				--				E.db.general.itemLevel[info[#info]] = value
+				--				Misc:UpdateInspectPageFonts("Character")
+				--				Misc:UpdateInspectPageFonts("Inspect")
+				--			end,
+				--			args = {
+				--				itemLevelFont = {
+				--					order = 1,
+				--					type = "select",
+				--					name = L["Font"],
+				--					dialogControl = 'LSM30_Font',
+				--					values = AceGUIWidgetLSMlists.font,
+				--				},
+				--				itemLevelFontSize = {
+				--					order = 2,
+				--					type = "range",
+				--					name = L["FONT_SIZE"],
+				--					min = 4, max = 40, step = 1,
+				--				},
+				--				itemLevelFontOutline = {
+				--					order = 3,
+				--					type = "select",
+				--					name = L["Font Outline"],
+				--					values = C.Values.FontFlags,
+				--				},
+				--			},
+				--		},
+				--	},
+				--},
+				--objectiveFrameGroup = {
+				--	order = 14,
+				--	type = "group",
+				--	guiInline = true,
+				--	name = L["Objective Frame"],
+				--	get = function(info) return E.db.general[info[#info]] end,
+				--	args = {
+				--		objectiveFrameAutoHide = {
+				--			order = 31,
+				--			type = "toggle",
+				--			name = L["Auto Hide"],
+				--			desc = L["Automatically hide the objetive frame during boss or arena fights."],
+				--			disabled = function() return IsAddOnLoaded("!KalielsTracker") end,
+				--			set = function(info, value) E.db.general.objectiveFrameAutoHide = value; Blizzard:SetObjectiveFrameAutoHide(); end,
+				--		},
+				--		objectiveFrameHeight = {
+				--			order = 32,
+				--			type = 'range',
+				--			name = L["Objective Frame Height"],
+				--			desc = L["Height of the objective tracker. Increase size to be able to see more objectives."],
+				--			min = 400, max = E.screenheight, step = 1,
+				--			set = function(info, value) E.db.general.objectiveFrameHeight = value; Blizzard:SetObjectiveFrameHeight(); end,
+				--		},
+				--		bonusObjectivePosition = {
+				--			order = 33,
+				--			type = 'select',
+				--			name = L["Bonus Reward Position"],
+				--			desc = L["Position of bonus quest reward frame relative to the objective tracker."],
+				--			values = {
+				--				['RIGHT'] = L["Right"],
+				--				['LEFT'] = L["Left"],
+				--				['AUTO'] = L["Automatic"],
+				--			},
+				--		},
+				--	},
+				--},
+				chatBubblesGroup = {
+					order = 13,
+					type = "group",
 					guiInline = true,
-					get = function(info) return E.db.general.itemLevel[info[#info]] end,
+					name = L["Chat Bubbles"],
+					get = function(info) return E.private.general[info[#info]] end,
+					set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end,
 					args = {
-						displayCharacterInfo = {
-							order = 1,
-							type = "toggle",
-							name = L["Display Character Info"],
-							desc = L["Shows item level of each item, enchants, and gems on the character page."],
-							set = function(info, value)
-								E.db.general.itemLevel.displayCharacterInfo = value;
-								Misc:ToggleItemLevelInfo()
-							end
-						},
-						displayInspectInfo = {
+						chatBubbles = {
 							order = 2,
-							type = "toggle",
-							name = L["Display Inspect Info"],
-							desc = L["Shows item level of each item, enchants, and gems when inspecting another player."],
-							set = function(info, value)
-								E.db.general.itemLevel.displayInspectInfo = value;
-								Misc:ToggleItemLevelInfo()
-							end
+							type = "select",
+							name = L["Chat Bubbles Style"],
+							desc = L["Skin the blizzard chat bubbles."],
+							values = {
+								['backdrop'] = L["Skin Backdrop"],
+								['nobackdrop'] = L["Remove Backdrop"],
+								['backdrop_noborder'] = L["Skin Backdrop (No Borders)"],
+								['disabled'] = L["DISABLE"],
+							}
 						},
-						fontGroup = {
+						chatBubbleFont = {
 							order = 3,
-							type = 'group',
-							name = L["Fonts"],
-							disabled = function() return not E.db.general.itemLevel.displayCharacterInfo and not E.db.general.itemLevel.displayInspectInfo end,
-							get = function(info) return E.db.general.itemLevel[info[#info]] end,
-							set = function(info, value)
-								E.db.general.itemLevel[info[#info]] = value
-								Misc:UpdateInspectPageFonts("Character")
-								Misc:UpdateInspectPageFonts("Inspect")
-							end,
-							args = {
-								itemLevelFont = {
-									order = 1,
-									type = "select",
-									name = L["Font"],
-									dialogControl = 'LSM30_Font',
-									values = AceGUIWidgetLSMlists.font,
-								},
-								itemLevelFontSize = {
-									order = 2,
-									type = "range",
-									name = L["FONT_SIZE"],
-									min = 4, max = 40, step = 1,
-								},
-								itemLevelFontOutline = {
-									order = 3,
-									type = "select",
-									name = L["Font Outline"],
-									values = C.Values.FontFlags,
-								},
-							},
+							type = "select",
+							name = L["Font"],
+							dialogControl = 'LSM30_Font',
+							values = AceGUIWidgetLSMlists.font,
+						},
+						chatBubbleFontSize = {
+							order = 4,
+							type = "range",
+							name = L["FONT_SIZE"],
+							min = 4, max = 212, step = 1,
+						},
+						chatBubbleFontOutline = {
+							order = 5,
+							type = "select",
+							name = L["Font Outline"],
+							values = C.Values.FontFlags,
+						},
+						chatBubbleName = {
+							order = 6,
+							type = "toggle",
+							name = L["Chat Bubble Names"],
+							desc = L["Display the name of the unit on the chat bubble. This will not work if backdrop is disabled or when you are in an instance."],
 						},
 					},
-				},
-]=]
-			},
-		},
-		misc = {
-			order = 20,
-			type = "group",
-			name = L["Miscellaneous"],
-			get = function(info) return E.db.general[info[#info]] end,
-			set = function(info, value) E.db.general[info[#info]] = value end,
-			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Miscellaneous"],
-				},
-				interruptAnnounce = {
-					order = 1,
-					name = L["Announce Interrupts"],
-					desc = L["Announce when you interrupt a spell to the specified chat channel."],
-					type = 'select',
-					values = {
-						['NONE'] = L["NONE"],
-						['SAY'] = L["SAY"],
-						['YELL'] = L["YELL"],
-						['PARTY'] = L["Party Only"],
-						['RAID'] = L["Party / Raid"],
-						['RAID_ONLY'] = L["Raid Only"],
-						["EMOTE"] = L["CHAT_MSG_EMOTE"],
-					},
-					set = function(info, value)
-						E.db.general[info[#info]] = value
-						if value == 'NONE' then
-							Misc:UnregisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
-						else
-							Misc:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
-						end
-					end,
-				},
-				autoRepair = {
-					order = 2,
-					name = L["Auto Repair"],
-					desc = L["Automatically repair using the following method when visiting a merchant."],
-					type = 'select',
-					values = {
-						['NONE'] = L["NONE"],
-						['PLAYER'] = L["PLAYER"],
-					},
-				},
-				autoAcceptInvite = {
-					order = 3,
-					name = L["Accept Invites"],
-					desc = L["Automatically accept invites from guild/friends."],
-					type = 'toggle',
-				},
-				autoRoll = {
-					order = 4,
-					name = L["Auto Greed/DE"],
-					desc = L["Automatically select greed or disenchant (when available) on green quality items. This will only work if you are the max level."],
-					type = 'toggle',
-					disabled = function() return not E.private.general.lootRoll end
-				},
-				questRewardMostValueIcon = {
-					order = 5,
-					type = "toggle",
-					name = L["Mark Quest Reward"],
-					desc = L["Marks the most valuable quest reward with a gold coin."],
 				},
 			},
 		},
 	},
 }
-

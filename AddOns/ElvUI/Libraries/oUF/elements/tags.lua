@@ -431,11 +431,11 @@ local tagEvents = {
 	['affix']               = 'UNIT_CLASSIFICATION_CHANGED',
 	['classification']      = 'UNIT_CLASSIFICATION_CHANGED',
 	['cpoints']             = 'UNIT_POWER_FREQUENT PLAYER_TARGET_CHANGED',
-	['curhp']               = 'UNIT_HEALTH UNIT_MAXHEALTH',
+	['curhp']               = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH',
 	['curmana']             = 'UNIT_POWER_UPDATE UNIT_MAXPOWER',
 	['curpp']               = 'UNIT_POWER_UPDATE UNIT_MAXPOWER',
-	['dead']                = 'UNIT_HEALTH',
-	['deficit:name']        = 'UNIT_HEALTH UNIT_MAXHEALTH UNIT_NAME_UPDATE',
+	['dead']                = 'UNIT_HEALTH_FREQUENT',
+	['deficit:name']        = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE',
 	['difficulty']          = 'UNIT_FACTION',
 	['faction']             = 'UNIT_FACTION',
 	['group']               = 'GROUP_ROSTER_UPDATE',
@@ -445,11 +445,11 @@ local tagEvents = {
 	['maxhp']               = 'UNIT_MAXHEALTH',
 	['maxmana']             = 'UNIT_POWER_UPDATE UNIT_MAXPOWER',
 	['maxpp']               = 'UNIT_MAXPOWER',
-	['missinghp']           = 'UNIT_HEALTH UNIT_MAXHEALTH',
+	['missinghp']           = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH',
 	['missingpp']           = 'UNIT_MAXPOWER UNIT_POWER_UPDATE',
 	['name']                = 'UNIT_NAME_UPDATE',
-	['offline']             = 'UNIT_HEALTH UNIT_CONNECTION',
-	['perhp']               = 'UNIT_HEALTH UNIT_MAXHEALTH',
+	['offline']             = 'UNIT_HEALTH_FREQUENT UNIT_CONNECTION',
+	['perhp']               = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH',
 	['perpp']               = 'UNIT_MAXPOWER UNIT_POWER_UPDATE',
 	['plus']                = 'UNIT_CLASSIFICATION_CHANGED',
 	['powercolor']          = 'UNIT_DISPLAYPOWER',
@@ -458,7 +458,7 @@ local tagEvents = {
 	['resting']             = 'PLAYER_UPDATE_RESTING',
 	['shortclassification'] = 'UNIT_CLASSIFICATION_CHANGED',
 	['smartlevel']          = 'UNIT_LEVEL PLAYER_LEVEL_UP UNIT_CLASSIFICATION_CHANGED',
-	['status']              = 'UNIT_HEALTH PLAYER_UPDATE_RESTING UNIT_CONNECTION',
+	['status']              = 'UNIT_HEALTH_FREQUENT PLAYER_UPDATE_RESTING UNIT_CONNECTION',
 }
 
 local unitlessEvents = {
@@ -494,7 +494,7 @@ local function createOnUpdate(timer)
 		frame:SetScript('OnUpdate', function(self, elapsed)
 			if(total >= timer) then
 				for _, fs in next, strings do
-					if(fs:IsShown() and fs.parent:IsShown() and unitExists(fs.parent.unit)) then -- ElvUI adds fs IsShown
+					if(fs.parent:IsShown() and unitExists(fs.parent.unit)) then
 						fs:UpdateTag()
 					end
 				end
@@ -607,69 +607,18 @@ local function getTagFunc(tagstr)
 			-- end block
 		end
 
-		if(numTags == 1) then
-			func = function(self)
-				local parent = self.parent
-				local realUnit
-				if(self.overrideUnit) then
-					realUnit = parent.realUnit
-				end
-
-				_ENV._COLORS = parent.colors
-				_ENV._FRAME = parent
-				return self:SetFormattedText(
-					format,
-					args[1](parent.unit, realUnit) or ''
-				)
-			end
-		elseif(numTags == 2) then
+		if numTags ~= -1 then -- ElvUI replaced
 			func = function(self)
 				local parent = self.parent
 				local unit = parent.unit
-				local realUnit
-				if(self.overrideUnit) then
-					realUnit = parent.realUnit
-				end
+
+				local customArgs = parent.__customargs
+				local realUnit = self.overrideUnit and parent.realUnit
 
 				_ENV._COLORS = parent.colors
 				_ENV._FRAME = parent
-				return self:SetFormattedText(
-					format,
-					args[1](unit, realUnit) or '',
-					args[2](unit, realUnit) or ''
-				)
-			end
-		elseif(numTags == 3) then
-			func = function(self)
-				local parent = self.parent
-				local unit = parent.unit
-				local realUnit
-				if(self.overrideUnit) then
-					realUnit = parent.realUnit
-				end
-
-				_ENV._COLORS = parent.colors
-				_ENV._FRAME = parent
-				return self:SetFormattedText(
-					format,
-					args[1](unit, realUnit) or '',
-					args[2](unit, realUnit) or '',
-					args[3](unit, realUnit) or ''
-				)
-			end
-		elseif numTags ~= -1 then -- ElvUI changed (from else)
-			func = function(self)
-				local parent = self.parent
-				local unit = parent.unit
-				local realUnit
-				if(self.overrideUnit) then
-					realUnit = parent.realUnit
-				end
-
-				_ENV._COLORS = parent.colors
-				_ENV._FRAME = parent
-				for i, func in next, args do
-					tmp[i] = func(unit, realUnit) or ''
+				for i, fnc in next, args do
+					tmp[i] = fnc(unit, realUnit, customArgs[self]) or ''
 				end
 
 				-- We do 1, numTags because tmp can hold several unneeded variables.
@@ -736,6 +685,7 @@ local function Tag(self, fs, tagstr, ...)
 	if(not self.__tags) then
 		self.__tags = {}
 		self.__mousetags = {} -- ElvUI
+		self.__customargs = {} -- ElvUI
 
 		tinsert(self.__elements, Update)
 	elseif(self.__tags[fs]) then
@@ -749,6 +699,14 @@ local function Tag(self, fs, tagstr, ...)
 		while tagstr:find(escapeSequence) do
 			tagstr = tagstr:gsub(escapeSequence, replacement)
 		end
+	end
+
+	local customArgs = tagstr:match('{(.-)}%]')
+	if customArgs then
+		self.__customargs[fs] = customArgs
+		tagstr = tagstr:gsub('{.-}%]', ']')
+	else
+		self.__customargs[fs] = nil
 	end
 
 	if tagstr:find('%[mouseover%]') then

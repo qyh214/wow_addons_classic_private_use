@@ -48,10 +48,6 @@ The following options are listed by priority. The first check that returns true 
 .multiplier - A multiplier used to tint the background based on the main widgets R, G and B values. Defaults to 1
               (number)[0-1]
 
-## Attributes
-
-.disconnected - Indicates whether the unit is disconnected (boolean)
-
 ## Examples
 
     -- Position and size
@@ -92,7 +88,7 @@ local function UpdateColor(self, event, unit)
 	local ptype, ptoken, altR, altG, altB = UnitPowerType(unit)
 
 	local r, g, b, t, atlas
-	if(element.colorDisconnected and element.disconnected) then
+	if(element.colorDisconnected and not UnitIsConnected(unit)) then
 		t = self.colors.disconnected
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		t = self.colors.tapped
@@ -177,11 +173,10 @@ local function Update(self, event, unit)
 	end
 
 	local cur, max = UnitPower(unit), UnitPowerMax(unit)
-	local disconnected = not UnitIsConnected(unit)
 
 	element:SetMinMaxValues(0, max)
 
-	if(disconnected) then
+	if not UnitIsConnected(unit) then
 		element:SetValue(max)
 	else
 		element:SetValue(cur)
@@ -190,7 +185,6 @@ local function Update(self, event, unit)
 	element.cur = cur
 	element.min = 0
 	element.max = max
-	element.disconnected = disconnected
 
 	--[[ Callback: Power:PostUpdate(unit, cur, min, max)
 	Called after the element has been updated.
@@ -279,6 +273,7 @@ local function SetFrequentUpdates(element, state)
 	end
 end
 
+-- ElvUI changed block
 local onUpdateElapsed, onUpdateWait = 0, 0.25
 local function onUpdatePower(self, elapsed)
 	if onUpdateElapsed > onUpdateWait then
@@ -314,6 +309,7 @@ local function SetPowerUpdateMethod(self, state, force)
 		end
 	end
 end
+-- end block
 
 local function Enable(self)
 	local element = self.Power
@@ -324,9 +320,11 @@ local function Enable(self)
 		element.SetColorTapping = SetColorTapping
 		element.SetFrequentUpdates = SetFrequentUpdates
 
+		-- ElvUI changed block
 		self.SetPowerUpdateSpeed = SetPowerUpdateSpeed
 		self.SetPowerUpdateMethod = SetPowerUpdateMethod
 		SetPowerUpdateMethod(self, self.effectivePower, true)
+		-- end block
 
 		if(element.colorDisconnected) then
 			self:RegisterEvent('UNIT_CONNECTION', ColorPath)
@@ -360,7 +358,7 @@ local function Disable(self)
 	if(element) then
 		element:Hide()
 
-		element:SetScript('OnUpdate', nil)
+		element:SetScript('OnUpdate', nil) -- ElvUI changed
 		self:UnregisterEvent('UNIT_DISPLAYPOWER', Path)
 		self:UnregisterEvent('UNIT_MAXPOWER', Path)
 		self:UnregisterEvent('UNIT_POWER_BAR_HIDE', Path)

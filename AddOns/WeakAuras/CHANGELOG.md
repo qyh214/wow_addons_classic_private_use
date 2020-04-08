@@ -1,31 +1,26 @@
-# [2.16.1](https://github.com/WeakAuras/WeakAuras2/tree/2.16.1) (2020-01-17)
+# [2.16.6](https://github.com/WeakAuras/WeakAuras2/tree/2.16.6) (2020-02-14)
 
-[Full Changelog](https://github.com/WeakAuras/WeakAuras2/compare/2.16.0...2.16.1)
+[Full Changelog](https://github.com/WeakAuras/WeakAuras2/compare/2.16.5...2.16.6)
 
 ## Highlights
 
- Bug fixes! 
+ - Actually enable templates for classic
+- Bug fixes 
 
 ## Commits
 
-InfusOnWoW (5):
+InfusOnWoW (4):
 
-- Fix the wrong init function being run
-- Use Encounter Journal as a source of the encounter_ids
-- Fix the Custom Code Editor for Conditions
-- Interpret a missing glowType as a standard buttonOverlay
-- Fix %cost not always being interpreted as %cost and a infinite loop
+- BuffTrigger2: Fix ghost states
+- Fix Masque integration with clones and zoom/keep aspect ratio
+- Adjust conditions on moving/deleting/duplicating conditions
+- Fix multiple display of encounter ids
 
-Stanzilla (1):
+emptyrivers (1):
 
-- Prevent the next French revolution
+- add 'reset entry' button to arrays in user mode
 
-mrbuds (2):
+mrbuds (1):
 
-- fix Alternate Power trigger not active without a first UNIT_POWER_FREQUENT event
-- Use LibClassicSpellActionCount-1.0 to get number of reagents for spells fixes #1849
-
-nullKomplex (1):
-
-- Change default text region custom text update value to match updated subregions texts.
+- classic: WeakAurasTemplates was not moved to correct folder
 

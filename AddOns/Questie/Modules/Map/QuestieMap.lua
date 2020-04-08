@@ -64,8 +64,10 @@ function QuestieMap:GetFramesForQuest(questId)
     local frames = {}
     --If no frames exists or if the quest does not exist we just return an empty list
     if (QuestieMap.questIdFrames[questId]) then
-        for i, name in ipairs(QuestieMap.questIdFrames[questId]) do
-            tinsert(frames, _G[name])
+        for i, name in pairs(QuestieMap.questIdFrames[questId]) do
+            if _G[name] then
+                frames[name] = _G[name]
+            end
         end
     end
     return frames
@@ -73,15 +75,17 @@ end
 
 function QuestieMap:UnloadQuestFrames(questId, iconType)
     if(QuestieMap.questIdFrames[questId]) then
-        if(iconType == nil) then
-            for _, frame in ipairs(QuestieMap:GetFramesForQuest(questId)) do
+        if iconType == nil then
+            for _, frame in pairs(QuestieMap:GetFramesForQuest(questId)) do
                 frame:Unload();
             end
             QuestieMap.questIdFrames[questId] = nil;
         else
-            for _, frame in ipairs(QuestieMap:GetFramesForQuest(questId)) do
-                if(frame and frame.data and frame.data.Icon == iconType) then
+            for name, frame in pairs(QuestieMap:GetFramesForQuest(questId)) do
+                if frame and frame.data and frame.data.Icon == iconType then
                     frame:Unload();
+                    QuestieMap.questIdFrames[questId][name] = nil
+                    _G[name] = nil
                 end
             end
         end
@@ -109,6 +113,12 @@ function QuestieMap:UnloadManualFrames(id)
             frame:Unload();
         end
         QuestieMap.manualFrames[id] = nil;
+    end
+end
+
+function QuestieMap:ResetManualFrames()
+    for id, _ in pairs(QuestieMap.manualFrames) do
+        QuestieMap:UnloadManualFrames(id)
     end
 end
 
@@ -147,7 +157,7 @@ end
 -- Rescale all the icons
 function QuestieMap:RescaleIcons(modifier)
     for _, framelist in pairs(QuestieMap.questIdFrames) do
-        for _, frameName in ipairs(framelist) do
+        for _, frameName in pairs(framelist) do
             rescaleIcon(frameName, modifier)
         end
     end
@@ -253,7 +263,7 @@ function QuestieMap:ShowNPC(npcID)
     end
     -- get the NPC data
     local npc = QuestieDB:GetNPC(npcID)
-    if npc == nil then return end
+    if npc == nil or npc.spawns == nil then return end
 
     -- create the icon data
     local data = {}
@@ -449,8 +459,12 @@ function QuestieMap:DrawWorldIcon(data, areaID, x, y, showFlag)
         error("Questie".."Data.Id must be set to the quests ID!")
     end
     if ZoneDataAreaIDToUiMapID[areaID] == nil then
-        error("No UiMapID for ("..tostring(ZoneDataAreaIDToUiMapID[areaID])..") :".. areaID .. tostring(data.Name))
-        return nil, nil
+        if QuestieZoneToParentTable[areaID] == nil then
+            error("No UiMapID for ("..tostring(ZoneDataAreaIDToUiMapID[areaID])..") :".. areaID .. tostring(data.Name))
+            return nil, nil
+        else
+            areaID = QuestieZoneToParentTable[areaID]
+        end
     end
 
     if(showFlag == nil) then
@@ -460,6 +474,7 @@ function QuestieMap:DrawWorldIcon(data, areaID, x, y, showFlag)
     -- if(floatOnEdge == nil) then floatOnEdge = true; end
     local floatOnEdge = true
 
+    ---@type IconFrame
     local iconMap = QuestieFramePool:GetFrame()
     iconMap.data = data
     iconMap.x = x
@@ -469,6 +484,7 @@ function QuestieMap:DrawWorldIcon(data, areaID, x, y, showFlag)
     iconMap.miniMapIcon = false;
     iconMap:UpdateTexture(data.Icon);
 
+    ---@type IconFrame
     local iconMinimap = QuestieFramePool:GetFrame()
     iconMinimap.data = data
     iconMinimap.x = x
@@ -562,26 +578,23 @@ function QuestieMap:DrawWorldIcon(data, areaID, x, y, showFlag)
         QuestieMap.questIdFrames[data.Id] = {}
     end
 
-    tinsert(QuestieMap.questIdFrames[data.Id], iconMap:GetName())
-    tinsert(QuestieMap.questIdFrames[data.Id], iconMinimap:GetName())
+    -- tinsert(QuestieMap.questIdFrames[data.Id], iconMap:GetName())
+    -- tinsert(QuestieMap.questIdFrames[data.Id], iconMinimap:GetName())
+    QuestieMap.questIdFrames[data.Id][iconMap:GetName()] = iconMap:GetName()
+    QuestieMap.questIdFrames[data.Id][iconMinimap:GetName()] = iconMinimap:GetName()
 
 
     --Hide unexplored logic
-    if(not QuestieMap.utils:IsExplored(iconMap.UiMapID, x, y) and questieGlobalDB.hideUnexploredMapIcons) then
+    if(not QuestieMap.utils:IsExplored(iconMap.UiMapID, x, y) and Questie.db.char.hideUnexploredMapIcons) then
         iconMap:FakeHide()
         iconMinimap:FakeHide()
     end
 
-    -- preset hidden state when needed (logic from QuestieQuest:UpdateHiddenNotes
-    -- we should add all this code to something like obj:CheckHide() instead of copying it
-    if (QuestieQuest.NotesHidden or (((not questieGlobalDB.enableObjectives) and (iconMap.data.Type == "monster" or iconMap.data.Type == "object" or iconMap.data.Type == "event" or iconMap.data.Type == "item"))
-                or ((not questieGlobalDB.enableTurnins) and iconMap.data.Type == "complete")
-                or ((not questieGlobalDB.enableAvailable) and iconMap.data.Type == "available"))
-                or ((not questieGlobalDB.enableMapIcons) and (not iconMap.miniMapIcon))
-                or ((not questieGlobalDB.enableMiniMapIcons) and (iconMinimap.miniMapIcon)))
-                or (iconMap.data.ObjectiveData and iconMap.data.ObjectiveData.HideIcons)
-                or (iconMap.data.QuestData and iconMap.data.QuestData.HideIcons and iconMap.data.Type ~= "complete") then
+    if iconMap:ShouldBeHidden() then
         iconMap:FakeHide()
+    end
+
+    if iconMinimap:ShouldBeHidden() then
         iconMinimap:FakeHide()
     end
 
@@ -709,6 +722,9 @@ function QuestieMap:FindClosestStarter()
 end
 
 function QuestieMap:GetNearestSpawn(objective)
+    if objective == nil then
+        return nil
+    end
     local playerX, playerY, playerI = HBD:GetPlayerWorldPosition()
     local bestDistance = 999999999
     local bestSpawn, bestSpawnZone, bestSpawnId, bestSpawnType, bestSpawnName
@@ -740,6 +756,9 @@ function QuestieMap:GetNearestSpawn(objective)
 end
 
 function QuestieMap:GetNearestQuestSpawn(quest)
+    if quest == nil then
+        return nil
+    end
     if QuestieQuest:IsComplete(quest) == 1 then
         local finisher = nil
         if quest.Finisher ~= nil then

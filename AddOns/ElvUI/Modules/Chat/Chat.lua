@@ -148,49 +148,65 @@ function CH:AddSmiley(key, texture)
 	end
 end
 
-local specialChatIcons, itsSimpy, SimpysText
+local specialChatIcons
 do --this can save some main file locals
 	local x, y = ':16:16',':13:25'
-	--local ElvMelon		= E:TextureString(E.Media.ChatLogos.ElvMelon,y)
-	--local ElvRainbow	= E:TextureString(E.Media.ChatLogos.ElvRainbow,y)
-	local ElvRed		= E:TextureString(E.Media.ChatLogos.ElvRed,y)
-	local ElvOrange		= E:TextureString(E.Media.ChatLogos.ElvOrange,y)
-	local ElvYellow		= E:TextureString(E.Media.ChatLogos.ElvYellow,y)
-	local ElvGreen		= E:TextureString(E.Media.ChatLogos.ElvGreen,y)
+
 	local ElvBlue		= E:TextureString(E.Media.ChatLogos.ElvBlue,y)
-	local ElvPurple		= E:TextureString(E.Media.ChatLogos.ElvPurple,y)
+	local ElvGreen		= E:TextureString(E.Media.ChatLogos.ElvGreen,y)
+	local ElvMelon		= E:TextureString(E.Media.ChatLogos.ElvMelon,y)
+	local ElvOrange		= E:TextureString(E.Media.ChatLogos.ElvOrange,y)
 	local ElvPink		= E:TextureString(E.Media.ChatLogos.ElvPink,y)
-	--local Bathrobe		= E:TextureString(E.Media.ChatLogos.Bathrobe,x)
-	--local MrHankey		= E:TextureString(E.Media.ChatLogos.MrHankey,x)
-	--local Rainbow		= E:TextureString(E.Media.ChatLogos.Rainbow,x)
+	local ElvPurple		= E:TextureString(E.Media.ChatLogos.ElvPurple,y)
+	local ElvRed		= E:TextureString(E.Media.ChatLogos.ElvRed,y)
+	local ElvYellow		= E:TextureString(E.Media.ChatLogos.ElvYellow,y)
+	local Bathrobe		= E:TextureString(E.Media.ChatLogos.Bathrobe,x)
+	local MrHankey		= E:TextureString(E.Media.ChatLogos.MrHankey,x)
+	local Rainbow		= E:TextureString(E.Media.ChatLogos.Rainbow,x)
+	local Hibiscus		= E:TextureString(E.Media.ChatLogos.Hibiscus,x)
+	local Clover		= E:TextureString(E.Media.ChatLogos.Clover,x)
+	local Burger		= E:TextureString(E.Media.ChatLogos.Burger,x)
+	local Lion			= E:TextureString(E.Media.ChatLogos.Lion,x)
 
-	do	-- simpy chaos:
-		--- new icon color every message, in order then reversed back, repeatedly
+	--[[ Simpys Thing: new icon color every message, in order then reversed back, repeating of course
 		local a, b, c = 0, false, {ElvRed, ElvOrange, ElvYellow, ElvGreen, ElvBlue, ElvPurple, ElvPink}
-		itsSimpy = function() a = a - (b and 1 or -1) if (b and a == 1 or a == 0) or a == #c then b = not b end return c[a] end
+		(a = a - (b and 1 or -1) if (b and a == 1 or a == 0) or a == #c then b = not b end return c[a])
+	]]
 
-		--- gradient text, ignoring hyperlinks and keywords
-		local e, f, g = {'|%x+|H.-|h.-|h|r', '|H.-|h.-|h', '|T.-|t', '|c.-|r'}, {}, {}
-		local gradient = function(t) return gsub(gsub(E:TextGradient(gsub(gsub(t,'%%%%','\27'),'\124\124','\26'), 0.31,0.85,0.82, 0.33,0.89,0.50, 0.84,0.85,0.20, 0.87,0.64,0.33, 0.93,0.53,0.47, 0.97,0.44,0.81, 0.72,0.33,0.87, 0.31,0.85,0.82),'\27','%%%%'),'\26','||') end
-		local protect = function(t, u, v) local w = E:EscapeString(v) local r, s = strfind(u, w) while f[r] do r, s = strfind(u, w, s) end tinsert(g, r) f[r] = w return gsub(t, w, '\24') end
-		SimpysText = function(t) local u = t
-			for _, w in ipairs(e) do for k in gmatch(t, w) do t = protect(t, u, k) end end
-			t = gradient(t) --Light Spring: '50dad3','56e580','d8da33','dfa455','ee8879','f972d1','b855df','50dad3'
-			if next(g) then if #g > 1 then sort(g) end for n in gmatch(t, '\24') do local _, v = next(g) t = gsub(t, n, f[v], 1) tremove(g, 1) f[v] = nil end end
-			return t
+	local itsElv, itsSimpyA, itsSimpyH
+	do	--Simpy Chaos: super cute text coloring function that ignores hyperlinks and keywords
+		local e, f, g = {'|[TA].-|[ta]', '|?c?%x-%[?|H.-|h.-|h]?|?r?', '|c.-|r'}, {}, {}
+		local prettify = function(t,...) return gsub(gsub(E:TextGradient(gsub(gsub(t,'%%%%','\27'),'\124\124','\26'),...),'\27','%%%%'),'\26','||') end
+		local protectText = function(t, u, v) local w = E:EscapeString(v) local r, s = strfind(u, w) while f[r] do r, s = strfind(u, w, s) end tinsert(g, r) f[r] = w return gsub(t, w, '\24') end
+		local specialText = function(t,...) local u = t for _, w in ipairs(e) do for k in gmatch(t, w) do t = protectText(t, u, k) end end t = prettify(t,...)
+			if next(g) then if #g > 1 then sort(g) end for n in gmatch(t, '\24') do local _, v = next(g) t = gsub(t, n, f[v], 1) tremove(g, 1) f[v] = nil end end return t
 		end
+
+		--Watermelon: 909090 (Light Slate Grey), FA6687 (Light Coral) x2, 73FA9B (Pale Green)
+		local SimpyColors = function(t) return specialText(t, 0.45,0.45,0.45, 0.98,0.4,0.53, 0.98,0.4,0.53, 0.45,0.98,0.45) end
+		--Detroit Lions Colors: Honolulu Blue to Silver [Elv: I stoles it @Simpy]
+		local ElvColors = function(t) return specialText(t, 0,0.42,0.69, 0.61,0.61,0.61) end
+
+		itsSimpyH = function() return Burger..ElvMelon, SimpyColors end
+		itsSimpyA = function() return Lion..ElvMelon, SimpyColors end
+		itsElv = function() return ElvBlue, ElvColors end
 	end
 
 	specialChatIcons = {
 		-- Simpy
-		["Simpy-Atiesh"]		= itsSimpy, -- Warlock
-		["Simpy-Myzrael"]		= itsSimpy, -- Warlock
-		["Cutepally-Myzrael"]	= itsSimpy, -- Paladin
-		["Imsocheesy-Myzrael"]	= itsSimpy, -- [Horde] Priest
-		["Imsospicy-Myzrael"]	= itsSimpy, -- [Horde] Mage
+		["Simpy-Atiesh"]		= itsSimpyA, -- Warlock
+		["Simpy-Myzrael"]		= itsSimpyA, -- Warlock
+		["Cutepally-Myzrael"]	= itsSimpyA, -- Paladin
+		["Imsocheesy-Myzrael"]	= itsSimpyH, -- [Horde] Priest
+		["Imsospicy-Myzrael"]	= itsSimpyH, -- [Horde] Mage
 		-- Blazeflack
 		["Freezly-MirageRaceway"]	= ElvBlue, -- Mage
 		["Blazii-MirageRaceway"]	= ElvBlue, -- Priest
+		-- Luckyone
+		["Luckyone-Shazzrah"]		= Clover, -- Hunter
+		["Luckyfear-Shazzrah"]		= Clover, -- Warlock
+		["Luckydruid-Shazzrah"]		= Clover, -- Druid
+		["Elvuidevtest-Shazzrah"]	= Clover, -- Warrior
 	}
 end
 
@@ -526,7 +542,7 @@ do
 	end
 	removeIconFromLine = function(text)
 		text = gsub(text, "|TInterface\\TargetingFrame\\UI%-RaidTargetingIcon_(%d+):0|t", raidIconFunc) --converts raid icons into {star} etc, if possible.
-		text = gsub(text, "(%s?)(|?)|T.-|t(%s?)", stripTextureFunc) --strip any other texture out but keep a single space from the side(s).
+		text = gsub(text, "(%s?)(|?)|[TA].-|[ta](%s?)", stripTextureFunc) --strip any other texture out but keep a single space from the side(s).
 		text = gsub(text, "(|?)|H(.-)|h(.-)|h", hyperLinkFunc) --strip hyperlink data only keeping the actual text.
 		return text
 	end
@@ -705,7 +721,7 @@ end
 function CH:PositionChat(override)
 	if ((InCombatLockdown() and not override and self.initialMove) or (IsMouseButtonDown("LeftButton") and not override)) then return end
 
-	local RightChatPanel, LeftChatPanel, RightChatDataPanel, LeftChatToggleButton, LeftChatTab, CombatLogButton = _G.RightChatPanel, _G.LeftChatPanel, _G.RightChatDataPanel, _G.LeftChatToggleButton, _G.LeftChatTab, _G.CombatLogQuickButtonFrame_Custom
+	local RightChatPanel, LeftChatPanel, RightChatDataPanel, LeftChatToggleButton, LeftChatTab = _G.RightChatPanel, _G.LeftChatPanel, _G.RightChatDataPanel, _G.LeftChatToggleButton, _G.LeftChatTab
 	if not RightChatPanel or not LeftChatPanel then return end
 
 	RightChatPanel:Size(E.db.chat.separateSizes and E.db.chat.panelWidthRight or E.db.chat.panelWidth, E.db.chat.separateSizes and E.db.chat.panelHeightRight or E.db.chat.panelHeight)
@@ -713,7 +729,8 @@ function CH:PositionChat(override)
 
 	if E.private.chat.enable ~= true or not self.db.lockPositions then return end
 
-	CombatLogButton:Size(LeftChatTab:GetWidth(), LeftChatTab:GetHeight())
+	local CombatLogButton = _G.CombatLogQuickButtonFrame_Custom
+	if CombatLogButton then CombatLogButton:Size(LeftChatTab:GetWidth(), LeftChatTab:GetHeight()) end
 
 	self.RightChatWindowID = FindRightChatID()
 
@@ -750,7 +767,7 @@ function CH:PositionChat(override)
 			if id ~= 2 then
 				chat:Size((E.db.chat.separateSizes and E.db.chat.panelWidthRight or E.db.chat.panelWidth) - 11, (E.db.chat.separateSizes and E.db.chat.panelHeightRight or E.db.chat.panelHeight) - BASE_OFFSET)
 			else
-				chat:Size(E.db.chat.panelWidth - 11, (E.db.chat.panelHeight - BASE_OFFSET) - CombatLogButton:GetHeight())
+				chat:Size(E.db.chat.panelWidth - 11, (E.db.chat.panelHeight - BASE_OFFSET) - LeftChatTab:GetHeight())
 			end
 
 			--Pass a 2nd argument which prevents an infinite loop in our ON_FCF_SavePositionAndDimensions function
@@ -1454,11 +1471,11 @@ function CH:ChatFrame_MessageEventHandler(frame, event, arg1, arg2, arg3, arg4, 
 			-- Player Flags
 			local pflag, chatIcon, pluginChatIcon = "", specialChatIcons[playerName], CH:GetPluginIcon(playerName)
 			if type(chatIcon) == 'function' then
-				if chatIcon == itsSimpy and not CH:MessageIsProtected(message) then
-					message = SimpysText(message)
+				local icon, prettify = chatIcon()
+				if prettify and not CH:MessageIsProtected(message) then
+					message = prettify(message)
 				end
-
-				chatIcon = chatIcon()
+				chatIcon = icon or ''
 			end
 
 			if arg6 ~= "" then -- Blizzard Flags

@@ -1,7 +1,7 @@
 ## Interface: 11303
 ## Author: Elv
-## Version: 1.06
-## Title: |cfffe7b2cElvUI|r |cff1784d1Classic|r |cfffe7b2cOptionsUI|r
+## Version: 1.07
+## Title: |cff1784d1ElvUI Classic OptionsUI|r
 ## Notes: Options for ElvUI.
 ## RequiredDeps: ElvUI
 ## LoadOnDemand: 1
@@ -18,10 +18,10 @@ Cooldown.lua
 DataTexts.lua
 DataBars.lua
 Filters.lua
+Skins.lua
 Tooltip.lua
 UnitFrames.lua
 Nameplates.lua
-Skins.lua
 Profiles.lua
 Maps.lua
 ModuleControl.lua

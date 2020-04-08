@@ -111,6 +111,7 @@ local function resetAttributes(self)
 	self.channeling = nil
 	self.notInterruptible = nil
 	self.spellID = nil
+	self.spellName = nil -- ElvUI
 end
 
 local function CastStart(self, event, unit)
@@ -144,6 +145,7 @@ local function CastStart(self, event, unit)
 	element.holdTime = 0
 	element.castID = castID
 	element.spellID = spellID
+	element.spellName = name -- ElvUI
 
 	if(element.casting) then
 		element.duration = GetTime() - startTime
@@ -418,12 +420,11 @@ local function Enable(self, unit)
 			self:RegisterEvent('UNIT_SPELLCAST_FAILED', CastFail)
 			self:RegisterEvent('UNIT_SPELLCAST_INTERRUPTED', CastFail)
 		end
-
-		element.holdTime = 0
-
 		-- ElvUI block
 		self:RegisterEvent('UNIT_SPELLCAST_SENT', UNIT_SPELLCAST_SENT, true)
 		-- end block
+
+		element.holdTime = 0
 
 		element:SetScript('OnUpdate', element.OnUpdate or onUpdate)
 
@@ -450,6 +451,8 @@ local function Enable(self, unit)
 		if(safeZone and safeZone:IsObjectType('Texture') and not safeZone:GetTexture()) then
 			safeZone:SetColorTexture(1, 0, 0)
 		end
+
+		element:Hide()
 
 		return true
 	end

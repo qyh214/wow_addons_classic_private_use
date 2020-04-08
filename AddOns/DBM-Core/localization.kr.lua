@@ -11,7 +11,7 @@ DBM_CORE_LOAD_GUI_COMBAT			= "전투중에는 GUI의 최초 로딩을 할 수 �
 DBM_CORE_BAD_LOAD					= "DBM이 전투로 인해 현재 인스턴스의 모드를 완전히 로딩하지 못했습니다. 전투가 종료된 후 가능한 빨리 /console reloadui 명령어를 입력해주세요."
 DBM_CORE_LOAD_MOD_VER_MISMATCH		= "DBM-Core가 로딩 조건과 맞지 않아 %s|1을;를; 로딩하지 못했습니다. 최신 버전을 설치하세요"
 DBM_CORE_LOAD_MOD_EXP_MISMATCH		= "아직 출시되지 않은 WoW 확장팩용으로 설계되었으므로 %s|1을;를; 로딩하지 못했습니다. 확장팩이 출시되면 해당 모드는 자동으로 작동합니다."
-DBM_CORE_LOAD_MOD_TOC_MISMATCH		= "아직 나오지 않은 WoW 패치 (%2$s) 용으로 설계되었으므로 %1$s|1을;를; 로딩하지 못했습니다. 패치가 나오면 해당 모드는 자동으로 작동합니다."
+DBM_CORE_LOAD_MOD_TOC_MISMATCH		= "%s|1은;는; WoW 클래식 용으로 제작된 것이 아니라서 로딩할 수 없습니다. 최신 버전용 모듈을 설치한 것 같습니다. 해당 모듈은 삭제하시고 월드 오브 워크래프트 클래식 용으로 제작된 애드온만 사용하세요"
 DBM_CORE_LOAD_MOD_DISABLED			= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드가 로딩되지 않습니다."
 DBM_CORE_LOAD_MOD_DISABLED_PLURAL	= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드들이 로딩되지 않습니다."
 
@@ -30,7 +30,7 @@ DBM_CORE_LOOT_SPEC_REMINDER			= "현재 전문화는 %s입니다. 현재 지정�
 
 DBM_CORE_BIGWIGS_ICON_CONFLICT		= "DBM이 BigWigs와 DBM 모두 공격대 징표 기능을 사용하고 있음을 감지했습니다. 충돌을 방지하기 위해 공대장이 두 애드온중 하나의 징표 설정을 비활성화해야 합니다."
 
-DBM_CORE_MOD_AVAILABLE				= "이 지역에서 %s|1을;를; 사용할 수 있습니다. Curse/Twitch, WoWI, deadlybossmods.com에서 다운로드 받으실 수 있습니다."
+DBM_CORE_MOD_AVAILABLE				= "이 지역에서 %s|1을;를; 사용할 수 있습니다. Curse/Twitch, WoWI에서 다운로드 받으실 수 있습니다."
 
 DBM_CORE_COMBAT_STARTED				= "%s 전투 시작. 행운을 빕니다! :)";
 DBM_CORE_COMBAT_STARTED_IN_PROGRESS	= "%s 전투 진행 도중 참가했습니다. 행운을 빕니다! :)"
@@ -151,7 +151,6 @@ DBM_CORE_UPDATEREMINDER_HEADER			= "사용중인 Deadly Boss Mods 버전의 사�
 DBM_CORE_UPDATEREMINDER_HEADER_ALPHA	= "사용중인 Deadly Boss Mods ALPHA 버전의 사용 기한이 지났습니다.\n 적어도 %s 테스트 버전 이상은 사용해야 합니다. ALPHA 버전을 선택한 DBM 이용자는 최신 ALPHA 버전을 실행하는걸 권장합니다. 아니면 최신 RELEASE 버전을 사용하는 것도 좋습니다. 오래된 ALPHA 버전은 개발용인 관계로 버전 검사 기능이 제한되어 있기 때문입니다."
 DBM_CORE_UPDATEREMINDER_FOOTER			= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
 DBM_CORE_UPDATEREMINDER_FOOTER_GENERIC	= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
---DBM_CORE_UPDATEREMINDER_URL				= "http://www.inven.co.kr/board/powerbbs.php?come_idx=3716" -- No longer updated by the website
 DBM_CORE_UPDATEREMINDER_DISABLE			= "경고: 지금 사용중인 Deadly Boss Mods가 지나치게 오래되어 강제로 비활성화되며 업데이트 전 까진 사용할 수 없습니다. 이는 오래되고 호환되지 않는 모드가 당신과 파티/공대원의 플레이에 악영향을 미치지 않게 하기 위함입니다."
 --DBM_CORE_UPDATEREMINDER_NODISABLE		= "경고: 설치한 Deadly Boss Mods가 사용 기한을 지났습니다. 업데이트 알림이 꺼져있거나 해서 특정 기한을 지나면 본 메시지가 등장하는 것이며 이 알림은 끌 수 없습니다. 반드시 업데이트 하시기 바랍니다."
 DBM_CORE_UPDATEREMINDER_HOTFIX			= "지금 사용하는 DBM 버전은 이 보스 전투에서 알려진 오류를 가지고 있습니다. 이 오류는 최신 버전으로 업데이트하면 수정됩니다."
@@ -306,6 +305,7 @@ DBM_CORE_AUTO_ANNOUNCE_TEXTS.adds			= "%s 남은 수: %%d"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.cast			= "%s 시전: %.1f초"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.soon			= "곧 %s"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.sooncount		= "곧 %s (%%s)"
+DBM_CORE_AUTO_ANNOUNCE_TEXTS.countdown		= "%s %%d초 전"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.prewarn		= "%2$s 후 %1$s"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.bait		= "곧 %s - 위치 유도"
 DBM_CORE_AUTO_ANNOUNCE_TEXTS.stage			= "%s단계"
@@ -325,6 +325,7 @@ DBM_CORE_AUTO_ANNOUNCE_OPTIONS.adds			= "$spell:%s의 남은 수 알림 보기"
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.cast			= "$spell:%s 시전시 경고 보기"
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.soon		= prewarnOption
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.sooncount	= prewarnOption
+DBM_CORE_AUTO_ANNOUNCE_OPTIONS.countdown	= "$spell:%s의 초읽기 사전 경고 보기"
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.prewarn 		= prewarnOption
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.bait		= "$spell:%s 사전 경고 보기 (위치 유도)"
 DBM_CORE_AUTO_ANNOUNCE_OPTIONS.stage		= "%s단계 알림"
@@ -426,13 +427,18 @@ DBM_CORE_AUTO_TIMER_TEXTS.cd				= "%s 쿨타임"
 DBM_CORE_AUTO_TIMER_TEXTS.cdcount		= "%s 쿨타임 (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.cdsource		= "%s 쿨타임: >%%s<"
 DBM_CORE_AUTO_TIMER_TEXTS.cdspecial		= "특수 능력 쿨타임"
+DBM_CORE_AUTO_TIMER_TEXTS.cdspecialshort	= "~특수 능력"
 DBM_CORE_AUTO_TIMER_TEXTS.next			= "다음 %s"
 DBM_CORE_AUTO_TIMER_TEXTS.nextcount		= "다음 %s (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.nextsource		= "다음 %s: %%s"
 DBM_CORE_AUTO_TIMER_TEXTS.nextspecial		= "다음 특수 능력"
+DBM_CORE_AUTO_TIMER_TEXTS.nextspecialshort	= "특수 능력"
 DBM_CORE_AUTO_TIMER_TEXTS.stage			= "다음 단계"
+DBM_CORE_AUTO_TIMER_TEXTS.stageshort		= "단계"
 DBM_CORE_AUTO_TIMER_TEXTS.adds			= "쫄 등장"
+DBM_CORE_AUTO_TIMER_TEXTS.addsshort		= "쫄"
 DBM_CORE_AUTO_TIMER_TEXTS.addscustom		= "쫄 등장 (%%s)"
+DBM_CORE_AUTO_TIMER_TEXTS.addscustomshort	= "쫄 (%%s)"
 DBM_CORE_AUTO_TIMER_TEXTS.roleplay		= "롤플레이"
 
 DBM_CORE_AUTO_TIMER_OPTIONS.target		= "$spell:%s 디버프 타이머 바 보기"

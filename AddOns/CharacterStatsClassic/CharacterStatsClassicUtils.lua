@@ -156,44 +156,58 @@ local function CSC_GetPlayerMissChances(unit, playerHit)
 	local missChanceVsNPC = 5; -- Level 60 npcs with 300 def
 	local missChanceVsBoss = 9;
 	local missChanceVsPlayer = 5; -- Level 60 player def is 300 base
+	local totalWeaponSkill = nil;
 
 	local mainHandItemId = 16;
+	local unitClassLoc = select(2, UnitClass(unit));
 
-	local itemId = GetInventoryItemID(unit, mainHandItemId);
-	if (itemId) then
-		local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
-		if itemSubtypeId then
-			local weaponString = weaponStringByWeaponId[itemSubtypeId];
-			if weaponString then
-				local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
-				if skillRank and skillModifier then
-					-- Weapon skill from racials should be already in skillRank
-					local totalWeaponSkill = skillRank + skillModifier;
-					local bossDefense = 315; -- level 63
-					
-					local playerBossDeltaSkill = bossDefense - totalWeaponSkill;
-					
-					if (playerBossDeltaSkill > 10) then
-						if (hitChance >= 1) then
-							hitChance = hitChance - 1;
-						end
+	-- Druid checks
+	local shapeIndex = -1;
+	if (unitClassLoc == "DRUID") then
+		shapeIndex = CSC_GetShapeshiftForm();
+	end
 
-						missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.2);
-					else
-						missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.1);
+	if (unitClassLoc == "DRUID") and (shapeIndex > 0) then
+		totalWeaponSkill = UnitLevel(unit) * 5;
+	else
+		local itemId = GetInventoryItemID(unit, mainHandItemId);
+		if (itemId) then
+			local itemSubtypeId = select(7, GetItemInfoInstant(itemId));
+			if itemSubtypeId then
+				local weaponString = weaponStringByWeaponId[itemSubtypeId];
+				if weaponString then
+					local skillRank, skillModifier = CSC_GetSkillRankAndModifier(CSC_WEAPON_SKILLS_HEADER, weaponString);
+					if skillRank and skillModifier then
+						-- Weapon skill from racials should be already in skillRank
+						totalWeaponSkill = skillRank + skillModifier;
 					end
 				end
 			end
 		end
 	end
 
-	local dwMissChanceVsNpc = math.max(0, (missChanceVsNPC*0.8 + 20) - hitChance);
-	local dwMissChanceVsBoss = math.max(0, (missChanceVsBoss*0.8 + 20) - hitChance);
-	local dwMissChanceVsPlayer = math.max(0, (missChanceVsPlayer*0.8 + 20) - hitChance);
+	if totalWeaponSkill then
+		local bossDefense = 315; -- level 63
+		local playerBossDeltaSkill = bossDefense - totalWeaponSkill;
+		
+		if (playerBossDeltaSkill > 10) then
+			if (hitChance >= 1) then
+				hitChance = hitChance - 1;
+			end
 
-	missChanceVsNPC = math.max(0, missChanceVsNPC - hitChance);
+			missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.2);
+		else
+			missChanceVsBoss = 5 + (playerBossDeltaSkill * 0.1);
+		end
+	end
+
+	local dwMissChanceVsNpc = math.max(0, (missChanceVsNPC*0.8 + 20) - playerHit);
+	local dwMissChanceVsBoss = math.max(0, (missChanceVsBoss*0.8 + 20) - hitChance);
+	local dwMissChanceVsPlayer = math.max(0, (missChanceVsPlayer*0.8 + 20) - playerHit);
+
+	missChanceVsNPC = math.max(0, missChanceVsNPC - playerHit);
 	missChanceVsBoss = math.max(0, missChanceVsBoss - hitChance);
-	missChanceVsPlayer = math.max(0, missChanceVsPlayer - hitChance);
+	missChanceVsPlayer = math.max(0, missChanceVsPlayer - playerHit);
 
 	return missChanceVsNPC, missChanceVsBoss, missChanceVsPlayer, dwMissChanceVsNpc, dwMissChanceVsBoss, dwMissChanceVsPlayer;
 end
@@ -729,23 +743,48 @@ end
 local function CSC_GetBlockValue(unit)
 	CSC_ScanTooltip:ClearLines();
 
-	local blockFromShield = 0;
-	local offHandIndex = 17;
+	local blockValueFromItems = 0;
+	local firstItemslotIndex = 1;
+	local lastItemslotIndex = 18;
 
-	local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, offHandIndex);
-	if hasItem then
-		local maxLines = CSC_ScanTooltip:NumLines();
-		for line=1, maxLines do
-			local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
-			if leftText:GetText() then
-				local valueTxt = string.match(leftText:GetText(), "%d+ "..ITEM_MOD_BLOCK_RATING_SHORT);
-				if valueTxt then
-					valueTxt = string.match(valueTxt, "%d+");
-					if valueTxt then
-						local numValue = tonumber(valueTxt);
-						if numValue then
-							blockFromShield = numValue;
-							break;
+	local blockValueIDs = { ITEM_MOD_BLOCK_RATING_SHORT, ITEM_MOD_BLOCK_RATING, ITEM_MOD_BLOCK_VALUE };
+
+	local equippedMightSetItems = 0;
+	local battlegearOfMightIDs = { [16861] = 16861, 
+								   [16862] = 16862, 
+								   [16863] = 16863, 
+								   [16864] = 16864, 
+								   [16865] = 16865, 
+								   [16866] = 16866, 
+								   [16867] = 16867, 
+								   [16868] = 16868
+								};
+
+	for itemslot=firstItemslotIndex, lastItemslotIndex do
+		local hasItem = CSC_ScanTooltip:SetInventoryItem(unit, itemslot);
+		if hasItem then
+			local itemId = GetInventoryItemID(unit, itemslot);
+			if (itemId == battlegearOfMightIDs[itemId]) then
+				equippedMightSetItems = equippedMightSetItems + 1;
+			else
+				local maxLines = CSC_ScanTooltip:NumLines();
+				for line=1, maxLines do
+					local leftText = getglobal(CSC_ScanTooltipPrefix.."TextLeft"..line);
+					if leftText:GetText() then
+						for blockValueID=1, 3 do
+							local valueTxt = string.match(leftText:GetText(), "%d+ "..blockValueIDs[blockValueID]);
+							if not valueTxt then
+								valueTxt = string.match(leftText:GetText(), string.sub( blockValueIDs[blockValueID], 1, -5).." %d+");
+							end
+							if valueTxt then
+								valueTxt = string.match(valueTxt, "%d+");
+								if valueTxt then
+									local numValue = tonumber(valueTxt);
+									if numValue then
+										blockValueFromItems = blockValueFromItems + numValue;
+									end
+								end
+							end
 						end
 					end
 				end
@@ -755,7 +794,12 @@ local function CSC_GetBlockValue(unit)
 
 	local strStatIndex = 1;
 	local strength = select(2, UnitStat(unit, strStatIndex));
-	local blockValue = blockFromShield + (strength / 20);
+	local blockValue = blockValueFromItems + (strength / 20);
+	
+	local requiredMightSetItems = 3;
+	if (equippedMightSetItems >= requiredMightSetItems) then
+		blockValue = blockValue + 30; -- Set bonus reached
+	end
 
 	return blockValue;
 end
@@ -771,12 +815,6 @@ function CSC_PaperDollFrame_SetBlock(statFrame, unit)
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_BLOCK, blockChance, true, blockChance);
 
 	statFrame.blockChance = string.format("%.2F", blockChance).."%";
-	if CharacterStatsClassicDB.useBlizzardBlockValue then
-		statFrame.blockValue = GetShieldBlock();
-	else
-		statFrame.blockValue = CSC_GetBlockValue(unit);
-	end
-
 	statFrame:Show();
 end
 
@@ -799,12 +837,6 @@ function CSC_PaperDollFrame_SetSpellPower(statFrame, unit)
 	end
 
 	CSC_PaperDollFrame_SetLabelAndText(statFrame, STAT_SPELLPOWER, BreakUpLargeNumbers(maxSpellDmg), false, maxSpellDmg);
-	statFrame.holyDmg = GetSpellBonusDamage(2);
-	statFrame.fireDmg = GetSpellBonusDamage(3);
-	statFrame.natureDmg = GetSpellBonusDamage(4);
-	statFrame.frostDmg = GetSpellBonusDamage(5);
-	statFrame.shadowDmg = GetSpellBonusDamage(6);
-	statFrame.arcaneDmg = GetSpellBonusDamage(7);
 	statFrame:Show();
 end
 
@@ -869,6 +901,14 @@ function CSC_CharacterDamageFrame_OnEnter(self)
 end
 
 function CSC_CharacterSpellDamageFrame_OnEnter(self)
+	
+	self.holyDmg = GetSpellBonusDamage(2);
+	self.fireDmg = GetSpellBonusDamage(3);
+	self.natureDmg = GetSpellBonusDamage(4);
+	self.frostDmg = GetSpellBonusDamage(5);
+	self.shadowDmg = GetSpellBonusDamage(6);
+	self.arcaneDmg = GetSpellBonusDamage(7);
+
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(STAT_SPELLPOWER, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(STAT_SPELLPOWER_TOOLTIP);
@@ -906,6 +946,13 @@ function CSC_CharacterManaRegenFrame_OnEnter(self)
 end
 
 function CSC_CharacterBlock_OnEnter(self)
+	
+	if CharacterStatsClassicDB.useBlizzardBlockValue then
+		self.blockValue = GetShieldBlock();
+	else
+		self.blockValue = CSC_GetBlockValue("player");
+	end
+	
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 	GameTooltip:SetText(" ", HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 	GameTooltip:AddDoubleLine(BLOCK_CHANCE..": ", self.blockChance);

@@ -271,10 +271,6 @@ function M:START_LOOT_ROLL(_, rollID, time)
 			break
 		end
 	end
-
-	if E.db.general.autoRoll and E.mylevel == MAX_PLAYER_LEVEL and quality == 2 and not bop then
-		RollOnLoot(rollID, 2)
-	end
 end
 
 function M:LOOT_HISTORY_ROLL_CHANGED(_, itemIdx, playerIdx)

@@ -3,33 +3,31 @@ local UF = E:GetModule('UnitFrames');
 
 --Lua functions
 local _G = _G
-local tostring = tostring
 local format = format
+local unpack = unpack
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local IsShiftKeyDown = IsShiftKeyDown
 local IsAltKeyDown = IsAltKeyDown
 local IsControlKeyDown = IsControlKeyDown
 
--- GLOBALS: ElvUF_Player
-
-local function OnClick(self)
+function UF:AuraBars_OnClick()
 	local mod = E.db.unitframe.auraBlacklistModifier
 	if mod == "NONE" or not ((mod == "SHIFT" and IsShiftKeyDown()) or (mod == "ALT" and IsAltKeyDown()) or (mod == "CTRL" and IsControlKeyDown())) then return end
 	local auraName = self.name
 
 	if auraName then
 		E:Print(format(L["The spell '%s' has been added to the Blacklist unitframe aura filter."], auraName))
-		E.global.unitframe.aurafilters.Blacklist.spells[auraName] = { enable = true, priority = 0 }
+		E.global.unitframe.aurafilters.Blacklist.spells[self.spellID or self.name] = { enable = true, priority = 0 }
 		UF:Update_AllFrames()
 	end
 end
 
 function UF:Construct_AuraBars(statusBar)
 	statusBar:CreateBackdrop(nil, nil, nil, UF.thinBorders, true)
-	statusBar:SetScript('OnMouseDown', OnClick)
-	statusBar:SetPoint("LEFT")
-	statusBar:SetPoint("RIGHT")
+	statusBar:SetScript('OnMouseDown', UF.AuraBars_OnClick)
+	statusBar:Point("LEFT")
+	statusBar:Point("RIGHT")
 
 	statusBar.icon:CreateBackdrop(nil, nil, nil, UF.thinBorders, true)
 	UF.statusbars[statusBar] = true
@@ -43,7 +41,7 @@ function UF:Construct_AuraBars(statusBar)
 
 	statusBar.nameText:SetJustifyH('LEFT')
 	statusBar.nameText:SetJustifyV('MIDDLE')
-	statusBar.nameText:SetPoint("RIGHT", statusBar.timeText, "LEFT", -4, 0)
+	statusBar.nameText:Point("RIGHT", statusBar.timeText, "LEFT", -4, 0)
 	statusBar.nameText:SetWordWrap(false)
 
 	statusBar.bg = statusBar:CreateTexture(nil, 'BORDER')
@@ -74,7 +72,7 @@ end
 
 function UF:Construct_AuraBarHeader(frame)
 	local auraBar = CreateFrame('Frame', nil, frame)
-	auraBar:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 10) --Make them appear above any text element
+	auraBar:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 10)
 	auraBar:SetHeight(1)
 	auraBar.PreSetPosition = UF.SortAuras
 	auraBar.PostCreateBar = UF.Construct_AuraBars
@@ -90,7 +88,6 @@ function UF:Construct_AuraBarHeader(frame)
 end
 
 function UF:Configure_AuraBars(frame)
-	if not frame.VARIABLES_SET then return end
 	local auraBars = frame.AuraBars
 	local db = frame.db
 	auraBars.db = db.aurabar
@@ -126,9 +123,13 @@ function UF:Configure_AuraBars(frame)
 		local colors = UF.db.colors.auraBarBuff
 		if E:CheckClassColor(colors.r, colors.g, colors.b) then
 			local classColor = E:ClassColor(E.myclass, true)
-			colors.r = classColor.r
-			colors.g = classColor.g
-			colors.b = classColor.b
+			colors.r, colors.g, colors.b = classColor.r, classColor.g, classColor.b
+		end
+
+		colors = UF.db.colors.auraBarDebuff
+		if E:CheckClassColor(colors.r, colors.g, colors.b) then
+			local classColor = E:ClassColor(E.myclass, true)
+			colors.r, colors.g, colors.b = classColor.r, classColor.g, classColor.b
 		end
 
 		if not auraBars.Holder then
@@ -137,13 +138,11 @@ function UF:Configure_AuraBars(frame)
 			holder:Size(db.aurabar.detachedWidth, 20)
 
 			if frame.unitframeType == "player" then
-				E:CreateMover(holder, 'ElvUF_PlayerAuraMover',  "Player Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,player,aurabar')
+				E:CreateMover(holder, 'ElvUF_PlayerAuraMover',  "Player Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,player,aurabar')
 			elseif frame.unitframeType == "target" then
-				E:CreateMover(holder, 'ElvUF_TargetAuraMover',  "Target Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,target,aurabar')
+				E:CreateMover(holder, 'ElvUF_TargetAuraMover',  "Target Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,target,aurabar')
 			elseif frame.unitframeType == "pet" then
-				E:CreateMover(holder, 'ElvUF_PetAuraMover',  "Pet Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,pet,aurabar')
-			elseif frame.unitframeType == "focus" then
-				E:CreateMover(holder, 'ElvUF_FocusAuraMover',  "Focus Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,focus,aurabar')
+				E:CreateMover(holder, 'ElvUF_PetAuraMover',  "Pet Aura Bars", nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,pet,aurabar')
 			end
 
 			auraBars.Holder = holder
@@ -204,7 +203,7 @@ function UF:PostUpdateBar_AuraBars(unit, statusBar, index, position, duration, e
 	statusBar.db = self.db
 	statusBar.icon:SetTexCoord(unpack(E.TexCoords))
 
-	local colors = E.global.unitframe.AuraBarColors[spellID] or E.global.unitframe.AuraBarColors[tostring(spellID)] or E.global.unitframe.AuraBarColors[spellName]
+	local colors = E.global.unitframe.AuraBarColors[spellID] and E.global.unitframe.AuraBarColors[spellID].enable and E.global.unitframe.AuraBarColors[spellID].color
 
 	if E.db.unitframe.colors.auraBarTurtle and (E.global.unitframe.aurafilters.TurtleBuffs.spells[spellID] or E.global.unitframe.aurafilters.TurtleBuffs.spells[spellName]) and not colors and (spellName ~= GOTAK or (spellName == GOTAK and spellID == GOTAK_ID)) then
 		colors = E.db.unitframe.colors.auraBarTurtleColor
@@ -215,7 +214,7 @@ function UF:PostUpdateBar_AuraBars(unit, statusBar, index, position, duration, e
 			if (not debuffType or (debuffType == '' or debuffType == 'none')) then
 				colors = UF.db.colors.auraBarDebuff
 			else
-				colors = DebuffTypeColor[debuffType]
+				colors = _G.DebuffTypeColor[debuffType]
 			end
 		elseif statusBar.filter == 'HARMFUL' then
 			colors = UF.db.colors.auraBarDebuff

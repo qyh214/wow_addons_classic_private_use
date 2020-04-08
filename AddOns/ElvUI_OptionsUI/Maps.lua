@@ -2,9 +2,6 @@ local E, _, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, Profi
 local C, L = unpack(select(2, ...))
 local WM = E:GetModule('WorldMap')
 local MM = E:GetModule('Minimap')
-local AB = E:GetModule('ActionBars')
-
-local SetCVar = SetCVar
 
 -- GLOBALS: WORLD_MAP_MIN_ALPHA
 
@@ -18,13 +15,7 @@ E.Options.args.maps = {
 			order = 1,
 			type = "group",
 			name = L["WORLD_MAP"],
-			disabled = false,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["WORLD_MAP"],
-				},
 				generalGroup = {
 					order = 1,
 					type = "group",
@@ -32,7 +23,7 @@ E.Options.args.maps = {
 					guiInline = true,
 					args = {
 						enable = {
-							order = 1,
+							order = 0,
 							type = "toggle",
 							name = L["Enable"],
 							desc = L["Enable/Disable the World Map Enhancements."],
@@ -40,7 +31,7 @@ E.Options.args.maps = {
 							set = function(info, value) E.private.general.worldMap = value; E:StaticPopup_Show("PRIVATE_RL") end,
 						},
 						smallerWorldMap = {
-							order = 2,
+							order = 1,
 							type = "toggle",
 							name = L["Smaller World Map"],
 							desc = L["Make the world map smaller."],
@@ -48,7 +39,7 @@ E.Options.args.maps = {
 							set = function(info, value) E.global.general.smallerWorldMap = value; E:StaticPopup_Show("GLOBAL_RL") end,
 						},
 						smallerWorldMapScale = {
-							order = 3,
+							order = 2,
 							type = "range",
 							name = L["Smaller World Map Scale"],
 							isPercent = true,
@@ -57,22 +48,21 @@ E.Options.args.maps = {
 							set = function(info, value) E.global.general.smallerWorldMapScale = value; E:StaticPopup_Show("GLOBAL_RL") end,
 						},
 						spacer1 = {
-							order = 4,
+							order = 3,
 							type = "description",
 							name = ""
 						},
 						fadeMapWhenMoving = {
-							order = 5,
+							order = 4,
 							type = "toggle",
 							name = L["MAP_FADE_TEXT"],
 							get = function(info) return E.global.general.fadeMapWhenMoving end,
 							set = function(info, value)
 								E.global.general.fadeMapWhenMoving = value;
-								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
 							end,
 						},
 						mapAlphaWhenMoving = {
-							order = 6,
+							order = 5,
 							type = "range",
 							name = L["Map Opacity When Moving"],
 							isPercent = true,
@@ -80,26 +70,23 @@ E.Options.args.maps = {
 							get = function(info) return E.global.general.mapAlphaWhenMoving end,
 							set = function(info, value)
 								E.global.general.mapAlphaWhenMoving = value;
-								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
+								-- we use E.noop to force the update of the minValue here
+								E.WorldMap.UpdateMapFade(_G.WorldMapFrame, E.global.general.mapAlphaWhenMoving, 1.0, E.global.general.fadeMapDuration, E.noop);
 							end,
 						},
 						fadeMapDuration = {
-							order = 7,
+							order = 6,
 							type = "range",
 							name = L["Fade Duration"],
 							min = 0, max = 1, step = 0.01,
 							get = function(info) return E.global.general.fadeMapDuration end,
 							set = function(info, value)
 								E.global.general.fadeMapDuration = value;
-								E.WorldMap:EnableMapFading(_G.WorldMapFrame)
+								-- we use E.noop to force the update of the minValue here
+								E.WorldMap.UpdateMapFade(_G.WorldMapFrame, E.global.general.mapAlphaWhenMoving, 1.0, E.global.general.fadeMapDuration, E.noop);
 							end,
 						},
 					},
-				},
-				spacer = {
-					order = 2,
-					type = "description",
-					name = "\n"
 				},
 				coordinatesGroup = {
 					order = 3,
@@ -114,11 +101,6 @@ E.Options.args.maps = {
 							desc = L["Puts coordinates on the world map."],
 							get = function(info) return E.global.general.WorldMapCoordinates.enable end,
 							set = function(info, value) E.global.general.WorldMapCoordinates.enable = value; E:StaticPopup_Show("GLOBAL_RL") end,
-						},
-						spacer = {
-							order = 2,
-							type = "description",
-							name = " "
 						},
 						position = {
 							order = 3,
@@ -165,11 +147,6 @@ E.Options.args.maps = {
 			get = function(info) return E.db.general.minimap[info[#info]] end,
 			childGroups = "tab",
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["MINIMAP_LABEL"],
-				},
 				generalGroup = {
 					order = 1,
 					type = "group",
@@ -189,7 +166,7 @@ E.Options.args.maps = {
 							type = "range",
 							name = L["Size"],
 							desc = L["Adjust the size of the minimap."],
-							min = 120, max = 500, step = 1,
+							min = 40, max = 500, step = 1,
 							get = function(info) return E.db.general.minimap[info[#info]] end,
 							set = function(info, value) E.db.general.minimap[info[#info]] = value; MM:UpdateSettings() end,
 							disabled = function() return not E.private.general.minimap.enable end,
@@ -272,7 +249,7 @@ E.Options.args.maps = {
 					name = L["Minimap Buttons"],
 					args = {
 						calendar = {
-							order = 1,
+							order = 2,
 							type = "group",
 							name = L["Calendar"],
 							get = function(info) return E.db.general.minimap.icons.calendar[info[#info]] end,

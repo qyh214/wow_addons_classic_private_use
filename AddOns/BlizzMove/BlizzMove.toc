@@ -1,10 +1,9 @@
-## Interface: 11302
-## Title: Blizzmove
+## Interface: 11304
+## Title: BlizzMove
 ## Notes: Move those blizzard windows
-## Author: yess
+## Author: the-rebel-Mermaid - github.com/the-rebel-Mermaid/BlizzMove/
 ## X-WoWI-ID: 23875
-## Version: 1.9
-
+## Version: v2.1.5
 
 Handle.lua
 BlizzMove.lua

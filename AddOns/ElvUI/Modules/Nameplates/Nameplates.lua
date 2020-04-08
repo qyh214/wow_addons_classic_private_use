@@ -232,8 +232,6 @@ function NP:StylePlate(nameplate)
 	NP:Construct_Auras(nameplate)
 
 	NP.Plates[nameplate] = nameplate:GetName()
-
-	NP:StyleFilterPlateStyled(nameplate)
 end
 
 function NP:UpdatePlate(nameplate)
@@ -241,8 +239,10 @@ function NP:UpdatePlate(nameplate)
 	NP:Update_Highlight(nameplate)
 	NP:Update_RaidTargetIndicator(nameplate)
 
-	if (nameplate.VisibilityChanged or nameplate.NameOnlyChanged) or (not NP.db.units[nameplate.frameType].enable) or NP.db.units[nameplate.frameType].nameOnly then
-		NP:DisablePlate(nameplate, nameplate.NameOnlyChanged or (NP.db.units[nameplate.frameType].nameOnly and not nameplate.VisibilityChanged))
+	local SF_NameOnly = NP:StyleFilterCheckChanges(nameplate, 'NameOnly')
+	local SF_Visibility = NP:StyleFilterCheckChanges(nameplate, 'Visibility')
+	if SF_Visibility or SF_NameOnly or NP.db.units[nameplate.frameType].nameOnly or not NP.db.units[nameplate.frameType].enable then
+		NP:DisablePlate(nameplate, SF_NameOnly or (NP.db.units[nameplate.frameType].nameOnly and not SF_Visibility))
 	else
 		NP:Update_Health(nameplate)
 		NP:Update_HealthPrediction(nameplate)
@@ -309,7 +309,7 @@ end
 
 function NP:SetupTarget(nameplate, removed)
 	local TCP = _G.ElvNP_TargetClassPower
-	local nameOnly = nameplate and (nameplate.NameOnlyChanged or NP.db.units[nameplate.frameType].nameOnly)
+	local nameOnly = nameplate and (NP:StyleFilterCheckChanges(nameplate, 'NameOnly') or NP.db.units[nameplate.frameType].nameOnly)
 	TCP.realPlate = (NP.db.units.TARGET.classpower.enable and not (removed or nameOnly) and nameplate) or nil
 
 	local moveToPlate = TCP.realPlate or TCP
@@ -341,8 +341,9 @@ function NP:SetNamePlateEnemyClickThrough()
 end
 
 function NP:Update_StatusBars()
-	for StatusBar in pairs(NP.StatusBars) do
-		StatusBar:SetStatusBarTexture(E.LSM:Fetch('statusbar', NP.db.statusbar))
+	for bar in pairs(NP.StatusBars) do
+		local SF_HealthTexture = NP:StyleFilterCheckChanges(bar:GetParent(), 'HealthTexture')
+		if not SF_HealthTexture then bar:SetStatusBarTexture(E.LSM:Fetch("statusbar", NP.db.statusbar) or E.media.normTex) end
 	end
 end
 
@@ -382,7 +383,7 @@ function NP:ConfigureAll()
 
 	for nameplate in pairs(NP.Plates) do
 		if _G.ElvNP_Player ~= nameplate or (NP.db.units.PLAYER.enable and NP.db.units.PLAYER.useStaticPosition) then
-			--NP:StyleFilterClear(nameplate) -- keep this at the top of the loop
+			NP:StyleFilterClear(nameplate) -- keep this at the top of the loop
 
 			if nameplate.frameType == 'PLAYER' then
 				nameplate:Size(NP.db.plateSize.personalWidth, NP.db.plateSize.personalHeight)
@@ -519,11 +520,14 @@ function NP:NamePlateCallBack(nameplate, event, unit)
 			NP:UpdatePlateGUID(nameplate)
 		end
 
-		-- cutaway needs this
+		-- Vars that we need to keep in a nonstale state
+		--- Cutaway
 		nameplate.Health.cur = nil
 		nameplate.Power.cur = nil
+		--- WidgetXPBar
+		nameplate.npcID = nil
 
-		NP:StyleFilterClearVariables(nameplate)
+		NP:StyleFilterClearVariables(nameplate) -- keep this at the end
 	elseif event == 'PLAYER_TARGET_CHANGED' then -- we need to check if nameplate exists in here
 		NP:SetupTarget(nameplate) -- pass it, even as nil here
 	end

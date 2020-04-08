@@ -15,7 +15,6 @@ local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
 function UF:Configure_ClassBar(frame, cur)
-	if not frame.VARIABLES_SET then return end
 	local bars = frame[frame.ClassBar]
 	if not bars then return end
 
@@ -272,7 +271,7 @@ local function ToggleResourceBar(bars, overrideVisibility)
 
 	if not frame.CLASSBAR_DETACHED then --Only update when necessary
 		UF:Configure_HealthBar(frame)
-		UF:Configure_Portrait(frame, true) --running :Hide on portrait makes the frame all funky
+		UF:Configure_Portrait(frame)
 	end
 end
 UF.ToggleResourceBar = ToggleResourceBar --Make available to combobar

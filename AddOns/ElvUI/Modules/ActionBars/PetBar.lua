@@ -178,6 +178,8 @@ function AB:PositionAndSizeBarPet()
 		bar:SetParent(E.UIParent)
 	end
 
+	bar:EnableMouse(not self.db.barPet.clickThrough)
+
 	local button, lastButton, lastColumnButton, autoCast
 	local firstButtonSpacing = (self.db.barPet.backdrop == true and (E.Border + backdropSpacing) or E.Spacing)
 	for i = 1, NUM_PET_ACTION_SLOTS do
@@ -189,8 +191,7 @@ function AB:PositionAndSizeBarPet()
 		button:SetParent(bar)
 		button:ClearAllPoints()
 		button:Size(size)
-		button:Show()
-
+		button:EnableMouse(not self.db.barPet.clickThrough)
 		autoCast:SetOutside(button, autoCastSize, autoCastSize)
 
 		if i == 1 then

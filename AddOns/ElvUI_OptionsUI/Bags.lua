@@ -35,11 +35,6 @@ E.Options.args.bags = {
 			name = L["General"],
 			disabled = function() return not E.Bags.Initialized end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["General"],
-				},
 				currencyFormat = {
 					order = 1,
 					type = 'select',
@@ -50,7 +45,7 @@ E.Options.args.bags = {
 						['ICON_TEXT'] = L["Icons and Text"],
 						["ICON_TEXT_ABBR"] = L["Icons and Text (Short)"],
 					},
-					set = function(info, value) E.db.bags[info[#info]] = value; end,
+					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateTokens(); end,
 				},
 				moneyFormat = {
 					order = 2,
@@ -81,60 +76,53 @@ E.Options.args.bags = {
 					name = L["Transparent Buttons"],
 					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
 				},
-				questIcon = {
-					order = 5,
-					type = "toggle",
-					name = L["Show Quest Icon"],
-					desc = L["Display an exclamation mark on items that starts a quest."],
-					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end
-				},
 				junkIcon = {
-					order = 6,
-					type = "toggle",
+					order = 5,
+					type = 'toggle',
 					name = L["Show Junk Icon"],
 					desc = L["Display the junk icon on all grey items that can be vendored."],
-					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end
+					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				junkDesaturate = {
-					order = 7,
-					type = "toggle",
+					order = 6,
+					type = 'toggle',
 					name = L["Desaturate Junk Items"],
-					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end,
+					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				newItemGlow = {
-					order = 8,
+					order = 9,
 					type = 'toggle',
 					name = L["Show New Item Glow"],
 					desc = L["Display the New Item Glow"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				qualityColors = {
-					order = 10,
+					order = 11,
 					type = 'toggle',
 					name = L["Show Quality Color"],
 					desc = L["Colors the border according to the Quality of the Item."],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				specialtyColors = {
-					order = 11,
+					order = 12,
 					type = 'toggle',
 					name = L["Show Special Bags Color"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				showBindType = {
-					order = 12,
+					order = 13,
 					type = 'toggle',
 					name = L["Show Bind on Equip/Use Text"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				clearSearchOnClose = {
-					order = 13,
+					order = 14,
 					type = 'toggle',
 					name = L["Clear Search On Close"],
 					set = function(info, value) E.db.bags[info[#info]] = value; end
 				},
 				reverseLoot = {
-					order = 14,
+					order = 15,
 					type = "toggle",
 					name = L["REVERSE_NEW_LOOT_TEXT"],
 					set = function(info, value)
@@ -143,25 +131,25 @@ E.Options.args.bags = {
 					end,
 				},
 				reverseSlots = {
-					order = 15,
+					order = 16,
 					type = "toggle",
 					name = L["Reverse Bag Slots"],
 					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAll() end,
 				},
 				disableBagSort = {
-					order = 16,
+					order = 17,
 					type = "toggle",
 					name = L["Disable Bag Sort"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:ToggleSortButtonState(false); end
 				},
 				disableBankSort = {
-					order = 17,
+					order = 18,
 					type = "toggle",
 					name = L["Disable Bank Sort"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:ToggleSortButtonState(true); end
 				},
 				strata = {
-					order = 18,
+					order = 20,
 					type = "select",
 					name = L["Frame Strata"],
 					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end,
@@ -259,7 +247,7 @@ E.Options.args.bags = {
 							name = L["Item Level Threshold"],
 							desc = L["The minimum item level required for it to be shown."],
 							type = 'range',
-							min = 1, max = 200, step = 1,
+							min = 1, max = 1000, step = 1,
 							disabled = function() return not E.db.bags.itemLevel end,
 							set = function(info, value) E.db.bags.itemLevelThreshold = value; B:UpdateItemLevelDisplay() end,
 						},
@@ -298,11 +286,6 @@ E.Options.args.bags = {
 			name = L["Size"],
 			disabled = function() return not E.Bags.Initialized end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Size"],
-				},
 				bagSize = {
 					order = 2,
 					type = 'range',
@@ -341,16 +324,12 @@ E.Options.args.bags = {
 			order = 5,
 			type = "group",
 			name = L["COLORS"],
+			disabled = function() return not E.Bags.Initialized end,
 			args = {
-				header = {
+				profession = {
 					order = 1,
-					type = "header",
-					name = L["COLORS"],
-				},
-				bags = {
-					order = 2,
 					type = "group",
-					name = L["Bags"],
+					name = L["Profession Bags"],
 					guiInline = true,
 					get = function(info)
 						local t = E.db.bags.colors.profession[info[#info]]
@@ -360,13 +339,12 @@ E.Options.args.bags = {
 					set = function(info, r, g, b)
 						local t = E.db.bags.colors.profession[info[#info]]
 						t.r, t.g, t.b = r, g, b
-						if not E.Bags.Initialized then return end
 						B:UpdateBagColors('ProfessionColors', info[#info], r, g, b)
 						B:UpdateAllBagSlots()
 					end,
 					args = {
 						colorBackdrop = {
-							order = 1,
+							order = 0,
 							type = 'toggle',
 							name = L["Color Backdrop"],
 							get = function(info, value) return E.db.bags.colors.profession.colorBackdrop end,
@@ -437,11 +415,6 @@ E.Options.args.bags = {
 			get = function(info) return E.db.bags.bagBar[info[#info]] end,
 			set = function(info, value) E.db.bags.bagBar[info[#info]] = value; B:SizeAndPositionBagBar() end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Bag-Bar"],
-				},
 				enable = {
 					order = 1,
 					type = "toggle",
@@ -473,7 +446,7 @@ E.Options.args.bags = {
 					type = 'range',
 					name = L["Button Spacing"],
 					desc = L["The spacing between buttons."],
-					min = 1, max = 10, step = 1,
+					min = -1, max = 10, step = 1,
 				},
 				backdropSpacing = {
 					order = 6,
@@ -528,11 +501,6 @@ E.Options.args.bags = {
 			set = function(info, value) E.db.bags.split[info[#info]] = value B:UpdateAll() end,
 			disabled = function() return not E.Bags.Initialized end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Split"],
-				},
 				bagSpacing = {
 					order = 1,
 					type = "range",
@@ -579,11 +547,6 @@ E.Options.args.bags = {
 							type = "toggle",
 							name = L["Bag 4"],
 						},
-						['bag-2'] = {
-							order = 6,
-							type = "toggle",
-							name = L["Keyring"],
-						}
 					},
 					disabled = function() return not E.db.bags.split.player end,
 				},
@@ -642,11 +605,6 @@ E.Options.args.bags = {
 			get = function(info) return E.db.bags.vendorGrays[info[#info]] end,
 			set = function(info, value) E.db.bags.vendorGrays[info[#info]] = value; B:UpdateSellFrameSettings() end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Vendor Grays"],
-				},
 				enable = {
 					order = 1,
 					type = "toggle",
@@ -679,21 +637,11 @@ E.Options.args.bags = {
 			name = L["Bag Sorting"],
 			disabled = function() return (not E.Bags.Initialized) or E.db.bags.useBlizzardCleanup end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Bag Sorting"],
-				},
 				sortInverted = {
 					order = 1,
 					type = 'toggle',
 					name = L["Sort Inverted"],
 					desc = L["Direction the bag sorting will use to allocate the items."],
-				},
-				spacer = {
-					order = 2,
-					type = "description",
-					name = " ",
 				},
 				description = {
 					order = 3,
@@ -719,12 +667,6 @@ E.Options.args.bags = {
 								local itemID = strmatch(value, "item:(%d+)")
 								E.db.bags.ignoredItems[(itemID or value)] = value
 							end,
-						},
-						spacer = {
-							order = 2,
-							type = "description",
-							name = " ",
-							width = "normal",
 						},
 						addEntryGlobal = {
 							order = 3,
@@ -777,11 +719,6 @@ E.Options.args.bags = {
 			name = L["Search Syntax"],
 			disabled = function() return not E.Bags.Initialized end,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Search Syntax"],
-				},
 				text = {
 					order = 1,
 					type = "input",

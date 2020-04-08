@@ -46,25 +46,6 @@ function UF:Construct_RaidpetFrames()
 	return self
 end
 
---I don't know if this function is needed or not? But the error I pm'ed you about was because of the missing OnEvent so I just added it.
-function UF:RaidPetsSmartVisibility(event)
-	if not self.db or (self.db and not self.db.enable) or (UF.db and not UF.db.smartRaidFilter) or self.isForced then return; end
-	if event == "PLAYER_REGEN_ENABLED" then self:UnregisterEvent("PLAYER_REGEN_ENABLED") end
-
-	if not InCombatLockdown() then
-		local _, instanceType = GetInstanceInfo()
-		if instanceType == "raid" then
-			UnregisterStateDriver(self, "visibility")
-			self:Show()
-		elseif self.db.visibility then
-			RegisterStateDriver(self, "visibility", self.db.visibility)
-		end
-	else
-		self:RegisterEvent("PLAYER_REGEN_ENABLED")
-		return
-	end
-end
-
 function UF:Update_RaidpetHeader(header, db)
 	header.db = db
 
@@ -74,16 +55,14 @@ function UF:Update_RaidpetHeader(header, db)
 	if not headerHolder.positioned then
 		headerHolder:ClearAllPoints()
 		headerHolder:Point("BOTTOMLEFT", E.UIParent, "BOTTOMLEFT", 4, 574)
-
 		E:CreateMover(headerHolder, headerHolder:GetName()..'Mover', L["Raid Pet Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,raidpet,generalGroup')
-		headerHolder.positioned = true;
 
-		headerHolder:RegisterEvent("PLAYER_ENTERING_WORLD")
-		headerHolder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		headerHolder:SetScript("OnEvent", UF.RaidPetsSmartVisibility)
+		headerHolder.positioned = true;
 	end
 
-	UF.RaidPetsSmartVisibility(headerHolder)
+	if not header.forceShow and db.enable then
+		RegisterStateDriver(headerHolder, "visibility", headerHolder.db.visibility)
+	end
 end
 
 function UF:Update_RaidpetFrames(frame, db)
@@ -100,13 +79,11 @@ function UF:Update_RaidpetFrames(frame, db)
 			frame.BORDER = E.Border
 			frame.SPACING = E.Spacing
 		end
+
 		frame.SHADOW_SPACING = 3
-
 		frame.ORIENTATION = db.orientation --allow this value to change when unitframes position changes on screen?
-
 		frame.UNIT_WIDTH = db.width
 		frame.UNIT_HEIGHT = db.height
-
 		frame.USE_POWERBAR = false
 		frame.POWERBAR_DETACHED = false
 		frame.USE_INSET_POWERBAR = false
@@ -115,15 +92,11 @@ function UF:Update_RaidpetFrames(frame, db)
 		frame.POWERBAR_OFFSET = 0
 		frame.POWERBAR_HEIGHT = 0
 		frame.POWERBAR_WIDTH = 0
-
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
 		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
 		frame.PORTRAIT_WIDTH = (frame.USE_PORTRAIT_OVERLAY or not frame.USE_PORTRAIT) and 0 or db.portrait.width
-
 		frame.CLASSBAR_YOFFSET = 0
 		frame.BOTTOM_OFFSET = 0
-
-		frame.VARIABLES_SET = true
 	end
 
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
@@ -132,8 +105,7 @@ function UF:Update_RaidpetFrames(frame, db)
 	UF:UpdateNameSettings(frame)
 
 	UF:EnableDisable_Auras(frame)
-	UF:Configure_Auras(frame, 'Buffs')
-	UF:Configure_Auras(frame, 'Debuffs')
+	UF:Configure_AllAuras(frame)
 
 	UF:Configure_AuraWatch(frame, true)
 	UF:Configure_CustomTexts(frame)

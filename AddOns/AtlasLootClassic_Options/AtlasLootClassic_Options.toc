@@ -1,6 +1,6 @@
-﻿## Interface: 11303
+﻿## Interface: 11304
 ## Author: Lag
-## Version: v1.4.5
+## Version: v1.4.8
 ## Dependencies: AtlasLootClassic
 ## LoadOnDemand: 1
 
@@ -11,7 +11,7 @@
 ## Title-frFR: AtlasLoot Classic |cFF22B14C[Options]|r
 ## Title-itIT: AtlasLoot Classic |cFF22B14C[Options]|r
 ## Title-koKR: AtlasLoot 클래식 |cFF22B14C[옵션]|r
-## Title-ptBR: AtlasLoot Classic |cFF22B14C[Options]|r
+## Title-ptBR: AtlasLoot Classic |cFF22B14C[Opções]|r
 ## Title-ruRU: AtlasLoot Classic |cFF22B14C[Настройки]|r
 ## Title-zhCN: AtlasLoot经典版 |cFF22B14C[选项]|r
 ## Title-zhTW: 副本戰利品查詢經典版 |cFF22B14C[設定選項]|r
@@ -22,7 +22,7 @@
 ## Notes-frFR: Module des options
 ## Notes-itIT: AtlasLoot options module
 ## Notes-koKR: AtlasLoot 설정 모듈
-## Notes-ptBR: AtlasLoot options module
+## Notes-ptBR: Módulo de opções de AtlasLoot
 ## Notes-ruRU: Настройки модулей AtlasLoot
 ## Notes-zhCN: AtlasLoot t选项模块
 ## Notes-zhTW: 副本戰利品查詢的選項設定。

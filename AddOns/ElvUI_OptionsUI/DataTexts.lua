@@ -119,11 +119,6 @@ E.Options.args.datatexts = {
 			type = "group",
 			name = L["General"],
 			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["General"],
-				},
 				generalGroup = {
 					order = 2,
 					type = "group",
@@ -200,6 +195,30 @@ E.Options.args.datatexts = {
 						},
 					},
 				},
+				time = {
+					order = 6,
+					type = "group",
+					name = L["Time"],
+					guiInline = true,
+					args = {
+						time24 = {
+							order = 2,
+							type = 'toggle',
+							name = L["24-Hour Time"],
+							desc = L["Toggle 24-hour mode for the time datatext."],
+							get = function(info) return E.db.datatexts.time24 end,
+							set = function(info, value) E.db.datatexts.time24 = value; DT:LoadDataTexts() end,
+						},
+						localtime = {
+							order = 3,
+							type = 'toggle',
+							name = L["Local Time"],
+							desc = L["If not set to true then the server time will be displayed instead."],
+							get = function(info) return E.db.datatexts.localtime end,
+							set = function(info, value) E.db.datatexts.localtime = value; DT:LoadDataTexts() end,
+						},
+					},
+				},
 			},
 		},
 		panels = {
@@ -207,11 +226,6 @@ E.Options.args.datatexts = {
 			name = L["Panels"],
 			order = 4,
 			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["Panels"],
-				},
 				leftChatPanel = {
 					order = 2,
 					name = L["Datatext Panel (Left)"],
@@ -306,11 +320,6 @@ E.Options.args.datatexts = {
 						Minimap:UpdateSettings()
 					end,
 				},
-				spacer = {
-					order = 11,
-					type = "description",
-					name = "\n",
-				},
 				smallPanels = {
 					type = "group",
 					name = L["Small Panels"],
@@ -319,79 +328,11 @@ E.Options.args.datatexts = {
 				},
 			},
 		},
-		currencies = {
-			order = 5,
-			type = "group",
-			name = L["CURRENCY"],
-			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["CURRENCY"],
-				},
-				goldFormat = {
-					order = 2,
-					type = 'select',
-					name = L["Gold Format"],
-					desc = L["The display format of the money text that is shown in the gold datatext and its tooltip."],
-					hidden = function() return (E.db.datatexts.currencies.displayedCurrency ~= "GOLD") end,
-					values = {
-						['SMART'] = L["Smart"],
-						['FULL'] = L["Full"],
-						['SHORT'] = L["SHORT"],
-						['SHORTINT'] = L["Short (Whole Numbers)"],
-						['CONDENSED'] = L["Condensed"],
-						['BLIZZARD'] = L["Blizzard Style"],
-						['BLIZZARD2'] = L["Blizzard Style"].." 2",
-					},
-				},
-				goldCoins = {
-					order = 3,
-					type = 'toggle',
-					name = L["Show Coins"],
-					desc = L["Use coin icons instead of colored text."],
-					hidden = function() return (E.db.datatexts.currencies.displayedCurrency ~= "GOLD") end,
-				},
-			},
-		},
-		time = {
-			order = 6,
-			type = "group",
-			name = L["Time"],
-			args = {
-				header = {
-					order = 1,
-					type = "header",
-					name = L["Time"],
-				},
-				time24 = {
-					order = 2,
-					type = 'toggle',
-					name = L["24-Hour Time"],
-					desc = L["Toggle 24-hour mode for the time datatext."],
-					get = function(info) return E.db.datatexts.time24 end,
-					set = function(info, value) E.db.datatexts.time24 = value; DT:LoadDataTexts() end,
-				},
-				localtime = {
-					order = 3,
-					type = 'toggle',
-					name = L["Local Time"],
-					desc = L["If not set to true then the server time will be displayed instead."],
-					get = function(info) return E.db.datatexts.localtime end,
-					set = function(info, value) E.db.datatexts.localtime = value; DT:LoadDataTexts() end,
-				},
-			},
-		},
 		friends = {
 			order = 7,
 			type = "group",
 			name = L["FRIENDS"],
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["FRIENDS"],
-				},
 				description = {
 					order = 1,
 					type = "description",

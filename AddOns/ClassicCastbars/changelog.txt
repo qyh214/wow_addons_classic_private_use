@@ -1,3 +1,80 @@
+v1.3.3:
+- Fix addon not working when old versions of LibClassicDurations is loaded by some other addon.
+- Minor performance optimizations.
+
+v1.3.2:
+- Casts will now also be stopped on unit jumping.
+- Removed April fools joke, don't worry there'll be a new one next year :)
+- Add options to toggle between showing friendly & enemy casts for nameplates.
+- Add option to use different settings profile per character.
+- Add default list of uninterruptible NPC spells for all locales. (As a side effect your previous auto-learned uninterruptible list will be reset).
+  Note that this is just some sensible defaults, it doesn't have every single uninterruptible spell in the game.
+
+
+v1.3.1:
+- Fix focus frame not being click-through when it's hidden after first usage.
+- Minor improvements and bug fixes to uninterruptible cast system.
+- Localization updates.
+
+
+v1.3.0:
+- Add uninterruptible cast indicator like on retail. You can configure this in the options. (SHIFT+Click the test button to force show uninterruptible castbar)
+  This system works by detecting and learning from interrupt immunities. If you interrupt a casting mob and it shows "immune", the addon will
+  remember this for the next time that spell is being cast and will show a grey uninterruptible spell indicator from then on. If you interrupt into bubble
+  immunity this will be ignored aslong as you have LibClassicDurations enabled (should be embedded in either Details, WeakAuras or ClassicAuraDurations).
+  Auto-learning is currently only enabled for NPCs, against players it will use a prebuilt list of uninterruptible spells instead. This is because there's
+  so many temporary immunities for players that can give false positives. Also note that only interrupts are checked and not silences since its possible
+  for a silence to be immuned while an interrupt still lands. This feature is still very much WIP, please let me know if there's any bugs or oversights.
+- Add option to toggle castbar spark effect.
+- Castbar spark effect is now hidden for channeled casts like on retail.
+- Removed option for detecting cast speed modifiers, it is now always enabled instead.
+- Removed option for showing cast info only. You can achieve the same effect by setting border texture to none, disabling spark & setting castbar background color to zero alpha value.
+- Minor localization string updates & added 40% of Brazilian localizations, thanks to dalanwoopy.
+
+v1.2.11:
+- Update for WoW patch 1.13.4.
+- Fix occasional Lua errors when testmode is enabled after v1.2.8 changes.
+- Fix Arcane Missiles rank 1 not being shown.
+- Fix Arcane Missiles cast by yourself being refreshed every tick if the enemy target is out of LoS.
+
+
+v1.2.10:
+- Fix rare Lua error for player castbar timer when there's no spell name text available.
+
+
+v1.2.9:
+- Add new statusbar color option for cast failed.
+- Fix castbar sometimes being incorrectly shown for a split second when you switch targets and the old target used a channeled spell before.
+- Add 64.29% of German localizations, thanks to x_RazzorX_x!
+
+
+v1.2.8:
+- Castbar now shows a red failed indicator on cast stopped. (Interrupt indicator will still say "Interrupted" instead of "Failed" so you can still track successful interrupts.)
+- Improvements to castbar finish animations.
+- Fix Lua error from v1.2.7 when using player castbar without timer text enabled.
+- Add more French localizations, thanks to Irhala!
+
+
+v1.2.7:
+- Player castbar timer text is now placed outside the castbar if the spell name is too long, just like with the target castbar.
+
+
+v1.2.6:
+- Target castbar is no longer auto reanchored on target of target frame being shown or hidden, instead it's always placed below the target of target frame area.
+- Fix "Show Cast Info Only" option sometimes bugging out if you have it enabled for one type of unit frame but disabled for another.
+- Casting speed modifiers now stack like intended, also haste increases no longer affect channeled abilities.
+- Castbar background will now turn from orange to slightly yellow when the cast is finished but no spell cast success event was detected (e.g when unit is out of range)
+- Improved default settings for player castbar. (only updated on settings reset or fresh install)
+- Increased max & min values allowed for options.
+- Removed option for castbar stop on movement detection, it is now always enabled instead.
+- Add French localizations, thanks to Pgmbru. (still missing some translations)
+
+
+v1.2.5:
+- Fix party castbars not working with ZPerl Party frames. (Raid frames are still not supported.)
+- Fix party frame being hidden while in a party group when toggling party testmode.
+
+
 v1.2.4:
 - Add focus mouseover support. (/focus mouseover)
 - Fix target click trigger for focus castbar being incorrectly placed when not using default UI scale.

@@ -183,6 +183,7 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 		if not localeClass or not class then return end
 
 		local name, realm = UnitName(unit)
+		local nameRealm = (realm and realm ~= "" and format("%s-%s", name, realm)) or name
 		local guildName, guildRankName = GetGuildInfo(unit)
 		local pvpName = UnitPVPName(unit)
 		local relationship = UnitRealmRelationship(unit)
@@ -234,6 +235,14 @@ function TT:SetUnitText(tt, unit, level, isShiftKeyDown)
 			levelLine:SetText(levelString)
 		else
 			GameTooltip:AddLine(levelString)
+		end
+
+		if E.db.tooltip.showElvUIUsers then
+			local addonUser = E.UserList[nameRealm]
+			if addonUser then
+				local v,r,g,b = addonUser == E.version, unpack(E.media.rgbvaluecolor)
+				GameTooltip:AddDoubleLine(L["ElvUI Version:"], addonUser, r,g,b, v and 0 or 1, v and 1 or 0, 0)
+			end
 		end
 	else
 		if UnitIsTapDenied(unit) then

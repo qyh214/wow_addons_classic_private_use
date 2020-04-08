@@ -73,8 +73,6 @@ function QuestieOptionsDefaults:Load()
             trackerbindUntrack = "shiftleft",
             iconFadeLevel = 0.3,
             trackerLocked = true,
-            hideUnexploredMapIcons = false,
-            showRepeatableQuests = true,
             trackerBackgroundEnabled = false,
         },
         char = {
@@ -84,6 +82,7 @@ function QuestieOptionsDefaults:Load()
             enabled = true,
             lowlevel = false,
             manualMinLevelOffset = false,
+            manualMinLevelOffsetAbsolute = false,
             journey = {},
             searchType = 1,
             autoaccept = false,
@@ -91,6 +90,11 @@ function QuestieOptionsDefaults:Load()
             autoModifier = "shift",
             acceptTrivial = false,
             isTrackerExpanded = true,
+            hideUnexploredMapIcons = false,
+            showRepeatableQuests = true,
+            showEventQuests = true,
+            showDungeonQuests = true,
+            showPvPQuests = true,
         },
         profile = {minimap = {hide = false}}
     }

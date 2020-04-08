@@ -58,52 +58,6 @@ function UF:Construct_Raid40Frames()
 	return self
 end
 
-function UF:Raid40SmartVisibility(event)
-	if not self.db or (self.db and not self.db.enable) or (UF.db and not UF.db.smartRaidFilter) or self.isForced then
-		self.blockVisibilityChanges = false
-		return
-	end
-
-	if event == "PLAYER_REGEN_ENABLED" then
-		self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-	end
-
-	if not InCombatLockdown() then
-		self.isInstanceForced = nil
-		local _, instanceType, _, _, maxPlayers, _, _, instanceID = GetInstanceInfo()
-		if instanceType == 'raid' or instanceType == 'pvp' then
-			if UF.instanceMapIDs[instanceID] then
-				maxPlayers = UF.instanceMapIDs[instanceID]
-			end
-
-			UnregisterStateDriver(self, "visibility")
-
-			if(maxPlayers == 40) then
-				self.blockVisibilityChanges = false
-				self.isInstanceForced = true
-				self:Show()
-
-				if(ElvUF_Raid40.numGroups ~= E:Round(maxPlayers/5) and event) then
-					UF:CreateAndUpdateHeaderGroup('raid40')
-				end
-			else
-				self.blockVisibilityChanges = true
-				self:Hide()
-			end
-		elseif self.db.visibility then
-			RegisterStateDriver(self, "visibility", self.db.visibility)
-			self.blockVisibilityChanges = false
-
-			if(ElvUF_Raid40.numGroups ~= self.db.numGroups) then
-				UF:CreateAndUpdateHeaderGroup('raid40')
-			end
-		end
-	else
-		self:RegisterEvent("PLAYER_REGEN_ENABLED")
-		return
-	end
-end
-
 function UF:Update_Raid40Header(header, db)
 	header:GetParent().db = db
 
@@ -113,16 +67,10 @@ function UF:Update_Raid40Header(header, db)
 	if not headerHolder.positioned then
 		headerHolder:ClearAllPoints()
 		headerHolder:Point("BOTTOMLEFT", E.UIParent, "BOTTOMLEFT", 4, 195)
-
 		E:CreateMover(headerHolder, headerHolder:GetName()..'Mover', L["Raid-40 Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,raid40,generalGroup')
 
-		headerHolder:RegisterEvent("PLAYER_ENTERING_WORLD")
-		headerHolder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-		headerHolder:SetScript("OnEvent", UF.Raid40SmartVisibility)
 		headerHolder.positioned = true;
 	end
-
-	UF.Raid40SmartVisibility(headerHolder)
 end
 
 function UF:Update_Raid40Frames(frame, db)
@@ -166,8 +114,12 @@ function UF:Update_Raid40Frames(frame, db)
 		frame.INFO_PANEL_HEIGHT = frame.USE_INFO_PANEL and db.infoPanel.height or 0
 
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
+	end
 
-		frame.VARIABLES_SET = true
+	if db.enable and not frame:IsEnabled() then
+		frame:Enable()
+	elseif not db.enable and frame:IsEnabled() then
+		frame:Disable()
 	end
 
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
@@ -178,8 +130,7 @@ function UF:Update_Raid40Frames(frame, db)
 	UF:UpdateNameSettings(frame)
 
 	UF:EnableDisable_Auras(frame)
-	UF:Configure_Auras(frame, 'Buffs')
-	UF:Configure_Auras(frame, 'Debuffs')
+	UF:Configure_AllAuras(frame)
 
 	UF:Configure_AuraWatch(frame)
 	UF:Configure_CustomTexts(frame)

@@ -156,13 +156,6 @@ local function CreateDatatbarsConfig()
 		get = function(info) return E.global.profileCopy.databars[info[#info]] end,
 		set = function(info, value) E.global.profileCopy.databars[info[#info]] = value; end
 	}
-	config.args.honor = {
-		order = 4,
-		type = "toggle",
-		name = L["HONOR"],
-		get = function(info) return E.global.profileCopy.databars[info[#info]] end,
-		set = function(info, value) E.global.profileCopy.databars[info[#info]] = value; end
-	}
 
 	return config
 end
@@ -471,14 +464,9 @@ E.Options.args.modulecontrol= {
 			type = "group",
 			name = L["Module Copy"],
 			order = 1,
-			childGroups = "select",
+			childGroups = "tab",
 			handler = E.Options.args.profiles.handler,
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Module Copy"],
-				},
 				intro = {
 					order = 1,
 					type = "description",
@@ -503,15 +491,15 @@ E.Options.args.modulecontrol= {
 				elvui = {
 					order = 10,
 					type = 'group',
-					name = E.title,
-					desc = L["Core |cfffe7b2cElvUI|r options."],
-					childGroups = "tab",
+					name = 'ElvUI',
+					desc = L["Core |cff1784d1ElvUI|r options."],
+					childGroups = "tree",
 					disabled = E.Options.args.profiles.args.copyfrom.disabled,
 					args = {
 						header = {
 							order = 0,
 							type = "header",
-							name = L["Core |cfffe7b2cElvUI|r options."],
+							name = L["Core |cff1784d1ElvUI|r options."],
 						},
 						actionbar = CreateActionbarsConfig(),
 						auras = CreateAurasConfig(),
@@ -531,7 +519,7 @@ E.Options.args.modulecontrol= {
 					type = 'group',
 					name = L["Movers"],
 					desc = L["On screen positions for different elements."],
-					childGroups = "tab",
+					childGroups = "tree",
 					disabled = E.Options.args.profiles.args.copyfrom.disabled,
 					args = MC:CreateMoversConfigGroup(),
 				},

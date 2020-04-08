@@ -49,14 +49,14 @@ local LSM = E.Libs.LSM
 
 --Constants
 E.noop = function() end
-E.title = format('|cfffe7b2c%s |r', 'ElvUI')
+E.title = format('|cff1784d1%s |r', 'ElvUI')
+E.version = tonumber(GetAddOnMetadata('ElvUI', 'Version'))
 E.myfaction, E.myLocalizedFaction = UnitFactionGroup('player')
 E.mylevel = UnitLevel('player')
 E.myLocalizedClass, E.myclass, E.myClassID = UnitClass('player')
 E.myLocalizedRace, E.myrace = UnitRace('player')
 E.myname = UnitName('player')
 E.myrealm = GetRealmName()
-E.version = GetAddOnMetadata('ElvUI', 'Version')
 E.wowpatch, E.wowbuild = GetBuildInfo()
 E.wowbuild = tonumber(E.wowbuild)
 E.IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
@@ -65,7 +65,8 @@ E.screenwidth, E.screenheight = GetPhysicalScreenSize()
 E.isMacClient = IsMacClient()
 E.NewSign = '|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:14:14|t' -- not used by ElvUI yet, but plugins like BenikUI and MerathilisUI use it.
 E.TexturePath = 'Interface\\AddOns\\ElvUI\\Media\\Textures\\' -- for plugins?
-E.InfoColor = '|cfffe7b2c'
+E.InfoColor = '|cff1784d1'
+E.UserList = {}
 
 -- oUF Defines
 E.oUF.Tags.Vars.E = E
@@ -535,7 +536,7 @@ end
 --param cleanTable : table you want cleaned
 --param checkTable : table you want to check against.
 --return : a copy of cleanTable with duplicate key/value pairs removed
-function E:RemoveTableDuplicates(cleanTable, checkTable)
+function E:RemoveTableDuplicates(cleanTable, checkTable, customVars)
 	if type(cleanTable) ~= 'table' then
 		E:Print('Bad argument #1 to \'RemoveTableDuplicates\' (table expected)')
 		return
@@ -547,11 +548,12 @@ function E:RemoveTableDuplicates(cleanTable, checkTable)
 
 	local rtdCleaned = {}
 	for option, value in pairs(cleanTable) do
-		if type(value) == 'table' and checkTable[option] and type(checkTable[option]) == 'table' then
-			rtdCleaned[option] = self:RemoveTableDuplicates(value, checkTable[option])
-		else
-			-- Add unique data to our clean table
-			if (cleanTable[option] ~= checkTable[option]) then
+		if not customVars or (customVars[option] or checkTable[option] ~= nil) then
+			-- we only want to add settings which are existing in the default table, unless it's allowed by customVars
+			if type(value) == 'table' and type(checkTable[option]) == 'table' then
+				rtdCleaned[option] = self:RemoveTableDuplicates(value, checkTable[option], customVars)
+			elseif cleanTable[option] ~= checkTable[option] then
+				-- add unique data to our clean table
 				rtdCleaned[option] = value
 			end
 		end
@@ -763,9 +765,10 @@ do
 		if event == 'CHAT_MSG_ADDON' then
 			if sender == myName then return end
 			if prefix == 'ELVUI_VERSIONCHK' then
-				local msg, ver = tonumber(message), tonumber(E.version)
+				local msg, ver = tonumber(message), E.version
 				local inCombat = InCombatLockdown()
 
+				E.UserList[gsub(sender, '%-'..myRealm,'')] = msg
 				if ver ~= G.general.version then
 					if not E.shownUpdatedWhileRunningPopup and not inCombat then
 						E:StaticPopup_Show('ELVUI_UPDATED_WHILE_RUNNING', nil, nil, {mismatch = ver > G.general.version})
@@ -907,6 +910,7 @@ function E:UpdateNamePlates(skipCallback)
 end
 
 function E:UpdateTooltip()
+	Tooltip:SetTooltipFonts()
 	-- for plugins :3
 end
 
@@ -989,7 +993,8 @@ function E:UpdateEnd()
 
 	E:SetMoversClampedToScreen(true) -- Go back to using clamp after resizing has taken place.
 
-	if (E.installSetup ~= true) and (E.private.install_complete == nil or (E.private.install_complete and type(E.private.install_complete) == 'boolean') or (E.private.install_complete and type(tonumber(E.private.install_complete)) == 'number' and tonumber(E.private.install_complete) <= 3.83)) then
+	local iver = E.private.install_complete
+	if (E.installSetup ~= true) and (not iver or ((type(iver) == 'boolean') or (type(tonumber(iver)) == 'number' and tonumber(iver) <= 0.1))) then
 		E.installSetup = nil
 		E:Install()
 	end
@@ -1041,6 +1046,9 @@ do
 			end
 			if E.private.chat.enable then
 				tinsert(staggerTable, 'UpdateChat')
+			end
+			if E.private.tooltip.enable then
+				tinsert(staggerTable, 'UpdateTooltip')
 			end
 			tinsert(staggerTable, 'UpdateDataBars')
 			tinsert(staggerTable, 'UpdateDataTexts')
@@ -1257,12 +1265,11 @@ function E:InitializeModules()
 end
 
 local function buffwatchConvert(spell)
-	if spell.sizeOverride then
-		local newSize = spell.sizeOverride
-		spell.size = (newSize > 8 and newSize) or 8
-		spell.sizeOverride = nil
-	elseif not spell.size or spell.size < 6 then
-		spell.size = 6
+	if spell.sizeOverride then spell.sizeOverride = nil end
+	if spell.size then spell.size = nil end
+
+	if not spell.sizeOffset then
+		spell.sizeOffset = 0
 	end
 
 	if spell.styleOverride then
@@ -1384,12 +1391,6 @@ function E:DBConversions()
 		E.db.nameplates.units.TARGET.scale = nil
 	end
 
-	if not E.db.chat.panelColorConverted then
-		local color = E.db.general.backdropfadecolor
-		E.db.chat.panelColor = {r = color.r, g = color.g, b = color.b, a = color.a}
-		E.db.chat.panelColorConverted = true
-	end
-
 	--Convert cropIcon to tristate
 	local cropIcon = E.db.general.cropIcon
 	if type(cropIcon) == 'boolean' then
@@ -1479,6 +1480,39 @@ function E:DBConversions()
 	for _, spell in pairs(E.db.unitframe.filters.buffwatch) do
 		buffwatchConvert(spell)
 	end
+
+	-- fix aurabars colors
+	local auraBarColors = E.global.unitframe.AuraBarColors
+	for spell, info in pairs(auraBarColors) do
+		if type(spell) == 'string' then
+			local spellID = select(7, GetSpellInfo(spell))
+			if spellID and not auraBarColors[spellID] then
+				auraBarColors[spellID] = info
+				auraBarColors[spell] = nil
+				spell = spellID
+			end
+		end
+
+		if type(info) == 'boolean' then
+			auraBarColors[spell] = { color = { r = 1, g = 1, b = 1 }, enable = info }
+		elseif type(info) == 'table' then
+			if info.r or info.g or info.b then
+				auraBarColors[spell] = { color = { r = info.r or 1, g = info.g or 1, b = info.b or 1 }, enable = true }
+			elseif info.color then -- azil created a void hole, delete it -x-
+				if info.color.color then info.color.color = nil end
+				if info.color.enable then info.color.enable = nil end
+				if info.color.a then info.color.a = nil end -- alpha isnt supported by this
+			end
+		end
+	end
+
+	if E.db.unitframe.colors.debuffHighlight.blendMode == 'MOD' then
+		E.db.unitframe.colors.debuffHighlight.blendMode = P.unitframe.colors.debuffHighlight.blendMode
+	end
+
+	if type(E.db.general.autoRepair) ~= 'boolean' then
+		E.db.general.autoRepair = false
+	end
 end
 
 function E:RefreshModulesDB()
@@ -1492,6 +1526,9 @@ function E:Initialize()
 	twipe(self.db)
 	twipe(self.global)
 	twipe(self.private)
+
+	E.Libs.LSM:SetDefault('font', 'PT Sans Narrow')
+	E.Libs.LSM:SetDefault('statusbar', 'ElvUI Norm')
 
 	self.myguid = UnitGUID('player')
 	self.data = E.Libs.AceDB:New('ElvDB', self.DF)

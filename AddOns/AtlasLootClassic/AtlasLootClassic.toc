@@ -1,6 +1,6 @@
-﻿## Interface: 11303
+﻿## Interface: 11304
 ## Author: Lag
-## Version: v1.4.5
+## Version: v1.4.8
 ## SavedVariables: AtlasLootClassicDB
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDBIcon-1.0, LibDataBroker-1.1, LibClassicItemSets-1.0
 ## DefaultState: Enabled
@@ -15,7 +15,7 @@
 ## Title-frFR: AtlasLoot Classic |cFF22B14C[Noyau]|r
 ## Title-itIT: AtlasLoot Classic |cFF22B14C[Core]|r
 ## Title-koKR: AtlasLoot 클래식 |cFF22B14C[코어]|r
-## Title-ptBR: AtlasLoot Classic |cFF22B14C[Core]|r
+## Title-ptBR: AtlasLoot Classic |cFF22B14C[Núcleo]|r
 ## Title-ruRU: AtlasLoot Classic |cFF22B14C[Ядро]|r
 ## Title-zhCN: AtlasLoot经典版 |cFF22B14C[主程序]|r
 ## Title-zhTW: 副本戰利品查詢經典版 |cFF22B14C[主程式]|r
@@ -25,7 +25,7 @@
 ## Notes-frFR: Affiche les butins possibles des boss
 ## Notes-itIT: Shows the possible loot from the bosses
 ## Notes-koKR: 보스로부터 획득가능한 전리품 표시
-## Notes-ptBR: Shows the possible loot from the bosses
+## Notes-ptBR: Mostra o possível saque dos chefes
 ## Notes-ruRU: Показывает возможную добычу с боссов
 ## Notes-zhCN: 显示首领可能的掉落物品
 ## Notes-zhTW: 顯示首領與小怪可能掉落的物品，並可查詢各陣營與戰場的獎勵物品、套裝物品等資訊。

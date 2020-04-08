@@ -226,7 +226,7 @@ local function OnEnter(self, _, noUpdate)
 	DT:SetupTooltip(self)
 
 	local total, _, online = GetNumGuildMembers()
-	if #guildTable == 0 then BuildGuildTable() end
+	if #guildTable == 0 or #guildTable < online then BuildGuildTable() end
 
 	SortGuildTable(IsShiftKeyDown())
 

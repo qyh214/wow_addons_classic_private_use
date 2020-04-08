@@ -38,99 +38,9 @@ function E:RefreshGUI()
 end
 
 E.Libs.AceConfig:RegisterOptionsTable("ElvUI", E.Options)
-E.Libs.AceConfigDialog:SetDefaultSize("ElvUI", E:GetConfigDefaultSize())
+E.Libs.AceConfigDialog:SetDefaultSize("ElvUI", E:Config_GetDefaultSize())
+E.Options.name = format("%s: |cff99ff33%s|r", L["Version"], E.version)
 
-E.Options.args = {
-	ElvUI_Header = {
-		order = 1,
-		type = "header",
-		name = L["Version"] .. format(": |cff99ff33%s|r", E.version),
-		width = "full"
-	},
-	RepositionWindow = {
-		order = 2,
-		type = "execute",
-		name = L["Reposition Window"],
-		desc = L["Reset the size and position of this frame."],
-		customWidth = 175,
-		func = function()
-			E:UpdateConfigSize(true)
-		end
-	},
-	ToggleTutorial = {
-		order = 3,
-		type = "execute",
-		name = L["Toggle Tutorials"],
-		customWidth = 150,
-		func = function()
-			E:Tutorials(true)
-			E:ToggleOptionsUI()
-		end
-	},
-	Install = {
-		order = 4,
-		type = "execute",
-		name = L["Install"],
-		customWidth = 100,
-		desc = L["Run the installation process."],
-		func = function()
-			E:Install()
-			E:ToggleOptionsUI()
-		end
-	},
-	ResetAllMovers = {
-		order = 5,
-		type = "execute",
-		name = L["Reset Anchors"],
-		customWidth = 150,
-		desc = L["Reset all frames to their original positions."],
-		func = function()
-			E:ResetUI()
-		end
-	},
-	ToggleAnchors = {
-		order = 6,
-		type = "execute",
-		name = L["Toggle Anchors"],
-		customWidth = 150,
-		desc = L["Unlock various elements of the UI to be repositioned."],
-		func = function()
-			E:ToggleMoveMode()
-		end
-	},
-	LoginMessage = {
-		order = 7,
-		type = "toggle",
-		name = L["Login Message"],
-		customWidth = 150,
-		get = function(info)
-			return E.db.general.loginmessage
-		end,
-		set = function(info, value)
-			E.db.general.loginmessage = value
-		end
-	},
-	Info_Separate = {
-		order = 3,
-		type = "group",
-		name = "  ------ "..L["Info/Controls"].." ------",
-		disabled = true,
-		args = {},
-	},
-	Plugin_Separate = {
-		order = 6,
-		type = "group",
-		name = "  --------- "..L["Plugins"].." ---------",
-		disabled = true,
-		hidden = true,
-		args = {},
-	},
-}
-
-local DONATOR_STRING = ""
-local DEVELOPER_STRING = ""
-local TESTER_STRING = ""
-local LINE_BREAK = "\n"
 local DONATORS = {
 	"Dandruff",
 	"Tobur/Tarilya",
@@ -180,23 +90,18 @@ local DEVELOPERS = {
 	"Omega1970",
 	"Hydrazine",
 	"Blazeflack",
-	"NihilisticPandemonium",
-	"|cffff7d0aMerathilis|r",
-	"|cff4fd8d1S|cff50dabfi|cff51ddaem|cff52df9dp|cff53e18cy|cff5ae27b, |cff91de5bb|cffaddb4bu|cffc8d93bt |cffd8c73dm|cffdabc44y |cffdda652n|cffe09e59a|cffe39861m|cffe69268e |cffed8777n|cffef828ae|cfff17d9ce|cfff378aed|cfff573c0s |cffe668d2t|cffd962d5o |cffbe57dcb|cffac62dce |cff8099d7l|cff6ab5d4o|cff54d1d1n|cff4fd8d1g|cff4fd8d1e|cff4fd8d1r|cff4fd8d1.",
 	"|cff0070DEAzilroka|r",
 	"|cff9482c9Darth Predator|r",
-	"Luckyone",
-	"thurin",
-	"catskull",
-	"Crum"
+	"|TInterface\\Icons\\INV_Misc_MonsterClaw_04:15:15:0:0:64:64:5:59:5:59|t |cffff7d0aMerathilis|r",
+	"|cffff2020NihilisticPandemonium|r",
+	E:TextGradient("Simpy but my name needs to be longer", 0.45,0.45,0.45, 0.98,0.4,0.53, 0.98,0.4,0.53, 0.45,0.98,0.45).."|r",
+	"Crum",
 }
 
 local TESTERS = {
 	"Tukui Community",
-	"|cffF76ADBSarah|r - For Sarahing",
 	"Affinity",
 	"Modarch",
-	"Bladesdruid",
 	"Tirain",
 	"Phima",
 	"Veiled",
@@ -204,13 +109,21 @@ local TESTERS = {
 	"Alex",
 	"Nidra",
 	"Kurhyus",
+	"Shrom",
 	"BuG",
+	"Rubgrsch",
+	"Luckyone",
 	"Yachanay",
-	"Catok"
+	"AcidWeb",
+	"Catok",
+	"Catskull",
+	"Thurin",
+	"|TInterface\\Icons\\INV_Staff_30:15:15:0:0:64:64:5:59:5:59|t Loon - For being right",
+	"|TInterface\\Icons\\INV_Misc_MonsterClaw_04:15:15:0:0:64:64:5:59:5:59|t |cffFF7D0ABladesdruid|r - AKA SUPERBEAR",
 }
 
 local function SortList(a, b)
-	return a < b
+	return E:StripString(a) < E:StripString(b)
 end
 
 sort(DONATORS, SortList)
@@ -219,31 +132,133 @@ sort(TESTERS, SortList)
 
 for _, name in pairs(DONATORS) do
 	tinsert(E.CreditsList, name)
-	DONATOR_STRING = DONATOR_STRING .. LINE_BREAK .. name
 end
+local DONATOR_STRING = table.concat(DONATORS, "\n")
 for _, name in pairs(DEVELOPERS) do
 	tinsert(E.CreditsList, name)
-	DEVELOPER_STRING = DEVELOPER_STRING .. LINE_BREAK .. name
 end
+local DEVELOPER_STRING = table.concat(DEVELOPERS, "\n")
 for _, name in pairs(TESTERS) do
 	tinsert(E.CreditsList, name)
-	TESTER_STRING = TESTER_STRING .. LINE_BREAK .. name
 end
+local TESTER_STRING = table.concat(TESTERS, "\n")
 
-E.Options.args.credits = {
+E.Options.args.info = {
+	order = 4,
 	type = "group",
-	name = L["Credits"],
-	order = 5,
+	name = L["Information"],
 	args = {
-		text = {
+		header = {
 			order = 1,
 			type = "description",
-			name =
-				L["ELVUI_CREDITS"] .. "\n\n" ..
-				L["Coding:"] .. DEVELOPER_STRING .. "\n\n" ..
-				L["Testing:"] .. TESTER_STRING .. "\n\n" ..
-				L["Donations:"] .. DONATOR_STRING
-		}
+			name = L["ELVUI_DESC"],
+			fontSize = "medium",
+		},
+		spacer = {
+			order = 2,
+			type = "description",
+			name = "",
+		},
+		support = {
+			order = 3,
+			type = "group",
+			name = L["Support & Download"],
+			guiInline = true,
+			args = {
+				homepage = {
+					order = 1,
+					type = "execute",
+					name = L["Support Forum"],
+					customWidth = 140,
+					func = function() E:StaticPopup_Show("ELVUI_EDITBOX", nil, nil, "https://www.tukui.org/forum/viewforum.php?f=4") end,
+				},
+				git = {
+					order = 2,
+					type = "execute",
+					name = L["Ticket Tracker"],
+					customWidth = 140,
+					func = function() E:StaticPopup_Show("ELVUI_EDITBOX", nil, nil, "https://git.tukui.org/elvui/elvui/issues") end,
+				},
+				discord = {
+					order = 3,
+					type = "execute",
+					name = L["Discord"],
+					customWidth = 140,
+					func = function() E:StaticPopup_Show("ELVUI_EDITBOX", nil, nil, "https://discordapp.com/invite/xFWcfgE") end,
+				},
+				changelog = {
+					order = 4,
+					type = "execute",
+					name = L["Changelog"],
+					customWidth = 140,
+					func = function() E:StaticPopup_Show("ELVUI_EDITBOX", nil, nil, "https://www.tukui.org/download.php?ui=elvui#changelog") end,
+				},
+				development = {
+					order = 5,
+					type = 'execute',
+					name = L["Development Version"],
+					desc = L["Link to the latest development version."],
+					customWidth = 140,
+					func = function() E:StaticPopup_Show("ELVUI_EDITBOX", nil, nil, "https://git.tukui.org/elvui/elvui/-/archive/development/elvui-development.zip") end,
+				},
+			},
+		},
+		credits = {
+			order = 4,
+			type = "group",
+			name = L["Credits"],
+			guiInline = true,
+			args = {
+				string = {
+					order = 1,
+					type = "description",
+					fontSize = "medium",
+					name = L["ELVUI_CREDITS"]
+				},
+			},
+		},
+		coding = {
+			order = 5,
+			type = "group",
+			name = L["Coding:"],
+			guiInline = true,
+			args = {
+				string = {
+					order = 1,
+					type = "description",
+					fontSize = "medium",
+					name = DEVELOPER_STRING
+				},
+			},
+		},
+		testers = {
+			order = 6,
+			type = "group",
+			name = L["Testing:"],
+			guiInline = true,
+			args = {
+				string = {
+					order = 1,
+					type = "description",
+					fontSize = "medium",
+					name = TESTER_STRING
+				},
+			},
+		},
+		donators = {
+			order = 7,
+			type = "group",
+			name = L["Donations:"],
+			guiInline = true,
+			args = {
+				string = {
+					order = 1,
+					type = "description",
+					fontSize = "medium",
+					name = DONATOR_STRING
+				},
+			},
+		},
 	}
 }
 
@@ -282,7 +297,7 @@ local function ExportImport_Open(mode)
 	Frame.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 	Frame:SetLayout("flow")
 
-	local Box = E.Libs.AceGUI:Create("MultiLineEditBox")
+	local Box = E.Libs.AceGUI:Create("MultiLineEditBox-ElvUI")
 	Box:SetNumLines(30)
 	Box:DisableButton(true)
 	Box:SetWidth(800)
@@ -293,6 +308,7 @@ local function ExportImport_Open(mode)
 	Box.editBox.OnCursorChangedOrig = Box.editBox:GetScript("OnCursorChanged")
 	--Remove OnCursorChanged script as it causes weird behaviour with long text
 	Box.editBox:SetScript("OnCursorChanged", nil)
+	Box.scrollFrame:UpdateScrollChildRect()
 
 	local Label1 = E.Libs.AceGUI:Create("Label")
 	local font = GameFontHighlightSmall:GetFont()
@@ -326,11 +342,10 @@ local function ExportImport_Open(mode)
 		ExportFormatDropdown:SetWidth(150)
 		Frame:AddChild(ExportFormatDropdown)
 
-		local exportButton = E.Libs.AceGUI:Create("Button")
+		local exportButton = E.Libs.AceGUI:Create("Button-ElvUI")
 		exportButton:SetText(L["Export Now"])
 		exportButton:SetAutoWidth(true)
-		local function OnClick(self)
-			--Clear labels
+		exportButton:SetCallback("OnClick", function()
 			Label1:SetText("")
 			Label2:SetText("")
 
@@ -339,83 +354,64 @@ local function ExportImport_Open(mode)
 			if not profileKey or not profileExport then
 				Label1:SetText(L["Error exporting profile!"])
 			else
-				Label1:SetText(
-					format("%s: %s%s|r", L["Exported"], E.media.hexvaluecolor, profileTypeItems[profileType])
-				)
+				Label1:SetText(format("%s: %s%s|r", L["Exported"], E.media.hexvaluecolor, profileTypeItems[profileType]))
+
 				if profileType == "profile" then
 					Label2:SetText(format("%s: %s%s|r", L["Profile Name"], E.media.hexvaluecolor, profileKey))
 				end
 			end
+
 			Box:SetText(profileExport)
 			Box.editBox:HighlightText()
 			Box:SetFocus()
+
 			exportString = profileExport
-		end
-		exportButton:SetCallback("OnClick", OnClick)
+		end)
 		Frame:AddChild(exportButton)
 
 		--Set scripts
-		Box.editBox:SetScript(
-			"OnChar",
-			function()
+		Box.editBox:SetScript("OnChar", function()
+			Box:SetText(exportString)
+			Box.editBox:HighlightText()
+		end)
+		Box.editBox:SetScript("OnTextChanged", function(_, userInput)
+			if userInput then
+				--Prevent user from changing export string
 				Box:SetText(exportString)
 				Box.editBox:HighlightText()
+			else
+				--Scroll frame doesn't scroll to the bottom by itself, so let's do that now
+				Box.scrollFrame:SetVerticalScroll(Box.scrollFrame:GetVerticalScrollRange())
 			end
-		)
-		Box.editBox:SetScript(
-			"OnTextChanged",
-			function(self, userInput)
-				if userInput then
-					--Prevent user from changing export string
-					Box:SetText(exportString)
-					Box.editBox:HighlightText()
-				end
-			end
-		)
+		end)
 	elseif mode == "import" then
 		Frame:SetTitle(L["Import Profile"])
 		local importButton = E.Libs.AceGUI:Create("Button-ElvUI") --This version changes text color on SetDisabled
 		importButton:SetDisabled(true)
 		importButton:SetText(L["Import Now"])
 		importButton:SetAutoWidth(true)
-		importButton:SetCallback(
-			"OnClick",
-			function()
-				--Clear labels
-				Label1:SetText("")
-				Label2:SetText("")
+		importButton:SetCallback("OnClick", function()
+			Label1:SetText("")
+			Label2:SetText("")
 
-				local text
-				local success = D:ImportProfile(Box:GetText())
-				if success then
-					text = L["Profile imported successfully!"]
-				else
-					text = L["Error decoding data. Import string may be corrupted!"]
-				end
-				Label1:SetText(text)
-			end
-		)
+			local success = D:ImportProfile(Box:GetText())
+			Label1:SetText((success and L["Profile imported successfully!"]) or L["Error decoding data. Import string may be corrupted!"])
+		end)
 		Frame:AddChild(importButton)
 
 		local decodeButton = E.Libs.AceGUI:Create("Button-ElvUI")
 		decodeButton:SetDisabled(true)
 		decodeButton:SetText(L["Decode Text"])
 		decodeButton:SetAutoWidth(true)
-		decodeButton:SetCallback(
-			"OnClick",
-			function()
-				--Clear labels
-				Label1:SetText("")
-				Label2:SetText("")
-				local decodedText
-				local profileType, profileKey, profileData = D:Decode(Box:GetText())
-				if profileData then
-					decodedText = E:TableToLuaString(profileData)
-				end
-				local importText = D:CreateProfileExport(decodedText, profileType, profileKey)
-				Box:SetText(importText)
-			end
-		)
+		decodeButton:SetCallback("OnClick", function()
+			Label1:SetText("")
+			Label2:SetText("")
+
+			local profileType, profileKey, profileData = D:Decode(Box:GetText())
+			local decodedText = (profileData and E:TableToLuaString(profileData)) or nil
+			local importText = D:CreateProfileExport(decodedText, profileType, profileKey)
+			Box:SetText(importText)
+		end)
 		Frame:AddChild(decodeButton)
 
 		local oldText = ""
@@ -441,46 +437,41 @@ local function ExportImport_Open(mode)
 					importButton:SetDisabled(true)
 					decodeButton:SetDisabled(true)
 				else
-					Label1:SetText(
-						format("%s: %s%s|r", L["Importing"], E.media.hexvaluecolor, profileTypeItems[profileType] or "")
-					)
+					Label1:SetText(format("%s: %s%s|r", L["Importing"], E.media.hexvaluecolor, profileTypeItems[profileType] or ""))
 					if profileType == "profile" then
 						Label2:SetText(format("%s: %s%s|r", L["Profile Name"], E.media.hexvaluecolor, profileKey))
 					end
+
+					--Scroll frame doesn't scroll to the bottom by itself, so let's do that now
+					Box.scrollFrame:UpdateScrollChildRect()
+					Box.scrollFrame:SetVerticalScroll(Box.scrollFrame:GetVerticalScrollRange())
+
 					importButton:SetDisabled(false)
 				end
-
-				--Scroll frame doesn't scroll to the bottom by itself, so let's do that now
-				Box.scrollFrame:UpdateScrollChildRect()
-				Box.scrollFrame:SetVerticalScroll(Box.scrollFrame:GetVerticalScrollRange())
 
 				oldText = text
 			end
 		end
 
 		Box.editBox:SetFocus()
-		--Set scripts
 		Box.editBox:SetScript("OnChar", nil)
 		Box.editBox:SetScript("OnTextChanged", OnTextChanged)
 	end
 
-	Frame:SetCallback(
-		"OnClose",
-		function(widget)
-			--Restore changed scripts
-			Box.editBox:SetScript("OnChar", nil)
-			Box.editBox:SetScript("OnTextChanged", Box.editBox.OnTextChangedOrig)
-			Box.editBox:SetScript("OnCursorChanged", Box.editBox.OnCursorChangedOrig)
-			Box.editBox.OnTextChangedOrig = nil
-			Box.editBox.OnCursorChangedOrig = nil
+	Frame:SetCallback("OnClose", function(widget)
+		--Restore changed scripts
+		Box.editBox:SetScript("OnChar", nil)
+		Box.editBox:SetScript("OnTextChanged", Box.editBox.OnTextChangedOrig)
+		Box.editBox:SetScript("OnCursorChanged", Box.editBox.OnCursorChangedOrig)
+		Box.editBox.OnTextChangedOrig = nil
+		Box.editBox.OnCursorChangedOrig = nil
 
-			--Clear stored export string
-			exportString = ""
+		--Clear stored export string
+		exportString = ""
 
-			E.Libs.AceGUI:Release(widget)
-			E.Libs.AceConfigDialog:Open("ElvUI")
-		end
-	)
+		E.Libs.AceGUI:Release(widget)
+		E:Config_OpenWindow()
+	end)
 
 	--Clear default text
 	Label1:SetText("")
@@ -495,7 +486,8 @@ end
 --Create Profiles Table
 E.Options.args.profiles = E.Libs.AceDBOptions:GetOptionsTable(E.data)
 E.Libs.AceConfig:RegisterOptionsTable("ElvProfiles", E.Options.args.profiles)
-E.Options.args.profiles.order = 4
+E.Options.args.profiles.name = L["Profiles"]
+E.Options.args.profiles.order = 5
 
 if not E.Options.args.profiles.plugins then
 	E.Options.args.profiles.plugins = {}

@@ -139,7 +139,6 @@ function NP:Update_TargetIndicator(nameplate)
 
 		if nameplate.TargetIndicator.Spark and (GlowStyle == "style2" or GlowStyle == "style6" or GlowStyle == "style8") then
 			local size = E.Border + 14
-
 			nameplate.TargetIndicator.Spark:Point("TOPLEFT", nameplate.Health, "TOPLEFT", -(size * 2), size)
 			nameplate.TargetIndicator.Spark:Point("BOTTOMRIGHT", nameplate.Health, "BOTTOMRIGHT", (size * 2), -size)
 			nameplate.TargetIndicator.Spark:SetVertexColor(Color.r, Color.g, Color.b, Color.a)
@@ -166,9 +165,9 @@ function NP:Update_Highlight(nameplate)
 			nameplate:EnableElement("Highlight")
 		end
 
-		if db.health.enable and not (db.nameOnly or nameplate.NameOnlyChanged) then
+		if db.health.enable and not (db.nameOnly or NP:StyleFilterCheckChanges(nameplate, 'NameOnly')) then
 			nameplate.Highlight.texture:SetColorTexture(1, 1, 1, 0.25)
-			nameplate.Highlight.texture:SetAllPoints(nameplate.FlashTexture)
+			nameplate.Highlight.texture:SetAllPoints(nameplate.HealthFlashTexture)
 			nameplate.Highlight.texture:SetAlpha(0.75)
 		else
 			nameplate.Highlight.texture:SetTexture(E.Media.Textures.Spark)

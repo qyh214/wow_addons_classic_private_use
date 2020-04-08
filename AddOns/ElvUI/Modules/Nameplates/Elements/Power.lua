@@ -20,7 +20,7 @@ function NP:Power_UpdateColor(event, unit)
 	local ptype, ptoken, altR, altG, altB = UnitPowerType(unit)
 	element.token = ptoken
 
-	if self.PowerColorChanged then return end
+	if NP:StyleFilterCheckChanges(self, 'PowerColor') then return end
 
 	local r, g, b, t, atlas
 	if(element.colorDead and element.dead) then

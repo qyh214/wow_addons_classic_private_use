@@ -21,17 +21,12 @@ E.Options.args.databars = {
 			name = "",
 		},
 		experience = {
-			order = 1,
+			order = 5,
 			get = function(info) return mod.db.experience[info[#info]] end,
 			set = function(info, value) mod.db.experience[info[#info]] = value; mod:UpdateExperienceDimensions() end,
 			type = "group",
 			name = L["XPBAR_LABEL"],
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["XPBAR_LABEL"],
-				},
 				enable = {
 					order = 1,
 					type = "toggle",
@@ -120,17 +115,12 @@ E.Options.args.databars = {
 			},
 		},
 		petExperience = {
-			order = 2,
+			order = 6,
 			get = function(info) return mod.db.petExperience[info[#info]] end,
 			set = function(info, value) mod.db.petExperience[info[#info]] = value; mod:UpdatePetExperienceDimensions() end,
 			type = "group",
 			name = L["Pet Experience"],
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["Pet Experience"],
-				},
 				enable = {
 					order = 1,
 					type = "toggle",
@@ -219,17 +209,12 @@ E.Options.args.databars = {
 			},
 		},
 		reputation = {
-			order = 3,
+			order = 7,
 			get = function(info) return mod.db.reputation[info[#info]] end,
 			set = function(info, value) mod.db.reputation[info[#info]] = value; mod:UpdateReputationDimensions() end,
 			type = "group",
 			name = L["REPUTATION"],
 			args = {
-				header = {
-					order = 0,
-					type = "header",
-					name = L["REPUTATION"],
-				},
 				enable = {
 					order = 1,
 					type = "toggle",
@@ -251,11 +236,6 @@ E.Options.args.databars = {
 					order = 5,
 					type = "toggle",
 					name = L["Reverse Fill Direction"],
-				},
-				spacer = {
-					order = 6,
-					type = "description",
-					name = " ",
 				},
 				orientation = {
 					order = 7,

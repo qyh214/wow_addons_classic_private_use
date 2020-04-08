@@ -2,6 +2,20 @@
 
 This mod is distributed under Version 2 of the GPL.  A copy of the GPL is included in this zip file with links to non-english translations.
 
+## v1.4.7 (Mar. 07, 2020)
+
+- Update droprates
+- Outrider's Plate Legguards set P6
+- fix rare error with compare tooltips
+
+## v1.4.6 (Feb. 12, 2020)
+
+- Updates for BWL
+
+## v1.4.5 (Jan. 16, 2020)
+
+- Update translations
+
 ## v1.4.4 (Dec. 24, 2019)
 
 - Favourites lists are now sorted by name

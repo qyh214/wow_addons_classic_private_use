@@ -16,6 +16,9 @@ L:SetOptionLocalization{
 }
 L:SetMiscLocalization{
 	Phase2Emote	= "flee as the controlling power of the orb is drained.",
+	YellEgg1 = "You'll pay for forcing me to do this!",
+	YellEgg2 = "Fools! These eggs are more precious than you know!",
+	YellEgg3 = "No - not another one! I'll have your heads for this atrocity!",
 	YellPull 	= "Intruders have breached the hatchery! Sound the alarm! Protect the eggs at all costs!\r\n"--Yes this yell actually has a return and new line in it. as grabbed by transcriptor
 }
 -------------------
@@ -70,6 +73,32 @@ L:SetGeneralLocalization{
 	name = "Flamegor"
 }
 
+
+-----------------------
+--  Vulnerabilities  --
+-----------------------
+-- Chromaggus, Death Talon Overseer and Death Talon Wyrmguard
+L = DBM:GetModLocalization("TalonGuards")
+
+L:SetGeneralLocalization{
+	name = "Talon Guards"
+}
+L:SetWarningLocalization{
+	WarnVulnerable		= "%s Vulnerability"
+}
+L:SetOptionLocalization{
+	WarnVulnerable		= "Show warning for spell vulnerabilities"
+}
+L:SetMiscLocalization{
+	Fire		= "Fire",
+	Nature		= "Nature",
+	Frost		= "Frost",
+	Shadow		= "Shadow",
+	Arcane		= "Arcane",
+	Holy		= "Holy"
+}
+
+
 ------------------
 --  Chromaggus  --
 ------------------
@@ -79,18 +108,31 @@ L:SetGeneralLocalization{
 	name = "Chromaggus"
 }
 L:SetWarningLocalization{
-	WarnBreath		= "%s"
+	WarnBreath		= "%s",
+	WarnVulnerable	= "%s Vulnerability"
 }
 L:SetTimerLocalization{
-	TimerBreathCD	= "%s CD"
+	TimerBreathCD	= "%s CD",
+	TimerBreath		= "%s cast",
+	TimerVulnCD		= "%s Vulnerability CD"
 }
 L:SetOptionLocalization{
 	WarnBreath		= "Show warning when Chromaggus casts one of his Breaths",
-	TimerBreathCD	= "Show Breath CD"
+	WarnVulnerable	= "Show warning for spell vulnerabilities",
+	TimerBreathCD	= "Show Breath CD",
+	TimerBreath		= "Show Breath cast",
+	TimerVulnCD		= "Show Vulnerability CD"
 }
 L:SetMiscLocalization{
-	Breath1	= "First Breath",
-	Breath2	= "Second Breath"
+	Breath1		= "First Breath",
+	Breath2		= "Second Breath",
+	VulnEmote	= "%s flinches as its skin shimmers.",
+	Fire		= "Fire",
+	Nature		= "Nature",
+	Frost		= "Frost",
+	Shadow		= "Shadow",
+	Arcane		= "Arcane",
+	Holy		= "Holy"
 }
 
 ----------------
@@ -102,6 +144,7 @@ L:SetGeneralLocalization{
 	name = "Nefarian"
 }
 L:SetWarningLocalization{
+	WarnAddsLeft		= "%d kills remaining",
 	WarnClassCall		= "%s call"
 }
 L:SetTimerLocalization{
@@ -109,9 +152,11 @@ L:SetTimerLocalization{
 }
 L:SetOptionLocalization{
 	TimerClassCall		= "Show timer for class call duration",
+	WarnAddsLeft		= "Announce kills remaining until Stage 2 is triggered",
 	WarnClassCall		= "Announce class calls"
 }
 L:SetMiscLocalization{
+	YellP1		= "Let the games begin!",
 	YellP2		= "Well done, my minions. The mortals' courage begins to wane! Now, let's see how they contend with the true Lord of Blackrock Spire!!!",
 	YellP3		= "Impossible! Rise my minions!  Serve your master once more!",
 	YellShaman	= "Shamans, show me",

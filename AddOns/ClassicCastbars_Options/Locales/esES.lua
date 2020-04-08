@@ -12,6 +12,8 @@ L["AUTO_POS_BAR"] = "Autoposicionar la barra de lanzamiento"
 L["AUTO_POS_BAR_TOOLTIP"] = [=[Cuando está habilitado, posicionará automáticamente la barra de lanzamiento en función de la cantidad de beneficios que se muestran en el marco de la unidad, etc.
 No funciona con marcos de unidades de terceros.]=]
 L["BORDER_COLOR"] = "Seleccionar Color del Borde"
+L["BORDERSHIELD"] = "Mostrar Escudo de Borde Ininterrumpible"
+L["BORDERSHIELD_TOOLTIP"] = "Muestra un escudo alrededor de la barra de lanzamiento cuando un lanzamiento no puede ser interrumpido. La desactivación de esta opción seguirá mostrando un color de fondo gris en los lanzamientos ininterrumpibles.|cffffff00Puede hacer clic en el botón \"Alternar barra de lanzamiento de prueba\" mientras mantiene presionadas las teclas modificadoras como SHIFT o CTRL para probar la barra de cast con el escudo de borde que se muestra.|r"
 L["CAST_BORDER"] = "Seleccionar Textura del Borde"
 L["CAST_BORDER_TOOLTIP"] = "Selecciona la textura utilizada para el borde de la barra de lanzamiento."
 L["CAST_FONT"] = "Seleccionar Fuente de la Barra de Lanzamiento"
@@ -39,28 +41,24 @@ L["ICON_SIZE"] = "Tamaño del Icono"
 L["ICON_SIZE_TOOLTIP"] = "Establece el tamaño del icono de hechizo de la barra de lanzamiento."
 L["LSM_TEXTURE_NOTE"] = [=[
 Nota: Si usa una textura / fuente de terceros personalizada y la elimina más adelante de su ordenador, deberá restablecer manualmente la textura o fuente aquí para que el complemento continúe funcionando.]=]
-L["MOVEMENT_DETECT"] = "Dejar la barra de lanzamiento en movimiento"
-L["MOVEMENT_DETECT_TOOLTIP"] = [=[Habilita esto para dejar la barra de lanzamiento cuando mueva su personaje.
-Es posible que desee deshabilitar esto si juega con alta latencia, ya que a veces puede detener incorrectamente la barra de lanzamiento para los jugadores con retraso.
-]=]
 L["NAMEPLATE"] = "Placa identificativa"
 L["PARTY"] = "Grupo"
+L["PER_CHARACTER"] = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|tConfiguraciones Específicas de Personaje"
+L["PER_CHARACTER_TOOLTIP"] = "Haga clic aquí para alternar entre la configuración general y la configuración específica de este personaje."
 L["PLAYER"] = "Jugador"
 L["POSXY_TOOLTIP"] = "Ajuste los valores de desplazamiento XY para mover el marco."
-L["PUSHBACK"] = "Detectar retrocesos de lanzar"
-L["PUSHBACK_TOOLTIP"] = [=[Permite la detección de retroceso de lanzamiento y modificadores (es decir, Maldición de la lengua).
-Esta detección no es completamente precisa ya que ciertos hechizos y talentos dan la oportunidad de ignorar el retroceso.
-]=]
 L["REQUIRES_RESTART"] = "Deshabilitar este módulo de barra de lanzamiento requiere una recarga de su interfaz. Presione Aceptar para recargar la IU."
 L["RESET_ALL"] = "Restablecer"
-L["SHOW_CAST_INFO_ONLY"] = "Mostrar solo información de lanzamiento"
-L["SHOW_CAST_INFO_ONLY_TOOLTIP"] = [=[Habilita para ocultar los temporizadores de lanzamiento, pero aún muestra la información de lanzamiento.
-También puede establecer la altura de la barra de lanzamiento en cero y el borde en ninguno si solo desea mostrar el nombre del hechizo en lugar de la barra completa.]=]
+L["SHOW_FOR_ENEMY"] = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|tMostrar Lanzamientos de Enemigos"
+L["SHOW_FOR_FRIENDLY"] = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|tMostrar Lanzamientos de Aliados"
+L["SHOW_SPARK"] = "Mostrar Efecto de Chispa de la Barra de Lanzamiento"
 L["SHOW_TIMER"] = "Mostrar texto del temporizador"
 L["SHOW_TIMER_TOOLTIP"] = "Muestra una cuenta atrás del temporizador para el lanzamiento actual."
 L["STATUS_BG_COLOR"] = "Seleccionar Color de Fondo"
 L["STATUS_CHANNEL_COLOR"] = "Seleccionar Color de Llenar Canal"
 L["STATUS_COLOR"] = "Seleccionar Color de Llenar Lanzamiento"
+L["STATUS_FAILED_COLOR"] = "Seleccionar Color de Relleno de Hechizos Fallidos"
+L["STATUS_UNINTERRUPTIBLE_COLOR"] = "Seleccionar Color de Relleno Ininterrumpible"
 L["TARGET"] = "Objetivo"
 L["TEST"] = "Alternar Probando"
 L["TEST_MODE_DRAG"] = "Modo de Prueba - Arrastre para Mover"

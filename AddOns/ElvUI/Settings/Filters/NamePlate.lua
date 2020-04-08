@@ -287,11 +287,9 @@ E.StyleFilterDefaults = {
 			health = false,
 			power = false,
 			border = false,
-			name = false,
 			healthColor = {r = 1, g = 1, b = 1, a = 1},
 			powerColor = {r = 1, g = 1, b = 1, a = 1},
-			borderColor = {r = 1, g = 1, b = 1, a = 1},
-			nameColor = {r = 1, g = 1, b = 1, a = 1}
+			borderColor = {r = 1, g = 1, b = 1, a = 1}
 		},
 		texture = {
 			enable = false,
@@ -301,6 +299,13 @@ E.StyleFilterDefaults = {
 			enable = false,
 			color = {r = 1, g = 1, b = 1, a = 1},
 			speed = 4
+		},
+		tags = {
+			name = '',
+			level = '',
+			title = '',
+			health = '',
+			power = ''
 		},
 		hide = false,
 		usePortrait = false,

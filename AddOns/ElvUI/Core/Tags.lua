@@ -7,14 +7,16 @@ local translitMark = '!'
 
 --Lua functions
 local _G = _G
-local select = select
-local wipe = wipe
-local floor = floor
-local pairs = pairs
-local gmatch, gsub, format = gmatch, gsub, format
-local strfind, strmatch, utf8lower, utf8sub = strfind, strmatch, string.utf8lower, string.utf8sub
-local strlower = strlower
+local tonumber, next = tonumber, next
+local pairs, wipe, floor, ceil = pairs, wipe, floor, ceil
+local gmatch, gsub, format, select = gmatch, gsub, format, select
+local strfind, strmatch, strlower, strsplit = strfind, strmatch, strlower, strsplit
+local utf8lower, utf8sub, utf8len = string.utf8lower, string.utf8sub, string.utf8len
+
 --WoW API / Variables
+local CreateTextureMarkup = CreateTextureMarkup
+local UnitFactionGroup = UnitFactionGroup
+local GetCVarBool = GetCVarBool
 local GetGuildInfo = GetGuildInfo
 local GetNumGroupMembers = GetNumGroupMembers
 local GetPVPTimer = GetPVPTimer
@@ -42,62 +44,45 @@ local UnitLevel = UnitLevel
 local UnitPower = UnitPower
 local UnitPowerMax = UnitPowerMax
 local UnitPowerType = UnitPowerType
-local UnitReaction = UnitReaction
-local UnitPlayerControlled = UnitPlayerControlled
-
-local CHAT_FLAG_AFK = CHAT_FLAG_AFK:gsub('<(.-)>', '|r<|cffFF0000%1|r>')
-local CHAT_FLAG_DND = CHAT_FLAG_DND:gsub('<(.-)>', '|r<|cffFFFF00%1|r>')
-local PVP = PVP
-local UNITNAME_SUMMON_TITLE17 = UNITNAME_SUMMON_TITLE17
-local UNKNOWN = UNKNOWN
-
-local GetCVarBool = GetCVarBool
-local GetNumQuestLogEntries = GetNumQuestLogEntries
-local GetQuestDifficultyColor = GetQuestDifficultyColor
-local GetQuestLogTitle = GetQuestLogTitle
 local UnitPVPName = UnitPVPName
-local LEVEL = LEVEL
-
-local HasPetUI = HasPetUI
-local GetPetHappiness = GetPetHappiness
-local CreateTextureMarkup = CreateTextureMarkup
+local UnitReaction = UnitReaction
 local CreateAtlasMarkup = CreateAtlasMarkup
 
+local CHAT_FLAG_AFK = CHAT_FLAG_AFK:gsub('<(.-)>', '|r<|cffFF3333%1|r>')
+local CHAT_FLAG_DND = CHAT_FLAG_DND:gsub('<(.-)>', '|r<|cffFFFF33%1|r>')
+
+local HasPetUI = HasPetUI
+local UnitPVPRank = UnitPVPRank
+local GetPVPRankInfo = GetPVPRankInfo
+local GetPetHappiness = GetPetHappiness
+local GetPetLoyalty = GetPetLoyalty
+local GetPetFoodTypes = GetPetFoodTypes
+
 local SPELL_POWER_MANA = Enum.PowerType.Mana or 0
--- GLOBALS: Hex, PowerBarColor, _TAGS, _COLORS
+local LEVEL = LEVEL
+local PVP = PVP
+
+-- GLOBALS: ElvUF, Hex, _TAGS, _COLORS
+
+--Expose local functions for plugins onto this table
+E.TagFunctions = {}
 
 ------------------------------------------------------------------------
 --	Tags
 ------------------------------------------------------------------------
 
-function E:UnitHealthValues(unit)
-	if _G.RealMobHealth and unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) then
-		local c, m, _, _ = _G.RealMobHealth.GetUnitHealth(unit);
-		return c, m
-	elseif _G.MobHealthFrame and unit and not UnitIsPlayer(unit) and not UnitPlayerControlled(unit) then
-		local name, level = UnitName(unit), UnitLevel(unit)
-		local cur, full = _G.MI2_GetMobData(name, level, unit).healthCur, _G.MI2_GetMobData(name, level, unit).healthMax;
-		return cur, full
-	else
-		return UnitHealth(unit), UnitHealthMax(unit)
-	end
-end
-
 local function UnitName(unit)
 	local name, realm = _G.UnitName(unit)
 
-	if (name == UNKNOWN and E.myclass == 'MONK') and UnitIsUnit(unit, 'pet') then
-		name = format(UNITNAME_SUMMON_TITLE17, _G.UnitName('player'))
-	end
-
-	if realm and realm ~= '' then
+	if realm and realm ~= "" then
 		return name, realm
 	else
 		return name
 	end
 end
+E.TagFunctions.UnitName = UnitName
 
-local function abbrev(name)
+local function Abbrev(name)
 	local letters, lastWord = '', strmatch(name, '.+%s(.+)$')
 	if lastWord then
 		for word in gmatch(name, '.-%s') do
@@ -110,6 +95,7 @@ local function abbrev(name)
 	end
 	return name
 end
+E.TagFunctions.Abbrev = Abbrev
 
 ElvUF.Tags.Events['status:text'] = 'PLAYER_FLAGS_CHANGED'
 ElvUF.Tags.Methods['status:text'] = function(unit)
@@ -149,7 +135,7 @@ ElvUF.Tags.Methods['healthcolor'] = function(unit)
 	if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
 		return Hex(0.84, 0.75, 0.65)
 	else
-		local cur, max = E:UnitHealthValues(unit)
+		local cur, max = UnitHealth(unit), UnitHealthMax(unit)
 		local r, g, b = ElvUF:ColorGradient(cur, max, 0.69, 0.31, 0.31, 0.65, 0.63, 0.35, 0.33, 0.59, 0.33)
 		return Hex(r, g, b)
 	end
@@ -157,7 +143,7 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:nostatus'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:deficit-percent:nostatus'] = function(unit)
-	local min, max = E:UnitHealthValues(unit)
+	local min, max = UnitHealth(unit), UnitHealthMax(unit)
 	local deficit = (min / max) - 1
 	if deficit == 0 then
 		return ''
@@ -174,14 +160,14 @@ for textFormat in pairs(E.GetFormattedTextStyles) do
 		if (status) then
 			return status
 		else
-			local min, max = E:UnitHealthValues(unit)
+			local min, max = UnitHealth(unit), UnitHealthMax(unit)
 			return E:GetFormattedText(textFormat, min, max)
 		end
 	end
 
 	ElvUF.Tags.Events[format('health:%s-nostatus', tagTextFormat)] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 	ElvUF.Tags.Methods[format('health:%s-nostatus', tagTextFormat)] = function(unit)
-		local min, max = E:UnitHealthValues(unit)
+		local min, max = UnitHealth(unit), UnitHealthMax(unit)
 		return E:GetFormattedText(textFormat, min, max)
 	end
 
@@ -215,14 +201,14 @@ for textFormat in pairs(E.GetFormattedTextStyles) do
 			if (status) then
 				return status
 			else
-				local min, max = E:UnitHealthValues(unit)
+				local min, max = UnitHealth(unit), UnitHealthMax(unit)
 				return E:GetFormattedText(textFormat, min, max, nil, true)
 			end
 		end
 
 		ElvUF.Tags.Events[format('health:%s-nostatus:shortvalue', tagTextFormat)] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
 		ElvUF.Tags.Methods[format('health:%s-nostatus:shortvalue', tagTextFormat)] = function(unit)
-			local min, max = E:UnitHealthValues(unit)
+			local min, max = UnitHealth(unit), UnitHealthMax(unit)
 			return E:GetFormattedText(textFormat, min, max, nil, true)
 		end
 
@@ -243,7 +229,7 @@ end
 for textFormat, length in pairs({veryshort = 5, short = 10, medium = 15, long = 20}) do
 	ElvUF.Tags.Events[format('health:deficit-percent:name-%s', textFormat)] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 	ElvUF.Tags.Methods[format('health:deficit-percent:name-%s', textFormat)] = function(unit)
-		local cur, max = E:UnitHealthValues(unit)
+		local cur, max = UnitHealth(unit), UnitHealthMax(unit)
 		local deficit = max - cur
 
 		if (deficit > 0 and cur > 0) then
@@ -258,7 +244,7 @@ for textFormat, length in pairs({veryshort = 5, short = 10, medium = 15, long = 
 		local name = UnitName(unit)
 
 		if name and strfind(name, '%s') then
-			name = abbrev(name)
+			name = Abbrev(name)
 		end
 
 		return name ~= nil and E:ShortenString(name, length) or ''
@@ -305,15 +291,43 @@ ElvUF.Tags.Methods['name:abbrev'] = function(unit)
 	local name = UnitName(unit)
 
 	if name and strfind(name, '%s') then
-		name = abbrev(name)
+		name = Abbrev(name)
 	end
 
 	return name ~= nil and name or ''
 end
 
+do
+	local function NameHealthColor(tags,hex,unit,default)
+		if hex == 'class' or hex == 'reaction' then
+			return tags.namecolor(unit)
+		elseif hex and strmatch(hex, '^%x%x%x%x%x%x$') then
+			return '|cFF'..hex
+		end
+
+		return default
+	end
+	E.TagFunctions.NameHealthColor = NameHealthColor
+
+	-- the third arg here is added from the user as like [name:health{ff00ff:00ff00}] or [name:health{class:00ff00}]
+	ElvUF.Tags.Events['name:health'] = 'UNIT_NAME_UPDATE UNIT_FACTION UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH'
+	ElvUF.Tags.Methods['name:health'] = function(unit, _, args)
+		local name = UnitName(unit)
+		if not name then return '' end
+
+		local min, max, bco, fco = UnitHealth(unit), UnitHealthMax(unit), strsplit(':', args or '')
+		local to = ceil(utf8len(name) * (min / max))
+
+		local fill = NameHealthColor(_TAGS, fco, unit, '|cFFff3333')
+		local base = NameHealthColor(_TAGS, bco, unit, '|cFFffffff')
+
+		return to > 0 and (base..utf8sub(name, 0, to)..fill..utf8sub(name, to+1, -1)) or fill..name
+	end
+end
+
 ElvUF.Tags.Events['health:max'] = 'UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:max'] = function(unit)
-	local _, max = E:UnitHealthValues(unit)
+	local _, max = UnitHealth(unit), UnitHealthMax(unit)
 
 	return E:GetFormattedText('CURRENT', max, max)
 end
@@ -335,7 +349,7 @@ end
 
 ElvUF.Tags.Events['health:max:shortvalue'] = 'UNIT_MAXHEALTH'
 ElvUF.Tags.Methods['health:max:shortvalue'] = function(unit)
-	local _, max = E:UnitHealthValues(unit)
+	local _, max = UnitHealth(unit), UnitHealthMax(unit)
 
 	return E:GetFormattedText('CURRENT', max, max, nil, true)
 end
@@ -357,7 +371,7 @@ end
 
 ElvUF.Tags.Events['health:deficit-percent:name'] = 'UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE'
 ElvUF.Tags.Methods['health:deficit-percent:name'] = function(unit)
-	local cur, max = E:UnitHealthValues(unit)
+	local cur, max = UnitHealth(unit), UnitHealthMax(unit)
 	local deficit = max - cur
 
 	if (deficit > 0 and cur > 0) then
@@ -372,7 +386,8 @@ ElvUF.Tags.Methods['manacolor'] = function()
 	if color then
 		return Hex(color[1], color[2], color[3])
 	else
-		return Hex(PowerBarColor.MANA.r, PowerBarColor.MANA.g, PowerBarColor.MANA.b)
+		local mana = _G.PowerBarColor.MANA
+		return Hex(mana.r, mana.g, mana.b)
 	end
 end
 
@@ -920,6 +935,27 @@ ElvUF.Tags.Methods['pvp:icon'] = function(unit)
 	end
 end
 
+local highestVersion = E.version
+ElvUF.Tags.OnUpdateThrottle['ElvUI-Users'] = 20
+ElvUF.Tags.Methods['ElvUI-Users'] = function(unit)
+	if E.UserList and next(E.UserList) then
+		local name, realm = UnitName(unit)
+		if name then
+			local nameRealm = (realm and realm ~= "" and format("%s-%s", name, realm)) or name
+			local userVersion = nameRealm and E.UserList[nameRealm]
+			if userVersion then
+				if highestVersion < userVersion then
+					highestVersion = userVersion
+				end
+				return (userVersion < highestVersion) and "|cffFF3333E|r" or "|cff3366ffE|r"
+			end
+		end
+	end
+	return ""
+end
+
+ElvUF.Tags.Events['creature'] = ''
+
 E.TagInfo = {
 	--Colors
 	['namecolor'] = { category = 'Colors', description = "Colors names by player class or NPC reaction" },
@@ -933,6 +969,7 @@ E.TagInfo = {
 	['manacolor'] = { category = 'Colors', description = "Changes the text color to a light-blue mana color" },
 	--Classification
 	['classification'] = { category = 'Classification', description = "Displays the unit's classification (e.g. 'ELITE' and 'RARE')" },
+	['creature'] = { category = 'Classification', description = "Displays the creature type of the unit" },
 	['shortclassification'] = { category = 'Classification', description = "Displays the unit's classification in short form (e.g. '+' for ELITE and 'R' for RARE)" },
 	['classification:icon'] = { category = 'Classification', description = "Displays the unit's classification in icon form (golden icon for 'ELITE' silver icon for 'RARE')" },
 	['rare'] = { category = 'Classification', description = "Displays 'Rare' when the unit is a rare or rareelite" },
@@ -1095,6 +1132,7 @@ E.TagInfo = {
 	['affix'] = { category = 'Miscellanous', description = "Displays low level critter mobs" },
 	['class'] = { category = 'Miscellanous', description = "Displays the class of the unit, if that unit is a player" },
 	['race'] = { category = 'Miscellanous', description = "Displays the race" },
+	['ElvUI-Users'] = { category = 'Miscellanous', description = "Displays ElvUI users and their version" },
 	--Range
 	['nearbyplayers:8'] = { category = 'Range', description = "Displays all players within 8 yards" },
 	['nearbyplayers:10'] = { category = 'Range', description = "Displays all players within 10 yards" },

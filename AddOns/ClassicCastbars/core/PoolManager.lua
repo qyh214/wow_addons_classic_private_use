@@ -2,7 +2,17 @@ local _, namespace = ...
 local PoolManager = {}
 namespace.PoolManager = PoolManager
 
-local framePool = CreateFramePool("Statusbar", UIParent, "SmallCastingBarFrameTemplate", PoolManager.ResetterFunc)
+local function ResetterFunc(pool, frame)
+    frame:Hide()
+    frame:SetParent(nil)
+    frame:ClearAllPoints()
+
+    if frame._data then
+        frame._data = nil
+    end
+end
+
+local framePool = CreateFramePool("Statusbar", UIParent, "SmallCastingBarFrameTemplate", ResetterFunc)
 local framesCreated = 0
 local framesActive = 0
 
@@ -51,16 +61,6 @@ function PoolManager:InitializeNewFrame(frame)
     frame.Timer:SetPoint("RIGHT", frame, -6, 0)
 end
 
-function PoolManager:ResetterFunc(pool, frame)
-    frame:Hide()
-    frame:SetParent(nil)
-    frame:ClearAllPoints()
-
-    if frame._data then
-        frame._data = nil
-    end
-end
-
 function PoolManager:GetFramePool()
     return framePool
 end
@@ -69,11 +69,3 @@ end
     print(format("Created %d frames in total.", framesCreated))
     print(format("Currently active frames: %d.", framesActive))
 end]]
-
-if date("%d.%m") == "01.04" then -- April Fools :)
-    C_Timer.After(1800, function()
-        if not UnitIsDeadOrGhost("player") then
-            DoEmote("fart")
-        end
-    end)
-end

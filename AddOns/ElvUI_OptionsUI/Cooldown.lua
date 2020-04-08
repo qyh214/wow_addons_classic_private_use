@@ -28,11 +28,6 @@ local function group(order, db, label)
 			E:UpdateCooldownSettings(db);
 		end,
 		args = {
-			header = {
-				order = 1,
-				type = "header",
-				name = label,
-			},
 			reverse = {
 				type = "toggle",
 				order = 2,
@@ -45,7 +40,7 @@ local function group(order, db, label)
 				type = "toggle",
 				order = 3,
 				name = L["Force Hide Blizzard Text"],
-				desc = L["This option will force hide Blizzard's cooldown text if it's enabled at [Interface > ActionBars > Show Numbers on Cooldown]."],
+				desc = L["This option will force hide Blizzard's cooldown text if it is enabled at [Interface > ActionBars > Show Numbers on Cooldown]."],
 				get = function(info) return (profile(db))[info[#info]] end,
 				set = function(info, value) (profile(db))[info[#info]] = value; E:UpdateCooldownSettings(db); end,
 				disabled = function()
@@ -116,11 +111,6 @@ local function group(order, db, label)
 						order = 3,
 						type = "header",
 						name = L["Threshold Colors"]
-					},
-					spacer2 = {
-						order = 4,
-						type = "description",
-						name = " "
 					},
 					expiringColor = {
 						type = 'color',
@@ -251,11 +241,6 @@ local function group(order, db, label)
 						name = L["Enable"],
 						desc = L["This will override the global cooldown settings."],
 						disabled = E.noop,
-					},
-					spacer1 = {
-						order = 2,
-						type = "description",
-						name = " "
 					},
 					fontSize = {
 						order = 3,

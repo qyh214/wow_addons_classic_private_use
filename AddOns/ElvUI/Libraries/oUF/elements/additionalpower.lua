@@ -114,7 +114,7 @@ local function ColorPath(self, ...)
 end
 
 local function Update(self, event, unit, powertype)
-	if(not (unit and unit == 'player') and powertype == 'MANA') then return end
+	if(not (unit and UnitIsUnit(unit, 'player') and powertype == 'MANA')) then return end
 
 	local element = self.AdditionalPower
 	--[[ Callback: AdditionalPower:PreUpdate(unit)
@@ -131,7 +131,12 @@ local function Update(self, event, unit, powertype)
 	local max = UnitPowerMax('player', 0)
 
 	element:SetMinMaxValues(0, max)
-	element:SetValue(cur)
+
+	if not UnitIsConnected(unit) then
+		element:SetValue(max)
+	else
+		element:SetValue(cur)
+	end
 
 	element.cur = cur
 	element.max = max
@@ -158,7 +163,7 @@ local function Path(self, ...)
 	* unit  - the unit accompanying the event (string)
 	* ...   - the arguments accompanying the event
 	--]]
-	(self.AdditionalPower.Override or Update) (self, ...)
+	(self.AdditionalPower.Override or Update) (self, ...);
 
 	ColorPath(self, ...)
 end
@@ -242,7 +247,7 @@ end
 
 local function Enable(self, unit)
 	local element = self.AdditionalPower
-	if(element and unit == 'player') then
+	if(element and UnitIsUnit(unit, 'player')) then
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 

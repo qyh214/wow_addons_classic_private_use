@@ -115,7 +115,7 @@ end
 function M:MERCHANT_SHOW()
 	if E.db.bags.vendorGrays.enable then E:Delay(0.5, Bags.VendorGrays, Bags) end
 
-	if E.db.general.autoRepair == 'NONE' or IsShiftKeyDown() or not CanMerchantRepair() then return end
+	if not E.db.general.autoRepair or IsShiftKeyDown() or not CanMerchantRepair() then return end
 
 	--Prepare to catch "not enough money" messages
 	self:RegisterEvent("UI_ERROR_MESSAGE")

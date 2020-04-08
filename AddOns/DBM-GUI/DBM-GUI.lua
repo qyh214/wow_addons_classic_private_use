@@ -43,7 +43,7 @@
 --
 
 
-local revision =(string.sub("20191116195159", 1, -5))
+local revision =(string.sub("20200312223333", 1, -5))
 local FrameTitle = "DBM_GUI_Option_"	-- all GUI frames get automatically a name FrameTitle..ID
 
 local PanelPrototype = {}
@@ -768,7 +768,7 @@ function PanelPrototype:CreateColorSelect(dimension, withalpha, alphawidth)
 
 	-- create the colorpicker
 	local colorwheelthumbtexture = colorselect:CreateTexture()
-	colorwheelthumbtexture:SetTexture(137056)--"Interface\\Buttons\\UI-ColorPicker-Buttons"
+	colorwheelthumbtexture:SetTexture(130756)--"Interface\\Buttons\\UI-ColorPicker-Buttons"
 	colorwheelthumbtexture:SetWidth(10)
 	colorwheelthumbtexture:SetHeight(10)
 	colorwheelthumbtexture:SetTexCoord(0,0.15625, 0, 0.625)
@@ -1081,7 +1081,6 @@ do
 		else
 			TABLE = DBM_GUI_Bosses:GetVisibleTabs()
 		end
-		local element
 
 		for i, element in ipairs(displayedElements) do
 			displayedElements[i] = nil
@@ -1116,7 +1115,7 @@ do
 		end
 
 		for i = 1, #buttons do
-			element = displayedElements[i + offset]
+			local element = displayedElements[i + offset]
 			if ( not element ) then
 				DBM_GUI_OptionsFrame:HideButton(buttons[i])
 			else
@@ -1465,6 +1464,7 @@ local function CreateOptionsMenu()
 		local WarningIconRight 		= raidwarnoptions:CreateCheckButton(L.WarningIconRight,  true, nil, "WarningIconRight")
 		local WarningIconChat 		= raidwarnoptions:CreateCheckButton(L.WarningIconChat,  true, nil, "WarningIconChat")
 		local WarningAlphabetical	= raidwarnoptions:CreateCheckButton(L.WarningAlphabetical,  true, nil, "WarningAlphabetical")
+		local WarningShortText		= raidwarnoptions:CreateCheckButton(L.ShortTextSpellname,  true, nil, "WarningShortText")
 
 		-- RaidWarn Font
 		local Fonts = MixinSharedMedia3("font", {
@@ -1479,7 +1479,7 @@ local function CreateOptionsMenu()
 			DBM:UpdateWarningOptions()
 			DBM:AddWarning(DBM_CORE_MOVE_WARNING_MESSAGE)
 		end)
-		FontDropDown:SetPoint("TOPLEFT", WarningAlphabetical, "BOTTOMLEFT", 0, -10)
+		FontDropDown:SetPoint("TOPLEFT", WarningShortText, "BOTTOMLEFT", 0, -10)
 
 		-- RaidWarn Font Style
 		local FontStyles = {
@@ -1553,6 +1553,12 @@ local function CreateOptionsMenu()
 			end)
 		end
 
+		local movemebutton = raidwarnoptions:CreateButton(L.MoveMe, 100, 16)
+		movemebutton:SetPoint('TOPRIGHT', raidwarnoptions.frame, "TOPRIGHT", -5, -5)
+		movemebutton:SetNormalFontObject(GameFontNormalSmall)
+		movemebutton:SetHighlightFontObject(GameFontNormalSmall)
+		movemebutton:SetScript("OnClick", function() DBM:MoveWarning() end)
+
 		--Raid Warning Colors
 		local raidwarncolors = RaidWarningPanel:CreateArea(L.RaidWarnColors, nil, 150, true)
 
@@ -1607,11 +1613,6 @@ local function CreateOptionsMenu()
 		local infotext = raidwarncolors:CreateText(L.InfoRaidWarning, 380, false, GameFontNormalSmall, "LEFT")
 		infotext:SetPoint('BOTTOMLEFT', raidwarncolors.frame, "BOTTOMLEFT", 10, 10)
 
-		local movemebutton = raidwarncolors:CreateButton(L.MoveMe, 100, 16)
-		movemebutton:SetPoint('BOTTOMRIGHT', raidwarncolors.frame, "TOPRIGHT", 0, -1)
-		movemebutton:SetNormalFontObject(GameFontNormalSmall)
-		movemebutton:SetHighlightFontObject(GameFontNormalSmall)
-		movemebutton:SetScript("OnClick", function() DBM:MoveWarning() end)
 		RaidWarningPanel:SetMyOwnHeight()
 	end
 
@@ -2117,7 +2118,7 @@ local function CreateOptionsMenu()
 		bar7OptionsText2:SetPoint("TOPLEFT", customInline, "TOPLEFT", 0, -60)
 
 		--General Options
-		local BarSetup = BarSetupPanel:CreateArea(L.AreaTitle_BarSetup, nil, 410, true)
+		local BarSetup = BarSetupPanel:CreateArea(L.AreaTitle_BarSetup, nil, 460, true)
 
 		local color1 = BarSetup:CreateColorSelect(64)
 		local color2 = BarSetup:CreateColorSelect(64)
@@ -2187,6 +2188,16 @@ local function CreateOptionsMenu()
 			end
 		end
 
+		local Styles = {
+			{	text	= L.BarDBM,				value	= "DBM" },
+			{	text	= L.BarSimple,			value 	= "NoAnim" }
+		}
+
+		local StyleDropDown = BarSetup:CreateDropdown(L.BarStyle, Styles, "DBT", "BarStyle", function(value)
+			DBM.Bars:SetOption("BarStyle", value)
+		end, 210)
+		StyleDropDown:SetPoint("TOPLEFT", BarSetup.frame, "TOPLEFT", 210, -25)
+
 		local Textures = MixinSharedMedia3("statusbar", {
 			{	text	= "Default",	value 	= "Interface\\AddOns\\DBM-DefaultSkin\\textures\\default.blp", 	texture	= "Interface\\AddOns\\DBM-DefaultSkin\\textures\\default.blp"	},
 			{	text	= "Blizzad",	value 	= "Interface\\PaperDollInfoFrame\\UI-Character-Skills-Bar", 	texture	= 136570	},
@@ -2198,17 +2209,7 @@ local function CreateOptionsMenu()
 		local TextureDropDown = BarSetup:CreateDropdown(L.BarTexture, Textures, "DBT", "Texture", function(value)
 			DBM.Bars:SetOption("Texture", value)
 		end)
-		TextureDropDown:SetPoint("TOPLEFT", BarSetup.frame, "TOPLEFT", 210, -25)
-
-		local Styles = {
-			{	text	= L.BarDBM,				value	= "DBM" },
-			{	text	= L.BarSimple,			value 	= "NoAnim" }
-		}
-
-		local StyleDropDown = BarSetup:CreateDropdown(L.BarStyle, Styles, "DBT", "BarStyle", function(value)
-			DBM.Bars:SetOption("BarStyle", value)
-		end)
-		StyleDropDown:SetPoint("TOPLEFT", TextureDropDown, "BOTTOMLEFT", 0, -10)
+		TextureDropDown:SetPoint("TOPLEFT", StyleDropDown, "BOTTOMLEFT", 0, -10)
 
 		local Fonts = MixinSharedMedia3("font", {
 			{	text	= "Default",		value 	= standardFont,					font = standardFont	},
@@ -2220,7 +2221,7 @@ local function CreateOptionsMenu()
 		local FontDropDown = BarSetup:CreateDropdown(L.Bar_Font, Fonts, "DBT", "Font", function(value)
 			DBM.Bars:SetOption("Font", value)
 		end)
-		FontDropDown:SetPoint("TOPLEFT", StyleDropDown, "BOTTOMLEFT", 0, -10)
+		FontDropDown:SetPoint("TOPLEFT", TextureDropDown, "BOTTOMLEFT", 0, -10)
 
 		local FontFlags = {
 			{	text	= L.None,					value 	= "None"						},
@@ -2230,7 +2231,7 @@ local function CreateOptionsMenu()
 			{	text	= L.MonochromeThickOutline,	value 	= "MONOCHROME,THICKOUTLINE"		}
 		}
 
-		local FontFlagDropDown = BarSetup:CreateDropdown("Font Flags", FontFlags, "DBT", "FontFlag",
+		local FontFlagDropDown = BarSetup:CreateDropdown(L.Warn_FontStyle, FontFlags, "DBT", "FontFlag",
 			function(value)
 				DBM.Bars:SetOption("FontFlag", value)
 			end)
@@ -2242,8 +2243,14 @@ local function CreateOptionsMenu()
 		local iconright = BarSetup:CreateCheckButton(L.BarIconRight, nil, nil, nil, "IconRight")
 		iconright:SetPoint("LEFT", iconleft, "LEFT", 130, 0)
 
+		local SparkBars = BarSetup:CreateCheckButton(L.BarSpark, false, nil, nil, "Spark")
+		SparkBars:SetPoint("TOPLEFT", iconleft, "BOTTOMLEFT", 0, 0)
+
+		local FlashBars = BarSetup:CreateCheckButton(L.BarFlash, false, nil, nil, "FlashBar")
+		FlashBars:SetPoint("TOPLEFT", SparkBars, "BOTTOMLEFT", 0, 0)
+
 		local ClickThrough = BarSetup:CreateCheckButton(L.ClickThrough, false, nil, nil, "ClickThrough")
-		ClickThrough:SetPoint("TOPLEFT", iconleft, "BOTTOMLEFT", 0, 0)
+		ClickThrough:SetPoint("TOPLEFT", FlashBars, "BOTTOMLEFT", 0, 0)
 
 		local SortBars = BarSetup:CreateCheckButton(L.BarSort, false, nil, nil, "Sort")
 		SortBars:SetPoint("TOPLEFT", ClickThrough, "BOTTOMLEFT", 0, 0)
@@ -2257,8 +2264,11 @@ local function CreateOptionsMenu()
 		local ShortTimers = BarSetup:CreateCheckButton(L.ShortTimerText, false, nil, "ShortTimerText")
 		ShortTimers:SetPoint("TOPLEFT", ColorBars, "BOTTOMLEFT", 0, 0)
 
+		local StripTimers = BarSetup:CreateCheckButton(L.StripTimerText, false, nil, nil, "StripCDText")
+		StripTimers:SetPoint("TOPLEFT", ShortTimers, "BOTTOMLEFT", 0, 0)
+
 		local KeepTimers = BarSetup:CreateCheckButton(L.KeepBar, false, nil, nil, "KeepBars")
-		KeepTimers:SetPoint("TOPLEFT", ShortTimers, "BOTTOMLEFT", 0, 0)
+		KeepTimers:SetPoint("TOPLEFT", StripTimers, "BOTTOMLEFT", 0, 0)
 
 		local KeepTimers2 = BarSetup:CreateText(L.KeepBar2, 405, nil, nil, "LEFT")
 		KeepTimers2:SetPoint("TOPLEFT", KeepTimers, "BOTTOMLEFT", 25, 10)
@@ -2272,22 +2282,13 @@ local function CreateOptionsMenu()
 		-- Functions for bar setup
 		local function createDBTOnShowHandler(option)
 			return function(self)
-				if option == "EnlargeBarsPercent" then
-					self:SetValue(DBM.Bars:GetOption(option) * 100)
-				else
-					self:SetValue(DBM.Bars:GetOption(option))
-				end
+				self:SetValue(DBM.Bars:GetOption(option))
 			end
 		end
 		local function createDBTOnValueChangedHandler(option)
 			return function(self)
-				if option == "EnlargeBarsPercent" then
-					DBM.Bars:SetOption(option, self:GetValue() / 100)
-					self:SetValue(DBM.Bars:GetOption(option) * 100)
-				else
-					DBM.Bars:SetOption(option, self:GetValue())
-					self:SetValue(DBM.Bars:GetOption(option))
-				end
+				DBM.Bars:SetOption(option, self:GetValue())
+				self:SetValue(DBM.Bars:GetOption(option))
 			end
 		end
 
@@ -2311,24 +2312,10 @@ local function CreateOptionsMenu()
 		DecimalSlider:SetScript("OnShow", createDBTOnShowHandler("TDecimal"))
 		DecimalSlider:HookScript("OnValueChanged", createDBTOnValueChangedHandler("TDecimal"))
 
-		-------
-		local BarSetupDBMClassic = BarSetupPanel:CreateArea(L.Bar_DBMOnly, nil, 100, true)
-
 		local EnlargeTimeSlider = BarSetup:CreateSlider(L.Bar_EnlargeTime, 6, 30, 1)
-		EnlargeTimeSlider:SetPoint("TOPLEFT", BarSetupDBMClassic.frame, "TOPLEFT", 30, -20)
+		EnlargeTimeSlider:SetPoint("TOPLEFT", BarSetup.frame, "TOPLEFT", 20, -310)
 		EnlargeTimeSlider:SetScript("OnShow", createDBTOnShowHandler("EnlargeBarTime"))
 		EnlargeTimeSlider:HookScript("OnValueChanged", createDBTOnValueChangedHandler("EnlargeBarTime"))
-
-		local EnlargePerecntSlider = BarSetup:CreateSlider(L.Bar_EnlargePercent, 0, 50, 0.5)
-		EnlargePerecntSlider:SetPoint("TOPLEFT", BarSetupDBMClassic.frame, "TOPLEFT", 30, -65)
-		EnlargePerecntSlider:SetScript("OnShow", createDBTOnShowHandler("EnlargeBarsPercent"))
-		EnlargePerecntSlider:HookScript("OnValueChanged", createDBTOnValueChangedHandler("EnlargeBarsPercent"))
-
-		local SparkBars = BarSetup:CreateCheckButton(L.BarSpark, false, nil, nil, "Spark")
-		SparkBars:SetPoint("TOPLEFT", BarSetupDBMClassic.frame, "TOPLEFT", 270, -20)
-
-		local FlashBars = BarSetup:CreateCheckButton(L.BarFlash, false, nil, nil, "Flash")
-		FlashBars:SetPoint("TOPLEFT", SparkBars, "BOTTOMLEFT", 0, 0)
 
 		-----------------------
 		-- Small Bar Options --
@@ -2452,33 +2439,22 @@ local function CreateOptionsMenu()
 
 	do
 		local specPanel = DBM_GUI_Frame:CreateNewPanel(L.Panel_SpecWarnFrame, "option")
-		local specArea = specPanel:CreateArea(L.Area_SpecWarn, nil, 800, true)
+		local specArea = specPanel:CreateArea(L.Area_SpecWarn, nil, 300, true)
 		local check1 = specArea:CreateCheckButton(L.SpecWarn_ClassColor, true, nil, "SWarnClassColor")
 		local check2 = specArea:CreateCheckButton(L.WarningAlphabetical, true, nil, "SWarningAlphabetical")
-		local check3 = specArea:CreateCheckButton(L.SpecWarn_FlashFrame, true, nil, "ShowFlashFrame")
-		local check4 = specArea:CreateCheckButton(L.ShowSWarningsInChat, true, nil, "ShowSWarningsInChat")
-		local check5 = specArea:CreateCheckButton(L.SWarnNameInNote, true, nil, "SWarnNameInNote")
-		local check6 = specArea:CreateCheckButton(L.SpecialWarningIcon, true, nil, "SpecialWarningIcon")
-
-		local flashSlider = specArea:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 3, 1, 100)
-		flashSlider:SetPoint('BOTTOMLEFT', check3, "BOTTOMLEFT", 330, 0)
-		flashSlider:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashRepeatAmount)) end)
-		flashSlider:HookScript("OnValueChanged", function(self) DBM.Options.SpecialWarningFlashRepeatAmount = mfloor(self:GetValue()) end)
-
-		local showbutton = specArea:CreateButton(L.SpecWarn_DemoButton, 120, 16)
-		showbutton:SetPoint('TOPRIGHT', specArea.frame, "TOPRIGHT", -5, -5)
-		showbutton:SetNormalFontObject(GameFontNormalSmall)
-		showbutton:SetHighlightFontObject(GameFontNormalSmall)
-		showbutton:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 1) end)
+		local check3 = specArea:CreateCheckButton(L.ShowSWarningsInChat, true, nil, "ShowSWarningsInChat")
+		local check4 = specArea:CreateCheckButton(L.SWarnNameInNote, true, nil, "SWarnNameInNote")
+		local check5 = specArea:CreateCheckButton(L.SpecialWarningIcon, true, nil, "SpecialWarningIcon")
+		local check6 = specArea:CreateCheckButton(L.ShortTextSpellname, true, nil, "SpecialWarningShortText")
 
 		local movemebutton = specArea:CreateButton(L.SpecWarn_MoveMe, 120, 16)
-		movemebutton:SetPoint('TOPRIGHT', showbutton, "BOTTOMRIGHT", 0, -5)
+		movemebutton:SetPoint('TOPRIGHT', specArea.frame, "TOPRIGHT", 0, -5)
 		movemebutton:SetNormalFontObject(GameFontNormalSmall)
 		movemebutton:SetHighlightFontObject(GameFontNormalSmall)
 		movemebutton:SetScript("OnClick", function() DBM:MoveSpecialWarning() end)
 
 		local color0 = specArea:CreateColorSelect(64)
-		color0:SetPoint('TOPLEFT', specArea.frame, "TOPLEFT", 20, -180)
+		color0:SetPoint('TOPLEFT', specArea.frame, "TOPLEFT", 20, -200)
 		local color0text = specArea:CreateText(L.SpecWarn_FontColor, 80)
 		color0text:SetPoint("BOTTOM", color0, "TOP", 5, 4)
 		local color0reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
@@ -2489,7 +2465,7 @@ local function CreateOptionsMenu()
 				DBM.Options.SpecialWarningFontCol[3] = DBM.DefaultOptions.SpecialWarningFontCol[3]
 				color0:SetColorRGB(DBM.Options.SpecialWarningFontCol[1], DBM.Options.SpecialWarningFontCol[2], DBM.Options.SpecialWarningFontCol[3])
 				DBM:UpdateSpecialWarningOptions()
-				DBM:ShowTestSpecialWarning(nil, 1)
+				--DBM:ShowTestSpecialWarning(nil, 1)
 		end)
 		do
 			local firstshow = true
@@ -2504,7 +2480,7 @@ local function CreateOptionsMenu()
 					DBM.Options.SpecialWarningFontCol[3] = select(3, self:GetColorRGB())
 					color0text:SetTextColor(self:GetColorRGB())
 					DBM:UpdateSpecialWarningOptions()
-					DBM:ShowTestSpecialWarning(nil, 1)
+					--DBM:ShowTestSpecialWarning(nil, 1)
 			end)
 		end
 
@@ -2520,7 +2496,7 @@ local function CreateOptionsMenu()
 			DBM:UpdateSpecialWarningOptions()
 			DBM:ShowTestSpecialWarning(nil, 1)
 		end)
-		FontDropDown:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -178)
+		FontDropDown:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 95, -198)
 
 		local FontStyles = {
 			{	text	= L.None,					value 	= "None"						},
@@ -2577,11 +2553,33 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local color1 = specArea:CreateColorSelect(64)
-		color1:SetPoint('TOPLEFT', color0, "TOPLEFT", 0, -105)
-		local color1text = specArea:CreateText(L.SpecWarn_FlashColor:format(1), 80)
+		local Sounds = MixinSharedMedia3("sound", {
+			{	text	= L.NoSound,			value	= "" },
+			--{ sound=true, text = "AirHorn", value = "Interface\\AddOns\\DBM-Core\\sounds\\AirHorn.ogg" },
+			{ sound=true, text = "Algalon: Beware!", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\UR_Algalon_BHole01.ogg" },
+			{ sound=true, text = "BB Wolf: Run Away", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\HoodWolfTransformPlayer01.ogg" },
+			--{ sound=true, text = "Blizzard", value = 37666 },--"Sound\\interface\\UI_RaidBossWhisperWarning.ogg"
+			{ sound=true, text = "Illidan: Not Prepared", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\BLACK_Illidan_04.ogg" },
+			{ sound=true, text = "Illidan: Not Prepared2", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\VO_703_Illidan_Stormrage_03.ogg" },
+			{ sound=true, text = "Kil'Jaeden: Destruction", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\KILJAEDEN02.ogg" },
+			{ sound=true, text = "Loatheb: I see you", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\LOA_NAXX_AGGRO02.ogg" },
+			{ sound=true, text = "Night Elf Bell", value = 11742 },--"Sound\\Doodad\\BellTollNightElf.ogg"
+			{ sound=true, text = "PvP Flag", value = 8174 },--"Sound\\Spells\\PVPFlagTaken.ogg"
+		})
+
+		local specWarnOne = specPanel:CreateArea(L.SpecialWarnHeader1, nil, 160, true)
+
+		local showbuttonOne = specWarnOne:CreateButton(L.SpecWarn_DemoButton, 120, 16)
+		showbuttonOne:SetPoint('BOTTOMRIGHT', specWarnOne.frame, "BOTTOMRIGHT", -5, 5)
+		showbuttonOne:SetNormalFontObject(GameFontNormalSmall)
+		showbuttonOne:SetHighlightFontObject(GameFontNormalSmall)
+		showbuttonOne:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 1) end)
+
+		local color1 = specWarnOne:CreateColorSelect(64)
+		color1:SetPoint('TOPLEFT', specWarnOne.frame, "TOPLEFT", 20, -30)
+		local color1text = specWarnOne:CreateText(L.SpecWarn_FlashColor:format(1), 80)
 		color1text:SetPoint("BOTTOM", color1, "TOP", 5, 4)
-		local color1reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
+		local color1reset = specWarnOne:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
 		color1reset:SetPoint('TOP', color1, "BOTTOM", 5, -10)
 		color1reset:SetScript("OnClick", function(self)
 				DBM.Options.SpecialWarningFlashCol1[1] = DBM.DefaultOptions.SpecialWarningFlashCol1[1]
@@ -2589,7 +2587,7 @@ local function CreateOptionsMenu()
 				DBM.Options.SpecialWarningFlashCol1[3] = DBM.DefaultOptions.SpecialWarningFlashCol1[3]
 				color1:SetColorRGB(DBM.Options.SpecialWarningFlashCol1[1], DBM.Options.SpecialWarningFlashCol1[2], DBM.Options.SpecialWarningFlashCol1[3])
 				DBM:UpdateSpecialWarningOptions()
-				DBM:ShowTestSpecialWarning(nil, 1)
+				--DBM:ShowTestSpecialWarning(nil, 1)
 		end)
 		do
 			local firstshow = true
@@ -2604,23 +2602,77 @@ local function CreateOptionsMenu()
 					DBM.Options.SpecialWarningFlashCol1[3] = select(3, self:GetColorRGB())
 					color1text:SetTextColor(self:GetColorRGB())
 					DBM:UpdateSpecialWarningOptions()
-					DBM:ShowTestSpecialWarning(nil, 1)
+					--DBM:ShowTestSpecialWarning(nil, 1)
 			end)
 		end
 
-		local color2 = specArea:CreateColorSelect(64)
-		color2:SetPoint('TOPLEFT', color1, "TOPLEFT", 0, -105)
-		local color2text = specArea:CreateText(L.SpecWarn_FlashColor:format(2), 80)
+		local SpecialWarnSoundDropDown = specWarnOne:CreateDropdown(L.SpecialWarnSoundOption, Sounds, "DBM", "SpecialWarningSound", function(value)
+			DBM.Options.SpecialWarningSound = value
+		end)
+		SpecialWarnSoundDropDown:SetPoint("TOPLEFT", specWarnOne.frame, "TOPLEFT", 95, -28)
+		local flashCheck1 = specWarnOne:CreateCheckButton(L.SpecWarn_Flash, nil, nil, "SpecialWarningFlash1")
+		flashCheck1:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown, "BOTTOMLEFT", 210, 4)
+
+		local flashdurSlider = specWarnOne:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
+		flashdurSlider:SetPoint('TOPLEFT', SpecialWarnSoundDropDown, "TOPLEFT", 20, -45)
+		do
+			local firstshow = true
+			flashdurSlider:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashDura1)
+			end)
+			flashdurSlider:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashDura1 = self:GetValue()
+				--DBM:ShowTestSpecialWarning(nil, 1, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashdalphaSlider = specWarnOne:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
+		flashdalphaSlider:SetPoint('BOTTOMLEFT', flashdurSlider, "BOTTOMLEFT", 180, -0)
+		do
+			local firstshow = true
+			flashdalphaSlider:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashAlph1)
+			end)
+			flashdalphaSlider:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashAlph1 = self:GetValue()
+				--DBM:ShowTestSpecialWarning(nil, 1, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashRepSlider = specWarnOne:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 4, 1, 120)
+		flashRepSlider:SetPoint('TOPLEFT', flashdurSlider, "TOPLEFT", 95, -45)
+		flashRepSlider:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashCount1)) end)
+		flashRepSlider:HookScript("OnValueChanged", function(self)
+			DBM.Options.SpecialWarningFlashCount1 = mfloor(self:GetValue())
+			--self:SetValue(DBM.Options.SpecialWarningFlashCount1)
+		end)
+
+		--Special Warning Area 2
+		local specWarnTwo = specPanel:CreateArea(L.SpecialWarnHeader2, nil, 160, true)
+
+		local showbuttonTwo = specWarnTwo:CreateButton(L.SpecWarn_DemoButton, 120, 16)
+		showbuttonTwo:SetPoint('BOTTOMRIGHT', specWarnTwo.frame, "BOTTOMRIGHT", -5, 5)
+		showbuttonTwo:SetNormalFontObject(GameFontNormalSmall)
+		showbuttonTwo:SetHighlightFontObject(GameFontNormalSmall)
+		showbuttonTwo:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 2) end)
+
+		local color2 = specWarnTwo:CreateColorSelect(64)
+		color2:SetPoint('TOPLEFT', specWarnTwo.frame, "TOPLEFT", 20, -30)
+		local color2text = specWarnTwo:CreateText(L.SpecWarn_FlashColor:format(2), 80)
 		color2text:SetPoint("BOTTOM", color2, "TOP", 5, 4)
-		local color2reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
+		local color2reset = specWarnTwo:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
 		color2reset:SetPoint('TOP', color2, "BOTTOM", 5, -10)
 		color2reset:SetScript("OnClick", function(self)
 				DBM.Options.SpecialWarningFlashCol2[1] = DBM.DefaultOptions.SpecialWarningFlashCol2[1]
 				DBM.Options.SpecialWarningFlashCol2[2] = DBM.DefaultOptions.SpecialWarningFlashCol2[2]
 				DBM.Options.SpecialWarningFlashCol2[3] = DBM.DefaultOptions.SpecialWarningFlashCol2[3]
 				color2:SetColorRGB(DBM.Options.SpecialWarningFlashCol2[1], DBM.Options.SpecialWarningFlashCol2[2], DBM.Options.SpecialWarningFlashCol2[3])
-				DBM:UpdateSpecialWarningOptions()
-				DBM:ShowTestSpecialWarning(nil, 2)
+				--DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 2)
 		end)
 		do
 			local firstshow = true
@@ -2635,15 +2687,72 @@ local function CreateOptionsMenu()
 					DBM.Options.SpecialWarningFlashCol2[3] = select(3, self:GetColorRGB())
 					color2text:SetTextColor(self:GetColorRGB())
 					DBM:UpdateSpecialWarningOptions()
-					DBM:ShowTestSpecialWarning(nil, 2)
+					--DBM:ShowTestSpecialWarning(nil, 2)
 			end)
 		end
 
-		local color3 = specArea:CreateColorSelect(64)
-		color3:SetPoint('TOPLEFT', color2, "TOPLEFT", 0, -105)
-		local color3text = specArea:CreateText(L.SpecWarn_FlashColor:format(3), 80)
+		local SpecialWarnSoundDropDown2 = specWarnTwo:CreateDropdown(L.SpecialWarnSoundOption, Sounds, "DBM", "SpecialWarningSound2", function(value)
+			DBM.Options.SpecialWarningSound2 = value
+		end)
+		SpecialWarnSoundDropDown2:SetPoint("TOPLEFT", specWarnTwo.frame, "TOPLEFT", 95, -28)
+		local flashCheck2 = specWarnTwo:CreateCheckButton(L.SpecWarn_Flash, nil, nil, "SpecialWarningFlash2")
+		flashCheck2:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown2, "BOTTOMLEFT", 210, 4)
+
+		local flashdurSlider2 = specWarnTwo:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
+		flashdurSlider2:SetPoint('TOPLEFT', SpecialWarnSoundDropDown2, "TOPLEFT", 20, -45)
+		do
+			local firstshow = true
+			flashdurSlider2:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashDura2)
+			end)
+			flashdurSlider2:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashDura2 = self:GetValue()
+				--DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 2, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashdalphaSlider2 = specWarnTwo:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
+		flashdalphaSlider2:SetPoint('BOTTOMLEFT', flashdurSlider2, "BOTTOMLEFT", 180, -0)
+		do
+			local firstshow = true
+			flashdalphaSlider2:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashAlph2)
+			end)
+			flashdalphaSlider2:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashAlph2 = self:GetValue()
+				--DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 2, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashRepSlider2 = specWarnOne:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 4, 1, 120)
+		flashRepSlider2:SetPoint('TOPLEFT', flashdurSlider2, "TOPLEFT", 95, -45)
+		flashRepSlider2:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashCount2)) end)
+		flashRepSlider2:HookScript("OnValueChanged", function(self)
+			DBM.Options.SpecialWarningFlashCount2 = mfloor(self:GetValue())
+			DBM:UpdateSpecialWarningOptions()
+			--self:SetValue(DBM.Options.SpecialWarningFlashCount2)
+		end)
+
+		--Special Warning Area 3
+		local specWarnThree = specPanel:CreateArea(L.SpecialWarnHeader3, nil, 160, true)
+
+		local showbuttonThree = specWarnThree:CreateButton(L.SpecWarn_DemoButton, 120, 16)
+		showbuttonThree:SetPoint('BOTTOMRIGHT', specWarnThree.frame, "BOTTOMRIGHT", -5, 5)
+		showbuttonThree:SetNormalFontObject(GameFontNormalSmall)
+		showbuttonThree:SetHighlightFontObject(GameFontNormalSmall)
+		showbuttonThree:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 3) end)
+
+		local color3 = specWarnThree:CreateColorSelect(64)
+		color3:SetPoint('TOPLEFT', specWarnThree.frame, "TOPLEFT", 20, -30)
+		local color3text = specWarnThree:CreateText(L.SpecWarn_FlashColor:format(3), 80)
 		color3text:SetPoint("BOTTOM", color3, "TOP", 5, 4)
-		local color3reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
+		local color3reset = specWarnThree:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
 		color3reset:SetPoint('TOP', color3, "BOTTOM", 5, -10)
 		color3reset:SetScript("OnClick", function(self)
 				DBM.Options.SpecialWarningFlashCol3[1] = DBM.DefaultOptions.SpecialWarningFlashCol3[1]
@@ -2670,11 +2779,67 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local color4 = specArea:CreateColorSelect(64)
-		color4:SetPoint('TOPLEFT', color3, "TOPLEFT", 0, -105)
-		local color4text = specArea:CreateText(L.SpecWarn_FlashColor:format(4), 80)
+		local SpecialWarnSoundDropDown3 = specWarnThree:CreateDropdown(L.SpecialWarnSoundOption, Sounds, "DBM", "SpecialWarningSound3", function(value)
+			DBM.Options.SpecialWarningSound3 = value
+		end)
+		SpecialWarnSoundDropDown3:SetPoint("TOPLEFT", specWarnThree.frame, "TOPLEFT", 95, -28)
+		local flashCheck3 = specWarnThree:CreateCheckButton(L.SpecWarn_Flash, nil, nil, "SpecialWarningFlash3")
+		flashCheck3:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown3, "BOTTOMLEFT", 210, 4)
+
+		local flashdurSlider3 = specWarnThree:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
+		flashdurSlider3:SetPoint('TOPLEFT', SpecialWarnSoundDropDown3, "TOPLEFT", 20, -45)
+		do
+			local firstshow = true
+			flashdurSlider3:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashDura3)
+			end)
+			flashdurSlider3:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashDura3 = self:GetValue()
+				--DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 3, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashdalphaSlider3 = specWarnThree:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
+		flashdalphaSlider3:SetPoint('BOTTOMLEFT', flashdurSlider3, "BOTTOMLEFT", 180, -0)
+		do
+			local firstshow = true
+			flashdalphaSlider3:HookScript("OnShow", function(self)
+				firstshow = true
+				self:SetValue(DBM.Options.SpecialWarningFlashAlph3)
+			end)
+			flashdalphaSlider3:HookScript("OnValueChanged", function(self)
+				if firstshow then firstshow = false return end
+				DBM.Options.SpecialWarningFlashAlph3 = self:GetValue()
+				--DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 3, true)--Pass with flash but no sound
+			end)
+		end
+
+		local flashRepSlider3 = specWarnOne:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 4, 1, 120)
+		flashRepSlider3:SetPoint('TOPLEFT', flashdurSlider3, "TOPLEFT", 95, -45)
+		flashRepSlider3:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashCount3)) end)
+		flashRepSlider3:HookScript("OnValueChanged", function(self)
+			DBM.Options.SpecialWarningFlashCount3 = mfloor(self:GetValue())
+			DBM:UpdateSpecialWarningOptions()
+			--self:SetValue(DBM.Options.SpecialWarningFlashCount3)
+		end)
+
+		local specWarnFour = specPanel:CreateArea(L.SpecialWarnHeader4, nil, 160, true)
+
+		local showbuttonFour = specWarnFour:CreateButton(L.SpecWarn_DemoButton, 120, 16)
+		showbuttonFour:SetPoint('BOTTOMRIGHT', specWarnFour.frame, "BOTTOMRIGHT", -5, 5)
+		showbuttonFour:SetNormalFontObject(GameFontNormalSmall)
+		showbuttonFour:SetHighlightFontObject(GameFontNormalSmall)
+		showbuttonFour:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 4) end)
+
+		local color4 = specWarnFour:CreateColorSelect(64)
+		color4:SetPoint('TOPLEFT', specWarnFour.frame, "TOPLEFT", 20, -30)
+		local color4text = specWarnFour:CreateText(L.SpecWarn_FlashColor:format(4), 80)
 		color4text:SetPoint("BOTTOM", color4, "TOP", 5, 4)
-		local color4reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
+		local color4reset = specWarnFour:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
 		color4reset:SetPoint('TOP', color4, "BOTTOM", 5, -10)
 		color4reset:SetScript("OnClick", function(self)
 				DBM.Options.SpecialWarningFlashCol4[1] = DBM.DefaultOptions.SpecialWarningFlashCol4[1]
@@ -2701,176 +2866,14 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local color5 = specArea:CreateColorSelect(64)
-		color5:SetPoint('TOPLEFT', color4, "TOPLEFT", 0, -105)
-		local color5text = specArea:CreateText(L.SpecWarn_FlashColor:format(5), 80)
-		color5text:SetPoint("BOTTOM", color5, "TOP", 5, 4)
-		local color5reset = specArea:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
-		color5reset:SetPoint('TOP', color5, "BOTTOM", 5, -10)
-		color5reset:SetScript("OnClick", function(self)
-				DBM.Options.SpecialWarningFlashCol5[1] = DBM.DefaultOptions.SpecialWarningFlashCol5[1]
-				DBM.Options.SpecialWarningFlashCol5[2] = DBM.DefaultOptions.SpecialWarningFlashCol5[2]
-				DBM.Options.SpecialWarningFlashCol5[3] = DBM.DefaultOptions.SpecialWarningFlashCol5[3]
-				color5:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
-				DBM:UpdateSpecialWarningOptions()
-				DBM:ShowTestSpecialWarning(nil, 5)
-		end)
-		do
-			local firstshow = true
-			color5:SetScript("OnShow", function(self)
-					firstshow = true
-					self:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
-			end)
-			color5:SetScript("OnColorSelect", function(self)
-					if firstshow then firstshow = false return end
-					DBM.Options.SpecialWarningFlashCol5[1] = select(1, self:GetColorRGB())
-					DBM.Options.SpecialWarningFlashCol5[2] = select(2, self:GetColorRGB())
-					DBM.Options.SpecialWarningFlashCol5[3] = select(3, self:GetColorRGB())
-					color5text:SetTextColor(self:GetColorRGB())
-					DBM:UpdateSpecialWarningOptions()
-					DBM:ShowTestSpecialWarning(nil, 5)
-			end)
-		end
-
-		local Sounds = MixinSharedMedia3("sound", {
-			{	text	= L.NoSound,			value	= "" },
-			--{ sound=true, text = "AirHorn", value = "Interface\\AddOns\\DBM-Core\\sounds\\AirHorn.ogg" },
-			{ sound=true, text = "Algalon: Beware!", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\UR_Algalon_BHole01.ogg" },
-			{ sound=true, text = "BB Wolf: Run Away", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\HoodWolfTransformPlayer01.ogg" },
-			--{ sound=true, text = "Blizzard", value = 37666 },--"Sound\\interface\\UI_RaidBossWhisperWarning.ogg"
-			{ sound=true, text = "Illidan: Not Prepared", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\BLACK_Illidan_04.ogg" },
-			{ sound=true, text = "Illidan: Not Prepared2", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\VO_703_Illidan_Stormrage_03.ogg" },
-			{ sound=true, text = "Kil'Jaeden: Destruction", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\KILJAEDEN02.ogg" },
-			{ sound=true, text = "Loatheb: I see you", value = "Interface\\AddOns\\DBM-Core\\sounds\\ClassicSupport\\LOA_NAXX_AGGRO02.ogg" },
-			{ sound=true, text = "Night Elf Bell", value = 11742 },--"Sound\\Doodad\\BellTollNightElf.ogg"
-			{ sound=true, text = "PvP Flag", value = 8174 },--"Sound\\Spells\\PVPFlagTaken.ogg"
-		})
-
-		local SpecialWarnSoundDropDown = specArea:CreateDropdown(L.SpecialWarnSound, Sounds, "DBM", "SpecialWarningSound", function(value)
-			DBM.Options.SpecialWarningSound = value
-		end)
-		SpecialWarnSoundDropDown:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -280)
-		local repeatCheck1 = specArea:CreateCheckButton(L.SpecWarn_FlashRepeat, nil, nil, "SpecialWarningFlashRepeat1")
-		repeatCheck1:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown, "BOTTOMLEFT", 240, 0)
-
-		local flashdurSlider = specArea:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
-		flashdurSlider:SetPoint('TOPLEFT', SpecialWarnSoundDropDown, "TOPLEFT", 20, -45)
-		do
-			local firstshow = true
-			flashdurSlider:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashDura1)
-			end)
-			flashdurSlider:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashDura1 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 1, true)--Pass with flash but no sound
-			end)
-		end
-
-		local flashdalphaSlider = specArea:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
-		flashdalphaSlider:SetPoint('BOTTOMLEFT', flashdurSlider, "BOTTOMLEFT", 150, -0)
-		do
-			local firstshow = true
-			flashdalphaSlider:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashAlph1)
-			end)
-			flashdalphaSlider:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashAlph1 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 1, true)--Pass with flash but no sound
-			end)
-		end
-
-		local SpecialWarnSoundDropDown2 = specArea:CreateDropdown(L.SpecialWarnSound2, Sounds, "DBM", "SpecialWarningSound2", function(value)
-			DBM.Options.SpecialWarningSound2 = value
-		end)
-		SpecialWarnSoundDropDown2:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -385)
-		local repeatCheck2 = specArea:CreateCheckButton(L.SpecWarn_FlashRepeat, nil, nil, "SpecialWarningFlashRepeat2")
-		repeatCheck2:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown2, "BOTTOMLEFT", 240, 0)
-
-		local flashdurSlider2 = specArea:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
-		flashdurSlider2:SetPoint('TOPLEFT', SpecialWarnSoundDropDown2, "TOPLEFT", 20, -45)
-		do
-			local firstshow = true
-			flashdurSlider2:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashDura2)
-			end)
-			flashdurSlider2:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashDura2 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 2, true)--Pass with flash but no sound
-			end)
-		end
-
-		local flashdalphaSlider2 = specArea:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
-		flashdalphaSlider2:SetPoint('BOTTOMLEFT', flashdurSlider2, "BOTTOMLEFT", 150, -0)
-		do
-			local firstshow = true
-			flashdalphaSlider2:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashAlph2)
-			end)
-			flashdalphaSlider2:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashAlph2 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 2, true)--Pass with flash but no sound
-			end)
-		end
-
-		local SpecialWarnSoundDropDown3 = specArea:CreateDropdown(L.SpecialWarnSound3, Sounds, "DBM", "SpecialWarningSound3", function(value)
-			DBM.Options.SpecialWarningSound3 = value
-		end)
-		SpecialWarnSoundDropDown3:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -490)
-		local repeatCheck3 = specArea:CreateCheckButton(L.SpecWarn_FlashRepeat, nil, nil, "SpecialWarningFlashRepeat3")
-		repeatCheck3:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown3, "BOTTOMLEFT", 240, 0)
-
-		local flashdurSlider3 = specArea:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
-		flashdurSlider3:SetPoint('TOPLEFT', SpecialWarnSoundDropDown3, "TOPLEFT", 20, -45)
-		do
-			local firstshow = true
-			flashdurSlider3:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashDura3)
-			end)
-			flashdurSlider3:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashDura3 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 3, true)--Pass with flash but no sound
-			end)
-		end
-
-		local flashdalphaSlider3 = specArea:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
-		flashdalphaSlider3:SetPoint('BOTTOMLEFT', flashdurSlider3, "BOTTOMLEFT", 150, -0)
-		do
-			local firstshow = true
-			flashdalphaSlider3:HookScript("OnShow", function(self)
-				firstshow = true
-				self:SetValue(DBM.Options.SpecialWarningFlashAlph3)
-			end)
-			flashdalphaSlider3:HookScript("OnValueChanged", function(self)
-				if firstshow then firstshow = false return end
-				DBM.Options.SpecialWarningFlashAlph3 = self:GetValue()
-				--DBM:UpdateSpecialWarningOptions()
-				--DBM:ShowTestSpecialWarning(nil, 3, true)--Pass with flash but no sound
-			end)
-		end
-
-		local SpecialWarnSoundDropDown4 = specArea:CreateDropdown(L.SpecialWarnSound4, Sounds, "DBM", "SpecialWarningSound4", function(value)
+		local SpecialWarnSoundDropDown4 = specWarnFour:CreateDropdown(L.SpecialWarnSoundOption, Sounds, "DBM", "SpecialWarningSound4", function(value)
 			DBM.Options.SpecialWarningSound4 = value
 		end)
-		SpecialWarnSoundDropDown4:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -595)
-		local repeatCheck4 = specArea:CreateCheckButton(L.SpecWarn_FlashRepeat, nil, nil, "SpecialWarningFlashRepeat4")
-		repeatCheck4:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown4, "BOTTOMLEFT", 240, 0)
+		SpecialWarnSoundDropDown4:SetPoint("TOPLEFT", specWarnFour.frame, "TOPLEFT", 95, -28)
+		local flashCheck4 = specWarnFour:CreateCheckButton(L.SpecWarn_Flash, nil, nil, "SpecialWarningFlash4")
+		flashCheck4:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown4, "BOTTOMLEFT", 210, 4)
 
-		local flashdurSlider4 = specArea:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
+		local flashdurSlider4 = specWarnFour:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
 		flashdurSlider4:SetPoint('TOPLEFT', SpecialWarnSoundDropDown4, "TOPLEFT", 20, -45)
 		do
 			local firstshow = true
@@ -2886,8 +2889,8 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local flashdalphaSlider4 = specArea:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
-		flashdalphaSlider4:SetPoint('BOTTOMLEFT', flashdurSlider4, "BOTTOMLEFT", 150, -0)
+		local flashdalphaSlider4 = specWarnFour:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
+		flashdalphaSlider4:SetPoint('BOTTOMLEFT', flashdurSlider4, "BOTTOMLEFT", 180, -0)
 		do
 			local firstshow = true
 			flashdalphaSlider4:HookScript("OnShow", function(self)
@@ -2902,14 +2905,62 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local SpecialWarnSoundDropDown5 = specArea:CreateDropdown(L.SpecialWarnSound5, Sounds, "DBM", "SpecialWarningSound5", function(value)
+		local flashRepSlider4 = specWarnOne:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 4, 1, 120)
+		flashRepSlider4:SetPoint('TOPLEFT', flashdurSlider4, "TOPLEFT", 95, -45)
+		flashRepSlider4:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashCount4)) end)
+		flashRepSlider4:HookScript("OnValueChanged", function(self)
+			DBM.Options.SpecialWarningFlashCount4 = mfloor(self:GetValue())
+			DBM:UpdateSpecialWarningOptions()
+			--self:SetValue(DBM.Options.SpecialWarningFlashCount4)
+		end)
+
+		local specWarnFive = specPanel:CreateArea(L.SpecialWarnHeader5, nil, 160, true)
+
+		local showbuttonFive = specWarnFive:CreateButton(L.SpecWarn_DemoButton, 120, 16)
+		showbuttonFive:SetPoint('BOTTOMRIGHT', specWarnFive.frame, "BOTTOMRIGHT", -5, 5)
+		showbuttonFive:SetNormalFontObject(GameFontNormalSmall)
+		showbuttonFive:SetHighlightFontObject(GameFontNormalSmall)
+		showbuttonFive:SetScript("OnClick", function() DBM:ShowTestSpecialWarning(nil, 5) end)
+
+		local color5 = specWarnFive:CreateColorSelect(64)
+		color5:SetPoint('TOPLEFT', specWarnFive.frame, "TOPLEFT", 20, -30)
+		local color5text = specWarnFive:CreateText(L.SpecWarn_FlashColor:format(5), 80)
+		color5text:SetPoint("BOTTOM", color5, "TOP", 5, 4)
+		local color5reset = specWarnFive:CreateButton(L.Reset, 64, 10, nil, GameFontNormalSmall)
+		color5reset:SetPoint('TOP', color5, "BOTTOM", 5, -10)
+		color5reset:SetScript("OnClick", function(self)
+				DBM.Options.SpecialWarningFlashCol5[1] = DBM.DefaultOptions.SpecialWarningFlashCol5[1]
+				DBM.Options.SpecialWarningFlashCol5[2] = DBM.DefaultOptions.SpecialWarningFlashCol5[2]
+				DBM.Options.SpecialWarningFlashCol5[3] = DBM.DefaultOptions.SpecialWarningFlashCol5[3]
+				color5:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
+				DBM:UpdateSpecialWarningOptions()
+				--DBM:ShowTestSpecialWarning(nil, 5)
+		end)
+		do
+			local firstshow = true
+			color5:SetScript("OnShow", function(self)
+					firstshow = true
+					self:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
+			end)
+			color5:SetScript("OnColorSelect", function(self)
+					if firstshow then firstshow = false return end
+					DBM.Options.SpecialWarningFlashCol5[1] = select(1, self:GetColorRGB())
+					DBM.Options.SpecialWarningFlashCol5[2] = select(2, self:GetColorRGB())
+					DBM.Options.SpecialWarningFlashCol5[3] = select(3, self:GetColorRGB())
+					color5text:SetTextColor(self:GetColorRGB())
+					DBM:UpdateSpecialWarningOptions()
+					--DBM:ShowTestSpecialWarning(nil, 5)
+			end)
+		end
+
+		local SpecialWarnSoundDropDown5 = specWarnFive:CreateDropdown(L.SpecialWarnSoundOption, Sounds, "DBM", "SpecialWarningSound5", function(value)
 			DBM.Options.SpecialWarningSound5 = value
 		end)
-		SpecialWarnSoundDropDown5:SetPoint("TOPLEFT", specArea.frame, "TOPLEFT", 100, -700)
-		local repeatCheck5 = specArea:CreateCheckButton(L.SpecWarn_FlashRepeat, nil, nil, "SpecialWarningFlashRepeat5")
-		repeatCheck5:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown5, "BOTTOMLEFT", 240, 0)
+		SpecialWarnSoundDropDown5:SetPoint("TOPLEFT", specWarnFive.frame, "TOPLEFT", 95, -28)
+		local flashCheck5 = specWarnFive:CreateCheckButton(L.SpecWarn_Flash, nil, nil, "SpecialWarningFlash5")
+		flashCheck5:SetPoint("BOTTOMLEFT", SpecialWarnSoundDropDown5, "BOTTOMLEFT", 210, 4)
 
-		local flashdurSlider5 = specArea:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
+		local flashdurSlider5 = specWarnFive:CreateSlider(L.SpecWarn_FlashDur, 0.2, 2, 0.2, 120)   -- (text , min_value , max_value , step , width)
 		flashdurSlider5:SetPoint('TOPLEFT', SpecialWarnSoundDropDown5, "TOPLEFT", 20, -45)
 		do
 			local firstshow = true
@@ -2925,8 +2976,8 @@ local function CreateOptionsMenu()
 			end)
 		end
 
-		local flashdalphaSlider5 = specArea:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
-		flashdalphaSlider5:SetPoint('BOTTOMLEFT', flashdurSlider5, "BOTTOMLEFT", 150, -0)
+		local flashdalphaSlider5 = specWarnFive:CreateSlider(L.SpecWarn_FlashAlpha, 0.1, 1, 0.1, 120)   -- (text , min_value , max_value , step , width)
+		flashdalphaSlider5:SetPoint('BOTTOMLEFT', flashdurSlider5, "BOTTOMLEFT", 180, -0)
 		do
 			local firstshow = true
 			flashdalphaSlider5:HookScript("OnShow", function(self)
@@ -2941,77 +2992,110 @@ local function CreateOptionsMenu()
 			end)
 		end
 
+		local flashRepSlider5 = specWarnOne:CreateSlider(L.SpecWarn_FlashFrameRepeat, 1, 4, 1, 120)
+		flashRepSlider5:SetPoint('TOPLEFT', flashdurSlider5, "TOPLEFT", 95, -45)
+		flashRepSlider5:HookScript("OnShow", function(self) self:SetValue(mfloor(DBM.Options.SpecialWarningFlashCount5)) end)
+		flashRepSlider5:HookScript("OnValueChanged", function(self)
+			DBM.Options.SpecialWarningFlashCount5 = mfloor(self:GetValue())
+			DBM:UpdateSpecialWarningOptions()
+			--self:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount5)
+		end)
+
 		local resetbutton = specArea:CreateButton(L.SpecWarn_ResetMe, 120, 16)
 		resetbutton:SetPoint('BOTTOMRIGHT', specArea.frame, "BOTTOMRIGHT", -5, 5)
 		resetbutton:SetNormalFontObject(GameFontNormalSmall)
 		resetbutton:SetHighlightFontObject(GameFontNormalSmall)
 		resetbutton:SetScript("OnClick", function()
-				DBM.Options.SWarnNameInNote = DBM.DefaultOptions.SWarnNameInNote
-				DBM.Options.ShowFlashFrame = DBM.DefaultOptions.ShowFlashFrame
-				DBM.Options.SpecialWarningFont = DBM.DefaultOptions.SpecialWarningFont
-				DBM.Options.SpecialWarningSound = DBM.DefaultOptions.SpecialWarningSound
-				DBM.Options.SpecialWarningSound2 = DBM.DefaultOptions.SpecialWarningSound2
-				DBM.Options.SpecialWarningSound3 = DBM.DefaultOptions.SpecialWarningSound3
-				DBM.Options.SpecialWarningSound4 = DBM.DefaultOptions.SpecialWarningSound4
-				DBM.Options.SpecialWarningSound5 = DBM.DefaultOptions.SpecialWarningSound5
-				DBM.Options.SpecialWarningFontSize2 = DBM.DefaultOptions.SpecialWarningFontSize2
-				DBM.Options.SpecialWarningFlashCol1[1] = DBM.DefaultOptions.SpecialWarningFlashCol1[1]
-				DBM.Options.SpecialWarningFlashCol1[2] = DBM.DefaultOptions.SpecialWarningFlashCol1[2]
-				DBM.Options.SpecialWarningFlashCol1[3] = DBM.DefaultOptions.SpecialWarningFlashCol1[3]
-				DBM.Options.SpecialWarningFlashCol2[1] = DBM.DefaultOptions.SpecialWarningFlashCol2[1]
-				DBM.Options.SpecialWarningFlashCol2[2] = DBM.DefaultOptions.SpecialWarningFlashCol2[2]
-				DBM.Options.SpecialWarningFlashCol2[3] = DBM.DefaultOptions.SpecialWarningFlashCol2[3]
-				DBM.Options.SpecialWarningFlashCol3[1] = DBM.DefaultOptions.SpecialWarningFlashCol3[1]
-				DBM.Options.SpecialWarningFlashCol3[2] = DBM.DefaultOptions.SpecialWarningFlashCol3[2]
-				DBM.Options.SpecialWarningFlashCol3[3] = DBM.DefaultOptions.SpecialWarningFlashCol3[3]
-				DBM.Options.SpecialWarningFlashCol4[1] = DBM.DefaultOptions.SpecialWarningFlashCol4[1]
-				DBM.Options.SpecialWarningFlashCol4[2] = DBM.DefaultOptions.SpecialWarningFlashCol4[2]
-				DBM.Options.SpecialWarningFlashCol4[3] = DBM.DefaultOptions.SpecialWarningFlashCol4[3]
-				DBM.Options.SpecialWarningFlashCol5[1] = DBM.DefaultOptions.SpecialWarningFlashCol5[1]
-				DBM.Options.SpecialWarningFlashCol5[2] = DBM.DefaultOptions.SpecialWarningFlashCol5[2]
-				DBM.Options.SpecialWarningFlashCol5[3] = DBM.DefaultOptions.SpecialWarningFlashCol5[3]
-				DBM.Options.SpecialWarningFlashDura1 = DBM.DefaultOptions.SpecialWarningFlashDura1
-				DBM.Options.SpecialWarningFlashDura2 = DBM.DefaultOptions.SpecialWarningFlashDura2
-				DBM.Options.SpecialWarningFlashDura3 = DBM.DefaultOptions.SpecialWarningFlashDura3
-				DBM.Options.SpecialWarningFlashDura4 = DBM.DefaultOptions.SpecialWarningFlashDura4
-				DBM.Options.SpecialWarningFlashDura5 = DBM.DefaultOptions.SpecialWarningFlashDura5
-				DBM.Options.SpecialWarningFlashAlph1 = DBM.DefaultOptions.SpecialWarningFlashAlph1
-				DBM.Options.SpecialWarningFlashAlph2 = DBM.DefaultOptions.SpecialWarningFlashAlph2
-				DBM.Options.SpecialWarningFlashAlph3 = DBM.DefaultOptions.SpecialWarningFlashAlph3
-				DBM.Options.SpecialWarningFlashAlph4 = DBM.DefaultOptions.SpecialWarningFlashAlph4
-				DBM.Options.SpecialWarningFlashAlph5 = DBM.DefaultOptions.SpecialWarningFlashAlph5
-				DBM.Options.SpecialWarningPoint = DBM.DefaultOptions.SpecialWarningPoint
-				DBM.Options.SpecialWarningX = DBM.DefaultOptions.SpecialWarningX
-				DBM.Options.SpecialWarningY = DBM.DefaultOptions.SpecialWarningY
-				check1:SetChecked(DBM.Options.SWarnClassColor)
-				check2:SetChecked(DBM.Options.SWarnNameInNote)
-				check3:SetChecked(DBM.Options.ShowSWarningsInChat)
-				check4:SetChecked(DBM.Options.ShowFlashFrame)
-				FontDropDown:SetSelectedValue(DBM.Options.SpecialWarningFont)
-				SpecialWarnSoundDropDown:SetSelectedValue(DBM.Options.SpecialWarningSound)
-				SpecialWarnSoundDropDown2:SetSelectedValue(DBM.Options.SpecialWarningSound2)
-				SpecialWarnSoundDropDown3:SetSelectedValue(DBM.Options.SpecialWarningSound3)
-				SpecialWarnSoundDropDown4:SetSelectedValue(DBM.Options.SpecialWarningSound4)
-				SpecialWarnSoundDropDown5:SetSelectedValue(DBM.Options.SpecialWarningSound5)
-				fontSizeSlider:SetValue(DBM.DefaultOptions.SpecialWarningFontSize2)
-				color0:SetColorRGB(DBM.Options.SpecialWarningFontCol[1], DBM.Options.SpecialWarningFontCol[2], DBM.Options.SpecialWarningFontCol[3])
-				color1:SetColorRGB(DBM.Options.SpecialWarningFlashCol1[1], DBM.Options.SpecialWarningFlashCol1[2], DBM.Options.SpecialWarningFlashCol1[3])
-				color2:SetColorRGB(DBM.Options.SpecialWarningFlashCol2[1], DBM.Options.SpecialWarningFlashCol2[2], DBM.Options.SpecialWarningFlashCol2[3])
-				color3:SetColorRGB(DBM.Options.SpecialWarningFlashCol3[1], DBM.Options.SpecialWarningFlashCol3[2], DBM.Options.SpecialWarningFlashCol3[3])
-				color4:SetColorRGB(DBM.Options.SpecialWarningFlashCol4[1], DBM.Options.SpecialWarningFlashCol4[2], DBM.Options.SpecialWarningFlashCol4[3])
-				color5:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
-				flashdurSlider:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura1)
-				flashdurSlider2:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura2)
-				flashdurSlider3:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura3)
-				flashdurSlider4:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura4)
-				flashdurSlider5:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura5)
-				flashdalphaSlider:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph1)
-				flashdalphaSlider2:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph2)
-				flashdalphaSlider3:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph3)
-				flashdalphaSlider4:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph4)
-				flashdalphaSlider5:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph5)
-				DBM:UpdateSpecialWarningOptions()
+			--Set Options
+			DBM.Options.SWarnNameInNote = DBM.DefaultOptions.SWarnNameInNote
+			DBM.Options.SpecialWarningFont = DBM.DefaultOptions.SpecialWarningFont
+			DBM.Options.SpecialWarningSound = DBM.DefaultOptions.SpecialWarningSound
+			DBM.Options.SpecialWarningSound2 = DBM.DefaultOptions.SpecialWarningSound2
+			DBM.Options.SpecialWarningSound3 = DBM.DefaultOptions.SpecialWarningSound3
+			DBM.Options.SpecialWarningSound4 = DBM.DefaultOptions.SpecialWarningSound4
+			DBM.Options.SpecialWarningSound5 = DBM.DefaultOptions.SpecialWarningSound5
+			DBM.Options.SpecialWarningFlash1 = DBM.DefaultOptions.SpecialWarningFlash1
+			DBM.Options.SpecialWarningFlash2 = DBM.DefaultOptions.SpecialWarningFlash2
+			DBM.Options.SpecialWarningFlash3 = DBM.DefaultOptions.SpecialWarningFlash3
+			DBM.Options.SpecialWarningFlash4 = DBM.DefaultOptions.SpecialWarningFlash4
+			DBM.Options.SpecialWarningFlash5 = DBM.DefaultOptions.SpecialWarningFlash5
+			DBM.Options.SpecialWarningFlashCount1 = DBM.DefaultOptions.SpecialWarningFlashCount1
+			DBM.Options.SpecialWarningFlashCount2 = DBM.DefaultOptions.SpecialWarningFlashCount2
+			DBM.Options.SpecialWarningFlashCount3 = DBM.DefaultOptions.SpecialWarningFlashCount3
+			DBM.Options.SpecialWarningFlashCount4 = DBM.DefaultOptions.SpecialWarningFlashCount4
+			DBM.Options.SpecialWarningFlashCount5 = DBM.DefaultOptions.SpecialWarningFlashCount5
+			DBM.Options.SpecialWarningFontSize2 = DBM.DefaultOptions.SpecialWarningFontSize2
+			DBM.Options.SpecialWarningFlashCol1[1] = DBM.DefaultOptions.SpecialWarningFlashCol1[1]
+			DBM.Options.SpecialWarningFlashCol1[2] = DBM.DefaultOptions.SpecialWarningFlashCol1[2]
+			DBM.Options.SpecialWarningFlashCol1[3] = DBM.DefaultOptions.SpecialWarningFlashCol1[3]
+			DBM.Options.SpecialWarningFlashCol2[1] = DBM.DefaultOptions.SpecialWarningFlashCol2[1]
+			DBM.Options.SpecialWarningFlashCol2[2] = DBM.DefaultOptions.SpecialWarningFlashCol2[2]
+			DBM.Options.SpecialWarningFlashCol2[3] = DBM.DefaultOptions.SpecialWarningFlashCol2[3]
+			DBM.Options.SpecialWarningFlashCol3[1] = DBM.DefaultOptions.SpecialWarningFlashCol3[1]
+			DBM.Options.SpecialWarningFlashCol3[2] = DBM.DefaultOptions.SpecialWarningFlashCol3[2]
+			DBM.Options.SpecialWarningFlashCol3[3] = DBM.DefaultOptions.SpecialWarningFlashCol3[3]
+			DBM.Options.SpecialWarningFlashCol4[1] = DBM.DefaultOptions.SpecialWarningFlashCol4[1]
+			DBM.Options.SpecialWarningFlashCol4[2] = DBM.DefaultOptions.SpecialWarningFlashCol4[2]
+			DBM.Options.SpecialWarningFlashCol4[3] = DBM.DefaultOptions.SpecialWarningFlashCol4[3]
+			DBM.Options.SpecialWarningFlashCol5[1] = DBM.DefaultOptions.SpecialWarningFlashCol5[1]
+			DBM.Options.SpecialWarningFlashCol5[2] = DBM.DefaultOptions.SpecialWarningFlashCol5[2]
+			DBM.Options.SpecialWarningFlashCol5[3] = DBM.DefaultOptions.SpecialWarningFlashCol5[3]
+			DBM.Options.SpecialWarningFlashDura1 = DBM.DefaultOptions.SpecialWarningFlashDura1
+			DBM.Options.SpecialWarningFlashDura2 = DBM.DefaultOptions.SpecialWarningFlashDura2
+			DBM.Options.SpecialWarningFlashDura3 = DBM.DefaultOptions.SpecialWarningFlashDura3
+			DBM.Options.SpecialWarningFlashDura4 = DBM.DefaultOptions.SpecialWarningFlashDura4
+			DBM.Options.SpecialWarningFlashDura5 = DBM.DefaultOptions.SpecialWarningFlashDura5
+			DBM.Options.SpecialWarningFlashAlph1 = DBM.DefaultOptions.SpecialWarningFlashAlph1
+			DBM.Options.SpecialWarningFlashAlph2 = DBM.DefaultOptions.SpecialWarningFlashAlph2
+			DBM.Options.SpecialWarningFlashAlph3 = DBM.DefaultOptions.SpecialWarningFlashAlph3
+			DBM.Options.SpecialWarningFlashAlph4 = DBM.DefaultOptions.SpecialWarningFlashAlph4
+			DBM.Options.SpecialWarningFlashAlph5 = DBM.DefaultOptions.SpecialWarningFlashAlph5
+			DBM.Options.SpecialWarningPoint = DBM.DefaultOptions.SpecialWarningPoint
+			DBM.Options.SpecialWarningX = DBM.DefaultOptions.SpecialWarningX
+			DBM.Options.SpecialWarningY = DBM.DefaultOptions.SpecialWarningY
+			--Set UI visuals
+			check1:SetChecked(DBM.Options.SWarnClassColor)
+			check2:SetChecked(DBM.Options.SWarningAlphabetical)
+			check3:SetChecked(DBM.Options.ShowSWarningsInChat)
+			check4:SetChecked(DBM.Options.SWarnNameInNote)
+			check5:SetChecked(DBM.Options.SpecialWarningIcon)
+			check6:SetChecked(DBM.Options.SpecialWarningShortText)
+			FontDropDown:SetSelectedValue(DBM.Options.SpecialWarningFont)
+			SpecialWarnSoundDropDown:SetSelectedValue(DBM.Options.SpecialWarningSound)
+			SpecialWarnSoundDropDown2:SetSelectedValue(DBM.Options.SpecialWarningSound2)
+			SpecialWarnSoundDropDown3:SetSelectedValue(DBM.Options.SpecialWarningSound3)
+			SpecialWarnSoundDropDown4:SetSelectedValue(DBM.Options.SpecialWarningSound4)
+			SpecialWarnSoundDropDown5:SetSelectedValue(DBM.Options.SpecialWarningSound5)
+			fontSizeSlider:SetValue(DBM.DefaultOptions.SpecialWarningFontSize2)
+			color0:SetColorRGB(DBM.Options.SpecialWarningFontCol[1], DBM.Options.SpecialWarningFontCol[2], DBM.Options.SpecialWarningFontCol[3])
+			color1:SetColorRGB(DBM.Options.SpecialWarningFlashCol1[1], DBM.Options.SpecialWarningFlashCol1[2], DBM.Options.SpecialWarningFlashCol1[3])
+			color2:SetColorRGB(DBM.Options.SpecialWarningFlashCol2[1], DBM.Options.SpecialWarningFlashCol2[2], DBM.Options.SpecialWarningFlashCol2[3])
+			color3:SetColorRGB(DBM.Options.SpecialWarningFlashCol3[1], DBM.Options.SpecialWarningFlashCol3[2], DBM.Options.SpecialWarningFlashCol3[3])
+			color4:SetColorRGB(DBM.Options.SpecialWarningFlashCol4[1], DBM.Options.SpecialWarningFlashCol4[2], DBM.Options.SpecialWarningFlashCol4[3])
+			color5:SetColorRGB(DBM.Options.SpecialWarningFlashCol5[1], DBM.Options.SpecialWarningFlashCol5[2], DBM.Options.SpecialWarningFlashCol5[3])
+			flashCheck1:SetChecked(DBM.Options.SpecialWarningFlash1)
+			flashCheck2:SetChecked(DBM.Options.SpecialWarningFlash2)
+			flashCheck3:SetChecked(DBM.Options.SpecialWarningFlash3)
+			flashCheck4:SetChecked(DBM.Options.SpecialWarningFlash4)
+			flashCheck5:SetChecked(DBM.Options.SpecialWarningFlash5)
+			flashdurSlider:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura1)
+			flashdurSlider2:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura2)
+			flashdurSlider3:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura3)
+			flashdurSlider4:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura4)
+			flashdurSlider5:SetValue(DBM.DefaultOptions.SpecialWarningFlashDura5)
+			flashdalphaSlider:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph1)
+			flashdalphaSlider2:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph2)
+			flashdalphaSlider3:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph3)
+			flashdalphaSlider4:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph4)
+			flashdalphaSlider5:SetValue(DBM.DefaultOptions.SpecialWarningFlashAlph5)
+			flashRepSlider:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount1)
+			flashRepSlider2:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount2)
+			flashRepSlider3:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount3)
+			flashRepSlider4:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount4)
+			flashRepSlider5:SetValue(DBM.DefaultOptions.SpecialWarningFlashCount5)
+			DBM:UpdateSpecialWarningOptions()
 		end)
+
 		specPanel:SetMyOwnHeight()
 	end
 
@@ -3023,28 +3107,28 @@ local function CreateOptionsMenu()
 			DBM.Options.CountdownVoice = value
 			DBM:PlayCountSound(1, DBM.Options.CountdownVoice)
 			DBM:BuildVoiceCountdownCache()
-		end)
+		end, 180)
 		CountSoundDropDown:SetPoint("TOPLEFT", spokenGeneralArea.frame, "TOPLEFT", 0, -20)
 
 		local CountSoundDropDown2 = spokenGeneralArea:CreateDropdown(L.CountdownVoice2, DBM.Counts, "DBM", "CountdownVoice2", function(value)
 			DBM.Options.CountdownVoice2 = value
 			DBM:PlayCountSound(1, DBM.Options.CountdownVoice2)
 			DBM:BuildVoiceCountdownCache()
-		end)
+		end, 180)
 		CountSoundDropDown2:SetPoint("LEFT", CountSoundDropDown, "RIGHT", 50, 0)
 
 		local CountSoundDropDown3 = spokenGeneralArea:CreateDropdown(L.CountdownVoice3, DBM.Counts, "DBM", "CountdownVoice3", function(value)
 			DBM.Options.CountdownVoice3 = value
 			DBM:PlayCountSound(1, DBM.Options.CountdownVoice3)
 			DBM:BuildVoiceCountdownCache()
-		end)
+		end, 180)
 		CountSoundDropDown3:SetPoint("TOPLEFT", CountSoundDropDown, "TOPLEFT", 0, -45)
 
 		local VoiceDropDown = spokenGeneralArea:CreateDropdown(L.VoicePackChoice, DBM.Voices, "DBM", "ChosenVoicePack", function(value)
 			DBM.Options.ChosenVoicePack = value
 			DBM:Debug("DBM.Options.ChosenVoicePack is set to "..DBM.Options.ChosenVoicePack)
 			DBM:CheckVoicePackVersion(value)
-		end)
+		end, 180)
 		VoiceDropDown:SetPoint("TOPLEFT", CountSoundDropDown2, "TOPLEFT", 0, -45)
 
 		local voiceFilterArea		= spokenAlertsPanel:CreateArea(L.Area_VoicePackOptions, nil, 97, true)
@@ -3056,7 +3140,7 @@ local function CreateOptionsMenu()
 		}
 		local SWFilterDropDown		= voiceFilterArea:CreateDropdown(L.SpecWarn_NoSoundsWVoice, voiceSWOptions, "DBM", "VoiceOverSpecW2", function(value)
 			DBM.Options.VoiceOverSpecW2 = value
-		end)
+		end, 420)
 		SWFilterDropDown:SetPoint("TOPLEFT", VPF1, "TOPLEFT", 0, -45)
 
 		local VPUrlArea1		= spokenAlertsPanel:CreateArea(L.Area_GetVEM, nil, 28, true)
@@ -3091,7 +3175,7 @@ local function CreateOptionsMenu()
 			if value ~= "Random" then
 				DBM:PlaySoundFile(value)
 			end
-		end)
+		end, 180)
 		VictorySoundDropdown:SetPoint("TOPLEFT", eventSoundsGeneralArea.frame, "TOPLEFT", 0, -20)
 
 		local VictorySoundDropdown2 = eventSoundsGeneralArea:CreateDropdown(L.EventWipeSound, DBM.Defeat, "DBM", "EventSoundWipe", function(value)
@@ -3099,8 +3183,8 @@ local function CreateOptionsMenu()
 			if value ~= "Random" then
 				DBM:PlaySoundFile(value)
 			end
-		end)
-		VictorySoundDropdown2:SetPoint("LEFT", VictorySoundDropdown, "RIGHT", 70, 0)
+		end, 180)
+		VictorySoundDropdown2:SetPoint("LEFT", VictorySoundDropdown, "RIGHT", 45, 0)
 
 		local useCombined = DBM.Options.EventSoundMusicCombined
 		local DungeonMusicDropDown = eventSoundsGeneralArea:CreateDropdown(L.EventDungeonMusic, useCombined and DBM.Music or DBM.DungeonMusic, "DBM", "EventSoundDungeonBGM", function(value)
@@ -3117,7 +3201,7 @@ local function CreateOptionsMenu()
 				PlayMusic(value)
 				DBM.Options.musicPlaying = true
 			end
-		end)
+		end, 180)
 		DungeonMusicDropDown:SetPoint("TOPLEFT", VictorySoundDropdown, "TOPLEFT", 0, -45)
 
 		local MusicDropDown = eventSoundsGeneralArea:CreateDropdown(L.EventEngageMusic, useCombined and DBM.Music or DBM.BattleMusic, "DBM", "EventSoundMusic", function(value)
@@ -3134,13 +3218,13 @@ local function CreateOptionsMenu()
 				PlayMusic(value)
 				DBM.Options.musicPlaying = true
 			end
-		end)
+		end, 180)
 		MusicDropDown:SetPoint("TOPLEFT", VictorySoundDropdown2, "TOPLEFT", 0, -45)
 
 		local VictorySoundDropdown3 = eventSoundsGeneralArea:CreateDropdown(L.EventEngageSound, Sounds, "DBM", "EventSoundEngage2", function(value)
 			DBM.Options.EventSoundEngage2 = value
 			DBM:PlaySoundFile(DBM.Options.EventSoundEngage2)
-		end)
+		end, 180)
 		VictorySoundDropdown3:SetPoint("TOPLEFT", DungeonMusicDropDown, "TOPLEFT", 0, -45)
 
 		local eventSoundsExtrasArea	= eventSoundsPanel:CreateArea(L.Area_EventSoundsExtras, nil, 52, true)
@@ -3188,10 +3272,11 @@ local function CreateOptionsMenu()
 			{	text	= L.FilterInterrupts,	value 	= "onlyTandF"},
 			{	text	= L.FilterInterrupts2,	value 	= "TandFandBossCooldown"},
 			{	text	= L.FilterInterrupts3,	value 	= "TandFandAllCooldown"},
+			{	text	= L.FilterInterrupts4,	value 	= "Always"},
 		}
 		local interruptDropDown		= spamSpecArea:CreateDropdown(L.FilterInterruptsHeader, interruptOptions, "DBM", "FilterInterrupt2", function(value)
 			DBM.Options.FilterInterrupt2 = value
-		end)
+		end, 410)
 		interruptDropDown:SetPoint("TOPLEFT", FilterInterruptNote, "TOPLEFT", 0, -45)
 
 		local spamPTArea = spamPanel:CreateArea(L.Area_PullTimer, nil, 180, true)
@@ -3230,7 +3315,7 @@ local function CreateOptionsMenu()
 		}
 		local blockMovieDropDown = hideBlizzArea:CreateDropdown(L.DisableCinematics, movieOptions, "DBM", "MovieFilter2", function(value)
 			DBM.Options.MovieFilter2 = value
-		end)
+		end, 350)
 		blockMovieDropDown:SetPoint("TOPLEFT", DisableSFX, "TOPLEFT", 0, -40)--]]
 
 		hideBlizzArea:AutoSetDimension()
@@ -3277,7 +3362,6 @@ local function CreateOptionsMenu()
 		local advancedArea			= extraFeaturesPanel:CreateArea(L.Area_Advanced, nil, 100, true)
 		local FakeBW				= advancedArea:CreateCheckButton(L.FakeBW, true, nil, "FakeBWVersion")
 		local AITimers				= advancedArea:CreateCheckButton(L.AITimer, true, nil, "AITimer")
-		local ACTimers				= advancedArea:CreateCheckButton(L.AutoCorrectTimer, true, nil, "AutoCorrectTimer")
 
 		chatAlertsArea:AutoSetDimension()
 		soundAlertsArea:AutoSetDimension()
@@ -4535,7 +4619,7 @@ do
 	local Categories = {}
 	local subTabId = 0
 	function DBM_GUI:UpdateModList()
-		for k, addon in ipairs(DBM.AddOns) do
+		for z, addon in ipairs(DBM.AddOns) do
 			if not Categories[addon.category] then
 				-- Create a Panel for "Wrath of the Lich King" "Burning Crusade" ...
 				local expLevel = GetExpansionLevel()
@@ -4658,27 +4742,27 @@ do
 			category = mod.optionCategories[catident]
 			if category then
 				local catpanel = panel:CreateArea(mod.localization.cats[catident], nil, nil, true)
-				local button, lastButton, addSpacer
+				local catbutton, lastButton, addSpacer
 				local hasDropdowns = 0
 				for _, v in ipairs(category) do
 					if v == DBM_OPTION_SPACER then
 						addSpacer = true
 					else
-						lastButton = button
+						lastButton = catbutton
 						if v.line then
-							button = catpanel:CreateLine(v.text)
+							catbutton = catpanel:CreateLine(v.text)
 						elseif type(mod.Options[v]) == "boolean" then
 							if mod.Options[v .. "TColor"] then
-								button = catpanel:CreateCheckButton(mod.localization.options[v], true, nil, nil, nil, mod, v, nil, true)
+								catbutton = catpanel:CreateCheckButton(mod.localization.options[v], true, nil, nil, nil, mod, v, nil, true)
 							elseif mod.Options[v .. "SWSound"] then
-								button = catpanel:CreateCheckButton(mod.localization.options[v], true, nil, nil, nil, mod, v)
+								catbutton = catpanel:CreateCheckButton(mod.localization.options[v], true, nil, nil, nil, mod, v)
 							else
-								button = catpanel:CreateCheckButton(mod.localization.options[v], true)
+								catbutton = catpanel:CreateCheckButton(mod.localization.options[v], true)
 							end
-							button:SetScript("OnShow", function(self)
+							catbutton:SetScript("OnShow", function(self)
 								self:SetChecked(mod.Options[v])
 							end)
-							button:SetScript("OnClick", function(self)
+							catbutton:SetScript("OnClick", function(self)
 								mod.Options[v] = not mod.Options[v]
 								if mod.optionFuncs and mod.optionFuncs[v] then
 									mod.optionFuncs[v]()
@@ -4686,32 +4770,32 @@ do
 							end)
 						elseif mod.buttons and mod.buttons[v] then
 							local but = mod.buttons[v]
-							button = catpanel:CreateButton(v, but.width, but.height, but.onClick, but.fontObject)
+							catbutton = catpanel:CreateButton(v, but.width, but.height, but.onClick, but.fontObject)
 						elseif mod.editboxes and mod.editboxes[v] then
 							local editBox = mod.editboxes[v]
-							button = catpanel:CreateEditBox(mod.localization.options[v], mod.Options[v], editBox.width, editBox.height)
-							button:SetScript("OnTextChanged", function(self)
+							catbutton = catpanel:CreateEditBox(mod.localization.options[v], mod.Options[v], editBox.width, editBox.height)
+							catbutton:SetScript("OnTextChanged", function(self)
 								if mod.optionFuncs and mod.optionFuncs[v] then
 									mod.optionFuncs[v]()
 								end
 							end)
 						elseif mod.sliders and mod.sliders[v] then
 							local slider = mod.sliders[v]
-							button = catpanel:CreateSlider(mod.localization.options[v], slider.minValue, slider.maxValue, slider.valueStep)
-							button:SetScript("OnShow", function(self)
+							catbutton = catpanel:CreateSlider(mod.localization.options[v], slider.minValue, slider.maxValue, slider.valueStep)
+							catbutton:SetScript("OnShow", function(self)
 								self:SetValue(mod.Options[v])
 							end)
-							button:HookScript("OnValueChanged", function(self)
+							catbutton:HookScript("OnValueChanged", function(self)
 								if mod.optionFuncs and mod.optionFuncs[v] then
 									mod.optionFuncs[v]()
 								end
 							end)
 						elseif mod.dropdowns and mod.dropdowns[v] then
 							local dropdownOptions = {}
-							for i, v in ipairs(mod.dropdowns[v]) do
-								dropdownOptions[#dropdownOptions + 1] = { text = mod.localization.options[v], value = v }
+							for i, val in ipairs(mod.dropdowns[v]) do
+								dropdownOptions[#dropdownOptions + 1] = { text = mod.localization.options[val], value = val }
 							end
-							button = catpanel:CreateDropdown(mod.localization.options[v], dropdownOptions, mod, v, function(value)
+							catbutton = catpanel:CreateDropdown(mod.localization.options[v], dropdownOptions, mod, v, function(value)
 								mod.Options[v] = value
 								if mod.optionFuncs and mod.optionFuncs[v] then
 									mod.optionFuncs[v]()
@@ -4719,11 +4803,11 @@ do
 							end, nil, 32)
 							if not addSpacer then
 								hasDropdowns = hasDropdowns + 7--Add 7 extra pixels per dropdown, because autodims is only reserving 25 per line, and dropdowns are 32
-								button:SetPoint("TOPLEFT", lastButton, "BOTTOMLEFT", 0, -10)
+								catbutton:SetPoint("TOPLEFT", lastButton, "BOTTOMLEFT", 0, -10)
 							end
 						end
 						if addSpacer then
-							button:SetPoint("TOPLEFT", lastButton, "BOTTOMLEFT", 0, -6)
+							catbutton:SetPoint("TOPLEFT", lastButton, "BOTTOMLEFT", 0, -6)
 							addSpacer = false
 						end
 					end

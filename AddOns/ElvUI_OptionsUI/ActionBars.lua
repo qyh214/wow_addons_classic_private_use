@@ -41,7 +41,7 @@ E.Options.args.actionbar = {
 		general = {
 			order = 3,
 			type = "group",
-			name = L["General Options"],
+			name = L["General"],
 			disabled = function() return not E.ActionBars.Initialized; end,
 			args = {
 				toggleKeybind = {
@@ -399,34 +399,39 @@ E.Options.args.actionbar = {
 			set = function(info, value) E.db.actionbar.barPet[info[#info]] = value; AB:PositionAndSizeBarPet() end,
 			args = {
 				enabled = {
-					order = 1,
+					order = 0,
 					type = 'toggle',
 					name = L["Enable"],
 				},
 				restorePosition = {
-					order = 2,
+					order = 1,
 					type = 'execute',
 					name = L["Restore Bar"],
 					desc = L["Restore the actionbars default settings"],
 					func = function() E:CopyTable(E.db.actionbar.barPet, P.actionbar.barPet); E:ResetMovers('Pet Bar'); AB:PositionAndSizeBarPet() end,
 				},
 				point = {
-					order = 3,
+					order = 2,
 					type = 'select',
 					name = L["Anchor Point"],
 					desc = L["The first button anchors itself to this point on the bar."],
 					values = points,
 				},
 				backdrop = {
-					order = 4,
+					order = 3,
 					type = "toggle",
 					name = L["Backdrop"],
 					desc = L["Toggles the display of the actionbars backdrop."],
 				},
 				mouseover = {
-					order = 5,
+					order = 4,
 					name = L["Mouse Over"],
 					desc = L["The frame is not shown unless you mouse over the frame."],
+					type = "toggle",
+				},
+				clickThrough = {
+					order = 5,
+					name = L["Click Through"],
 					type = "toggle",
 				},
 				inheritGlobalFade = {
@@ -520,19 +525,19 @@ E.Options.args.actionbar = {
 			set = function(info, value) E.db.actionbar.stanceBar[info[#info]] = value; AB:PositionAndSizeBarShapeShift() end,
 			args = {
 				enabled = {
-					order = 1,
+					order = 0,
 					type = 'toggle',
 					name = L["Enable"],
 				},
 				restorePosition = {
-					order = 2,
+					order = 1,
 					type = 'execute',
 					name = L["Restore Bar"],
 					desc = L["Restore the actionbars default settings"],
 					func = function() E:CopyTable(E.db.actionbar.stanceBar, P.actionbar.stanceBar); E:ResetMovers('Stance Bar'); AB:PositionAndSizeBarShapeShift() end,
 				},
 				point = {
-					order = 3,
+					order = 2,
 					type = 'select',
 					name = L["Anchor Point"],
 					desc = L["The first button anchors itself to this point on the bar."],
@@ -546,22 +551,21 @@ E.Options.args.actionbar = {
 					},
 				},
 				backdrop = {
-					order = 4,
+					order = 3,
 					type = "toggle",
 					name = L["Backdrop"],
 					desc = L["Toggles the display of the actionbars backdrop."],
 				},
 				mouseover = {
-					order = 5,
+					order = 4,
 					name = L["Mouse Over"],
 					desc = L["The frame is not shown unless you mouse over the frame."],
 					type = "toggle",
 				},
-				usePositionOverride = {
-					order = 6,
+				clickThrough = {
+					order = 5,
+					name = L["Click Through"],
 					type = "toggle",
-					name = L["Use Position Override"],
-					desc = L["When enabled it will use the Anchor Point setting to determine growth direction, otherwise it will be determined by where the bar is positioned."],
 				},
 				inheritGlobalFade = {
 					order = 7,
@@ -682,11 +686,6 @@ E.Options.args.actionbar = {
 					desc = L["Change the alpha level of the frame."],
 					min = 0, max = 1, step = 0.1,
 				},
-				spacer = {
-					order = 4,
-					type = "description",
-					name = " ",
-				},
 				buttonSize = {
 					order = 5,
 					type = 'range',
@@ -708,11 +707,6 @@ E.Options.args.actionbar = {
 					desc = L["The amount of buttons to display per row."],
 					min = 1, max = #MICRO_BUTTONS, step = 1,
 				},
-				spacer2 = {
-					order = 8,
-					type = "description",
-					name = " ",
-				},
 				visibility = {
 					type = 'input',
 					order = 9,
@@ -730,12 +724,60 @@ E.Options.args.actionbar = {
 				},
 			},
 		},
+		vehicleExitButton = {
+			type = "group",
+			name = L["Vehicle Exit"],
+			order = 18,
+			disabled = function() return not E.ActionBars.Initialized; end,
+			get = function(info) return E.db.actionbar.vehicleExitButton[info[#info]] end,
+			set = function(info, value) E.db.actionbar.vehicleExitButton[info[#info]] = value; AB:UpdateVehicleLeave() end,
+			args = {
+				enable = {
+					order = 1,
+					type = 'toggle',
+					name = L["Enable"],
+					set = function(info, value) E.db.actionbar.vehicleExitButton[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end
+				},
+				size = {
+					order = 2,
+					type = 'range',
+					name = L["Size"],
+					min = 16, max = 50, step = 1,
+				},
+				level = {
+					order = 3,
+					type = "range",
+					name = L["Frame Level"],
+					min = 1, max = 128, step = 1,
+				},
+				strata = {
+					order = 4,
+					type = "select",
+					name = L["Frame Strata"],
+					values = {
+						["BACKGROUND"] = "BACKGROUND",
+						["LOW"] = "LOW",
+						["MEDIUM"] = "MEDIUM",
+						["HIGH"] = "HIGH",
+						["DIALOG"] = "DIALOG",
+						["TOOLTIP"] = "TOOLTIP",
+					},
+				},
+			},
+		},
+		playerBars = {
+			order = 4,
+			name = L["Player Bars"],
+			type = "group",
+			childGroups = "tree",
+			args = {},
+		},
 	},
 }
 
 for i = 1, 10 do
 	local name = L["Bar "]..i
-	E.Options.args.actionbar.args['bar'..i] = {
+	E.Options.args.actionbar.args.playerBars.args['bar'..i] = {
 		order = 3 + i,
 		name = name,
 		type = 'group',
@@ -744,7 +786,7 @@ for i = 1, 10 do
 		set = function(info, value) E.db.actionbar['bar'..i][info[#info]] = value; AB:PositionAndSizeBar('bar'..i) end,
 		args = {
 			enabled = {
-				order = 1,
+				order = 0,
 				type = 'toggle',
 				name = L["Enable"],
 				set = function(info, value)
@@ -753,19 +795,14 @@ for i = 1, 10 do
 				end,
 			},
 			restorePosition = {
-				order = 2,
+				order = 1,
 				type = 'execute',
 				name = L["Restore Bar"],
 				desc = L["Restore the actionbars default settings"],
 				func = function() E:CopyTable(E.db.actionbar['bar'..i], P.actionbar['bar'..i]); E:ResetMovers('Bar '..i); AB:PositionAndSizeBar('bar'..i) end,
 			},
-			spacer = {
-				order = 3,
-				type = "description",
-				name = " ",
-			},
 			backdrop = {
-				order = 4,
+				order = 3,
 				type = "toggle",
 				name = L["Backdrop"],
 				desc = L["Toggles the display of the actionbars backdrop."],
@@ -773,13 +810,18 @@ for i = 1, 10 do
 			showGrid = {
 				type = 'toggle',
 				name = L["Show Empty Buttons"],
-				order = 5,
+				order = 4,
 				set = function(info, value) E.db.actionbar['bar'..i][info[#info]] = value; AB:UpdateButtonSettingsForBar('bar'..i) end,
 			},
 			mouseover = {
-				order = 6,
+				order = 5,
 				name = L["Mouse Over"],
 				desc = L["The frame is not shown unless you mouse over the frame."],
+				type = "toggle",
+			},
+			clickThrough = {
+				order = 6,
+				name = L["Click Through"],
 				type = "toggle",
 			},
 			inheritGlobalFade = {
@@ -907,7 +949,7 @@ for i = 1, 10 do
 	}
 end
 
-E.Options.args.actionbar.args.bar1.args.pagingReset = {
+E.Options.args.actionbar.args.playerBars.args.bar1.args.pagingReset = {
 	type = 'execute',
 	name = L["Reset Action Paging"],
 	order = 2,
@@ -916,7 +958,7 @@ E.Options.args.actionbar.args.bar1.args.pagingReset = {
 	func = function() E.db.actionbar.bar1.paging[E.myclass] = P.actionbar.bar1.paging[E.myclass] AB:UpdateButtonSettings() end,
 }
 
-E.Options.args.actionbar.args.bar6.args.enabled.set = function(info, value)
+E.Options.args.actionbar.args.playerBars.args.bar6.args.enabled.set = function(info, value)
 	E.db.actionbar.bar6.enabled = value;
 	AB:PositionAndSizeBar("bar6")
 

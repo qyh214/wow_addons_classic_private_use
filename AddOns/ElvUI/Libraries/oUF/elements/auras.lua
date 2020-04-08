@@ -111,7 +111,7 @@ local function createAuraIcon(element, index)
 	local cd = CreateFrame('Cooldown', '$parentCooldown', button, 'CooldownFrameTemplate')
 	cd:SetAllPoints()
 
-	local icon = button:CreateTexture(nil, 'ARTWORK')
+	local icon = button:CreateTexture(nil, 'BORDER')
 	icon:SetAllPoints()
 
 	local countFrame = CreateFrame('Frame', nil, button)
@@ -547,6 +547,7 @@ local function ForceUpdate(element)
 	return Update(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
+-- ElvUI changed block
 local onUpdateElapsed, onUpdateWait = 0, 0.25
 local function onUpdateAuras(self, elapsed)
 	if onUpdateElapsed > onUpdateWait then
@@ -575,17 +576,22 @@ local function SetAuraUpdateMethod(self, state, force)
 		end
 	end
 end
+-- end block
 
 local function Enable(self)
+	-- ElvUI changed block
 	if not self.updateAurasFrame then
 		self.updateAurasFrame = CreateFrame('Frame', nil, self)
 		self.updateAurasFrame.__owner = self
 	end
+	-- end block
 
 	if(self.Buffs or self.Debuffs or self.Auras) then
+		-- ElvUI changed block
 		self.SetAuraUpdateSpeed = SetAuraUpdateSpeed
 		self.SetAuraUpdateMethod = SetAuraUpdateMethod
 		SetAuraUpdateMethod(self, self.effectiveAura, true)
+		-- end block
 
 		local buffs = self.Buffs
 		if(buffs) then
@@ -658,9 +664,11 @@ local function Enable(self)
 end
 
 local function Disable(self)
+	-- ElvUI changed block
 	if self.updateAurasFrame then
 		self.updateAurasFrame:SetScript('OnUpdate', nil)
 	end
+	-- end block
 
 	if(self.Buffs or self.Debuffs or self.Auras) then
 		self:UnregisterEvent('UNIT_AURA', UpdateAuras)

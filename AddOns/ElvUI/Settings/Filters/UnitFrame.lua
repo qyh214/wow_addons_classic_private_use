@@ -536,20 +536,20 @@ function UF:AuraWatch_AddSpell(id, point, color, anyUnit, onlyShowMissing, displ
 	local spellRank = rankText and strfind(rankText, '%d') and GetSpellSubtext(id) or nil
 
 	return {
-		enabled = true,
 		id = id,
+		enabled = true,
 		name = GetSpellInfo(id),
 		rank = spellRank,
 		point = point or 'TOPLEFT',
 		color = { r = r, g = g, b = b },
 		anyUnit = anyUnit or false,
 		onlyShowMissing = onlyShowMissing or false,
-		style = 'coloredIcon',
 		displayText = displayText or false,
 		textThreshold = textThreshold or -1,
 		xOffset = xOffset or 0,
 		yOffset = yOffset or 0,
-		size = 8,
+		style = 'coloredIcon',
+		sizeOffset = 0,
 	}
 end
 
@@ -880,6 +880,8 @@ G.unitframe.DebuffHighlightColors = {
 G.unitframe.specialFilters = {
 	-- Whitelists
 	Boss = true,
+	MyPet = true,
+	OtherPet = true,
 	Personal = true,
 	nonPersonal = true,
 	CastByUnit = true,

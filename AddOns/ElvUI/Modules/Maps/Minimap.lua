@@ -260,7 +260,7 @@ function M:UpdateSettings()
 		MiniMapMailFrame:Point(pos, Minimap, pos, E.db.general.minimap.icons.mail.xOffset or 3, E.db.general.minimap.icons.mail.yOffset or 4)
 		MiniMapMailFrame:SetScale(scale)
 	end
-	
+
 	local MiniMapBattlefieldFrame = _G.MiniMapBattlefieldFrame
 	if MiniMapBattlefieldFrame then
 		local pos = E.db.general.minimap.icons.battlefield.position or "BOTTOMLEFT"

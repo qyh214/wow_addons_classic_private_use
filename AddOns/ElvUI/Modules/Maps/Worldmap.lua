@@ -10,7 +10,7 @@ local ShowUIPanel = ShowUIPanel
 local HideUIPanel = HideUIPanel
 local IsPlayerMoving = IsPlayerMoving
 local InCombatLockdown = InCombatLockdown
-local MOUSE_LABEL = MOUSE_LABEL:gsub("|T.-|t","")
+local MOUSE_LABEL = MOUSE_LABEL:gsub("|[TA].-|[ta]","")
 local PLAYER = PLAYER
 -- GLOBALS: CoordsHolder
 

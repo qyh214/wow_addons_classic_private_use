@@ -41,10 +41,6 @@ The following options are listed by priority. The first check that returns true 
 
 .multiplier - Used to tint the background based on the main widgets R, G and B values. Defaults to 1 (number)[0-1]
 
-## Attributes
-
-.disconnected - Indicates whether the unit is disconnected (boolean)
-
 ## Examples
 
     -- Position and size
@@ -82,7 +78,7 @@ local function UpdateColor(self, event, unit)
 	local element = self.Health
 
 	local r, g, b, t
-	if(element.colorDisconnected and element.disconnected) then
+	if(element.colorDisconnected and not UnitIsConnected(unit)) then
 		t = self.colors.disconnected
 	elseif(element.colorTapping and not UnitPlayerControlled(unit) and UnitIsTapDenied(unit)) then
 		t = self.colors.tapped
@@ -158,7 +154,6 @@ local function Update(self, event, unit)
 
 	element.cur = cur
 	element.max = max
-	element.disconnected = disconnected
 
 	--[[ Callback: Health:PostUpdate(unit, cur, max)
 	Called after the element has been updated.
@@ -203,8 +198,12 @@ local function SetColorDisconnected(element, state)
 		element.colorDisconnected = state
 		if(element.colorDisconnected) then
 			element.__owner:RegisterEvent('UNIT_CONNECTION', ColorPath)
+			element.__owner:RegisterEvent('PARTY_MEMBER_ENABLE', ColorPath)
+			element.__owner:RegisterEvent('PARTY_MEMBER_DISABLE', ColorPath)
 		else
 			element.__owner:UnregisterEvent('UNIT_CONNECTION', ColorPath)
+			element.__owner:UnregisterEvent('PARTY_MEMBER_ENABLE', ColorPath)
+			element.__owner:UnregisterEvent('PARTY_MEMBER_DISABLE', ColorPath)
 		end
 	end
 end
@@ -226,6 +225,7 @@ local function SetColorTapping(element, state)
 	end
 end
 
+-- ElvUI changed block
 local onUpdateElapsed, onUpdateWait = 0, 0.25
 local function onUpdateHealth(self, elapsed)
 	if onUpdateElapsed > onUpdateWait then
@@ -256,6 +256,7 @@ local function SetHealthUpdateMethod(self, state, force)
 		end
 	end
 end
+-- end block
 
 local function Enable(self, unit)
 	local element = self.Health
@@ -265,12 +266,16 @@ local function Enable(self, unit)
 		element.SetColorDisconnected = SetColorDisconnected
 		element.SetColorTapping = SetColorTapping
 
+		-- ElvUI changed block
 		self.SetHealthUpdateSpeed = SetHealthUpdateSpeed
 		self.SetHealthUpdateMethod = SetHealthUpdateMethod
 		SetHealthUpdateMethod(self, self.effectiveHealth, true)
+		-- end block
 
 		if(element.colorDisconnected) then
 			self:RegisterEvent('UNIT_CONNECTION', ColorPath)
+			self:RegisterEvent('PARTY_MEMBER_ENABLE', ColorPath)
+			self:RegisterEvent('PARTY_MEMBER_DISABLE', ColorPath)
 		end
 
 		if(element.colorTapping) then
@@ -292,12 +297,14 @@ local function Disable(self)
 	if(element) then
 		element:Hide()
 
-		element:SetScript('OnUpdate', nil)
+		element:SetScript('OnUpdate', nil) -- ElvUI changed
 		self:UnregisterEvent('UNIT_HEALTH_FREQUENT', Path)
 		self:UnregisterEvent('UNIT_MAXHEALTH', Path)
 
 		self:UnregisterEvent('UNIT_CONNECTION', ColorPath)
 		self:UnregisterEvent('UNIT_FACTION', ColorPath)
+		self:UnregisterEvent('PARTY_MEMBER_ENABLE', ColorPath)
+		self:UnregisterEvent('PARTY_MEMBER_DISABLE', ColorPath)
 	end
 end
 

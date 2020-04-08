@@ -115,30 +115,12 @@ function AB:PositionAndSizeBarShapeShift()
 	local point = self.db.stanceBar.point
 	local widthMult = self.db.stanceBar.widthMult
 	local heightMult = self.db.stanceBar.heightMult
-	if bar.mover then
-		if self.db.stanceBar.usePositionOverride then
-			bar.mover.positionOverride = point
-		else
-			bar.mover.positionOverride = nil
-		end
-		E:UpdatePositionOverride(bar.mover:GetName())
-	end
 
-	--Now that we have set positionOverride for mover, convert "TOP" or "BOTTOM" to anchor points we can use
+	--Convert "TOP" or "BOTTOM" to anchor points we can use
 	local position = E:GetScreenQuadrant(bar)
 	if strfind(position, "LEFT") or position == "TOP" or position == "BOTTOM" then
-		if point == "TOP" then
-			point = "TOPLEFT"
-		elseif point == "BOTTOM" then
-			point = "BOTTOMLEFT"
-		end
-	else
-		if point == "TOP" then
-			point = "TOPRIGHT"
-		elseif point == "BOTTOM" then
-			point = "BOTTOMRIGHT"
-		end
-	end
+		if point == "TOP" then point = "TOPLEFT" elseif point == "BOTTOM" then point = "BOTTOMLEFT" end
+	elseif point == "TOP" then point = "TOPRIGHT" elseif point == "BOTTOM" then point = "BOTTOMRIGHT" end
 
 	bar.db = self.db.stanceBar
 	bar.db.position = nil; --Depreciated
@@ -198,13 +180,16 @@ function AB:PositionAndSizeBarShapeShift()
 	local useMasque = MasqueGroup and E.private.actionbar.masque.stanceBar
 	local firstButtonSpacing = (self.db.stanceBar.backdrop == true and (E.Border + backdropSpacing) or E.Spacing)
 
-	for i=1, NUM_STANCE_SLOTS do
+	bar:EnableMouse(not self.db.stanceBar.clickThrough)
+
+	for i = 1, NUM_STANCE_SLOTS do
 		button = _G["ElvUI_StanceBarButton"..i]
 		lastButton = _G["ElvUI_StanceBarButton"..i-1]
 		lastColumnButton = _G["ElvUI_StanceBarButton"..i-buttonsPerRow]
 		button:SetParent(bar)
 		button:ClearAllPoints()
 		button:Size(size)
+		button:EnableMouse(not self.db.stanceBar.clickThrough)
 
 		if self.db.stanceBar.mouseover == true then
 			bar:SetAlpha(0)

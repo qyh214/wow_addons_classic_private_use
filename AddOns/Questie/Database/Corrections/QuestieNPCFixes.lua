@@ -1,4 +1,5 @@
-QuestieNPCFixes = {...}
+---@class QuestieNPCFixes
+local QuestieNPCFixes = QuestieLoader:CreateModule("QuestieNPCFixes")
 -------------------------
 --Import modules.
 -------------------------
@@ -52,8 +53,14 @@ function QuestieNPCFixes:Load()
         [2306] = {
             [QuestieDB.npcKeys.spawns] = {[36]={{47.83,17.11},{56.28,26.7},{57.8,29.8},{61,43},},},
         },
+        [2403] = {
+            [QuestieDB.npcKeys.spawns] = {[267]={{35,38.6},{35.2,38},{35.2,40.4},{36.4,39.4},{36.4,39.6},{36.6,39.4},},},
+        },
         [2431] = {
             [QuestieDB.npcKeys.spawns] = {[36]={{60.4,43.8},{60.8,43.6},{61,43.4},{61.8,40.6},{62.4,40.2},{62.6,40.2},{63,43.4},{63.2,43.8},},},
+        },
+        [2450] = {
+            [QuestieDB.npcKeys.spawns] = {[267]={{31.12,58.63},{31.9,52.5},},},
         },
         [2624] = {
             [QuestieDB.npcKeys.spawns] = {[33]={{24.74,24.1},},}, -- #1375
@@ -140,7 +147,7 @@ function QuestieNPCFixes:Load()
             [QuestieDB.npcKeys.spawns] = {[45]={{56.55,38.7},{54.8,38.2},},},
         },
         [4499] = {
-            [QuestieDB.npcKeys.spawns] = {[400]={{17.1,38.1},},},
+            [QuestieDB.npcKeys.spawns] = {[400]={{17.1,38.1},{10.6,23.1},},},
         },
         [4700] = {
             [QuestieDB.npcKeys.spawns] = {[405]={{60.4,62},{60.6,62},{52.61,57.46},{50.51,56.63},{48.29,60.25},{52.24,60.64},{50.82,61.17},{53.65,56.69},{51.95,56.1},{58.03,34.84},{58.63,34.44},{58.93,34.32},{44.87,18.84},{44.92,19.65},{44.82,19.81},{49.36,41.23},{49.37,40.48},{49.37,40.17},{57.76,71.05},{56.74,82.06},{56.79,82.99},{56.94,82.97},},},
@@ -282,6 +289,12 @@ function QuestieNPCFixes:Load()
         },
         [12576] = {
             [QuestieDB.npcKeys.spawns] = {[400]={{31.86,21.66},},[17]={{44.0,92.0}},}, -- Add spawn in The Barrens to be shown on the map
+        },
+        [12677] = {
+            [QuestieDB.npcKeys.waypoints] = {[331]={{57.44,56.08},{57.23,56.0},{56.99,55.89},{56.7,55.76},{56.43,55.63},{56.08,55.5},{55.76,55.42},{55.55,55.38},{55.16,55.26},{54.92,55.11},{54.69,54.97},{54.43,54.92},{54.59,54.74},{54.93,54.88},{55.17,55.01},{55.35,55.12},{55.67,55.35},{56.0,55.5},{56.33,55.66},{56.56,55.77},{56.93,55.94},{57.07,55.98},{57.4,56.05},{57.73,55.95},{57.86,55.87},{58.0,55.78},{58.1,55.7},{58.38,55.5},{58.57,55.31},{58.83,55.2},{59.04,54.79},{59.19,54.33},{59.44,54.02},{59.25,54.26},{59.04,54.59},{58.92,54.85},{58.79,55.35},{58.59,55.53},{58.33,55.7},{58.08,55.77},{57.83,55.88},{57.71,55.93},},},
+        },
+        [12678] = {
+            [QuestieDB.npcKeys.waypoints] = {[331]={{41.93,68.6},{41.81,68.29},{41.69,67.98},{41.52,67.57},{41.45,67.23},{41.41,66.81},{41.48,66.42},{41.67,65.74},{41.85,65.48},{42.01,65.21},{42.17,64.94},{42.36,64.63},{42.44,64.53},{42.66,64.37},{42.88,64.25},{43.11,64.13},{43.6,63.94},{43.78,64.01},{44.05,64.22},{44.3,64.62},{44.44,65.15},{44.57,65.46},{44.61,65.76},{44.62,66.22},{44.59,66.79},{44.56,67.27},{44.46,67.85},{44.31,68.29},{44.05,68.56},{43.81,68.51},{43.37,68.4},{43.04,68.42},{42.84,68.42},{42.53,68.45},{42.25,68.59},},},
         },
         [12865] = {
             [QuestieDB.npcKeys.spawns] = {[17]={{46.2,90.2},{47.8,90.6},{48,92.4},{48.2,92.6},{48.4,95.4},{48.4,95.6},{48.6,95.4},{48.6,95.6},},},
@@ -547,6 +560,9 @@ function QuestieNPCFixes:Load()
             [QuestieDB.npcKeys.spawns] = {[3358]={{-1,-1},},},
             [QuestieDB.npcKeys.zoneID] = 3358,
         },
+        [15350] = {
+            [QuestieDB.npcKeys.spawns] = {[1637]={{80.68,30.51},},[1638]={{57.8,76.4},},[1497]={{58.27,97.9},},[36]={{63.09,59.87},},[17]={{46.71,8.68},},[45]={{73.5,29.13},},[47]={{50.33,89.57},},},
+        },
         [15557] = {
             [QuestieDB.npcKeys.spawns] = {[46]={{82.21,46.48},},},
         },
@@ -636,5 +652,66 @@ function QuestieNPCFixes:LoadFactionFixes()
         return npcFixesHorde
     else
         return npcFixesAlliance
+    end
+end
+
+---Updates the NPC spawns to be either in Elwynn Forest or Mulgore
+---@param isInMulgore boolean
+---@return table<integer, any>
+function QuestieNPCFixes:LoadDarkmoonFixes(isInMulgore)
+    if isInMulgore then
+        return {
+            [14828] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{37.24,37.67},},},
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+            [14829] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{37.47,39.56},},},
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+            [14832] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{37.82,39.81},},},
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+            [14833] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{36.17,35.15},},}, -- might be 37.2,37.7
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+            [14841] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{37.09,37.17},},},
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+            [14871] = {
+                [QuestieDB.npcKeys.spawns] = {[215]={{35.92,35.27},},},
+                [QuestieDB.npcKeys.zoneID] = 215,
+            },
+        }
+    else
+        return {
+            [14828] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{41.5,68.87},},},
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+            [14829] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{40.17,69.53},},},
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+            [14832] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{40.49,69.93},},},
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+            [14833] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{43.61,70.84},},}, -- might be 41.5,68.9
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+            [14841] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{41.71,70.72},},},
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+            [14871] = {
+                [QuestieDB.npcKeys.spawns] = {[12]={{43.34,70.28},},},
+                [QuestieDB.npcKeys.zoneID] = 12,
+            },
+        }
     end
 end
