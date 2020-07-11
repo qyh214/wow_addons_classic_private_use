@@ -1,6 +1,6 @@
 if GetLocale() ~= "deDE" then return end
-if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
-local L = DBM_GUI_Translations
+if not DBM_GUI_L then DBM_GUI_L = {} end
+local L = DBM_GUI_L
 
 L.MainFrame = "Deadly Boss Mods"
 
@@ -105,7 +105,7 @@ L.ShowEngageMessage 		= "Zeige Meldungen für den Beginn von Kämpfen im Chatfen
 L.ShowDefeatMessage 		= "Zeige Meldungen für Siege/Niederlagen im Chatfenster"
 L.ShowGuildMessages 		= "Zeige Meldungen für Kampfbeginn/Siege/Niederlagen für Schlachtzüge deiner Gilde im Chatfenster"
 L.ShowGuildMessagesPlus		= "Zeige auch Meldungen für Kampfbeginn/Siege/Niederlagen für Mythisch+ Gildengruppen (benötigt Schlachtzugeinstellung)"
-L.WhisperMessages			= "Flüstermeldungen"
+L.Area_WhisperMessages		= "Flüstermeldungen"
 L.AutoRespond 				= "Aktiviere automatische Antwort während eines Bosskampfes"
 L.WhisperStats 				= "Füge Sieg-/Niederlagestatistik den Flüsterantworten hinzu"
 L.DisableStatusWhisper 		= "Deaktiviere 'status'-Flüsteranfragen für die gesamte Gruppe (nur als Gruppenleiter; nur für normale/heroische/mythische Schlachtzüge und Mythisch+ Dungeons)"
@@ -168,7 +168,7 @@ L.BarInlineIcons			= "Zeichen einbetten"
 L.ShortTimerText			= "Nutze kurzen Timertext (falls verfügbar)"
 
 -- Tab: Spec Warn Frame
-L.Panel_SpecWarnFrame		= "Spezialwarnungen"
+L.Panel_SpecWarnFrame		= "Spezial Schlachtzug Warnungen"
 L.Area_SpecWarn				= "Einstellungen für Spezialwarnungen"
 L.SpecWarn_ClassColor		= "Benutze Klassenfarben für Spezialwarnungen"
 L.ShowSWarningsInChat 		= "Zeige Spezialwarnungen im Chatfenster"
@@ -225,10 +225,8 @@ L.EventFilterMythicMusic	= "Spiele keine Kampfmusik auf Schwierigkeitsgrad Mythi
 
 -- Tab: Global Filter
 L.Panel_SpamFilter			= "Deaktivierung von DBM-Funktionen"
-L.Area_SpamFilter_Outgoing	= "Globale Deaktivierungs- und Filtereinstellungen für DBM"
 L.SpamBlockNoShowAnnounce	= "Zeige keinen Text und spiele keine Sounds für JEGLICHE allgemeine Meldungen"
 L.SpamBlockNoShowTgtAnnounce= "Zeige keinen Text und spiele keine Sounds für allgemeine ZIEL-Meldungen (wird durch obigen Filter überschrieben)"
-L.SpamBlockNoSpecWarn		= "Zeige keine Spezialwarnungen und spiele keine Spezialwarnungssounds"
 L.SpamBlockNoSpecWarnText	= "Zeige keinen Spezialwarnungstext, aber erlaube dennoch Sprachpacks (wird durch obigen Filter überschrieben)"
 L.SpamBlockNoShowTimers		= "Zeige keine Mod-Timer (Boss Mod/Herausforderungsmodus/Gruppensuche/Wiedererscheinen)"
 L.SpamBlockNoShowUTimers	= "Zeige keine von anderen gesendeten Timer (benutzerdefiniert/Pull/Pause)"
@@ -240,7 +238,6 @@ L.SpamBlockNoNameplate		= "Zeige keine Namensplakettenauras"
 L.SpamBlockNoCountdowns		= "Spiele keine Countdown-Sounds"
 L.SpamBlockNoYells			= "Sende keine automatischen Schreie"
 L.SpamBlockNoNoteSync		= "Akzeptiere keine geteilten Notizen"
-L.SpamBlockNoReminders		= "Zeige keine Anmeldungs-, Empfehlungs-, und Aktualisierungsmeldungen (NICHT empfohlen)"
 
 L.Area_Restore				= "DBM-Wiederherstellungseinstellungen (Setzen des vorherigen Nutzerzustands nach Mod-Ende)"
 L.SpamBlockNoIconRestore	= "Setze Markierungszeichen am Kampfende nicht auf den vorherigen Zustand zurück"
@@ -254,9 +251,9 @@ L.StripServerName			= "Entferne den Realmnamen der Spieler in Warnungen und Time
 L.Area_SpecFilter			= "Filtereinstellungen für Rollen"
 L.FilterTankSpec			= "Unterdrücke Warnungen für Tanks, falls deine aktuelle Spezialisierung keine \"Schutz\"-Spezialisierung ist (Hinweis: Diese Filterung sollte normalerweise nicht deaktiviert werden, da alle individuellen \"Spott\"-Warnungen nun standardmäßig aktiviert sind.)"
 L.FilterInterruptsHeader	= "Unterdrücke Warnungen für unterbrechbare Zauber basierend auf Verhaltenseinstellung"
-L.FilterInterrupts			= "nicht von akt. Ziel/Fokusziel gewirkt (immer)"
-L.FilterInterrupts2			= "nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrechungen auf CD (nur Boss)"
-L.FilterInterrupts3			= "nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrech. auf CD (Boss & Trash)"
+L.FilterInterrupts			= "Nicht von akt. Ziel/Fokusziel gewirkt (immer)"
+L.FilterInterrupts2			= "Nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrechungen auf CD (nur Boss)"
+L.FilterInterrupts3			= "Nicht von akt. Ziel/Fokusziel gewirkt (immer) oder Unterbrech. auf CD (Boss & Trash)"
 L.FilterInterruptNoteName	= "Unterdrücke Warnungen für unterbrechbare Zauber (mit Zählung), falls die Warnung nicht deinen Namen in der nutzerdefinierten Notiz enthält"
 L.FilterDispels				= "Unterdrücke Warnungen für reinigbare Zauber, falls deine Reinigungen noch abklingen"
 L.FilterTrashWarnings		= "Unterdrücke alle \"Trash\"-Gegner Warnungen in normalen und heroischen Dungeons"

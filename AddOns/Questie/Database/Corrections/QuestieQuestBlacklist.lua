@@ -15,6 +15,9 @@ function QuestieQuestBlacklist:Load()
         [1318] = true, -- Duplicate of 7703 and not in the game
         [7704] = true, -- Not in the game
         [8258] = true, -- Not in the game (yet) -- #1805
+        [636] = true, -- Not in the game - #1900
+        [4603] = true, -- Duplicate of 2953
+        [4604] = true, -- Duplicate of 2953
         -- Welcome! quests (Collectors Edition)
         [5805] = true,
         [5841] = true,
@@ -63,8 +66,6 @@ function QuestieQuestBlacklist:Load()
         [925] = true,
         [7881] = true,
         [7882] = true,
-        [8351] = true,
-        [8352] = true,
         [8353] = true,
         [8354] = true,
         [172] = true,
@@ -500,6 +501,8 @@ function QuestieQuestBlacklist:Load()
         [8267] = true,
         [8268] = true,
         [8269] = true,
+        [8569] = true,
+        [8570] = true,
         -----------------------------------------------
 
         -- corrupted windblossom
@@ -545,6 +548,7 @@ function QuestieQuestBlacklist:Load()
         [7926] = true,
 
       --Phase 5 - AQ20/AQ40/AQ War Effort
+        [9248] = true,
         [8595] = true,
         [8579] = true,
         [8856] = true,
@@ -596,9 +600,6 @@ function QuestieQuestBlacklist:Load()
         [8774] = true,
         [8776] = true,
         [8316] = true,
-        [8348] = true,
-        [8349] = true,
-        [8363] = true,
         [9338] = true,
         [9023] = true,
         [9422] = true,
@@ -827,6 +828,9 @@ function QuestieQuestBlacklist:Load()
         [8759] = true,
         [8760] = true,
       --Phase 6 - Naxxramas
+        [9208] = true,
+        [9209] = true,
+        [9210] = true,
         [9142] = true,
         [9165] = true,
         [9141] = true,

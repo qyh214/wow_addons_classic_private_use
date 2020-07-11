@@ -1,10 +1,10 @@
 local mod	= DBM:NewMod("TwinEmpsAQ", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200215182107")
+mod:SetRevision("20200611171919")
 mod:SetCreatureID(15276, 15275)
 mod:SetEncounterID(715)
-mod:SetModelID(15778)
+--mod:SetModelID(15778)--Renders too close
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
@@ -23,7 +23,7 @@ local specWarnStrike		= mod:NewSpecialWarningDefensive(26613, nil, nil, nil, 1, 
 local timerTeleport			= mod:NewCDTimer(29.2, 800, nil, nil, nil, 6, nil, nil, nil, 1, 4)--29.2-40.2
 local timerExplodeBugCD		= mod:NewCDTimer(4.9, 804, nil, false, nil, 1)--4.9-9
 local timerMutateBugCD		= mod:NewCDTimer(11, 802, nil, false, nil, 1)--11-16
---local timerStrikeCD		= mod:NewCDTimer(9.7, 26613, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--9.7-42.6
+--local timerStrikeCD		= mod:NewCDTimer(9.7, 26613, nil, "Tank", nil, 5, nil, DBM_CORE_L.TANK_ICON)--9.7-42.6
 
 local berserkTimer			= mod:NewBerserkTimer(900)
 

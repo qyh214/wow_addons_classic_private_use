@@ -1,6 +1,6 @@
 if GetLocale() ~= "itIT" then return end
-if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
-local L = DBM_GUI_Translations
+if not DBM_GUI_L then DBM_GUI_L = {} end
+local L = DBM_GUI_L
 
 L.MainFrame = "Deadly Boss Mods"
 
@@ -93,7 +93,7 @@ L.ShowPizzaMessage 			= "Visualizza i messaggi inviati a tutti in chat"
 L.CombatMessages			= "Messaggi di Combattimento - Opzioni"
 L.ShowEngageMessage 		= "Visualizza in chat il messaggio di Ingaggio"
 L.ShowDefeatMessage 		= "Visualizza in chat il messaggio di uccisione"
-L.WhisperMessages			= "Sussurri - Opzioni"
+L.Area_WhisperMessages		= "Sussurri - Opzioni"
 L.AutoRespond 				= "Rispondi automaticamente ai sussurri mentre stai combattendo"
 L.WhisperStats 				= "Nelle risposte ai sussurri, aggiungi le informazioni su uccisioni e sconfitte."
 
@@ -119,7 +119,7 @@ L.FillUpBars				= "Riempi la barre"
 L.ClickThrough				= "Disabilita i click sulle barre"
 
 -- Tab: Spec Warn Frame
-L.Panel_SpecWarnFrame		= "Messaggi Speciali"
+L.Panel_SpecWarnFrame		= "Avvisi Speciali di Incursione"
 L.Area_SpecWarn				= "Messaggi Speciali - Opzioni"
 L.SpecWarn_Font				= "Carattere usato per i Messaggi Speciali"
 L.SpecWarn_DemoButton		= "Esempio"

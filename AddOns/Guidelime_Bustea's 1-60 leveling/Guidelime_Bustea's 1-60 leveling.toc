@@ -1,8 +1,8 @@
 
 ## Title: Guidelime_Bustea's 1-60 leveling Guide
 ## Author: Bustea
-## Version: 1.9.2-Release
-## Interface: 11304
+## Version: 1.9.3-Release
+## Interface: 11305
 ## Dependencies: Guidelime
 ## Notes: Bustea's 1-60 leveling Guide
 

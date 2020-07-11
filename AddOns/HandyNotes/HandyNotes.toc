@@ -1,9 +1,9 @@
-## Interface: 11302
+## Interface: 11304
 ## Title: HandyNotes
 ## Notes: Handy notes for your maps
 ## Notes-frFR: Notes pratiques pour vos cartes.
 ## Author: Xinhuan
-## Version: v1.5.9-1-g81432ff
+## Version: v1.5.10
 ## DefaultState: enabled
 ## X-Category: Map
 ## X-eMail: xinhuan @ gmail DOT com

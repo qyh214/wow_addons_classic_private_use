@@ -25,18 +25,26 @@ local QuestieMap = QuestieLoader:ImportModule("QuestieMap")
 local QuestieLib = QuestieLoader:ImportModule("QuestieLib")
 ---@type QuestieHash
 local QuestieHash = QuestieLoader:ImportModule("QuestieHash")
+---@type QuestieOptions
+local QuestieOptions = QuestieLoader:ImportModule("QuestieOptions")
 ---@type QuestiePlayer
 local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer")
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB")
 ---@type QuestieAuto
 local QuestieAuto = QuestieLoader:ImportModule("QuestieAuto")
+---@type Cleanup
+local QuestieCleanup = QuestieLoader:ImportModule("Cleanup")
+---@type DBCompiler
+local QuestieDBCompiler = QuestieLoader:ImportModule("DBCompiler")
+---@type ZoneDB
+local ZoneDB = QuestieLoader:ImportModule("ZoneDB")
 
 --- LOCAL ---
 --False -> true -> nil
-local playerEntered = false
+local didPlayerEnterWorld = false
 local hasFirstQLU = false
-local runQLU = false
+local shouldRunQLU = false
 
 -- forward declaration
 local _PLAYER_LOGIN, _PLAYER_LEVEL_UP, _PLAYER_REGEN_DISABLED, _PLAYER_REGEN_ENABLED
@@ -102,31 +110,58 @@ local function _Hack_prime_log() -- this seems to make it update the data much q
   end
 end
 
+
+
 _PLAYER_LOGIN = function()
-    C_Timer.After(1, function()
+
+    local function stage1()
         QuestieDB:Initialize()
         QuestieLib:CacheAllItemNames()
 
-        -- Initialize Journey Window
-        QuestieJourney.Initialize()
-    end)
-    C_Timer.After(4, function()
+        -- if compiled db exists and is up to date
+            QuestieCleanup:Run()
+        -- end
+    end
+
+    local function stage2()
         -- We want the framerate to be HIGH!!!
         QuestieMap:InitializeQueue()
         _Hack_prime_log()
         QuestiePlayer:Initialize()
+        QuestieJourney:Initialize()
         QuestieQuest:Initialize()
         QuestieQuest:GetAllQuestIdsNoObjectives()
         QuestieQuest:CalculateAvailableQuests()
         QuestieQuest:DrawAllAvailableQuests()
         QuestieNameplate:Initialize()
         Questie:Debug(DEBUG_ELEVATED, "PLAYER_ENTERED_WORLD")
-        playerEntered = true
+        didPlayerEnterWorld = true
         -- manually fire QLU since enter has been delayed past the first QLU
         if hasFirstQLU then
             _QUEST_LOG_UPDATE()
         end
-    end)
+        -- Initialize the tracker
+        QuestieTracker:Initialize()
+    end
+
+    if QuestieLib:GetAddonVersionString() ~= QuestieConfig.dbCompiledOnVersion or (Questie.db.global.questieLocaleDiff and Questie.db.global.questieLocale or GetLocale()) ~= QuestieConfig.dbCompiledLang then
+        QuestieConfig.dbIsCompiled = nil -- we need to recompile
+    end
+
+    if QuestieConfig.dbIsCompiled then -- todo: check for updates or language change and recompile
+        C_Timer.After(1, stage1)
+        C_Timer.After(4, stage2)
+    else
+        Questie.minimapConfigIcon:Hide("Questie") -- prevent opening journey / settings while compiling
+        C_Timer.After(4, function()
+            QuestieDBCompiler:Compile(function()
+                stage1()
+                stage2()
+                Questie.minimapConfigIcon:Show("Questie")
+            end)
+        end)
+    end
+
 end
 
 --Fires when a quest is accepted in anyway.
@@ -158,7 +193,7 @@ _MAP_EXPLORATION_UPDATED = function()
 end
 
 -- Needed to distinguish finished quests from abandoned quests
-local finishedEventReceived = false
+local questTurnedInEventReveived = false
 
 --- Fires when a quest is removed from the questlog, this includes turning it in
 --- and abandoning it.
@@ -166,9 +201,9 @@ local finishedEventReceived = false
 _QUEST_REMOVED = function(self, questID)
     Questie:Debug(DEBUG_DEVELOP, "[EVENT] QUEST_REMOVED", questID)
     _Hack_prime_log()
-    if finishedEventReceived == questID then
-        finishedEventReceived = false
-        runQLU = false
+    if questTurnedInEventReveived == questID then
+        questTurnedInEventReveived = false
+        shouldRunQLU = false
         _CompleteQuest(questID)
         --Broadcast our removal!
         Questie:SendMessage("QC_ID_BROADCAST_QUEST_REMOVE", questID)
@@ -176,7 +211,7 @@ _QUEST_REMOVED = function(self, questID)
     end
     QuestieQuest:AbandonedQuest(questID)
     QuestieJourney:AbandonQuest(questID)
-    runQLU = false
+    shouldRunQLU = false
 
     --Broadcast our removal!
     Questie:SendMessage("QC_ID_BROADCAST_QUEST_REMOVE", questID)
@@ -189,6 +224,7 @@ _CompleteQuest = function(questId, count)
     if(not count) then
         count = 1
     end
+    ---@type Quest
     local quest = QuestieDB:GetQuest(questId)
     if not quest then
         return
@@ -212,14 +248,15 @@ end
 _QUEST_TURNED_IN = function(self, questID, xpReward, moneyReward)
     Questie:Debug(DEBUG_DEVELOP, "[EVENT] QUEST_TURNED_IN", questID, xpReward, moneyReward)
     _Hack_prime_log()
-    finishedEventReceived = questID
+    questTurnedInEventReveived = questID
 
     -- Some repeatable sub quests don't fire a UQLC event when they're completed.
     -- Therefore we have to check here to make sure the next QLU updates the state.
+    ---@type Quest
     local quest = QuestieDB:GetQuest(questID)
     if quest and ((quest.parentQuest and quest.IsRepeatable) or quest.Description == nil) then
-        Questie:Debug(DEBUG_DEVELOP, "Enabling runQLU")
-        runQLU = true
+        Questie:Debug(DEBUG_DEVELOP, "Enabling shouldRunQLU")
+        shouldRunQLU = true
     end
 end
 
@@ -227,7 +264,7 @@ end
 --- client/server communication, so not every event really updates the log data.
 _QUEST_LOG_UPDATE = function()
     Questie:Debug(DEBUG_DEVELOP, "[EVENT] QUEST_LOG_UPDATE")
-    if playerEntered then
+    if didPlayerEnterWorld then
         Questie:Debug(DEBUG_DEVELOP, "---> Player entered world, START.")
         C_Timer.After(1, function ()
             Questie:Debug(DEBUG_DEVELOP, "---> Player entered world, DONE.")
@@ -235,14 +272,16 @@ _QUEST_LOG_UPDATE = function()
             QuestieTracker:Update()
             _GROUP_JOINED()
         end)
-        playerEntered = nil
+        didPlayerEnterWorld = nil
     end
 
     -- QR or UQLC events have set the flag, so we need to update Questie state.
-    if runQLU then
-        QuestieHash:CompareQuestHashes()
+    if shouldRunQLU then
+        local hashChanged = QuestieHash:CompareQuestHashes()
         QuestieNameplate:UpdateNameplate()
-        runQLU = false
+        if hashChanged then
+            shouldRunQLU = false
+        end
     end
 end
 
@@ -255,7 +294,7 @@ _UNIT_QUEST_LOG_CHANGED = function(self, unitTarget)
     -- data.
     if unitTarget == "player" then
         Questie:Debug(DEBUG_DEVELOP, "UNIT_QUEST_LOG_CHANGED: player")
-        runQLU = true
+        shouldRunQLU = true
     end
 end
 
@@ -289,6 +328,11 @@ _MODIFIER_STATE_CHANGED = function(self, key, down)
         GameTooltip:SetFrameStrata("TOOLTIP")
         GameTooltip:Show()
     end
+    if Questie.db.global.trackerLocked then
+        if QuestieTracker.private.baseFrame ~= nil then
+            QuestieTracker.private.baseFrame:Update()
+        end
+    end
 end
 
 --- Fires when some chat messages about skills are displayed
@@ -307,22 +351,23 @@ _CHAT_MSG_COMBAT_FACTION_CHANGE = function()
     Questie:Debug(DEBUG_DEVELOP, "CHAT_MSG_COMBAT_FACTION_CHANGE")
     local factionChanged = QuestieReputation:Update(false)
     if factionChanged then
+        QuestieTracker:Update()
         QuestieQuest:CalculateAvailableQuests()
         QuestieQuest:DrawAllAvailableQuests()
     end
 end
 
-local numOfMembers = -1
+local numberOfGroupMembers = -1
 _GROUP_ROSTER_UPDATE = function()
     local currentMembers = GetNumGroupMembers()
     -- Only want to do logic when number increases, not decreases.
-    if(numOfMembers < currentMembers) then
+    if numberOfGroupMembers < currentMembers then
         -- Tell comms to send information to members.
         --Questie:SendMessage("QC_ID_BROADCAST_FULL_QUESTLIST")
-        numOfMembers = currentMembers
+        numberOfGroupMembers = currentMembers
     else
         -- We do however always want the local to be the current number to allow up and down.
-        numOfMembers = currentMembers
+        numberOfGroupMembers = currentMembers
     end
 end
 
@@ -332,10 +377,10 @@ _GROUP_JOINED = function()
     --We want this to be fairly quick.
     checkTimer = C_Timer.NewTicker(0.1, function()
         local partyPending = UnitInParty("player")
-        local inParty = UnitInParty("party1")
-        local inRaid = UnitInRaid("raid1")
-        if(partyPending) then
-            if(inParty or inRaid) then
+        local isInParty = UnitInParty("party1")
+        local isInRaid = UnitInRaid("raid1")
+        if partyPending then
+            if (isInParty or isInRaid) then
                 Questie:Debug(DEBUG_DEVELOP, "[QuestieEventHandler]", "Player joined party/raid, ask for questlogs")
                 --Request other players log.
                 Questie:SendMessage("QC_ID_REQUEST_FULL_QUESTLIST")
@@ -360,6 +405,11 @@ _PLAYER_REGEN_DISABLED = function()
     if Questie.db.global.hideTrackerInCombat then
         previousTrackerState = Questie.db.char.isTrackerExpanded
         QuestieTracker:Collapse()
+    end
+    if InCombatLockdown() then
+        if QuestieConfigFrame:IsShown() then
+            QuestieOptions:HideFrame()
+        end
     end
 end
 
@@ -393,17 +443,17 @@ _QUEST_FINISHED = function()
     end)
 
     -- Quests which are just turned in don't trigger QLU.
-    -- So runQLU is still active from QUEST_TURNED_IN
-    if runQLU then
-        Questie:Debug(DEBUG_DEVELOP, "runQLU still active")
-        if finishedEventReceived then
+    -- So shouldRunQLU is still active from QUEST_TURNED_IN
+    if shouldRunQLU then
+        Questie:Debug(DEBUG_DEVELOP, "shouldRunQLU still active")
+        if questTurnedInEventReveived then
             Questie:Debug(DEBUG_DEVELOP, "finishedEventReceived is questId")
-            local quest = QuestieDB:GetQuest(finishedEventReceived)
+            local quest = QuestieDB:GetQuest(questTurnedInEventReveived)
             Questie:Debug(DEBUG_DEVELOP, "Completing automatic completion quest")
             QuestieQuest:CompleteQuest(quest)
         else
             Questie:Debug(DEBUG_DEVELOP, "finishedEventReceived is false. Something is off?")
         end
-        runQLU = false
+        shouldRunQLU = false
     end
 end

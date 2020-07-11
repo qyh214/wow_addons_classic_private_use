@@ -1,6 +1,14 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("ClassicCastbars")
 local LSM = LibStub("LibSharedMedia-3.0")
 
+local TEXT_POINTS = {
+    ["CENTER"] = "CENTER",
+    ["RIGHT"] = "RIGHT",
+    ["LEFT"] = "LEFT",
+    ["TOP"] = "TOP",
+    ["BOTTOM"] = "BOTTOM",
+}
+
 local function GetLSMTable(lsmType)
     local tbl = CopyTable(LSM:HashTable(lsmType)) -- copy to prevent modifying LSM table
 
@@ -120,8 +128,17 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                         disabled = ModuleIsDisabled,
                         hidden = unitID == "player",
                     },
-                    notes = {
+                    ignoreParentAlpha = {
                         order = 8,
+                        width = "full",
+                        name = L.IGNORE_PARENT_ALPHA,
+                        desc = L.IGNORE_PARENT_ALPHA_TOOLTIP,
+                        type = "toggle",
+                        disabled = ModuleIsDisabled,
+                        hidden = unitID == "player" or unitID == "focus",
+                    },
+                    notes = {
+                        order = 9,
                         hidden = unitID ~= "focus",
                         -- this note will soon be removed or changed to only contain slash commands so we dont bother localizing here
                         name = "\nSlash Commands:\n\n|cffffff00 - /focus\n\n - /clearfocus\n\n - /click FocusCastbar|r\n\n Note that if you switch focus in combat it wont update the targetting until you leave combat. Only the cast tracking will still work in combat.\n"
@@ -189,6 +206,12 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                         min = -2000,
                         max = 2000,
                         bigStep = 1,
+                    },
+                    textPoint = {
+                        order = 6,
+                        name = L.TEXT_POINT,
+                        type = "select",
+                        values = TEXT_POINTS,
                     },
                 },
             },
@@ -310,7 +333,7 @@ local function CreateUnitTabGroup(unitID, localizedUnit, order)
                         order = 6,
                         hasAlpha = true,
                         type = "color",
-                    }
+                    },
                 },
             },
 
@@ -439,7 +462,9 @@ local function GetOptionsTable()
                 --width = 2,
                 name = L.RESET_ALL,
                 type = "execute",
-                confirm = true,
+                confirm = function()
+                    return ClassicCastbars.db.player.enabled and L.REQUIRES_RESTART or true
+                end,
                 func = function()
                     local shouldReloadUI = ClassicCastbars.db.player.enabled
                     -- Reset savedvariables to default

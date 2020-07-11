@@ -1,4 +1,4 @@
-if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
+if GetLocale() ~= "esES" then return end
 local L
 
 ----------------
@@ -61,7 +61,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("Sulfuron")
 
 L:SetGeneralLocalization{
-	name = "Presagista Sulfuron"
+	name = "Sulfuron Presagista"
 }
 
 ----------------
@@ -81,7 +81,12 @@ L = DBM:GetModLocalization("Majordomo")
 L:SetGeneralLocalization{
 	name = "Mayordomo Executus"
 }
-
+L:SetTimerLocalization{
+	timerShieldCD		= "Próximo Escudo"
+}
+L:SetOptionLocalization{
+	timerShieldCD		= "Mostrar temporizador para el próximo Escudo de daño/reflejo"
+}
 ----------------
 --  Ragnaros  --
 ----------------
@@ -107,4 +112,13 @@ L:SetOptionLocalization{
 L:SetMiscLocalization{
 	Submerge	= "¡AVANZAD, MIS SIRVIENTES! ¡DEFENDED A VUESTRO MAESTRO!",
 	Pull		= "¡Crías imprudentes! ¡Os habéis precipitado hasta vuestra propia muerte! ¡Ahora mirad, el maestro se agita!"
+}
+
+-----------------
+--  MC: Trash  --
+-----------------
+L = DBM:GetModLocalization("MCTrash")
+
+L:SetGeneralLocalization{
+	name = "NM: Bichos"
 }

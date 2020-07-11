@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Flamegor", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200321001428")
+mod:SetRevision("20200623011525")
 mod:SetCreatureID(11981)
 mod:SetEncounterID(615)
 mod:SetModelID(6377)
@@ -23,7 +23,7 @@ local specWarnFrenzy		= mod:NewSpecialWarningDispel(23342, "RemoveEnrage", nil, 
 
 local timerWingBuffet		= mod:NewCDTimer(31, 23339, nil, nil, nil, 2)
 local timerShadowFlameCD	= mod:NewCDTimer(14, 22539, nil, false)--14-21
-local timerFrenzy	 		= mod:NewBuffActiveTimer(10, 23342, nil, "Tank|RemoveEnrage|Healer", 4, 5, nil, DBM_CORE_ENRAGE_ICON)
+local timerFrenzy	 		= mod:NewBuffActiveTimer(10, 23342, nil, "Tank|RemoveEnrage|Healer", 4, 5, nil, DBM_CORE_L.ENRAGE_ICON)
 
 function mod:OnCombatStart(delay)
 	timerShadowFlameCD:Start(18-delay)
@@ -61,31 +61,13 @@ do
 	function mod:SPELL_AURA_APPLIED(args)--did not see ebon use any of these abilities
 		--if args.spellId == 23342 then
 		if args.spellName == Frenzy then
-			if self:AntiSpam(5, "Frenzy") then
-				self:SendSync("Frenzy")
-			end
 			timerFrenzy:Start()
 		end
 	end
 	function mod:SPELL_AURA_REMOVED(args)--did not see ebon use any of these abilities
 		--if args.spellId == 23342 then
 		if args.spellName == Frenzy then
-			if self:AntiSpam(5, "FrenzyStop") then
-				self:SendSync("FrenzyStop")
-			end
 			timerFrenzy:Stop()
 		end
-	end
-end
-
-function mod:OnSync(msg, Name)
-	if self:AntiSpam(5, msg) then
-		--Do nothing, this is just an antispam threshold for syncing
-	end
-	if not self:IsInCombat() then return end
-	if msg == "Frenzy" then
-		timerFrenzy:Start()
-	elseif msg == "FrenzyStop" then
-		timerFrenzy:Stop()
 	end
 end

@@ -1,5 +1,4 @@
 local AutoLoot = CreateFrame("Frame")
-
 SpeedyAutoLootDB = SpeedyAutoLootDB or {}
 SpeedyAutoLootDB.global = SpeedyAutoLootDB.global or {}
 

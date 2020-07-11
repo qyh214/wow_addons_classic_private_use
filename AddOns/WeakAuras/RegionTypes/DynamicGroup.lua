@@ -163,7 +163,7 @@ end
 local sortNilFirst = WeakAuras.InvertSort(WeakAuras.SortNilLast)
 function WeakAuras.SortNilFirst(a, b)
   if a == nil and b == nil then
-    -- we want SortNil to always prevent nils from propogating
+    -- we want SortNil to always prevent nils from propagating
     -- as well as to sort nils onto one side
     -- to maintain stability, we need SortNil(nil, nil) to always be false
     -- hence this special case
@@ -367,7 +367,7 @@ local anchorers = {
       for _, regionData in ipairs(activeRegions) do
         local unit = regionData.region.state and regionData.region.state.unit
         if unit then
-          local frame = WeakAuras.GetUnitFrame(unit)
+          local frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames
           if frame then
             frames[frame] = frames[frame] or {}
             tinsert(frames[frame], regionData)
@@ -789,8 +789,8 @@ local function modify(parent, region, data)
   end
 
   function region:Suspend()
-    -- Stops group from repositioning and reindexing children
-    -- Calls to Activate, Deactivate, and Reindex will cache the relevant children
+    -- Stops group from repositioning and re-indexing children
+    -- Calls to Activate, Deactivate, and Re-index will cache the relevant children
     -- Similarly, Sort, Position, and Resize will be stopped
     -- to be called on the next Resume
     -- for when the group is resumed
@@ -1045,7 +1045,7 @@ local function modify(parent, region, data)
         data.anchorPoint,
         x + data.xOffset, y + data.yOffset
       )
-      controlPoint:SetShown(show)
+      controlPoint:SetShown(show and frame ~= WeakAuras.HiddenFrames)
       controlPoint:SetWidth(regionData.dimensions.width)
       controlPoint:SetHeight(regionData.dimensions.height)
       if self.anchorPerUnit == "UNITFRAME" then

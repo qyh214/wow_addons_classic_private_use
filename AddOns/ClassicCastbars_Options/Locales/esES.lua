@@ -39,6 +39,8 @@ L["ICON_POS_Y"] = "Posición de Icono Y"
 L["ICON_SHOW"] = "Mostrar icono de hechizo"
 L["ICON_SIZE"] = "Tamaño del Icono"
 L["ICON_SIZE_TOOLTIP"] = "Establece el tamaño del icono de hechizo de la barra de lanzamiento."
+L["IGNORE_PARENT_ALPHA"] = "Ignorar alfa del marco primario"
+L["IGNORE_PARENT_ALPHA_TOOLTIP"] = "Ignora la transparencia/valor alfa heredado del marco primario de barras de lanzamiento."
 L["LSM_TEXTURE_NOTE"] = [=[
 Nota: Si usa una textura / fuente de terceros personalizada y la elimina más adelante de su ordenador, deberá restablecer manualmente la textura o fuente aquí para que el complemento continúe funcionando.]=]
 L["NAMEPLATE"] = "Placa identificativa"
@@ -49,8 +51,8 @@ L["PLAYER"] = "Jugador"
 L["POSXY_TOOLTIP"] = "Ajuste los valores de desplazamiento XY para mover el marco."
 L["REQUIRES_RESTART"] = "Deshabilitar este módulo de barra de lanzamiento requiere una recarga de su interfaz. Presione Aceptar para recargar la IU."
 L["RESET_ALL"] = "Restablecer"
-L["SHOW_FOR_ENEMY"] = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|tMostrar Lanzamientos de Enemigos"
-L["SHOW_FOR_FRIENDLY"] = "|TInterface\\OptionsFrame\\UI-OptionsFrame-NewFeatureIcon:0:0:0:-1|tMostrar Lanzamientos de Aliados"
+L["SHOW_FOR_ENEMY"] = "Mostrar Lanzamientos de Enemigos"
+L["SHOW_FOR_FRIENDLY"] = "Mostrar Lanzamientos de Aliados"
 L["SHOW_SPARK"] = "Mostrar Efecto de Chispa de la Barra de Lanzamiento"
 L["SHOW_TIMER"] = "Mostrar texto del temporizador"
 L["SHOW_TIMER_TOOLTIP"] = "Muestra una cuenta atrás del temporizador para el lanzamiento actual."
@@ -69,6 +71,7 @@ L["TEST_TARGET_TOOLTIP"] = [=[Muestra la barra de lanzamiento del marco del obje
 Tendrá que apuntar a alguien primero para ver la barra de lanzamiento de prueba.
 ]=]
 L["TEXT_COLOR"] = "Seleccionar Color de Texto"
+L["TEXT_POINT"] = "Alineación del texto"
 L["TEXT_POS_X"] = "Posición de Texto X"
 L["TEXT_POS_Y"] = "Posición de Texto Y"
 L["TOGGLE_CASTBAR"] = "Habilitar barra de lanzamiento"

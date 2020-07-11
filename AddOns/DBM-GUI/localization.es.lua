@@ -1,7 +1,7 @@
 if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
 
-if not DBM_GUI_Translations then DBM_GUI_Translations = {} end
-local L = DBM_GUI_Translations
+if not DBM_GUI_L then DBM_GUI_L = {} end
+local L = DBM_GUI_L
 
 L.MainFrame = "Deadly Boss Mods"
 
@@ -11,6 +11,11 @@ L.Website					= "Visita nuestro canal de Discord: |cFF73C2FBhttps://discord.gg/d
 L.WebsiteButton				= "Página web"
 
 L.OTabBosses	= "Jefes"
+L.OTabRaids		= "Banda"--Raids & PVP
+L.OTabDungeons	= "Grupo/Solo"--1-5 person content (Dungeons, MoP Scenarios, World Events, Brawlers, Proving Grounds, Visions, Torghast, etc)
+L.OTabPlugins	= "Plugins del núcleo"
+L.OTabOptions	= GAMEOPTIONS_MENU
+L.OTabAbout		= "Sobre"
 
 L.TabCategory_Options	 	= "Opciones generales"
 L.TabCategory_BFA	 		= "Battle for Azeroth"
@@ -113,10 +118,15 @@ L.ShowEngageMessage 		= "Mostrar mensajes de inicio de encuentro en el chat"
 L.ShowDefeatMessage 		= "Mostrar mensajes de victoria y derrota en el chat"
 L.ShowGuildMessages 		= "Mostrar mensajes de inicio de encuentro, victoria y derrota de banda de hermandad en el chat"
 L.ShowGuildMessagesPlus		= "Mostrar también mensajes de inicio, victoria y derrota de Mítica+ de grupos de hermandad (requiere que la opción anterior esté activada)"
-L.WhisperMessages			= "Opciones de susurros"
+
+-- Tab: Privacy
+L.Tab_Privacy 				= "Privacidad"
+L.Area_WhisperMessages		= "Opciones de susurros"
 L.AutoRespond 				= "Responder automáticamente a susurros en encuentro"
 L.WhisperStats 				= "Incluir estadísticas de victoria y derrota en las respuestas automáticas a susurros"
 L.DisableStatusWhisper 		= "Desactivar susurros automáticos de estado de encuentro del grupo o banda para todos los jugadores (requiere ser el líder). Solo se aplica a bandas en dificultad normal, heroica y mítica, y a mazmorras de piedra angular."
+
+L.Area_SyncMessages			= "Opciones de sincronización"
 L.DisableGuildStatus 		= "Desactivar mensajes de hermandad de estado de encuentro del grupo o banda para todos los jugadores (requiere ser el líder)."
 L.EnableWBSharing 			= "Comparte cuando sacas/derrotas a un jefe mundial o activas un buff mundial con tus amigos de battle.net que están en el mismo reino. (Esta información siempre se compartirá con tu hermandad)"
 
@@ -171,6 +181,7 @@ L.CVoiceThree				= "Voz de Cuenta 3"
 -- Tab: Timers
 L.AreaTitle_BarColors		= "Colores de barras por tipo de temporizador"
 L.AreaTitle_BarSetup		= "Opciones generales de barras"
+L.AreaTitle_Behavior		= "Opciones de comportamiento de barra"
 L.AreaTitle_BarSetupSmall 	= "Opciones de barras pequeñas"
 L.AreaTitle_BarSetupHuge	= "Opciones de barras grandes"
 L.EnableHugeBar 			= "Habilitar barra grande (o 'Barra 2')"
@@ -186,6 +197,7 @@ L.BarSpark					= "Destello de barras"
 L.BarFlash					= "Iluminar barras a punto de expirar"
 L.BarSort					= "Ordenar por tiempo restante"
 L.BarColorByType			= "Color por tipo"
+L.NoBarFade					= "Use colores de inicio/fin como colores pequeños/grandes en lugar de un cambio gradual de color"
 L.BarInlineIcons			= "Iconos en barras"
 L.ShortTimerText			= "Texto de temporizador breve"
 L.StripTimerText			= "Eliminar reutilización/próximo de los temporizadores"
@@ -194,7 +206,7 @@ L.KeepBar2					= "(siempre que el módulo lo permita)"
 L.FadeBar					= "Desteñir barras de habilidades lejanas"
 
 -- Tab: Spec Warn Frame
-L.Panel_SpecWarnFrame		= "Avisos especiales"
+L.Panel_SpecWarnFrame		= "Avisos especiales de banda"
 L.Area_SpecWarn				= "Opciones de avisos especiales"
 L.SpecWarn_ClassColor		= "Usar colores de clase para avisos especiales"
 L.ShowSWarningsInChat 		= "Mostrar avisos especiales en el chat"
@@ -237,11 +249,11 @@ L.SWFAll					= "Cuando los avisos especiales usen cualquier sonido"
 L.SpecWarn_AlwaysVoice		= "Reproducir siempre todas las alertas de voz (ignora las opciones de jefe; útil para líderes de banda)"
 --TODO, maybe add URLS right to GUI panel on where to acquire 3rd party voice packs?
 L.Area_GetVEM				= "Descargar VEM Voice Pack"
-L.VEMDownload				= "|cFF73C2FBhttps://wow.curseforge.com/projects/dbm-voicepack-vem|r"
+L.VEMDownload				= "|cFF73C2FBhttps://curseforge.com/wow/addons/dbm-voicepack-vem|r"
 L.Area_BrowseOtherVP		= "Explorar otros paquetes de voz en Curse"
-L.BrowseOtherVPs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+voice|r"
+L.BrowseOtherVPs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+voice|r"
 L.Area_BrowseOtherCT		= "Explorar otros paquetes de voz de cuenta atrás en Curse"
-L.BrowseOtherCTs			= "|cFF73C2FBhttps://wow.curseforge.com/search?search=dbm+count+pack|r"
+L.BrowseOtherCTs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+count+pack|r"
 
 -- Tab: Event Sounds
 L.Panel_EventSounds			= "Sonidos de eventos"
@@ -259,13 +271,17 @@ L.EventFilterMythicMusic	= "Desactivar música personalizada de encuentros en di
 
 -- Tab: Global Filter
 L.Panel_SpamFilter			= "Filtros globales"
-L.Area_SpamFilter_Outgoing	= "Opciones de filtros globales"
+L.Area_SpamFilter_Anounces	= "Anunciar opciones globales de desactivación y filtro"
 L.SpamBlockNoShowAnnounce	= "Ocultar anuncios generales y desactivar los sonidos asociados"
 L.SpamBlockNoShowTgtAnnounce= "Ocultar anuncios generales de objetivos y desactivar los sonidos asociados (la opción anterior anula esta)"
-L.SpamBlockNoSpecWarn		= "Ocultar avisos especiales y desactivar los sonidos asociados"
 L.SpamBlockNoSpecWarnText	= "Ocultar avisos especiales pero sí reproducir sonidos de paquetes de voces (la opción anterior anula esta)"
+L.SpamBlockNoSpecWarnFlash	= "Ocultar avisos especiales de iluminación de pantalla"
+L.SpamBlockNoSpecWarnSound	= "Ocultar sonidos especiales (todavía permite paquetes de voz, si uno está habilitado en el panel Alertas de voz)"
+
+L.Area_SpamFilter_Timers	= "Desactivación global y opciones de filtro de temporizadores"
 L.SpamBlockNoShowTimers		= "Ocultar temporizadores de módulos"
 L.SpamBlockNoShowUTimers	= "Ocultar temporizadores de usuario"
+L.Area_SpamFilter_Misc		= "Diversas opciones globales de desactivación y filtro"
 L.SpamBlockNoSetIcon		= "Desactivar asignación automática de iconos"
 L.SpamBlockNoRangeFrame		= "Ocultar marcos de distancia"
 L.SpamBlockNoInfoFrame		= "Ocultar marcos de información"
@@ -274,7 +290,6 @@ L.SpamBlockNoNameplate		= "Ocultar auras de placas de nombres"
 L.SpamBlockNoCountdowns		= "Desactivar sonidos de cuenta atrás"
 L.SpamBlockNoYells			= "Desactivar envío automático de mensajes en el chat"
 L.SpamBlockNoNoteSync		= "Rechazar automáticamente notas compartidas"
-L.SpamBlockNoReminders		= "Ocultar mensajes de carga, recomendaciones y actualizaciones (no recomendado)"
 
 L.Area_Restore				= "Opciones de restauración"
 L.SpamBlockNoIconRestore	= "Restaurar iconos al acabar el encuentro"

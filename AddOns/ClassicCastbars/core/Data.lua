@@ -1316,7 +1316,7 @@ end)
 -- Spells that often have cast time reduced by talents.
 namespace.castTimeTalentDecreases = {
     [GetSpellInfo(403)] = 2000,      -- Lightning Bolt
-    [GetSpellInfo(421)] = 1500,      -- Chain Lightning
+    [GetSpellInfo(10605)] = 1500,    -- Chain Lightning
     [GetSpellInfo(6353)] = 4000,     -- Soul Fire
     [GetSpellInfo(116)] = 2500,      -- Frostbolt
     [GetSpellInfo(133)] = 3000,      -- Fireball
@@ -1855,7 +1855,7 @@ namespace.castModifiers = {
 
 -- Addon Savedvariables
 namespace.defaultConfig = {
-    version = "21", -- settings version
+    version = "24", -- settings version
     locale = GetLocale(),
     npcCastUninterruptibleCache = {},
     usePerCharacterSettings = false,
@@ -1888,8 +1888,10 @@ namespace.defaultConfig = {
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
         textPositionY = 0,
+        textPoint = "CENTER",
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
+        ignoreParentAlpha = false,
     },
 
     target = {
@@ -1918,8 +1920,10 @@ namespace.defaultConfig = {
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
         textPositionY = 0,
+        textPoint = "CENTER",
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
+        ignoreParentAlpha = false,
     },
 
     focus = {
@@ -1948,8 +1952,10 @@ namespace.defaultConfig = {
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
         textPositionY = 0,
+        textPoint = "CENTER",
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
+        ignoreParentAlpha = false,
     },
 
     party = {
@@ -1978,8 +1984,10 @@ namespace.defaultConfig = {
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
         textPositionY = 0,
+        textPoint = "CENTER",
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
+        ignoreParentAlpha = false,
     },
 
     player = {
@@ -2008,8 +2016,10 @@ namespace.defaultConfig = {
         textColor = { 1, 1, 1, 1 },
         textPositionX = 0,
         textPositionY = 1,
+        textPoint = "CENTER",
         frameLevel = 10,
         statusBackgroundColor = { 0, 0, 0, 0.535 },
+        ignoreParentAlpha = false,
     },
 }
 
@@ -2051,6 +2061,22 @@ namespace.defaultConfig.npcCastUninterruptibleCache = {
     ["11492" .. GetSpellInfo(9616)] = true, -- Alzzin the Wildshaper Wild Regeneration
     ["13996" .. GetSpellInfo(22334)] = true, -- Blackwing Technician Bomb
     ["11359" .. GetSpellInfo(16430)] = true, -- Soulflayer Soul Tap
-    ["11359" .. GetSpellInfo(22678)] = true, -- Soulflayer Fear
     ["11372" .. GetSpellInfo(24011)] = true, -- Razzashi Adder Venom Spit
+    ["14834" .. GetSpellInfo(24322)] = true, -- Hakkar Blood Siphon
+    ["14509" .. GetSpellInfo(24189)] = true, -- High Priest Thekal Force Punch
+    ["11382" .. GetSpellInfo(24314)] = true, -- Broodlord Mandokir Threatening Gaze
+    ["14750" .. GetSpellInfo(24024)] = true, -- Gurubashi Bat Rider Unstable Concoction
+    ["12259" .. GetSpellInfo(686)] = true, -- Gehennas Shadow Bolt
+    ["11339" .. GetSpellInfo(22908)] = true, -- Hakkari Shadow Hunter Volley
+    ["14507" .. GetSpellInfo(14914)] = true, -- High Priest Venoxis Holy Fire
+    ["13161" .. GetSpellInfo(21188)] = true, -- Aerie Gryphon Stun Bomb Attack
+    ["14943" .. GetSpellInfo(21188)] = true, -- Guse's War Rider Stun Bomb Attack
+    ["14947" .. GetSpellInfo(21188)] = true, -- Ichman's Gryphon Stun Bomb Attack
+    ["14944" .. GetSpellInfo(21188)] = true, -- Jeztor's War Rider Stun Bomb Attack
+    ["14945" .. GetSpellInfo(21188)] = true, -- Mulverick's War Rider Stun Bomb Attack
+    ["12119" .. GetSpellInfo(20604)] = true, -- Flamewaker Protector Dominate Mind
+    ["12459" .. GetSpellInfo(22372)] = true, -- Blackwing Warlock Demon Portal
+    ["15114" .. GetSpellInfo(22479)] = true, -- Gahz'ranka Frost Breath
+    ["15114" .. GetSpellInfo(22421)] = true, -- Gahz'ranka Massive Geyser
+    ["12557" .. GetSpellInfo(14515)] = true, -- Grethok the Controller Dominate Mind
 }

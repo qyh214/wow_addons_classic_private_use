@@ -27,16 +27,16 @@ local warnAspectOfThekal		= mod:NewSpellAnnounce(24689, 3, nil, "Tank|RemoveEnra
 local warnAspectOfArlokk		= mod:NewTargetNoFilterAnnounce(24690, 3)
 
 local specWarnBlood				= mod:NewSpecialWarningMoveAway(24328, nil, nil, nil, 1, 2)
+local yellBlood					= mod:NewYell(24328, nil, false, 2)
 local specWarnAspectOfThekal	= mod:NewSpecialWarningDispel(24689, "RemoveEnrage", nil, nil, 1, 6)
-local yellBlood					= mod:NewYell(24328)
 
 local timerSiphon				= mod:NewNextTimer(90, 24324, nil, nil, nil, 2)
 local timerAspectOfMarli		= mod:NewTargetTimer(6, 24686, nil, nil, nil, 5)
 local timerAspectOfMarliCD		= mod:NewCDTimer(16, 24686, nil, nil, nil, 2)--16-20
 local timerAspectOfJeklik		= mod:NewTargetTimer(5, 24687, nil, false, 2, 5)--Could be spammy so off by default. Users can turn it on who want to see this
 local timerAspectOfJeklikCD		= mod:NewCDTimer(23, 24687, nil, nil, nil, 2)--23-24
-local timerAspectOfVenoxisCD	= mod:NewCDTimer(16.2, 24687, nil, nil, nil, 2)--16.2-18.3
-local timerAspectOfThekal		= mod:NewBuffActiveTimer(8, 24689, nil, "Tank|RemoveEnrage|Healer", 3, 5, nil, DBM_CORE_TANK_ICON..DBM_CORE_ENRAGE_ICON)
+local timerAspectOfVenoxisCD	= mod:NewCDTimer(16.2, 24688, nil, nil, nil, 2)--16.2-18.3
+local timerAspectOfThekal		= mod:NewBuffActiveTimer(8, 24689, nil, "Tank|RemoveEnrage|Healer", 3, 5, nil, DBM_CORE_L.TANK_ICON..DBM_CORE_L.ENRAGE_ICON)
 local timerAspectOfThekalCD		= mod:NewCDTimer(15.8, 24689, nil, nil, nil, 2)
 local timerAspectOfArlokk		= mod:NewTargetTimer(2, 24690, nil, nil, nil, 2)
 local timerAspectOfArlokkCD		= mod:NewNextTimer(30, 24690, nil, nil, nil, 2)--Needs more data to verify it's a next timer, rest aren't

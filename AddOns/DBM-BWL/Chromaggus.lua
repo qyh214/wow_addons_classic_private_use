@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Chromaggus", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200329220208")
+mod:SetRevision("20200623011525")
 mod:SetCreatureID(14020)
 mod:SetEncounterID(616)
 mod:SetModelID(14367)
@@ -31,12 +31,13 @@ local warnVuln			= mod:NewAnnounce("WarnVulnerable", 1, false)
 local specWarnBronze	= mod:NewSpecialWarningYou(23170, nil, nil, nil, 1, 8)
 local specWarnFrenzy	= mod:NewSpecialWarningDispel(23128, "RemoveEnrage", nil, nil, 1, 6)
 
-local timerBreath		= mod:NewCastTimer(2, "TimerBreath", 23316, nil, nil, 3)
+local timerBreath		= mod:NewTimer(2, "TimerBreath", 23316, nil, nil, 3)
 local timerBreathCD		= mod:NewTimer(60, "TimerBreathCD", 23316, nil, nil, 3)
-local timerFrenzy		= mod:NewBuffActiveTimer(8, 23128, nil, "Tank|RemoveEnrage|Healer", 3, 5, nil, DBM_CORE_TANK_ICON..DBM_CORE_ENRAGE_ICON)
+local timerFrenzy		= mod:NewBuffActiveTimer(8, 23128, nil, "Tank|RemoveEnrage|Healer", 3, 5, nil, DBM_CORE_L.TANK_ICON..DBM_CORE_L.ENRAGE_ICON)
 local timerVuln			= mod:NewTimer(17, "TimerVulnCD")-- seen 16.94 - 25.53, avg 21.8
 
 mod:AddNamePlateOption("NPAuraOnVulnerable", 22277)
+mod:AddInfoFrameOption(22277, true)
 
 mod.vb.phase = 1
 local mydebuffs = 0
@@ -49,6 +50,7 @@ local spellIcons = {
 	[TimeLaps] = 23312,
 }
 
+local lastVulnName = nil
 local vulnerabilities = {
 	-- [guid] = school
 }
@@ -73,11 +75,30 @@ local vulnSpells = {
 	[22281] = 64,
 }
 
+local updateInfoFrame
+do
+	local lines = {}
+	local sortedLines = {}
+	local function addLine(key, value)
+		-- sort by insertion order
+		lines[key] = value
+		sortedLines[#sortedLines + 1] = key
+	end
+	updateInfoFrame = function()
+		table.wipe(lines)
+		table.wipe(sortedLines)
+		if lastVulnName then
+			addLine(lastVulnName, "")
+		end
+		return lines, sortedLines
+	end
+end
+
 --Local Functions
 -- in theory this should only alert on a new vulnerability on your target or when you change target
 local function update_vulnerability(self)
 	local target = UnitGUID("target")
-	local spellSchool	= vulnerabilities[target]
+	local spellSchool = vulnerabilities[target]
 	local cid = self:GetCIDFromGUID(target)
 	if not spellSchool or cid ~= 14020 then
 		return
@@ -90,23 +111,37 @@ local function update_vulnerability(self)
 	timerVuln:SetColor(info[2])
 	timerVuln:UpdateIcon(info[3])
 	timerVuln:UpdateName(name)
-	warnVuln.icon = info[3]
-	warnVuln:Show(name)
-
-	if self.Options.NPAuraOnVulnerable then
-		DBM.Nameplate:Hide(true, target, 22277, 135924)
-		DBM.Nameplate:Hide(true, target, 22277, 135808)
-		DBM.Nameplate:Hide(true, target, 22277, 136006)
-		DBM.Nameplate:Hide(true, target, 22277, 135846)
-		DBM.Nameplate:Hide(true, target, 22277, 136197)
-		DBM.Nameplate:Hide(true, target, 22277, 136096)
-		DBM.Nameplate:Show(true, target, 22277, tonumber(info[3]))
+	if not lastVulnName or lastVulnName ~= name then
+		warnVuln.icon = info[3]
+		warnVuln:Show(name)
+		lastVulnName = name
+		if self.Options.InfoFrame then
+			if not DBM.InfoFrame:IsShown() then
+				DBM.InfoFrame:SetHeader(L.Vuln)
+				DBM.InfoFrame:Show(1, "function", updateInfoFrame, false, false, true)
+			else
+				DBM.InfoFrame:Update()
+			end
+		end
+		if self.Options.NPAuraOnVulnerable then
+			DBM.Nameplate:Hide(true, target, 22277, 135924)
+			DBM.Nameplate:Hide(true, target, 22277, 135808)
+			DBM.Nameplate:Hide(true, target, 22277, 136006)
+			DBM.Nameplate:Hide(true, target, 22277, 135846)
+			DBM.Nameplate:Hide(true, target, 22277, 136197)
+			DBM.Nameplate:Hide(true, target, 22277, 136096)
+			DBM.Nameplate:Show(true, target, 22277, tonumber(info[3]))
+		end
 	end
 	self:UnregisterShortTermEvents()--Unregister SPELL_DAMAGE until next shimmer emote
 end
 
 local function check_spell_damage(self, target, amount, spellSchool, critical)
-	if amount > (critical and 1400 or 700) then
+	local cid = self:GetCIDFromGUID(target)
+	if cid ~= 14020 then
+		return
+	end
+	if amount > (critical and 1600 or 800) then
 		if not vulnerabilities[target] or vulnerabilities[target] ~= spellSchool then
 			vulnerabilities[target] = spellSchool
 			update_vulnerability(self)
@@ -123,7 +158,7 @@ local function check_target_vulns(self)
 
 	local spellId = select(10, DBM:UnitBuff("target", 22277, 22280, 22278, 22279, 22281)) or 0
 	local vulnSchool = vulnSpells[spellId]
-	if vulnSchool ~= nil then
+	if vulnSchool then
 		return check_spell_damage(self, target, 10000, vulnSchool)
 	end
 end
@@ -151,22 +186,20 @@ function mod:OnCombatEnd()
 	if self.Options.NPAuraOnVulnerable  then
 		DBM.Nameplate:Hide(true, nil, nil, nil, true, true)--isGUID, unit, spellId, texture, force, isHostile, isFriendly
 	end
+	if self.Options.InfoFrame then
+		DBM.InfoFrame:Hide()
+	end
 end
 
 do
 	function mod:SPELL_CAST_START(args)
 		--if args:IsSpellID(23309, 23313, 23189, 23315, 23312) then
 		if args.spellName == Incinerate or args.spellName == CorrosiveAcid or args.spellName == FrostBurn or args.spellName == IgniteFlesh or args.spellName == TimeLaps then
-			if self:AntiSpam(5, "Breath") then
-				self:SendSync("Breath", args.spellName)
-			end
-			if self:AntiSpam(15, 1) then
-				warnBreath:Show(args.spellName)
-				timerBreath:Start(2, args.spellName)
-				timerBreath:UpdateIcon(spellIcons[args.spellName])
-				timerBreathCD:Start(60, args.spellName)
-				timerBreathCD:UpdateIcon(spellIcons[args.spellName])
-			end
+			warnBreath:Show(args.spellName)
+			timerBreath:Start(2, args.spellName)
+			timerBreath:UpdateIcon(spellIcons[args.spellName])
+			timerBreathCD:Start(60, args.spellName)
+			timerBreathCD:UpdateIcon(spellIcons[args.spellName])
 		end
 	end
 end
@@ -229,23 +262,15 @@ do
 			end
 		--elseif args.spellId == 23128 then
 		elseif args.spellName == Frenzy and args:IsDestTypeHostile() then
-			if self:AntiSpam(5, "Frenzy") then
-				self:SendSync("Frenzy")
+			if self.Options.SpecWarn23128dispel then
+				specWarnFrenzy:Show()
+				specWarnFrenzy:Play("enrage")
+			else
+				warnFrenzy:Show()
 			end
-			if self:AntiSpam(15, 2) then
-				if self.Options.SpecWarn23128dispel then
-					specWarnFrenzy:Show()
-					specWarnFrenzy:Play("enrage")
-				else
-					warnFrenzy:Show()
-				end
-				timerFrenzy:Start()
-			end
+			timerFrenzy:Start()
 		--elseif args.spellId == 23537 then
 		elseif args.spellName == Enrage and args:IsDestTypeHostile() then
-			if self:AntiSpam(5, "Phase2") then
-				self:SendSync("Phase2")
-			end
 			if self.vb.phase < 2 then
 				self.vb.phase = 2
 				warnPhase2:Show()
@@ -272,9 +297,6 @@ do
 		elseif args.spellName == BroodAffBronze and args:IsPlayer() then
 			mydebuffs = mydebuffs - 1
 		elseif args.spellName == Frenzy and args:IsDestTypeHostile() then
-			if self:AntiSpam(5, "FrenzyStop") then
-				self:SendSync("FrenzyStop")
-			end
 			timerFrenzy:Stop()
 		end
 	end
@@ -298,28 +320,8 @@ function mod:CHAT_MSG_MONSTER_EMOTE(msg)
 end
 
 function mod:OnSync(msg, Name)
-	if self:AntiSpam(5, msg) then
-		--Do nothing, this is just an antispam threshold for syncing
-	end
 	if not self:IsInCombat() then return end
-	if msg == "Breath" and Name and self:AntiSpam(15, 1) then
-		warnBreath:Show(Name)
-		timerBreathCD:Start(Name)
-		timerBreathCD:UpdateIcon(spellIcons[Name])
-	elseif msg == "Frenzy" and self:AntiSpam(15, 2) then
-		if self.Options.SpecWarn23128dispel then
-			specWarnFrenzy:Show()
-			specWarnFrenzy:Play("enrage")
-		else
-			warnFrenzy:Show()
-		end
-		timerFrenzy:Start()
-	elseif msg == "FrenzyStop" then
-		timerFrenzy:Stop()
-	elseif msg == "Phase2" and self.vb.phase < 2 then
-		self.vb.phase = 2
-		warnPhase2:Show()
-	elseif msg == "Vulnerable" then
+	if msg == "Vulnerable" then
 		timerVuln:Start()
 		table.wipe(vulnerabilities)
 		if self.Options.WarnVulnerable then

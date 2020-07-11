@@ -84,12 +84,14 @@ L["STRING_CLICK_REPORT_LINE2"] = "|cFFFFCC22Shift+Click|r: |cFFFFEE00Fenstermodu
 L["STRING_CLOSEALL"] = "Alle Details!-Fenster sind geschlossen, schreibe '/details show', um sie wieder zu öffnen."
 L["STRING_COLOR"] = "Farbe"
 L["STRING_COMMAND_LIST"] = "Befehlsliste"
+--[[Translation missing --]]
+--[[ L["STRING_CONTEXT"] = ""--]] 
 L["STRING_COOLTIP_NOOPTIONS"] = "Keine Optionen"
 L["STRING_CREATEAURA"] = "Aura erstellen"
 L["STRING_CRITICAL_HITS"] = "Kritische Treffer"
 L["STRING_CRITICAL_ONLY"] = "kritisch"
 L["STRING_CURRENT"] = "Aktuell"
-L["STRING_CURRENTFIGHT"] = "Aktueller Kampf"
+L["STRING_CURRENTFIGHT"] = "Aktuelles Segment"
 L["STRING_CUSTOM_ACTIVITY_ALL"] = "Aktiv-Zeit"
 L["STRING_CUSTOM_ACTIVITY_ALL_DESC"] = "Zeigt die Aktiv-Zeiten für jeden Spieler im Schlachtzug."
 L["STRING_CUSTOM_ACTIVITY_DPS"] = "Aktive Schadenzeit"
@@ -100,7 +102,7 @@ L["STRING_CUSTOM_ATTRIBUTE_DAMAGE"] = "Schaden"
 L["STRING_CUSTOM_ATTRIBUTE_HEAL"] = "Heilung"
 L["STRING_CUSTOM_ATTRIBUTE_SCRIPT"] = "Benutzerdefiniertes Skript"
 L["STRING_CUSTOM_AUTHOR"] = "Autor:"
-L["STRING_CUSTOM_AUTHOR_DESC"] = "Wer erstellte diese Anzeige."
+L["STRING_CUSTOM_AUTHOR_DESC"] = "Wer hat diese Anzeige erstellt?"
 L["STRING_CUSTOM_CANCEL"] = "Abbrechen"
 L["STRING_CUSTOM_CC_DONE"] = "Verursachte Massenkontrolle"
 L["STRING_CUSTOM_CC_RECEIVED"] = "Erhaltene Massenkontrolle"
@@ -289,6 +291,8 @@ L["STRING_INFO_TUTORIAL_COMPARISON1"] = "Klicke auf den |cFFFFDD00Vergleichen|r-
 L["STRING_INSTANCE_CHAT"] = "Instanzchat"
 L["STRING_INSTANCE_LIMIT"] = "Maximale Fensteranzahl erreicht. Dieses Limit kann in den Optionen geändert werden. Geschlossene Fenster können via (#) Fenstermenü wieder angezeigt werden."
 L["STRING_INTERFACE_OPENOPTIONS"] = "Konfigurationsmenü öffnen"
+--[[Translation missing --]]
+--[[ L["STRING_INVERT_RULE"] = ""--]] 
 L["STRING_ISA_PET"] = "Dies ist ein Begleiter"
 L["STRING_KEYBIND_BOOKMARK"] = "Lesezeichen"
 L["STRING_KEYBIND_BOOKMARK_NUMBER"] = "Lesezeichen #%s"
@@ -395,14 +399,14 @@ L["STRING_OPTIONS_3D_LALPHA_DESC"] = [=[Wähle einen Wert für die Transparenz.
 |cFFFFFF00Achtung|r: Einige Modelle ignorieren den Transparenzwert.]=]
 L["STRING_OPTIONS_3D_LANCHOR"] = "Unteres 3D-Modell:"
 L["STRING_OPTIONS_3D_LENABLED_DESC"] = "Aktiviert oder deaktiviert die Nutzung eines 3D-Modells unter den Balken."
-L["STRING_OPTIONS_3D_LSELECT_DESC"] = "Wähle das zu benutzende 3D-Modell für die Balken."
+L["STRING_OPTIONS_3D_LSELECT_DESC"] = "Wähle, welches 3D-Modell in der unteren Modellleiste verwendet werden soll."
 L["STRING_OPTIONS_3D_SELECT"] = "Modell wählen"
 L["STRING_OPTIONS_3D_UALPHA_DESC"] = [=[Wähle einen Wert für die Transparenz des oberen Modells.
 
 |cFFFFFF00Achtung|r: Einige Modelle ignorieren den Transparenzwert.]=]
 L["STRING_OPTIONS_3D_UANCHOR"] = "Oberes 3D-Modell:"
 L["STRING_OPTIONS_3D_UENABLED_DESC"] = "Aktiviert oder deaktiviert die Nutzung eines 3D-Modells über den Balken."
-L["STRING_OPTIONS_3D_USELECT_DESC"] = "Wähle das zu benutzende 3D-Modell für die Balken."
+L["STRING_OPTIONS_3D_USELECT_DESC"] = "Wähle, welches 3D-Modell in der oberen Modellleiste verwendet werden soll."
 L["STRING_OPTIONS_ADVANCED"] = "Erweitert"
 L["STRING_OPTIONS_ALPHAMOD_ANCHOR"] = "Automatisch Verbergen:"
 L["STRING_OPTIONS_ALWAYS_USE"] = "Bei allen Charakteren benutzen"
@@ -593,13 +597,13 @@ L["STRING_OPTIONS_CMISC_DESC"] = [=[Aktiviert die Erfassung von:
 L["STRING_OPTIONS_COLORANDALPHA"] = "Farbe & Transparenz"
 L["STRING_OPTIONS_COLORFIXED"] = "Festgelegte Farbe"
 L["STRING_OPTIONS_COMBAT_ALPHA"] = "Wann?"
-L["STRING_OPTIONS_COMBAT_ALPHA_1"] = "Niemals"
 L["STRING_OPTIONS_COMBAT_ALPHA_2"] = "Innerhalb eines Kampfes"
 L["STRING_OPTIONS_COMBAT_ALPHA_3"] = "Außerhalb eines Kampfes"
 L["STRING_OPTIONS_COMBAT_ALPHA_4"] = "Außerhalb einer Gruppe"
 L["STRING_OPTIONS_COMBAT_ALPHA_5"] = "Außerhalb einer Instanz"
 L["STRING_OPTIONS_COMBAT_ALPHA_6"] = "Innerhalb einer Instanz"
-L["STRING_OPTIONS_COMBAT_ALPHA_7"] = "Im Schlachtzug"
+L["STRING_OPTIONS_COMBAT_ALPHA_7"] = "Fehler beseitgen im Schlachtzug"
+L["STRING_OPTIONS_COMBAT_ALPHA_8"] = "auf dem Schlachtfeld"
 L["STRING_OPTIONS_COMBAT_ALPHA_DESC"] = [=[Wähle, wie ein Kampf die Fenstertransparenz beeinflussen soll.
 
 |cFFFFFF00Keine Änderung|r: Transparenz unverändert.
@@ -845,7 +849,7 @@ L["STRING_OPTIONS_OVERALL_LOGOFF"] = "Beim Ausloggen löschen"
 L["STRING_OPTIONS_OVERALL_LOGOFF_DESC"] = "Aktiviert: Die Gesamtdaten werden automatisch beim Ausloggen des Charakters gelöscht."
 L["STRING_OPTIONS_OVERALL_MYTHICPLUS"] = "Beim Start einer Mythic+ löschen"
 L["STRING_OPTIONS_OVERALL_MYTHICPLUS_DESC"] = "Wenn aktiviert, werden sämtliche Daten automatisch gelöscht, wenn ein neuer Mythisch+-Durchlauf gestartet wird."
-L["STRING_OPTIONS_OVERALL_NEWBOSS"] = "Bei neuem Boss löschen"
+L["STRING_OPTIONS_OVERALL_NEWBOSS"] = "Bei neuem Schlachtzugsboss löschen"
 L["STRING_OPTIONS_OVERALL_NEWBOSS_DESC"] = "Aktiviert: Die Gesamtdaten werden automatisch bei einem neuen Boss gelöscht."
 L["STRING_OPTIONS_OVERALL_RAIDBOSS"] = "Schlachtzugsbosse"
 L["STRING_OPTIONS_OVERALL_RAIDBOSS_DESC"] = "Segmente mit Begegnungen werden den Gesamtdaten hinzugefügt."
@@ -1073,7 +1077,7 @@ L["STRING_OPTIONS_SHOW_TOTALBAR_DESC"] = "Zeigt oder versteckt den Gesamtbalken.
 L["STRING_OPTIONS_SHOW_TOTALBAR_ICON"] = "Symbol"
 L["STRING_OPTIONS_SHOW_TOTALBAR_ICON_DESC"] = "Wähle das auf dem Gesamtbalken gezeigte Symbol."
 L["STRING_OPTIONS_SHOW_TOTALBAR_INGROUP"] = "Nur in Gruppe"
-L["STRING_OPTIONS_SHOW_TOTALBAR_INGROUP_DESC"] = "Der Gesamtbalken wird nur in einer Gruppe angezeigt."
+L["STRING_OPTIONS_SHOW_TOTALBAR_INGROUP_DESC"] = "Der Gesamtbalken wird nicht angezeigt, wenn du in keiner Gruppe angehörst."
 L["STRING_OPTIONS_SIZE"] = "Größe"
 L["STRING_OPTIONS_SKIN_A"] = "Skineinstellungen"
 L["STRING_OPTIONS_SKIN_A_DESC"] = "Diese Option erlaubt es dir, deinen Skin zu ändern."
@@ -1144,6 +1148,8 @@ L["STRING_OPTIONS_TEXT_LOUTILINE"] = "Textschatten"
 L["STRING_OPTIONS_TEXT_LOUTILINE_DESC"] = "Aktiviert oder deaktiviert den Umriss des linken Textes."
 L["STRING_OPTIONS_TEXT_LPOSITION"] = "Nummer zeigen"
 L["STRING_OPTIONS_TEXT_LPOSITION_DESC"] = "Zeigt die Positionsnummer eines Spielers links vom Namen."
+L["STRING_OPTIONS_TEXT_LTRANSLIT"] = "Transliterieren"
+L["STRING_OPTIONS_TEXT_LTRANSLIT_DESC"] = "Stellt die russischen Buchstaben, die niemand versteht, in westliche Buchstaben da."
 L["STRING_OPTIONS_TEXT_RIGHT_ANCHOR"] = "Rechter Text:"
 L["STRING_OPTIONS_TEXT_ROUTILINE_DESC"] = "Aktiviert oder deaktiviert den Umriss des rechten Textes."
 L["STRING_OPTIONS_TEXT_ROWICONS_ANCHOR"] = "Symbole:"
@@ -1454,7 +1460,7 @@ L["STRING_REPORTFRAME_SEND"] = "senden"
 L["STRING_REPORTFRAME_WHISPER"] = "Flüstern"
 L["STRING_REPORTFRAME_WHISPERTARGET"] = "Ziel anflüstern"
 L["STRING_REPORTFRAME_WINDOW_TITLE"] = "verlinkt Details!"
-L["STRING_REPORTHISTORY"] = "Berichtsverlauf"
+L["STRING_REPORTHISTORY"] = "Letzte Berichte"
 L["STRING_RESISTED"] = "Widerstanden"
 L["STRING_RESIZE_ALL"] = "Freie Größenänderung aller Fenster"
 L["STRING_RESIZE_COMMON"] = [=[verändert die Größe
@@ -1548,7 +1554,8 @@ L["STRING_TOTAL"] = "Gesamt"
 L["STRING_TRANSLATE_LANGUAGE"] = "Hilf mit bei der Details!-Übersetzung"
 L["STRING_TUTORIAL_FULLY_DELETE_WINDOW"] = [=[Du hast ein Fenster geschlossen, du kannst es jederzeit erneut öffnen.
 Um ein Fenster komplett zu löschen, gehe zu den Optionen  -> Fenster: Allgemein -> Löschen.]=]
-L["STRING_TUTORIAL_OVERALL1"] = "Anpassen der Gesamteinstellungen auf dem Optionsmenü > PvE/PvP"
+--[[Translation missing --]]
+--[[ L["STRING_TUTORIAL_OVERALL1"] = ""--]] 
 L["STRING_UNKNOW"] = "Unbekannt"
 L["STRING_UNKNOWSPELL"] = "Unbekannter Zauber"
 L["STRING_UNLOCK"] = [=[Fenstergruppe auflösen

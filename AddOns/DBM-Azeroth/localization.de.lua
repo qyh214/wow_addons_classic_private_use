@@ -53,14 +53,14 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
---	Pull		= "Ich spüre die Schatten in Euren Herzen. Die Verdammten werden niemals ruhen!"
+	Pull		= "Ich spüre die Schatten in Euren Herzen. Die Verdammten werden niemals ruhen!"
 })
 
 -- Emeriss (Duskwood)
 L = DBM:GetModLocalization("Emeriss")
 
 L:SetGeneralLocalization{
-	name = "Smariss"
+	name = "Emeriss"
 }
 
 L:SetMiscLocalization({

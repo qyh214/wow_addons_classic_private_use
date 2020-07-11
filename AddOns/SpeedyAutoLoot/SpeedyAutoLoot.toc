@@ -1,8 +1,8 @@
-## Interface: 11302
+## Interface: 11305
 ## Title: |cffEEE4AESpeedy AutoLoot|r
 ## Notes: |cff58C6FALoot at ludicrous speed!|r
 ## Author: Yuyuli
-## Version: 2.0.25
+## Version: 2.0.28
 ## SavedVariables: SpeedyAutoLootDB
 
 SpeedyAutoLoot.lua

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Majordomo", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200215182107")
+mod:SetRevision("20200623011525")
 mod:SetCreatureID(12018, 11663, 11664)
 mod:SetEncounterID(671)
 mod:SetModelID(12029)
@@ -23,10 +23,10 @@ local warnDamageShield		= mod:NewSpellAnnounce(21075, 2)
 local specWarnMagicReflect	= mod:NewSpecialWarningReflect(20619, "CasterDps", nil, 2, 1, 2)
 local specWarnDamageShield	= mod:NewSpecialWarningReflect(21075, false, nil, 2, 1, 2)
 
-local timerMagicReflect		= mod:NewBuffActiveTimer(10, 20619, nil, nil, nil, 5, nil, DBM_CORE_DAMAGE_ICON)
-local timerDamageShield		= mod:NewBuffActiveTimer(10, 21075, nil, nil, nil, 5, nil, DBM_CORE_DAMAGE_ICON)
-local timerTeleportCD		= mod:NewCDTimer(25, 20534, nil, nil, nil, 5, nil, DBM_CORE_TANK_ICON)--25-30
-local timerShieldCD			= mod:NewTimer(30.3, "timerShieldCD", nil, nil, nil, 6, nil, DBM_CORE_DAMAGE_ICON)
+local timerMagicReflect		= mod:NewBuffActiveTimer(10, 20619, nil, nil, nil, 5, nil, DBM_CORE_L.DAMAGE_ICON)
+local timerDamageShield		= mod:NewBuffActiveTimer(10, 21075, nil, nil, nil, 5, nil, DBM_CORE_L.DAMAGE_ICON)
+local timerTeleportCD		= mod:NewCDTimer(25, 20534, nil, nil, nil, 5, nil, DBM_CORE_L.TANK_ICON)--25-30
+local timerShieldCD			= mod:NewTimer(30.3, "timerShieldCD", nil, nil, nil, 6, nil, DBM_CORE_L.DAMAGE_ICON)
 
 function mod:OnCombatStart(delay)
 	timerTeleportCD:Start(19.4-delay)
@@ -40,55 +40,24 @@ do
 		local spellName = args.spellName
 		--if spellId == 20619 then
 		if spellName == MagicReflect then
-			self:SendSync("MagicReflect")
-			if self:AntiSpam(5, 1) then
-				specWarnMagicReflect:Show(BOSS)--Always a threat to casters
-				specWarnMagicReflect:Play("stopattack")
-				timerMagicReflect:Start()
-				timerShieldCD:Start()
-			end
+			specWarnMagicReflect:Show(BOSS)--Always a threat to casters
+			specWarnMagicReflect:Play("stopattack")
+			timerMagicReflect:Start()
+			timerShieldCD:Start()
 		--elseif spellId == 21075 then
 		elseif spellName == MeleeReflect then
-			self:SendSync("MeleeReflect")
-			if self:AntiSpam(5, 2) then
-				if self.Options.SpecWarn21075reflect and (self:IsDifficulty("event40") or not self:IsTrivial(75)) then--Not a threat to high level melee
-					specWarnDamageShield:Show(BOSS)
-					specWarnDamageShield:Play("stopattack")
-				else
-					warnDamageShield:Show()
-				end
-				timerDamageShield:Start()
-				timerShieldCD:Start()
+			if self.Options.SpecWarn21075reflect and (self:IsDifficulty("event40") or not self:IsTrivial(75)) then--Not a threat to high level melee
+				specWarnDamageShield:Show(BOSS)
+				specWarnDamageShield:Play("stopattack")
+			else
+				warnDamageShield:Show()
 			end
+			timerDamageShield:Start()
+			timerShieldCD:Start()
 		--elseif spellId == 20534 then
 		elseif spellName == Teleport then
-			self:SendSync("Teleport", args.destName)
-			if self:AntiSpam(5, 3) then
-				warnTeleport:Show(args.destName)
-				timerTeleportCD:Start()
-			end
+			warnTeleport:Show(args.destName)
+			timerTeleportCD:Start()
 		end
-	end
-end
-
-function mod:OnSync(msg, targetName)
-	if not self:IsInCombat() then return end
-	if msg == "MagicReflect" and self:AntiSpam(5, 1) then
-		specWarnMagicReflect:Show(BOSS)--Always a threat to casters
-		specWarnMagicReflect:Play("stopattack")
-		timerMagicReflect:Start()
-		timerShieldCD:Start()
-	elseif msg == "MeleeReflect" and self:AntiSpam(5, 2) then
-		if self.Options.SpecWarn21075reflect and (self:IsDifficulty("event40") or not self:IsTrivial(75)) then--Not a threat to high level melee
-			specWarnDamageShield:Show(BOSS)
-			specWarnDamageShield:Play("stopattack")
-		else
-			warnDamageShield:Show()
-		end
-		timerDamageShield:Start()
-		timerShieldCD:Start()
-	elseif msg == "Teleport" and targetName and self:AntiSpam(5, 3) then
-		warnTeleport:Show(targetName)
-		timerTeleportCD:Start()
 	end
 end

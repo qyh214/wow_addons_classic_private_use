@@ -7,13 +7,11 @@ end
 local L = WeakAuras.L
 
 -- WeakAuras/Templates
-	--[[Translation missing --]]
-	L["Abilities"] = "Abilities"
+	L["Abilities"] = "Fähigkeiten"
 	L["Ability Charges"] = "Aufladungen der Fähigkeit"
 	L["Add Triggers"] = "Auslöser hinzufügen"
 	L["Always Active"] = "Immer aktiv"
-	--[[Translation missing --]]
-	L["Always Show"] = "Always Show"
+	L["Always Show"] = "Immer anzeigen"
 	--[[Translation missing --]]
 	L["Always show the aura, highlight it if debuffed."] = "Always show the aura, highlight it if debuffed."
 	--[[Translation missing --]]
@@ -49,6 +47,8 @@ local L = WeakAuras.L
 	L["Back"] = "Zurück"
 	--[[Translation missing --]]
 	L["Basic Show On Cooldown"] = "Basic Show On Cooldown"
+	--[[Translation missing --]]
+	L["Basic Show On Ready"] = "Basic Show On Ready"
 	L["Bloodlust/Heroism"] = "Kampfrausch/Heldentum"
 	L["buff"] = "buff"
 	L["Buffs"] = "Buffs"
@@ -63,12 +63,10 @@ local L = WeakAuras.L
 	--[[Translation missing --]]
 	L["Charge Tracking"] = "Charge Tracking"
 	L["cooldown"] = "Abklingzeit"
-	--[[Translation missing --]]
-	L["Cooldown"] = "Cooldown"
+	L["Cooldown"] = "Abklingzeit"
 	--[[Translation missing --]]
 	L["Cooldown Tracking"] = "Cooldown Tracking"
-	--[[Translation missing --]]
-	L["Create Auras"] = "Create Auras"
+	L["Create Auras"] = "Auren erstellen"
 	--[[Translation missing --]]
 	L["debuff"] = "debuff"
 	L["Debuffs"] = "Debuffs"
@@ -94,8 +92,7 @@ local L = WeakAuras.L
 	--[[Translation missing --]]
 	L["Hold CTRL to create multiple auras at once"] = "Hold CTRL to create multiple auras at once"
 	L["Keeps existing triggers intact"] = "Verändert existierende Auslöser nicht"
-	--[[Translation missing --]]
-	L["Next"] = "Next"
+	L["Next"] = "Nächste"
 	--[[Translation missing --]]
 	L["On Procc Trinkets (Aura)"] = "On Procc Trinkets (Aura)"
 	--[[Translation missing --]]
@@ -110,6 +107,8 @@ local L = WeakAuras.L
 	L["Only shows the aura if the target has the buff."] = "Only shows the aura if the target has the buff."
 	--[[Translation missing --]]
 	L["Only shows the aura when the ability is on cooldown."] = "Only shows the aura when the ability is on cooldown."
+	--[[Translation missing --]]
+	L["Only shows the aura when the ability is ready to use."] = "Only shows the aura when the ability is ready to use."
 	L["Pet alive"] = "Begleiter am Leben"
 	L["Pet Behavior"] = "Begleiterverhalten"
 	--[[Translation missing --]]
@@ -155,8 +154,7 @@ local L = WeakAuras.L
 	L["Show Cooldown and Debuff"] = "Show Cooldown and Debuff"
 	--[[Translation missing --]]
 	L["Show Cooldown and Debuff and Check for Target"] = "Show Cooldown and Debuff and Check for Target"
-	--[[Translation missing --]]
-	L["Show Cooldown and Duration"] = "Show Cooldown and Duration"
+	L["Show Cooldown and Duration"] = "Abklingzeit und Dauer anzeigen"
 	--[[Translation missing --]]
 	L["Show Cooldown and Duration and Check for Target"] = "Show Cooldown and Duration and Check for Target"
 	--[[Translation missing --]]
@@ -165,6 +163,8 @@ local L = WeakAuras.L
 	L["Show Cooldown and Proc Tracking"] = "Show Cooldown and Proc Tracking"
 	--[[Translation missing --]]
 	L["Show Cooldown and Totem Information"] = "Show Cooldown and Totem Information"
+	--[[Translation missing --]]
+	L["Show on Ready"] = "Show on Ready"
 	--[[Translation missing --]]
 	L["Show Only if Buffed"] = "Show Only if Buffed"
 	--[[Translation missing --]]
@@ -176,8 +176,7 @@ local L = WeakAuras.L
 	--[[Translation missing --]]
 	L["slow debuff"] = "slow debuff"
 	L["Specific Azerite Traits"] = "Spezifische Azerit Traits"
-	--[[Translation missing --]]
-	L["Stance"] = "Stance"
+	L["Stance"] = "Haltung"
 	--[[Translation missing --]]
 	L["stun debuff"] = "stun debuff"
 	--[[Translation missing --]]

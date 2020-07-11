@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lucifron", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200215182107")
+mod:SetRevision("20200625015320")
 mod:SetCreatureID(12118)--, 12119
 mod:SetEncounterID(663)
 mod:SetModelID(13031)
@@ -26,9 +26,9 @@ local warnMC		= mod:NewTargetNoFilterAnnounce(20604, 4)
 local specWarnMC	= mod:NewSpecialWarningYou(20604, nil, nil, nil, 1, 2)
 local yellMC		= mod:NewYell(20604)
 
-local timerCurseCD	= mod:NewCDTimer(20.5, 19703, nil, nil, nil, 3, nil, DBM_CORE_CURSE_ICON)--20-25N)
-local timerDoomCD	= mod:NewCDTimer(20, 19702, nil, nil, nil, 3, nil, DBM_CORE_MAGIC_ICON)--20-25
---local timerDoom		= mod:NewCastTimer(10, 19702, nil, nil, nil, 3, nil, DBM_CORE_MAGIC_ICON)
+local timerCurseCD	= mod:NewCDTimer(20.5, 19703, nil, nil, nil, 3, nil, DBM_CORE_L.CURSE_ICON)--20-25N)
+local timerDoomCD	= mod:NewCDTimer(20, 19702, nil, nil, nil, 3, nil, DBM_CORE_L.MAGIC_ICON)--20-25
+--local timerDoom		= mod:NewCastTimer(10, 19702, nil, nil, nil, 3, nil, DBM_CORE_L.MAGIC_ICON)
 
 mod:AddSetIconOption("SetIconOnMC", 20604, true, false, {1, 2})
 
@@ -92,31 +92,13 @@ do
 		local spellName = args.spellName
 		--if spellId == 19702 then
 		if spellName == Doom then
-			self:SendSync("Doom")
-			if self:AntiSpam(5, 1) then
-				warnDoom:Show()
---				timerDoom:Start()
-				timerDoomCD:Start()
-			end
+			warnDoom:Show()
+--			timerDoom:Start()
+			timerDoomCD:Start()
 		--elseif spellId == 19703 then
 		elseif spellName == Curse then
-			self:SendSync("Curse")
-			if self:AntiSpam(5, 2) then
-				warnCurse:Show()
-				timerCurseCD:Start()
-			end
+			warnCurse:Show()
+			timerCurseCD:Start()
 		end
-	end
-end
-
-function mod:OnSync(msg, targetName)
-	if not self:IsInCombat() then return end
-	if msg == "Doom" and self:AntiSpam(5, 1) then
-		warnDoom:Show()
---		timerDoom:Start()
-		timerDoomCD:Start()
-	elseif msg == "Curse" and self:AntiSpam(5, 2) then
-		warnCurse:Show()
-		timerCurseCD:Start()
 	end
 end

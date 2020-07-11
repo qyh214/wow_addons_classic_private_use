@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("PlaguemawtheRotting", "DBM-Party-Classic", 10)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200215182107")
+mod:SetRevision("20200611161557")
 mod:SetCreatureID(7356)
 --mod:SetEncounterID(585)
 
@@ -16,7 +16,7 @@ local warningWitheredTouch			= mod:NewTargetNoFilterAnnounce(11442, 2, nil, "Rem
 
 local specWarnPutridStench			= mod:NewSpecialWarningDispel(12946, "RemoveDisease", nil, nil, 1, 2)
 
-local timerPutridStenchCD			= mod:NewAITimer(180, 12946, nil, nil, nil, 5, nil, DBM_CORE_DISEASE_ICON)
+local timerPutridStenchCD			= mod:NewAITimer(180, 12946, nil, nil, nil, 5, nil, DBM_CORE_L.DISEASE_ICON)
 
 function mod:OnCombatStart(delay)
 	timerPutridStenchCD:Start(1-delay)

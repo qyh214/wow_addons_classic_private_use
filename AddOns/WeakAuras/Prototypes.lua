@@ -14,6 +14,7 @@ local UnitAlternatePowerInfo, UnitAlternatePowerTextureInfo = UnitAlternatePower
 local GetSpellInfo, GetItemInfo, GetItemCount, GetItemIcon = GetSpellInfo, GetItemInfo, GetItemCount, GetItemIcon
 local GetShapeshiftFormInfo, GetShapeshiftForm = GetShapeshiftFormInfo, GetShapeshiftForm
 local GetRuneCooldown, UnitCastingInfo, UnitChannelInfo = GetRuneCooldown, UnitCastingInfo, UnitChannelInfo
+local UnitDetailedThreatSituation, UnitThreatSituation = UnitDetailedThreatSituation, UnitThreatSituation
 local CastingInfo, ChannelInfo = CastingInfo, ChannelInfo
 
 local WeakAuras = WeakAuras
@@ -77,6 +78,13 @@ end
 
 LibRangeCheck:RegisterCallback(LibRangeCheck.CHECKERS_CHANGED, RangeCacheUpdate)
 
+function WeakAuras.UnitDetailedThreatSituation(unit1, unit2)
+  local ok, aggro, status, threatpct, rawthreatpct, threatvalue = pcall(UnitDetailedThreatSituation, unit1, unit2)
+  if ok then
+    return aggro, status, threatpct, rawthreatpct, threatvalue
+  end
+end
+
 local LibClassicCasterino
 if WeakAuras.IsClassic() then
   LibClassicCasterino = LibStub("LibClassicCasterino")
@@ -104,7 +112,9 @@ function WeakAuras.UnitChannelInfo(unit)
   end
 end
 
-
+local constants = {
+  nameRealmFilterDesc = L[" Filter formats: 'Name', 'Name-Realm', '-Realm'. \n\nSupports multiple entries, separated by commas\n"],
+}
 
 local encounter_list = ""
 local zoneId_list = ""
@@ -208,7 +218,6 @@ function WeakAuras.InitializeEncounterAndZoneLists()
     for _, inRaid in ipairs({false, true}) do
       local instance_index = 1
       local instance_id = EJ_GetInstanceByIndex(instance_index, inRaid)
-
       local title = inRaid and L["Raids"] or L["Dungeons"]
       zoneId_list = ("%s|cffffd200%s|r\n"):format(zoneId_list, title)
       zoneGroupId_list = ("%s|cffffd200%s|r\n"):format(zoneGroupId_list, title)
@@ -802,6 +811,20 @@ function WeakAuras.CheckNumericIds(loadids, currentId)
   return false;
 end
 
+function WeakAuras.CheckString(ids, currentId)
+  if (not ids or not currentId) then
+    return false;
+  end
+
+  for id in ids:gmatch('([^,]+)') do
+    if id:trim() == currentId then
+      return true
+    end
+  end
+
+  return false;
+end
+
 function WeakAuras.ValidateNumeric(info, val)
   if val ~= nil and val ~= "" and (not tonumber(val) or tonumber(val) >= 2^31) then
     return false;
@@ -918,7 +941,7 @@ function WeakAuras.IsSpellKnownIncludingPet(spell)
     return true;
   end
   -- WORKAROUND brain damage around void eruption
-  -- In shadow form void eruption is overriden by void bolt, yet IsSpellKnown for void bolt
+  -- In shadow form void eruption is overridden by void bolt, yet IsSpellKnown for void bolt
   -- returns false, whereas it returns true for void eruption
   local baseSpell = FindBaseSpellByID(spell);
   if (not baseSpell) then
@@ -968,6 +991,11 @@ function WeakAuras.GetNumSetItemsEquipped(setID)
     end
     return equipped, 18, setName
   end
+end
+
+function WeakAuras.GetEffectiveAttackPower()
+  local base, pos, neg = UnitAttackPower("player")
+  return base + pos + neg
 end
 
 local function valuesForTalentFunction(trigger)
@@ -1097,7 +1125,7 @@ WeakAuras.load_prototype = {
       optional = true,
       enable = not WeakAuras.IsClassic(),
       hidden = WeakAuras.IsClassic(),
-      events = {"VEHICLE_UPDATE", "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE", "UPDATE_OVERRIDE_ACTIONBAR"}
+      events = {"VEHICLE_UPDATE", "UNIT_ENTERED_VEHICLE", "UNIT_EXITED_VEHICLE", "UPDATE_OVERRIDE_ACTIONBAR", "UPDATE_VEHICLE_ACTIONBAR"}
     },
     {
       name = "ingroup",
@@ -1109,16 +1137,32 @@ WeakAuras.load_prototype = {
       events = {"GROUP_ROSTER_UPDATE"}
     },
     {
-      name = "name",
-      display = L["Player Name"],
-      type = "tristatestring",
-      init = "arg"
+      name = "player",
+      hidden = true,
+      init = "arg",
+      test = "true"
     },
     {
       name = "realm",
-      display = L["Realm"],
-      type = "tristatestring",
-      init = "arg"
+      hidden = true,
+      init = "arg",
+      test = "true"
+    },
+    {
+      name = "namerealm",
+      display = L["Player Name/Realm"],
+      type = "string",
+      test = "nameRealmChecker:Check(player, realm)",
+      preamble = "local nameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+      desc = constants.nameRealmFilterDesc,
+    },
+    {
+      name = "namerealmblack",
+      display = L["Blacklisted Player Name/Realm"],
+      type = "string",
+      test = "not nameRealmBlacklistChecker:Check(player, realm)",
+      preamble = "local nameRealmBlacklistChecker = WeakAuras.ParseNameCheck(%q)",
+      desc = constants.nameRealmFilterDesc,
     },
     {
       name = "class",
@@ -1326,7 +1370,9 @@ WeakAuras.load_prototype = {
       display = L["Zone Name"],
       type = "string",
       init = "arg",
-      events = {"ZONE_CHANGED", "ZONE_CHANGED_INDOORS", "ZONE_CHANGED_NEW_AREA", "VEHICLE_UPDATE"}
+      test = "WeakAuras.CheckString(%q, zone)",
+      events = {"ZONE_CHANGED", "ZONE_CHANGED_INDOORS", "ZONE_CHANGED_NEW_AREA", "VEHICLE_UPDATE"},
+      desc = L["Supports multiple entries, separated by commas"]
     },
     {
       name = "zoneId",
@@ -1413,7 +1459,7 @@ local function AddUnitChangeInternalEvents(triggerUnit, t)
   if (triggerUnit == nil) then
     return
   end
-  if (triggerUnit == "player" or triggerUnit == "multi") then
+  if (triggerUnit == "multi") then
     -- Handled by normal events"
   elseif triggerUnit == "pet" then
     WeakAuras.WatchForPetDeath();
@@ -1446,12 +1492,7 @@ local function AddUnitRoleChangeInternalEvents(triggerUnit, t)
 end
 
 local function AddUnitEventForEvents(result, unit, event)
-  if not unit or not (WeakAuras.baseUnitId[unit] or WeakAuras.multiUnitId[unit]) then
-    if not result.events then
-      result.events = {}
-    end
-    tinsert(result.events, event)
-  else
+  if unit then
     if not result.unit_events then
       result.unit_events = {}
     end
@@ -1459,6 +1500,11 @@ local function AddUnitEventForEvents(result, unit, event)
       result.unit_events[unit] = {}
     end
     tinsert(result.unit_events[unit], event)
+  else
+    if not result.events then
+      result.events = {}
+    end
+    tinsert(result.events, event)
   end
 end
 
@@ -1500,6 +1546,10 @@ WeakAuras.event_prototypes = {
       local result = {}
       AddUnitEventForEvents(result, unit, "UNIT_LEVEL")
       AddUnitEventForEvents(result, unit, "UNIT_FACTION")
+      AddUnitEventForEvents(result, unit, "UNIT_NAME_UPDATE")
+      if trigger.use_ignoreDead or trigger.use_ignoreDisconnected then
+        AddUnitEventForEvents(result, unit, "UNIT_FLAGS")
+      end
       return result;
     end,
     internal_events = function(trigger)
@@ -1520,6 +1570,7 @@ WeakAuras.event_prototypes = {
         unit = string.lower(unit)
         local smart = %s
         local extraUnit = %q;
+        local name, realm = WeakAuras.UnitNameWithRealm(unit)
       ]=];
 
       ret = ret .. unitHelperFunctions.SpecificUnitCheck(trigger)
@@ -1547,15 +1598,39 @@ WeakAuras.event_prototypes = {
         test = "unitisunit",
         store = true,
         conditionType = "bool",
-        desc = function() return L["Can be used for e.g. checking if \"boss1target\" is the same as \"player\"."] end
+        desc = function() return L["Can be used for e.g. checking if \"boss1target\" is the same as \"player\"."] end,
+        enable = function(trigger) return not WeakAuras.multiUnitUnits[trigger.unit] end
       },
       {
         name = "name",
         display = L["Name"],
         type = "string",
-        init = "UnitName(unit)",
         store = true,
-        conditionType = "string"
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "realm",
+        display = L["Realm"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "namerealm",
+        display = L["Unit Name/Realm"],
+        type = "string",
+        preamble = "local nameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "nameRealmChecker:Check(name, realm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.name, state.realm)
+        end,
+        operator_types = "none",
       },
       {
         name = "class",
@@ -1563,6 +1638,15 @@ WeakAuras.event_prototypes = {
         type = "select",
         init = "select(2, UnitClass(unit))",
         values = "class_types",
+        store = true,
+        conditionType = "select"
+      },
+      {
+        name = "classification",
+        display = L["Classification"],
+        type = "multiselect",
+        init = "UnitClassification(unit)",
+        values = "classification_types",
         store = true,
         conditionType = "select"
       },
@@ -1579,10 +1663,40 @@ WeakAuras.event_prototypes = {
          end
       },
       {
+        name = "ignoreSelf",
+        display = L["Ignore Self"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "nameplate"
+        end,
+        init = "not UnitIsUnit(\"player\", unit)"
+      },
+      {
+        name = "ignoreDead",
+        display = WeakAuras.newFeatureString .. L["Ignore Dead"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "not UnitIsDeadOrGhost(unit)"
+      },
+      {
+        name = "ignoreDisconnected",
+        display = WeakAuras.newFeatureString .. L["Ignore Disconnected"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "UnitIsConnected(unit)"
+      },
+      {
         name = "hostility",
         display = L["Hostility"],
         type = "select",
-        init = "WeakAuras.GetPlayerReaciton(unit)",
+        init = "WeakAuras.GetPlayerReaction(unit)",
         values = "hostility_types",
         store = true,
         conditionType = "select",
@@ -1634,6 +1748,7 @@ WeakAuras.event_prototypes = {
       local unit = trigger.unit
       local result = {}
       AddUnitEventForEvents(result, unit, "UNIT_HEALTH_FREQUENT")
+      AddUnitEventForEvents(result, unit, "UNIT_NAME_UPDATE")
       if not WeakAuras.IsClassic() then
         if trigger.use_showAbsorb then
           AddUnitEventForEvents(result, unit, "UNIT_ABSORB_AMOUNT_CHANGED")
@@ -1641,6 +1756,9 @@ WeakAuras.event_prototypes = {
         if trigger.use_showIncomingHeal then
           AddUnitEventForEvents(result, unit, "UNIT_HEAL_PREDICTION")
         end
+      end
+      if trigger.use_ignoreDead or trigger.use_ignoreDisconnected then
+        AddUnitEventForEvents(result, unit, "UNIT_FLAGS")
       end
       return result
     end,
@@ -1657,6 +1775,7 @@ WeakAuras.event_prototypes = {
       trigger.unit = trigger.unit or "player";
       local ret = [=[
         unit = string.lower(unit)
+        local name, realm = WeakAuras.UnitNameWithRealm(unit)
         local smart = %s
       ]=];
 
@@ -1765,9 +1884,33 @@ WeakAuras.event_prototypes = {
         name = "name",
         display = L["Unit Name"],
         type = "string",
-        init = "UnitName(unit)",
         store = true,
-        conditionType = "string"
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "realm",
+        display = L["Realm"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "namerealm",
+        display = L["Unit Name/Realm"],
+        type = "string",
+        preamble = "local nameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "nameRealmChecker:Check(name, realm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.name, state.realm)
+        end,
+        operator_types = "none",
+        desc = constants.nameRealmFilterDesc,
       },
       {
         name = "npcId",
@@ -1799,10 +1942,40 @@ WeakAuras.event_prototypes = {
         end
       },
       {
+        name = "ignoreSelf",
+        display = WeakAuras.newFeatureString .. L["Ignore Self"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "nameplate"
+        end,
+        init = "not UnitIsUnit(\"player\", unit)"
+      },
+      {
+        name = "ignoreDead",
+        display = WeakAuras.newFeatureString .. L["Ignore Dead"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "not UnitIsDeadOrGhost(unit)"
+      },
+      {
+        name = "ignoreDisconnected",
+        display = WeakAuras.newFeatureString .. L["Ignore Disconnected"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "UnitIsConnected(unit)"
+      },
+      {
         name = "nameplateType",
         display = L["Nameplate Type"],
         type = "select",
-        init = "WeakAuras.GetPlayerReaciton(unit)",
+        init = "WeakAuras.GetPlayerReaction(unit)",
         values = "hostility_types",
         conditionType = "select",
         store = true,
@@ -1860,6 +2033,7 @@ WeakAuras.event_prototypes = {
       AddUnitEventForEvents(result, unit, "UNIT_POWER_FREQUENT")
       AddUnitEventForEvents(result, unit, "UNIT_MAXPOWER")
       AddUnitEventForEvents(result, unit, "UNIT_DISPLAYPOWER")
+      AddUnitEventForEvents(result, unit, "UNIT_NAME_UPDATE")
 
       -- The api for spell power costs is not meant to be for other units
       if trigger.use_showCost and trigger.unit == "player" then
@@ -1871,7 +2045,9 @@ WeakAuras.event_prototypes = {
       if trigger.use_powertype and trigger.powertype == 99 then
         AddUnitEventForEvents(result, unit, "UNIT_ABSORB_AMOUNT_CHANGED")
       end
-
+      if trigger.use_ignoreDead or trigger.use_ignoreDisconnected then
+        AddUnitEventForEvents(result, unit, "UNIT_FLAGS")
+      end
       return result;
     end,
     internal_events = function(trigger)
@@ -1888,6 +2064,7 @@ WeakAuras.event_prototypes = {
       trigger.unit = trigger.unit or "player";
       local ret = [=[
         unit = string.lower(unit)
+        local name, realm = WeakAuras.UnitNameWithRealm(unit)
         local smart = %s
         local powerType = %s;
         local unitPowerType = UnitPowerType(unit);
@@ -2063,9 +2240,33 @@ WeakAuras.event_prototypes = {
         name = "name",
         display = L["Unit Name"],
         type = "string",
-        init = "UnitName(unit)",
         store = true,
-        conditionType = "string"
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "realm",
+        display = L["Realm"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "namerealm",
+        display = L["Unit Name/Realm"],
+        type = "string",
+        preamble = "local nameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "nameRealmChecker:Check(name, realm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.name, state.realm)
+        end,
+        operator_types = "none",
+        desc = constants.nameRealmFilterDesc,
       },
       {
         name = "npcId",
@@ -2097,10 +2298,40 @@ WeakAuras.event_prototypes = {
         end
       },
       {
+        name = "ignoreSelf",
+        display = WeakAuras.newFeatureString .. L["Ignore Self"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "nameplate"
+        end,
+        init = "not UnitIsUnit(\"player\", unit)"
+      },
+      {
+        name = "ignoreDead",
+        display = WeakAuras.newFeatureString .. L["Ignore Dead"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "not UnitIsDeadOrGhost(unit)"
+      },
+      {
+        name = "ignoreDisconnected",
+        display = WeakAuras.newFeatureString .. L["Ignore Disconnected"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "UnitIsConnected(unit)"
+      },
+      {
         name = "nameplateType",
         display = L["Nameplate Type"],
         type = "select",
-        init = "WeakAuras.GetPlayerReaciton(unit)",
+        init = "WeakAuras.GetPlayerReaction(unit)",
         values = "hostility_types",
         store = true,
         conditionType = "select",
@@ -2133,6 +2364,11 @@ WeakAuras.event_prototypes = {
       local unit = trigger.unit
       local result = {}
       AddUnitEventForEvents(result, unit, "UNIT_POWER_FREQUENT")
+      AddUnitEventForEvents(result, unit, "UNIT_NAME_UPDATE")
+      if trigger.use_ignoreDead or trigger.use_ignoreDisconnected then
+        AddUnitEventForEvents(result, unit, "UNIT_FLAGS")
+      end
+      AddUnitEventForEvents(result, unit, "UNIT_POWER_BAR_SHOW")
       return result
     end,
     internal_events = function(trigger)
@@ -2148,6 +2384,7 @@ WeakAuras.event_prototypes = {
       trigger.unit = trigger.unit or "player";
       local ret = [=[
         unit = string.lower(unit)
+        local unitname, realm = WeakAuras.UnitNameWithRealm(unit)
         local smart = %s
       ]=]
 
@@ -2205,9 +2442,33 @@ WeakAuras.event_prototypes = {
         name = "unitname",
         display = L["Unit Name"],
         type = "string",
-        init = "UnitName(unit)",
         store = true,
-        conditionType = "string"
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "unitrealm",
+        display = L["Realm"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true"
+      },
+      {
+        name = "namerealm",
+        display = L["Unit Name/Realm"],
+        type = "string",
+        preamble = "local nameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "nameRealmChecker:Check(unitname, unitrealm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.unitname, state.unitrealm)
+        end,
+        operator_types = "none",
+        desc = constants.nameRealmFilterDesc,
       },
       {
         name = "icon",
@@ -2238,10 +2499,40 @@ WeakAuras.event_prototypes = {
         end
       },
       {
+        name = "ignoreSelf",
+        display = WeakAuras.newFeatureString .. L["Ignore Self"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "nameplate"
+        end,
+        init = "not UnitIsUnit(\"player\", unit)"
+      },
+      {
+        name = "ignoreDead",
+        display = WeakAuras.newFeatureString .. L["Ignore Dead"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "not UnitIsDeadOrGhost(unit)"
+      },
+      {
+        name = "ignoreDisconnected",
+        display = WeakAuras.newFeatureString .. L["Ignore Disconnected"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "group" or trigger.unit == "raid" or trigger.unit == "party"
+        end,
+        init = "UnitIsConnected(unit)"
+      },
+      {
         name = "nameplateType",
         display = L["Nameplate Type"],
         type = "select",
-        init = "WeakAuras.GetPlayerReaciton(unit)",
+        init = "WeakAuras.GetPlayerReaction(unit)",
         values = "hostility_types",
         store = true,
         conditionType = "select",
@@ -2280,7 +2571,8 @@ WeakAuras.event_prototypes = {
         init = "arg",
         hidden = "true",
         test = "true",
-        store = true
+        store = true,
+        display = L["Source GUID"]
       },
       {
         name = "sourceUnit",
@@ -2367,7 +2659,8 @@ WeakAuras.event_prototypes = {
         init = "arg",
         hidden = "true",
         test = "true",
-        store = true
+        store = true,
+        display = L["Destination GUID"]
       },
       {
         name = "destUnit",
@@ -5549,26 +5842,40 @@ WeakAuras.event_prototypes = {
   },
   ["Threat Situation"] = {
     type = "status",
-    events = {
-      ["unit_events"] = {
-        ["player"] = {"UNIT_THREAT_SITUATION_UPDATE"}
-      }
-    },
-    internal_events = function(trigger)
+    events = function(trigger)
       local result = {}
-      AddUnitChangeInternalEvents(trigger.unit, result)
+      if trigger.threatUnit and trigger.threatUnit ~= "none" then
+        AddUnitEventForEvents(result, trigger.threatUnit, "UNIT_THREAT_LIST_UPDATE")
+      else
+        AddUnitEventForEvents(result, "player", "UNIT_THREAT_SITUATION_UPDATE")
+      end
       return result
     end,
-    force_events = "UNIT_THREAT_SITUATION_UPDATE",
+    internal_events = function(trigger)
+      local result = {}
+      if trigger.threatUnit and trigger.threatUnit ~= "none" then
+        AddUnitChangeInternalEvents(trigger.threatUnit, result)
+      end
+      return result
+    end,
+    force_events = "UNIT_THREAT_LIST_UPDATE",
     name = L["Threat Situation"],
     init = function(trigger)
       local ret = [[
-        local status = UnitThreatSituation('player', %s) or -1;
-        local aggro = status == 2 or status == 3;
+        local unit = %s
+        local ok = true
+        local aggro, status, threatpct, rawthreatpct, threatvalue
+        if unit then
+          aggro, status, threatpct, rawthreatpct, threatvalue = WeakAuras.UnitDetailedThreatSituation('player', unit)
+        else
+          status = UnitThreatSituation('player')
+          aggro = status == 2 or status == 3
+          threatpct, rawthreatpct, threatvalue = 100, 100, 0
+        end
       ]];
-
       return ret:format(trigger.threatUnit and trigger.threatUnit ~= "none" and "[["..trigger.threatUnit.."]]" or "nil");
     end,
+    statesParameter = "one",
     args = {
       {
         name = "threatUnit",
@@ -5591,9 +5898,57 @@ WeakAuras.event_prototypes = {
         type = "tristate"
       },
       {
-        hidden = true,
-        test = "status ~= -1"
+        name = "threatpct",
+        display = L["Threat Percent"],
+        desc = L["Your threat on the mob as a percentage of the amount required to pull aggro. Will pull aggro at 100."],
+        type = "number",
+        store = true,
+        conditionType = "number",
+        enable = function(trigger) return trigger.threatUnit ~= "none" end,
       },
+      {
+        name = "rawthreatpct",
+        display = L["Raw Threat Percent"],
+        desc = L["Your threat as a percentage of the tank's current threat."],
+        type = "number",
+        store = true,
+        conditionType = "number",
+        enable = function(trigger) return trigger.threatUnit ~= "none" end,
+      },
+      {
+        name = "threatvalue",
+        display = L["Threat Value"],
+        desc = L["Your total threat on the mob."],
+        type = "number",
+        store = true,
+        conditionType = "number",
+        enable = function(trigger) return trigger.threatUnit ~= "none" end,
+      },
+      {
+        name = "value",
+        hidden = true,
+        init = "threatpct",
+        store = true,
+        test = "true"
+      },
+      {
+        name = "total",
+        hidden = true,
+        init = "100",
+        store = true,
+        test = "true"
+      },
+      {
+        name = "progressType",
+        hidden = true,
+        init = "'static'",
+        store = true,
+        test = "true"
+      },
+      {
+        hidden = true,
+        test = "status ~= nil and ok"
+      }
     },
     automaticrequired = true
   },
@@ -5630,6 +5985,7 @@ WeakAuras.event_prototypes = {
       AddUnitEventForEvents(result, unit, "UNIT_SPELLCAST_INTERRUPTIBLE")
       AddUnitEventForEvents(result, unit, "UNIT_SPELLCAST_NOT_INTERRUPTIBLE")
       AddUnitEventForEvents(result, unit, "UNIT_SPELLCAST_INTERRUPTED")
+      AddUnitEventForEvents(result, unit, "UNIT_NAME_UPDATE")
       if WeakAuras.IsClassic() and unit ~= "player" then
         LibClassicCasterino.RegisterCallback("WeakAuras", "UNIT_SPELLCAST_START", WeakAuras.ScanUnitEvents)
         LibClassicCasterino.RegisterCallback("WeakAuras", "UNIT_SPELLCAST_DELAYED", WeakAuras.ScanUnitEvents) -- only for player
@@ -5662,6 +6018,11 @@ WeakAuras.event_prototypes = {
       trigger.unit = trigger.unit or "player";
       local ret = [=[
         unit = string.lower(unit)
+        local destUnit = unit .. '-target'
+        local sourceName, sourceRealm = WeakAuras.UnitNameWithRealm(unit)
+        local destName, destRealm = WeakAuras.UnitNameWithRealm(destUnit)
+        destName = destName or ""
+        destRealm = destRealm or ""
         local smart = %s
         local remainingCheck = %s
         local inverseTrigger = %s
@@ -5716,6 +6077,7 @@ WeakAuras.event_prototypes = {
         type = "string",
         enable = function(trigger) return not trigger.use_inverse end,
         conditionType = "string",
+        store = true,
       },
       {
         name = "spellId",
@@ -5724,7 +6086,8 @@ WeakAuras.event_prototypes = {
         enable = function(trigger) return not trigger.use_inverse end,
         conditionType = "number",
         forceExactOption = true,
-        test = "GetSpellInfo(%s) == spell"
+        test = "GetSpellInfo(%s) == spell",
+        store = true,
       },
       {
         name = "castType",
@@ -5836,10 +6199,20 @@ WeakAuras.event_prototypes = {
          end
       },
       {
+        name = "ignoreSelf",
+        display = L["Ignore Self"],
+        type = "toggle",
+        width = WeakAuras.doubleWidth,
+        enable = function(trigger)
+          return trigger.unit == "nameplate"
+        end,
+        init = "not UnitIsUnit(\"player\", unit)"
+      },
+      {
         name = "nameplateType",
         display = L["Nameplate Type"],
         type = "select",
-        init = "WeakAuras.GetPlayerReaciton(unit)",
+        init = "WeakAuras.GetPlayerReaction(unit)",
         values = "hostility_types",
         store = true,
         conditionType = "select",
@@ -5865,18 +6238,43 @@ WeakAuras.event_prototypes = {
       {
         name = "sourceName",
         display = L["Caster Name"],
+        type = "string",
         store = true,
         hidden = true,
         test = "true",
-        init = "UnitName(unit)",
         enable = function(trigger) return not trigger.use_inverse end,
+      },
+      {
+        name = "sourceRealm",
+        display = L["Caster Realm"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true",
+        enable = function(trigger) return not trigger.use_inverse end,
+      },
+      {
+        name = "sourceNameRealm",
+        display = L["Source Unit Name/Realm"],
+        type = "string",
+        preamble = "local sourceNameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "sourceNameRealmChecker:Check(sourceName, sourceRealm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.sourceName, state.sourceRealm)
+        end,
+        operator_types = "none",
+        enable = function(trigger) return not trigger.use_inverse end,
+        desc = constants.nameRealmFilterDesc,
       },
       {
         name = "destUnit",
         display = L["Caster's Target "],
         type = "unit",
         values = "actual_unit_types_with_specific",
-        init = "unit .. '-target'",
         conditionType = "unit",
         conditionTest = function(state, unit, op)
           return state and state.show and state.destUnit and (UnitIsUnit(state.destUnit, unit) == (op == "=="))
@@ -5888,11 +6286,37 @@ WeakAuras.event_prototypes = {
       {
         name = "destName",
         display = L["Name of Caster's Target"],
+        type = "string",
         store = true,
         hidden = true,
         test = "true",
-        init = "UnitName(destUnit)",
         enable = function(trigger) return not trigger.use_inverse end,
+      },
+      {
+        name = "destRealm",
+        display = L["Realm of Caster's Target"],
+        type = "string",
+        store = true,
+        hidden = true,
+        test = "true",
+        enable = function(trigger) return not trigger.use_inverse end,
+      },
+      {
+        name = "destNameRealm",
+        display = L["Name/Realm of Caster's Target"],
+        type = "string",
+        preamble = "local destNameRealmChecker = WeakAuras.ParseNameCheck(%q)",
+        test = "destNameRealmChecker:Check(destName, destRealm)",
+        conditionType = "string",
+        conditionPreamble = function(input)
+          return WeakAuras.ParseNameCheck(input)
+        end,
+        conditionTest = function(state, needle, op, preamble)
+          return preamble:Check(state.destName, state.destRealm)
+        end,
+        operator_types = "none",
+        enable = function(trigger) return not trigger.use_inverse end,
+        desc = constants.nameRealmFilterDesc,
       },
       {
         name = "inverse",
@@ -5917,7 +6341,7 @@ WeakAuras.event_prototypes = {
         "PLAYER_TARGET_CHANGED"
       },
       ["unit_events"] = {
-        ["player"] = {"UNIT_STATS"}
+        ["player"] = {"UNIT_STATS", "UNIT_ATTACK_POWER"}
       }
     },
     internal_events = function(trigger, untrigger)
@@ -6070,6 +6494,14 @@ WeakAuras.event_prototypes = {
         hidden = WeakAuras.IsClassic()
       },
       {
+        name = "attackpower",
+        display = WeakAuras.newFeatureString .. L["Attack Power"],
+        type = "number",
+        init = "WeakAuras.GetEffectiveAttackPower()",
+        store = true,
+        conditionType = "number"
+      },
+      {
         name = "resistanceholy",
         display = L["Holy Resistance"],
         type = "number",
@@ -6161,7 +6593,7 @@ WeakAuras.event_prototypes = {
       },
       {
         name = "moveSpeed",
-        display = L["Continously update Movement Speed"],
+        display = L["Continuously update Movement Speed"],
         type = "boolean",
         test = true,
         width = WeakAuras.doubleWidth
@@ -6288,7 +6720,7 @@ WeakAuras.event_prototypes = {
         tinsert(events, "PLAYER_REGEN_DISABLED")
         tinsert(events, "PLAYER_ENTERING_WORLD")
       end
-      if trigger.use_pvpflagged ~= nil then
+      if trigger.use_pvpflagged ~= nil or trigger.use_afk ~= nil then
         tinsert(events, "PLAYER_FLAGS_CHANGED")
       end
       if trigger.use_alive ~= nil then
@@ -6422,6 +6854,12 @@ WeakAuras.event_prototypes = {
         display = L["Is Moving"],
         type = "tristate",
         init = "IsPlayerMoving()"
+      },
+      {
+        name = "afk",
+        display = L["Is Away from Keyboard"],
+        type = "tristate",
+        init = "UnitIsAFK('player')"
       },
       {
         name = "ingroup",
@@ -6718,7 +7156,7 @@ WeakAuras.event_prototypes = {
         name = "range",
         display = L["Distance"],
         type = "number",
-        operator_types_without_equal = true,
+        operator_types = "without_equal",
         test = "triggerResult",
         conditionType = "number",
         conditionTest = function(state, needle, needle2)
@@ -6736,108 +7174,135 @@ WeakAuras.event_prototypes = {
 };
 
 if WeakAuras.IsClassic() then
-  WeakAuras.event_prototypes["Threat Situation"] = nil
+  if not UnitDetailedThreatSituation then
+    WeakAuras.event_prototypes["Threat Situation"] = nil
+  end
   WeakAuras.event_prototypes["Death Knight Rune"] = nil
   WeakAuras.event_prototypes["Alternate Power"] = nil
   WeakAuras.event_prototypes["Equipment Set"] = nil
   WeakAuras.event_prototypes["Spell Activation Overlay"] = nil
+  WeakAuras.event_prototypes["Crowd Controlled"] = nil
 else
   WeakAuras.event_prototypes["Queued Action"] = nil
 end
 
 WeakAuras.dynamic_texts = {
   ["p"] = {
-    func = function(state, region)
-      if not state then return "" end
+    get = function(state)
+      if not state then return nil end
       if state.progressType == "static" then
-        return state.value or ""
+        return state.value or nil
       end
       if state.progressType == "timed" then
         if not state.expirationTime or not state.duration then
-          return ""
+          return nil
         end
         local remaining  = state.expirationTime - GetTime();
-        local duration  = state.duration;
-
-        local remainingStr     = "";
-        if remaining == math.huge then
-          remainingStr     = " ";
-        elseif remaining > 60 then
-          remainingStr     = string.format("%i:", math.floor(remaining / 60));
-          remaining        = remaining % 60;
-          remainingStr     = remainingStr..string.format("%02i", remaining);
-        elseif remaining > 0 then
-          local progressPrecision = region.progressPrecision and math.abs(region.progressPrecision) or 1
-          -- remainingStr = remainingStr..string.format("%."..(data.progressPrecision or 1).."f", remaining);
-          if progressPrecision == 4 and remaining <= 3 then
-            remainingStr = remainingStr..string.format("%.1f", remaining);
-          elseif progressPrecision == 5 and remaining <= 3 then
-            remainingStr = remainingStr..string.format("%.2f", remaining);
-          elseif (progressPrecision == 4 or progressPrecision == 5) and remaining > 3 then
-            remainingStr = remainingStr..string.format("%d", remaining);
-          else
-            remainingStr = remainingStr..string.format("%.".. progressPrecision .."f", remaining);
-          end
-        else
-          remainingStr     = " ";
-        end
-        return remainingStr
+        return remaining >= 0 and remaining or nil
       end
+    end,
+    func = function(remaining, state, progressPrecision)
+      progressPrecision = progressPrecision or 1
+      if not state or state.progressType ~= "timed" then
+        return remaining
+      end
+      if type(remaining) ~= "number" then
+        return ""
+      end
+
+      local remainingStr     = "";
+      if remaining == math.huge then
+        remainingStr     = " ";
+      elseif remaining > 60 then
+        remainingStr     = string.format("%i:", math.floor(remaining / 60));
+        remaining        = remaining % 60;
+        remainingStr     = remainingStr..string.format("%02i", remaining);
+      elseif remaining > 0 then
+        if progressPrecision == 4 and remaining <= 3 then
+          remainingStr = remainingStr..string.format("%.1f", remaining);
+        elseif progressPrecision == 5 and remaining <= 3 then
+          remainingStr = remainingStr..string.format("%.2f", remaining);
+        elseif progressPrecision == 6 and remaining <= 3 then
+          remainingStr = remainingStr..string.format("%.3f", remaining);
+        elseif (progressPrecision == 4 or progressPrecision == 5 or progressPrecision == 6) and remaining > 3 then
+          remainingStr = remainingStr..string.format("%d", remaining);
+        else
+          remainingStr = remainingStr..string.format("%.".. progressPrecision .."f", remaining);
+        end
+      else
+        remainingStr     = " ";
+      end
+      return remainingStr
     end
   },
   ["t"] = {
-    func = function(state, region)
+    get = function(state)
       if not state then return "" end
       if state.progressType == "static" then
-        return state.total or ""
+        return state.total, false
       end
       if state.progressType == "timed" then
         if not state.duration then
-          return ""
+          return nil
         end
-        -- Format a duration time string
-        local durationStr     = "";
-        local duration = state.duration
-        if math.abs(duration) == math.huge or tostring(duration) == "nan" then
-          durationStr = " ";
-        elseif duration > 60 then
-          durationStr     = string.format("%i:", math.floor(duration / 60));
-          duration       = duration % 60;
-          durationStr     = durationStr..string.format("%02i", duration);
-        elseif duration > 0 then
-          local totalPrecision = region.totalPrecision and math.abs(region.totalPrecision) or 1
-          if totalPrecision == 4 and duration <= 3 then
-            durationStr = durationStr..string.format("%.1f", duration);
-          elseif totalPrecision == 5 and duration <= 3 then
-            durationStr = durationStr..string.format("%.2f", duration);
-          elseif (totalPrecision == 4 or totalPrecision == 5) and duration > 3 then
-            durationStr = durationStr..string.format("%d", duration);
-          else
-            durationStr = durationStr..string.format("%."..totalPrecision.."f", duration);
-          end
-        else
-          durationStr     = " ";
-        end
-        return durationStr
+        return state.duration, true
       end
+    end,
+    func = function(duration, state, totalPrecision)
+      if state.progressType ~= "timed" then
+        return duration
+      end
+      if type(duration) ~= "number" then
+        return ""
+      end
+      local durationStr     = "";
+      if math.abs(duration) == math.huge or tostring(duration) == "nan" then
+        durationStr = " ";
+      elseif duration > 60 then
+        durationStr     = string.format("%i:", math.floor(duration / 60));
+        duration       = duration % 60;
+        durationStr     = durationStr..string.format("%02i", duration);
+      elseif duration > 0 then
+        if totalPrecision == 4 and duration <= 3 then
+          durationStr = durationStr..string.format("%.1f", duration);
+        elseif totalPrecision == 5 and duration <= 3 then
+          durationStr = durationStr..string.format("%.2f", duration);
+        elseif totalPrecision == 6 and duration <= 3 then
+          durationStr = durationStr..string.format("%.3f", duration);
+        elseif (totalPrecision == 4 or totalPrecision == 5 or totalPrecision == 6) and duration > 3 then
+          durationStr = durationStr..string.format("%d", duration);
+        else
+          durationStr = durationStr..string.format("%."..totalPrecision.."f", duration);
+        end
+      else
+        durationStr     = " ";
+      end
+      return durationStr
     end
   },
   ["n"] = {
-    func = function(state)
-      if not state then return "" end
-      return state.name or state.id
+    get = function(state)
+      return state.name or state.id or "", true
+    end,
+    func = function(v)
+      return v
     end
   },
   ["i"] = {
-    func = function(state)
-      if not state or not state.icon then return "|TInterface\\Icons\\INV_Misc_QuestionMark:12:12:0:0:64:64:4:60:4:60|t" end
-      return "|T".. state.icon ..":12:12:0:0:64:64:4:60:4:60|t"
+    get = function(state)
+      return state.icon or "Interface\\Icons\\INV_Misc_QuestionMark"
+    end,
+    func = function(v)
+      return "|T".. v ..":12:12:0:0:64:64:4:60:4:60|t"
     end
   },
   ["s"] = {
-    func = function(state)
+    get = function(state)
       if not state or state.stacks == 0 then return "" end
       return state.stacks
+    end,
+    func = function(v)
+      return v
     end
   }
 };
