@@ -283,6 +283,9 @@ L = DBM:GetModLocalization("PyroguardEmberseer")
 L:SetGeneralLocalization{
 	name 		= "Feuerwache Glutseher"
 }
+L:SetMiscLocalization{
+	Pull		= "%s kommt allmählich wieder zu Kräften!"
+}
 -----------------------------
 --  Solakar Flamewreath  --
 -----------------------------
@@ -1237,7 +1240,12 @@ L = DBM:GetModLocalization(455)
 L:SetGeneralLocalization{
 	name 		= "Ramstein der Verschlinger"
 }
-
+L:SetTimerLocalization{
+	TimerGuards	= "Wachposten Spawn"
+}
+L:SetOptionLocalization{
+	TimerGuards	= "Wenn der Boss besiegt wurde, zeige timer bis zur Ankunft von Wachposten der schwarzen Wache"
+}
 -----------------------------
 --  Baron Rivendare  --
 -----------------------------

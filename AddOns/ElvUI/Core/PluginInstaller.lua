@@ -344,6 +344,7 @@ function PI:CreateFrame()
 	end)
 
 	f.tutorialImage = f:CreateTexture('PluginInstallTutorialImage', 'OVERLAY')
+	f.tutorialImage2 = f:CreateTexture('PluginInstallTutorialImage2', 'OVERLAY')
 
 	f.side = CreateFrame('Frame', 'PluginInstallTitleFrame', f)
 	f.side:SetTemplate('Transparent')
@@ -411,6 +412,7 @@ function PI:RunInstall()
 		f.StepTitles = nil
 		f.StepTitlesColor = nil
 		f.StepTitlesColorSelected = nil
+
 		local db = self.Installs[1]
 		f.CurrentPage = 0
 		f.MaxPage = #(db.Pages)
@@ -418,23 +420,55 @@ function PI:RunInstall()
 		f.Title:SetText(db.Title or L["ElvUI Plugin Installation"])
 		f.Status:SetMinMaxValues(0, f.MaxPage)
 		f.Status.text:SetText(f.CurrentPage..' / '..f.MaxPage)
-		f.tutorialImage:SetTexture(db.tutorialImage or E.Media.Textures.Logo)
+
+		-- Logo
+		local LogoTop = db.tutorialImage or E.Media.Textures.LogoTop
+		f.tutorialImage:SetTexture(LogoTop)
+		f.tutorialImage:ClearAllPoints()
 		if db.tutorialImageSize then
 			f.tutorialImage:Size(db.tutorialImageSize[1], db.tutorialImageSize[2])
 		else
 			f.tutorialImage:Size(256, 128)
 		end
-		f.tutorialImage:ClearAllPoints()
 		if db.tutorialImagePoint then
 			f.tutorialImage:Point('BOTTOM', 0 + db.tutorialImagePoint[1], 70 + db.tutorialImagePoint[2])
 		else
 			f.tutorialImage:Point('BOTTOM', 0, 70)
 		end
+		if db.tutorialImageVertexColor then
+			f.tutorialImage:SetVertexColor(unpack(db.tutorialImageVertexColor))
+		elseif LogoTop == E.Media.Textures.LogoTop then
+			f.tutorialImage:SetVertexColor(unpack(E.media.rgbvaluecolor))
+		else
+			f.tutorialImage:SetVertexColor(1, 1, 1)
+		end
+
+		--Alt Logo
+		if LogoTop == E.Media.Textures.LogoTop or db.tutorialImage2 then
+			f.tutorialImage2:SetTexture(db.tutorialImage2 or E.Media.Textures.LogoBottom)
+			f.tutorialImage2:ClearAllPoints()
+			if db.tutorialImage2Size then
+				f.tutorialImage2:Size(db.tutorialImage2Size[1], db.tutorialImage2Size[2])
+			else
+				f.tutorialImage2:Size(256, 128)
+			end
+			if db.tutorialImage2Point then
+				f.tutorialImage2:Point('BOTTOM', 0 + db.tutorialImage2Point[1], 70 + db.tutorialImage2Point[2])
+			else
+				f.tutorialImage2:Point('BOTTOM', 0, 70)
+			end
+			if db.tutorialImage2VertexColor then
+				f.tutorialImage2:SetVertexColor(unpack(db.tutorialImage2VertexColor))
+			else
+				f.tutorialImage2:SetVertexColor(1, 1, 1)
+			end
+		end
 
 		f.Pages = db.Pages
 
 		PluginInstallFrame:Show()
-		f:SetPoint('CENTER')
+
+		f:Point('CENTER')
 		if db.StepTitles and #db.StepTitles == f.MaxPage then
 			f:SetPoint('CENTER', E.UIParent, 'CENTER', -((db.StepTitleWidth or 140)/2), 0)
 			f.side:SetWidth(db.StepTitleWidth or 140)
@@ -452,8 +486,10 @@ function PI:RunInstall()
 			f.StepTitlesColor = db.StepTitlesColor
 			f.StepTitlesColorSelected = db.StepTitlesColorSelected
 		end
+
 		NextPage()
 	end
+
 	if #(self.Installs) > 1 then
 		f.pending:Show()
 		E:Flash(f.pending, 0.53, true)

@@ -7,7 +7,7 @@ Guidelime.registerGuide([[
 
 You should be level [XP12 12] to start this guide.
 Go to Thunderbluff and accept [QA886]
-Go to [G43.7,52.4 The Barrens] and get the flight path from Omusa Thunderhorn.
+Go to [G44.4,59.2 The Barrens] and get the flight path from Omusa Thunderhorn.
 Pick up [QA886] and [QA854].
 Talk to Thork, turn in [QT854].
 Get [QA6361].

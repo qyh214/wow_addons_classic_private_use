@@ -28,7 +28,7 @@ function UF:Construct_PlayerFrame(frame)
 	frame.CombatIndicator = self:Construct_CombatIndicator(frame)
 	frame.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(frame)
 	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.DebuffHighlight = self:Construct_DebuffHighlight(frame)
+	frame.AuraHighlight = UF:Construct_AuraHighlight(frame)
 	frame.ThreatIndicator = self:Construct_Threat(frame)
 	frame.PvPIndicator = self:Construct_PvPIcon(frame)
 
@@ -64,8 +64,8 @@ function UF:Construct_PlayerFrame(frame)
 	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 
-	frame:Point('BOTTOMLEFT', E.UIParent, 'BOTTOM', -413, 68) --Set to default position
-	E:CreateMover(frame, frame:GetName()..'Mover', L["Player Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,player,generalGroup')
+	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', -342, 139) --Set to default position
+	E:CreateMover(frame, frame:GetName()..'Mover', L["Player Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,player,generalGroup')
 
 	frame.unitframeType = "player"
 end
@@ -103,6 +103,14 @@ function UF:Update_PlayerFrame(frame, db)
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
 	end
 
+	if db.strataAndLevel and db.strataAndLevel.useCustomStrata then
+		frame:SetFrameStrata(db.strataAndLevel.frameStrata)
+	end
+
+	if db.strataAndLevel and db.strataAndLevel.useCustomLevel then
+		frame:SetFrameLevel(db.strataAndLevel.frameLevel)
+	end
+
 	frame.colors = ElvUF.colors
 	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
@@ -138,7 +146,7 @@ function UF:Update_PlayerFrame(frame, db)
 	UF:Configure_AuraBars(frame)
 	UF:Configure_CustomTexts(frame)
 	UF:Configure_Cutaway(frame)
-	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_AuraHighlight(frame)
 	UF:Configure_EnergyManaRegen(frame)
 	UF:Configure_Fader(frame)
 	UF:Configure_HealComm(frame)

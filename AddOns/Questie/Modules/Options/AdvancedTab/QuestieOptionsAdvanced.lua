@@ -41,7 +41,7 @@ function QuestieOptions.tabs.advanced:Initialize()
     return {
         name = function() return QuestieLocale:GetUIString('ADVANCED_TAB'); end,
         type = "group",
-        order = 16,
+        order = 17,
         args = {
             map_options = {
                 type = "header",
@@ -167,7 +167,7 @@ function QuestieOptions.tabs.advanced:Initialize()
                     ['ptBR'] = 'Português',
                     ['frFR'] = 'Français',
                     ['deDE'] = 'Deutsch',
-                    ['ruRU'] = 'русский',
+                    ['ruRU'] = 'Русский',
                     ['zhCN'] = '简体中文',
                     ['zhTW'] = '正體中文',
                     ['koKR'] = '한국어',

@@ -310,6 +310,22 @@ function S:BlizzardOptions()
 		end
 	end
 
+	-- Categories Buttons
+	for i = 1, 10 do
+		local Button = _G["InterfaceOptionsFrameCategoriesButton"..i]
+		S:HandleCategoriesButtons(Button)
+	end
+
+	for i = 1, MAX_ADDONS_DISPLAYED do
+		local Button = _G["InterfaceOptionsFrameAddOnsButton"..i]
+		S:HandleCategoriesButtons(Button)
+	end
+
+	for i = 1, 6 do
+		local Button = _G["VideoOptionsFrameCategoryFrameButton"..i]
+		S:HandleCategoriesButtons(Button)
+	end
+
 	_G.InterfaceOptionsFrameTab1:Point('BOTTOMLEFT', _G.InterfaceOptionsFrameCategories, 'TOPLEFT', 6, 1)
 	_G.InterfaceOptionsFrameTab2:Point('TOPLEFT', _G.InterfaceOptionsFrameTab1, 'TOPRIGHT', 1, 0)
 	_G.InterfaceOptionsSocialPanel.EnableTwitter.Logo:SetAtlas('WoWShare-TwitterLogo')

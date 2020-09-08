@@ -39,6 +39,7 @@ local SetItemButtonDesaturated = SetItemButtonDesaturated
 local SetItemButtonTexture = SetItemButtonTexture
 local SetItemButtonTextureVertexColor = SetItemButtonTextureVertexColor
 local ToggleFrame = ToggleFrame
+local ToggleAllBags = ToggleAllBags
 local UseContainerItem = UseContainerItem
 local PutItemInBackpack = PutItemInBackpack
 local CursorHasItem = CursorHasItem
@@ -103,7 +104,7 @@ end
 function B:DisableBlizzard()
 	_G.BankFrame:UnregisterAllEvents()
 
-	for i=1, NUM_CONTAINER_FRAMES do
+	for i = 1, NUM_CONTAINER_FRAMES do
 		_G['ContainerFrame'..i]:UnregisterAllEvents()
 		_G['ContainerFrame'..i]:Kill()
 	end
@@ -127,7 +128,7 @@ function B:UpdateSearch()
 	local prevSearch = SEARCH_STRING
 	if #search > MIN_REPEAT_CHARACTERS then
 		local repeatChar = true
-		for i=1, MIN_REPEAT_CHARACTERS, 1 do
+		for i = 1, MIN_REPEAT_CHARACTERS, 1 do
 			if sub(search,(0-i), (0-i)) ~= sub(search,(-1-i),(-1-i)) then
 				repeatChar = false
 				break
@@ -1191,11 +1192,11 @@ function B:ConstructContainerButton(f, slotID, bagID)
 	slot.icon:SetInside()
 	slot.icon:SetTexCoord(unpack(E.TexCoords))
 
-	slot.itemLevel = slot:CreateFontString(nil, 'OVERLAY')
+	slot.itemLevel = slot:CreateFontString(nil, 'OVERLAY', nil, 1)
 	slot.itemLevel:Point('BOTTOMRIGHT', 0, 2)
 	slot.itemLevel:FontTemplate(E.Libs.LSM:Fetch('font', E.db.bags.itemLevelFont), E.db.bags.itemLevelFontSize, E.db.bags.itemLevelFontOutline)
 
-	slot.bindType = slot:CreateFontString(nil, 'OVERLAY')
+	slot.bindType = slot:CreateFontString(nil, 'OVERLAY', nil, 1)
 	slot.bindType:Point('TOP', 0, -2)
 	slot.bindType:FontTemplate(E.Libs.LSM:Fetch('font', E.db.bags.itemLevelFont), E.db.bags.itemLevelFontSize, E.db.bags.itemLevelFontOutline)
 
@@ -1687,6 +1688,9 @@ function B:Initialize()
 	B:RegisterEvent('BANKFRAME_OPENED', 'OpenBank')
 	B:RegisterEvent('BANKFRAME_CLOSED', 'CloseBank')
 	B:RegisterEvent('PLAYERBANKBAGSLOTS_CHANGED')
+
+	B:RegisterEvent('AUCTION_HOUSE_SHOW', 'OpenBags')
+	B:RegisterEvent('AUCTION_HOUSE_CLOSED', 'CloseBags')
 
 	_G.BankFrame:SetScale(0.0001)
 	_G.BankFrame:SetAlpha(0)

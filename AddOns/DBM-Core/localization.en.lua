@@ -5,6 +5,12 @@ local L = DBM_CORE_L
 L.DEADLY_BOSS_MODS					= "Deadly Boss Mods"
 L.DBM								= "DBM"
 
+local dateTable = date("*t")
+if dateTable.day and dateTable.month and dateTable.day == 1 and dateTable.month == 4 then
+	L.DEADLY_BOSS_MODS				= "Harmless Boss Mods"
+	L.DBM							= "HBM"
+end
+
 L.HOW_TO_USE_MOD					= "Welcome to " .. L.DBM .. ". Type /dbm help for a list of supported commands. To access options type /dbm in your chat to begin configuration. Load specific zones manually to configure any boss specific settings to your liking as well. DBM will setup defaults for your spec, but you may want to fine tune these."
 L.SILENT_REMINDER					= "Reminder: " .. L.DBM .. " is still in silent mode."
 
@@ -151,14 +157,14 @@ L.VERSIONCHECK_ENTRY_TWO			= "%s: %s (%s) & %s (%s)"--Two Boss mods
 L.VERSIONCHECK_ENTRY_NO_DBM			= "%s: No boss mod installed"
 L.VERSIONCHECK_FOOTER				= "Found %d player(s) with " .. L.DBM .. " & %d player(s) with Bigwigs"
 L.VERSIONCHECK_OUTDATED				= "Following %d player(s) have outdated boss mod version: %s"
-L.YOUR_VERSION_OUTDATED     		= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date. Please visit http://www.deadlybossmods.com to get the latest version."
+L.YOUR_VERSION_OUTDATED     		= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date. Please download the latest version through Curse/Twitch, WoWI, or from the GitHub Releases page."
 L.VOICE_PACK_OUTDATED				= "Your selected " .. L.DBM .. " voice pack is missing some sounds supported by " .. L.DBM .. ". Some warning sounds will still play default sounds. Please download a newer version of voice pack or pack contact author for an update that contains missing audio"
 L.VOICE_MISSING						= "You have a " .. L.DBM .. " voice pack selected that could not be found. If this is an error, make sure your voice pack is properly installed and enabled in addons."
 L.VOICE_DISABLED					= "You currently have at least one " .. L.DBM .. " voice pack installed but none enabled. If you intend to use a voice pack, make sure it's chosen in 'Spoken Alerts', else uninstall unused voice packs to hide this message"
 L.VOICE_COUNT_MISSING				= "Countdown voice %d is set to a voice/count pack that could not be found. It has be reset to default setting: %s."
 L.BIG_WIGS							= "BigWigs"
 
-L.UPDATEREMINDER_HEADER				= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n Version %s (%s) is available for download through Curse/Twitch, WoWI, or from GitHub project page"
+L.UPDATEREMINDER_HEADER				= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n Version %s (%s) is available for download through Curse/Twitch, WoWI, or from the GitHub Releases page"
 L.UPDATEREMINDER_HEADER_ALPHA		= "Your ALPHA version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n You are at least %s test versions behind. It is recommended that DBM users that choose ALPHA versions run the latest ALPHA. Otherwise, they should run latest RELEASE version. Out of date ALPHAs have a stricter version check because they are development versions of " .. L.DBM .. "."
 L.UPDATEREMINDER_FOOTER				= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the download link to your clipboard."
 L.UPDATEREMINDER_FOOTER_GENERIC		= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the link to your clipboard."
@@ -214,8 +220,10 @@ L.RANGERADAR_IN_RANGE_TEXTONE		= "%s (%0.1fy)"--One target
 
 L.INFOFRAME_SHOW_SELF				= "Always show your power"		-- Always show your own power value even if you are below the threshold
 L.INFOFRAME_SETLINES				= "Set max lines"
+L.INFOFRAME_SETCOLS					= "Set max columns"
 L.INFOFRAME_LINESDEFAULT			= "Set by mod"
 L.INFOFRAME_LINES_TO				= "%d lines"
+L.INFOFRAME_COLS_TO					= "%d columns"
 L.INFOFRAME_POWER					= "Power"
 L.INFOFRAME_AGGRO					= "Aggro"
 L.INFOFRAME_MAIN					= "Main:"--Main power
@@ -652,7 +660,7 @@ L.ENRAGE_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:2
 
 --LDB
 L.LDB_TOOLTIP_HELP1					= "Click to open " .. L.DBM
-L.LDB_TOOLTIP_HELP2					= "Alt-click to toggle Silent Mode"
+L.LDB_TOOLTIP_HELP2					= "Alt+right click to toggle Silent Mode"
 L.SILENTMODE_IS                     = "SilentMode is "
 
 L.LDB_LOAD_MODS						= "Load boss mods"
@@ -677,5 +685,7 @@ L.WORLD_BUFFS = {
 	hordeNef						= "NEFARIAN IS SLAIN! People of Orgrimmar",
 	allianceNef						= "Citizens of the Alliance, the Lord of Blackrock is slain!",
 	zgHeart							= "Now, only one step remains to rid us of the Soulflayer's threat",
+	zgHeartBooty					= "The Blood God, the Soulflayer, has been defeated!  We are imperiled no longer!",
+	zgHeartYojamba					= "Begin the ritual, my servants.  We must banish the heart of Hakkar back into the void!",
 	rendHead						= "The false Warchief, Rend Blackhand, has fallen!"
 }

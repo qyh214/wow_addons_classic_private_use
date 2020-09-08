@@ -70,18 +70,18 @@ function UF:RaidRoleUpdate()
 			leader:Point('LEFT', anchor, 'LEFT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 			masterlooter:Point('LEFT', leader, 'RIGHT')
 		elseif isLeader and db.raidRoleIcons.position == 'TOPRIGHT' then
-			leader:Point('RIGHT', anchor, 'RIGHT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
+			leader:Point('RIGHT', anchor, 'RIGHT', -db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 			masterlooter:Point('RIGHT', leader, 'LEFT')
 		elseif isAssist and db.raidRoleIcons.position == 'TOPLEFT' then
 			assistant:Point('LEFT', anchor, 'LEFT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 			masterlooter:Point('LEFT', assistant, 'RIGHT')
 		elseif isAssist and db.raidRoleIcons.position == 'TOPRIGHT' then
-			assistant:Point('RIGHT', anchor, 'RIGHT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
+			assistant:Point('RIGHT', anchor, 'RIGHT', -db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 			masterlooter:Point('RIGHT', assistant, 'LEFT')
 		elseif isMasterLooter and db.raidRoleIcons.position == 'TOPLEFT' then
 			masterlooter:Point('LEFT', anchor, 'LEFT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 		elseif isMasterLooter and db.raidRoleIcons.position == 'TOPRIGHT' then
-			masterlooter:Point('RIGHT', anchor, 'RIGHT', db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
+			masterlooter:Point('RIGHT', anchor, 'RIGHT', -db.raidRoleIcons.xOffset, db.raidRoleIcons.yOffset)
 		end
 	end
 end

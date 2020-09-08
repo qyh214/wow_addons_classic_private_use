@@ -1,6 +1,6 @@
 local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule('NamePlates')
-local UF = E:GetModule('UnitFrames');
+local UF = E:GetModule('UnitFrames')
 local LSM = E.Libs.LSM
 
 local _G = _G
@@ -9,7 +9,7 @@ local unpack = unpack
 local CreateFrame = CreateFrame
 
 function NP:Construct_Auras(nameplate)
-	local Buffs = CreateFrame('Frame', nameplate:GetDebugName()..'Buffs', nameplate)
+	local Buffs = CreateFrame('Frame', nameplate:GetName()..'Buffs', nameplate)
 	Buffs:SetFrameStrata(nameplate:GetFrameStrata())
 	Buffs:SetFrameLevel(5)
 	Buffs:Size(300, 27)
@@ -24,7 +24,7 @@ function NP:Construct_Auras(nameplate)
 	Buffs.type = 'buffs'
 	Buffs.forceShow = nameplate == _G.ElvNP_Test
 
-	local Debuffs = CreateFrame('Frame', nameplate:GetDebugName()..'Debuffs', nameplate)
+	local Debuffs = CreateFrame('Frame', nameplate:GetName()..'Debuffs', nameplate)
 	Debuffs:SetFrameStrata(nameplate:GetFrameStrata())
 	Debuffs:SetFrameLevel(5)
 	Debuffs:Size(300, 27)
@@ -103,7 +103,7 @@ function NP:Configure_Auras(nameplate, auras, db)
 end
 
 function NP:Update_Auras(nameplate, forceUpdate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if db.debuffs.enable or db.buffs.enable then
 		nameplate:SetAuraUpdateMethod(E.global.nameplate.effectiveAura)
@@ -139,10 +139,8 @@ function NP:Update_Auras(nameplate, forceUpdate)
 			nameplate.Buffs:Hide()
 			nameplate.Buffs = nil
 		end
-	else
-		if nameplate:IsElementEnabled('Auras') then
-			nameplate:DisableElement('Auras')
-		end
+	elseif nameplate:IsElementEnabled('Auras') then
+		nameplate:DisableElement('Auras')
 	end
 end
 

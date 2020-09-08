@@ -283,6 +283,9 @@ L = DBM:GetModLocalization("PyroguardEmberseer")
 L:SetGeneralLocalization{
 	name 		= "Piroguardián brasadivino"
 }
+L:SetMiscLocalization{
+	Pull		= "¡%s comienza a recuperar la fuerza!"
+}
 -----------------------------
 --  Solakar Flamewreath  --
 -----------------------------
@@ -1237,7 +1240,12 @@ L = DBM:GetModLocalization(455)
 L:SetGeneralLocalization{
 	name 		= "Ramstein el Empachador"
 }
-
+L:SetTimerLocalization{
+	TimerGuards	= "Aparecen los guardias"
+}
+L:SetOptionLocalization{
+	TimerGuards	= "Después de derrotar al jefe, muestra el temporizador para la llegada de los Argos Guardia Negra"
+}
 -----------------------------
 --  Baron Rivendare  --
 -----------------------------

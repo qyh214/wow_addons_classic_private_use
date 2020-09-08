@@ -9,7 +9,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "For the Legion! For Kil'Jaeden!"
+	Pull		= "Pour la Légion ! Pour Kil'Jaeden !"
 })
 
 -- Azuregos (Azshara)
@@ -20,7 +20,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "This place is under my protection. The mysteries of the arcane shall remain inviolate."
+	Pull		= "Cet endroit est sous ma protection. Les secrets de l'arcane resteront inviolés."
 })
 
 -- Taerar (Ashenvale)
@@ -31,7 +31,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "Peace is but a fleeting dream! Let the NIGHTMARE reign!"
+	Pull		= "La paix n'est qu'un rêve éphémère ! Que le CAUCHEMAR règne !"
 })
 
 -- Ysondre (Feralas)
@@ -42,18 +42,18 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "The strands of LIFE have been severed! The Dreamers must be avenged!"
+	Pull		= "Les fils de la VIE ont été coupés ! Les Rêveurs doivent être vengés !"
 })
 
 -- Lethon (Hinterlands)
 L = DBM:GetModLocalization("Lethon")
 
 L:SetGeneralLocalization{
-	name = "Lethon"
+	name = "Léthon"
 }
 
 L:SetMiscLocalization({
---	Pull		= "The strands of LIFE have been severed! The Dreamers must be avenged!"--Does not have one :\
+	Pull		= "Je sens l'OMBRE dans vos cœurs. Il ne peut y avoir de repos pour les vilains !"
 })
 
 -- Emeriss (Duskwood)

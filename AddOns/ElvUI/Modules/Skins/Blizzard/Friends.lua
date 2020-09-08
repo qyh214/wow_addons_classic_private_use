@@ -551,9 +551,9 @@ function S:FriendsFrame()
 
 	_G.RaidInfoFrame:HookScript('OnShow', function()
 		if GetNumSubgroupMembers() > 0 then
-			_G.RaidInfoFrame:Point('TOPLEFT', RaidFrame, 'TOPRIGHT', -14, -12)
+			_G.RaidInfoFrame:Point('TOPLEFT', RaidFrame, 'TOPRIGHT', 0, 0)
 		else
-			_G.RaidInfoFrame:Point('TOPLEFT', RaidFrame, 'TOPRIGHT', -34, -12)
+			_G.RaidInfoFrame:Point('TOPLEFT', RaidFrame, 'TOPRIGHT', 0, 0)
 		end
 	end)
 

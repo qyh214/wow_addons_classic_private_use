@@ -5,18 +5,23 @@ local _G = _G
 local pairs, unpack = pairs, unpack
 local CreateFrame = CreateFrame
 
+local questIconTypes = { "Item", "Loot", "Skull", "Chat" }
+local targetIndicators = { "Spark", "TopIndicator", "LeftIndicator", "RightIndicator" }
+
 function NP:Construct_QuestIcons(nameplate)
-	local QuestIcons = CreateFrame("Frame", nameplate:GetDebugName() .. "QuestIcons", nameplate)
+	local QuestIcons = CreateFrame("Frame", nameplate:GetName() .. "QuestIcons", nameplate)
+	QuestIcons:Size(20)
 	QuestIcons:Hide()
 
-	for _, object in pairs({"Item", "Loot", "Skull", "Chat"}) do
-		QuestIcons[object] = QuestIcons:CreateTexture(nil, "BORDER", nil, 1)
-		QuestIcons[object]:Point("CENTER")
-		QuestIcons[object]:Hide()
+	for _, object in pairs(questIconTypes) do
+		local icon = QuestIcons:CreateTexture(nil, "BORDER", nil, 1)
+		icon:Point("CENTER")
+		icon:Hide()
+
+		QuestIcons[object] = icon
 	end
 
 	QuestIcons.Item:SetTexCoord(unpack(E.TexCoords))
-
 	QuestIcons.Chat:SetTexture([[Interface\WorldMap\ChatBubble_64.PNG]])
 	QuestIcons.Chat:SetTexCoord(0, 0.5, 0.5, 1)
 
@@ -28,7 +33,7 @@ function NP:Construct_QuestIcons(nameplate)
 end
 
 function NP:Update_QuestIcons(nameplate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if (nameplate.frameType == "FRIENDLY_NPC" or nameplate.frameType == "ENEMY_NPC") and db.questIcon.enable then
 		if not nameplate:IsElementEnabled("QuestIcons") then
@@ -43,19 +48,17 @@ function NP:Update_QuestIcons(nameplate)
 		nameplate.QuestIcons.Loot:Size(db.questIcon.size, db.questIcon.size)
 		nameplate.QuestIcons.Skull:Size(db.questIcon.size + 4, db.questIcon.size + 4)
 		nameplate.QuestIcons.Chat:Size(db.questIcon.size + 4, db.questIcon.size + 4)
-	else
-		if nameplate:IsElementEnabled("QuestIcons") then
-			nameplate:DisableElement("QuestIcons")
-		end
+	elseif nameplate:IsElementEnabled("QuestIcons") then
+		nameplate:DisableElement("QuestIcons")
 	end
 end
 
 function NP:Construct_ClassificationIndicator(nameplate)
-	return nameplate:CreateTexture(nameplate:GetDebugName() .. "ClassificationIndicator", "OVERLAY")
+	return nameplate:CreateTexture(nameplate:GetName() .. "ClassificationIndicator", "OVERLAY")
 end
 
 function NP:Update_ClassificationIndicator(nameplate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if (nameplate.frameType == "FRIENDLY_NPC" or nameplate.frameType == "ENEMY_NPC") and db.eliteIcon.enable then
 		if not nameplate:IsElementEnabled("ClassificationIndicator") then
@@ -66,24 +69,24 @@ function NP:Update_ClassificationIndicator(nameplate)
 		nameplate.ClassificationIndicator:Size(db.eliteIcon.size, db.eliteIcon.size)
 
 		nameplate.ClassificationIndicator:Point(E.InversePoints[db.eliteIcon.position], nameplate, db.eliteIcon.position, db.eliteIcon.xOffset, db.eliteIcon.yOffset)
-	else
-		if nameplate:IsElementEnabled("ClassificationIndicator") then
-			nameplate:DisableElement("ClassificationIndicator")
-		end
+	elseif nameplate:IsElementEnabled("ClassificationIndicator") then
+		nameplate:DisableElement("ClassificationIndicator")
 	end
 end
 
 function NP:Construct_TargetIndicator(nameplate)
-	local TargetIndicator = CreateFrame("Frame", nameplate:GetDebugName() .. "TargetIndicator", nameplate)
+	local TargetIndicator = CreateFrame("Frame", nameplate:GetName() .. "TargetIndicator", nameplate)
 	TargetIndicator:SetFrameLevel(0)
 
 	TargetIndicator.Shadow = CreateFrame("Frame", nil, TargetIndicator)
 	TargetIndicator.Shadow:SetBackdrop({edgeFile = E.LSM:Fetch("border", "ElvUI GlowBorder"), edgeSize = E:Scale(5)})
 	TargetIndicator.Shadow:Hide()
 
-	for _, object in pairs({"Spark", "TopIndicator", "LeftIndicator", "RightIndicator"}) do
-		TargetIndicator[object] = TargetIndicator:CreateTexture(nil, "BACKGROUND", nil, -5)
-		TargetIndicator[object]:Hide()
+	for _, object in pairs(targetIndicators) do
+		local indicator = TargetIndicator:CreateTexture(nil, "BACKGROUND", nil, -5)
+		indicator:Hide()
+
+		TargetIndicator[object] = indicator
 	end
 
 	TargetIndicator.Spark:SetTexture(E.Media.Textures.Spark)
@@ -95,7 +98,7 @@ function NP:Construct_TargetIndicator(nameplate)
 end
 
 function NP:Update_TargetIndicator(nameplate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if nameplate.frameType == "PLAYER" then
 		if nameplate:IsElementEnabled("TargetIndicator") then
@@ -147,7 +150,7 @@ function NP:Update_TargetIndicator(nameplate)
 end
 
 function NP:Construct_Highlight(nameplate)
-	local Highlight = CreateFrame("Frame", nameplate:GetDebugName() .. "Highlight", nameplate)
+	local Highlight = CreateFrame("Frame", nameplate:GetName() .. "Highlight", nameplate)
 	Highlight:Hide()
 	Highlight:EnableMouse(false)
 	Highlight:SetFrameLevel(9)
@@ -158,14 +161,15 @@ function NP:Construct_Highlight(nameplate)
 end
 
 function NP:Update_Highlight(nameplate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if NP.db.highlight and db.enable then
 		if not nameplate:IsElementEnabled("Highlight") then
 			nameplate:EnableElement("Highlight")
 		end
 
-		if db.health.enable and not (db.nameOnly or NP:StyleFilterCheckChanges(nameplate, 'NameOnly')) then
+		local sf = NP:StyleFilterChanges(nameplate)
+		if db.health.enable and not (db.nameOnly or sf.NameOnly) then
 			nameplate.Highlight.texture:SetColorTexture(1, 1, 1, 0.25)
 			nameplate.Highlight.texture:SetAllPoints(nameplate.HealthFlashTexture)
 			nameplate.Highlight.texture:SetAlpha(0.75)
@@ -174,15 +178,13 @@ function NP:Update_Highlight(nameplate)
 			nameplate.Highlight.texture:SetAllPoints(nameplate)
 			nameplate.Highlight.texture:SetAlpha(0.50)
 		end
-	else
-		if nameplate:IsElementEnabled("Highlight") then
-			nameplate:DisableElement("Highlight")
-		end
+	elseif nameplate:IsElementEnabled("Highlight") then
+		nameplate:DisableElement("Highlight")
 	end
 end
 
 function NP:Update_Fader(nameplate)
-	local db = NP.db.units[nameplate.frameType]
+	local db = NP:PlateDB(nameplate)
 
 	if (not db.visibility) or db.visibility.showAlways then
 		if nameplate:IsElementEnabled("Fader") then
@@ -215,31 +217,18 @@ function NP:Update_Fader(nameplate)
 end
 
 function NP:Construct_Cutaway(nameplate)
+	local frameName = nameplate:GetName()
 	local Cutaway = {}
 
-	Cutaway.Health = nameplate.Health.ClipFrame:CreateTexture(nameplate:GetDebugName() .. "CutawayHealth")
-	if NP.db.cutaway.health.forceBlankTexture then
-		Cutaway.Health:SetTexture(E.media.blankTex)
-	else
-		Cutaway.Health:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
-		NP.StatusBars[Cutaway.Health] = true
-	end
-
+	Cutaway.Health = nameplate.Health.ClipFrame:CreateTexture(frameName .. "CutawayHealth")
 	local healthTexture = nameplate.Health:GetStatusBarTexture()
-	Cutaway.Health:SetPoint("TOPLEFT", healthTexture, "TOPRIGHT")
-	Cutaway.Health:SetPoint("BOTTOMLEFT", healthTexture, "BOTTOMRIGHT")
+	Cutaway.Health:Point("TOPLEFT", healthTexture, "TOPRIGHT")
+	Cutaway.Health:Point("BOTTOMLEFT", healthTexture, "BOTTOMRIGHT")
 
-	Cutaway.Power = nameplate.Power.ClipFrame:CreateTexture(nameplate:GetDebugName() .. "CutawayPower")
-	if NP.db.cutaway.power.forceBlankTexture then
-		Cutaway.Power:SetTexture(E.media.blankTex)
-	else
-		Cutaway.Power:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
-		NP.StatusBars[Cutaway.Power] = true
-	end
-
+	Cutaway.Power = nameplate.Power.ClipFrame:CreateTexture(frameName .. "CutawayPower")
 	local powerTexture = nameplate.Power:GetStatusBarTexture()
-	Cutaway.Power:SetPoint("TOPLEFT", powerTexture, "TOPRIGHT")
-	Cutaway.Power:SetPoint("BOTTOMLEFT", powerTexture, "BOTTOMRIGHT")
+	Cutaway.Power:Point("TOPLEFT", powerTexture, "TOPRIGHT")
+	Cutaway.Power:Point("BOTTOMLEFT", powerTexture, "BOTTOMRIGHT")
 
 	return Cutaway
 end
@@ -254,20 +243,19 @@ function NP:Update_Cutaway(nameplate)
 		if not nameplate:IsElementEnabled("Cutaway") then
 			nameplate:EnableElement("Cutaway")
 		end
-		nameplate.Cutaway:UpdateConfigurationValues(NP.db.cutaway)
-	end
-end
 
-function NP:Update_Cutaway(nameplate)
-	local eitherEnabled = NP.db.cutaway.health.enabled or NP.db.cutaway.power.enabled
-	if not eitherEnabled then
-		if nameplate:IsElementEnabled("Cutaway") then
-			nameplate:DisableElement("Cutaway")
-		end
-	else
-		if not nameplate:IsElementEnabled("Cutaway") then
-			nameplate:EnableElement("Cutaway")
-		end
 		nameplate.Cutaway:UpdateConfigurationValues(NP.db.cutaway)
+
+		if NP.db.cutaway.health.forceBlankTexture then
+			nameplate.Cutaway.Health:SetTexture(E.media.blankTex)
+		else
+			nameplate.Cutaway.Health:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
+		end
+
+		if NP.db.cutaway.power.forceBlankTexture then
+			nameplate.Cutaway.Power:SetTexture(E.media.blankTex)
+		else
+			nameplate.Cutaway.Power:SetTexture(E.Libs.LSM:Fetch("statusbar", NP.db.statusbar))
+		end
 	end
 end

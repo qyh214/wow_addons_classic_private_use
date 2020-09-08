@@ -4,14 +4,10 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
---Lua functions
 local _G = _G
---WoW API / Variables
 local CreateFrame = CreateFrame
 local GetInstanceInfo = GetInstanceInfo
 local InCombatLockdown = InCombatLockdown
-local RegisterStateDriver = RegisterStateDriver
-local UnregisterStateDriver = UnregisterStateDriver
 
 function UF:Construct_PartyFrames()
 	self:SetScript('OnEnter', _G.UnitFrame_OnEnter)
@@ -52,7 +48,7 @@ function UF:Construct_PartyFrames()
 
 		self.AuraWatch = UF:Construct_AuraWatch(self)
 		self.customTexts = {}
-		self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
+		self.AuraHighlight = UF:Construct_AuraHighlight(self)
 		self.HealthPrediction = UF:Construct_HealComm(self)
 		self.MouseGlow = UF:Construct_MouseGlow(self)
 		self.PhaseIndicator = UF:Construct_PhaseIcon(self)
@@ -80,17 +76,14 @@ function UF:Construct_PartyFrames()
 end
 
 function UF:Update_PartyHeader(header, db)
-	header.db = db
+	local parent = header:GetParent()
+	parent.db = db
 
-	local headerHolder = header:GetParent()
-	headerHolder.db = db
-
-	if not headerHolder.positioned then
-		headerHolder:ClearAllPoints()
-		headerHolder:Point("BOTTOMLEFT", E.UIParent, "BOTTOMLEFT", 4, 195)
-		E:CreateMover(headerHolder, headerHolder:GetName()..'Mover', L["Party Frames"], nil, nil, nil, 'ALL,PARTY,ARENA', nil, 'unitframe,party,generalGroup')
-
-		headerHolder.positioned = true;
+	if not parent.positioned then
+		parent:ClearAllPoints()
+		parent:Point('BOTTOMLEFT', E.UIParent, 'BOTTOMLEFT', 4, 248)
+		E:CreateMover(parent, parent:GetName()..'Mover', L["Party Frames"], nil, nil, nil, 'ALL,PARTY,ARENA', nil, 'unitframe,groupUnits,party,generalGroup')
+		parent.positioned = true
 	end
 end
 
@@ -98,10 +91,10 @@ function UF:Update_PartyFrames(frame, db)
 	frame.db = db
 
 	frame.colors = ElvUF.colors
-	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
+	frame:RegisterForClicks(UF.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 
 	do
-		if(self.thinBorders) then
+		if UF.thinBorders then
 			frame.SPACING = 0
 			frame.BORDER = E.mult
 		else
@@ -149,38 +142,38 @@ function UF:Update_PartyFrames(frame, db)
 
 		frame.BOTTOM_OFFSET = 0
 
-		local childDB = db.petsGroup
-		if frame.childType == "target" then
-			childDB = db.targetsGroup
+		frame.db = frame.childType == "target" and db.targetsGroup or db.petsGroup
+		db = frame.db
+
+		if frame.childType == 'pet' then
+			frame.Health.colorPetByUnitClass = db.colorPetByUnitClass
 		end
 
-		frame:Size(childDB.width, childDB.height)
+		frame:Size(db.width, db.height)
 
 		if not InCombatLockdown() then
-			if childDB.enable then
+			if db.enable then
 				frame:Enable()
 				frame:ClearAllPoints()
-				frame:Point(E.InversePoints[childDB.anchorPoint], frame.originalParent, childDB.anchorPoint, childDB.xOffset, childDB.yOffset)
+				frame:Point(E.InversePoints[db.anchorPoint], frame.originalParent, db.anchorPoint, db.xOffset, db.yOffset)
 			else
 				frame:Disable()
 			end
 		end
 
 		UF:Configure_HealthBar(frame)
-		UF:UpdateNameSettings(frame, frame.childType)
 	else
 		frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 
 		UF:Configure_HealthBar(frame)
 		UF:Configure_Power(frame)
 		UF:Configure_InfoPanel(frame)
-		UF:UpdateNameSettings(frame)
 		UF:EnableDisable_Auras(frame)
 		UF:Configure_AllAuras(frame)
 
 		UF:Configure_AuraWatch(frame)
 		UF:Configure_CustomTexts(frame)
-		UF:Configure_DebuffHighlight(frame)
+		UF:Configure_AuraHighlight(frame)
 		UF:Configure_HealComm(frame)
 		UF:Configure_PhaseIcon(frame)
 		UF:Configure_Portrait(frame)
@@ -192,6 +185,7 @@ function UF:Update_PartyFrames(frame, db)
 		UF:Configure_Threat(frame)
 	end
 
+	UF:UpdateNameSettings(frame)
 	UF:Configure_RaidIcon(frame)
 	UF:Configure_Fader(frame)
 	UF:Configure_Cutaway(frame)

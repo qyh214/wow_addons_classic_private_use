@@ -13,6 +13,8 @@ local QuestieLib = QuestieLoader:ImportModule("QuestieLib")
 local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer")
 ---@type QuestieCorrections
 local QuestieCorrections = QuestieLoader:ImportModule("QuestieCorrections")
+---@type QuestieQuestBlacklist
+local QuestieQuestBlacklist = QuestieLoader:ImportModule("QuestieQuestBlacklist")
 ---@type QuestieProfessions
 local QuestieProfessions = QuestieLoader:ImportModule("QuestieProfessions")
 ---@type QuestieReputation
@@ -38,13 +40,19 @@ local DB_NPC_FRIENDLY = 13
 local questTagCorrections = {
     [373] = {81, "Dungeon"},
     [4146] = {81, "Dungeon"},
+    [5342] = {0, ""},
+    [5344] = {0, ""},
     [6846] = {41, "PvP"},
     [6901] = {41, "PvP"},
     [7001] = {41, "PvP"},
     [7027] = {41, "PvP"},
     [7161] = {41, "PvP"},
     [7162] = {41, "PvP"},
+    [7841] = {0, ""},
+    [7842] = {0, ""},
+    [7843] = {0, ""},
     [8122] = {41, "PvP"},
+    [8386] = {41, "PvP"},
     [8404] = {41, "PvP"},
     [8405] = {41, "PvP"},
     [8406] = {41, "PvP"},
@@ -196,6 +204,12 @@ end
 function QuestieDB:IsPvPQuest(questId)
     local questType, _ = QuestieDB:GetQuestTagInfo(questId)
     return questType == 41
+end
+
+__TEST = function(id) return QuestieDB:IsAQWarEffortQuest(id) end
+
+function QuestieDB:IsAQWarEffortQuest(questId)
+    return QuestieQuestBlacklist:GetAQWarEffortQuests()[questId] == true
 end
 
 --- Wrapper function for the GetQuestTagInfo API to correct
@@ -508,6 +522,10 @@ function QuestieDB:GetQuest(questId) -- /dump QuestieDB:GetQuest(867)
         return QuestieEvent.activeQuests[self.Id] == true
     end
 
+    function QO:IsAQWarEffortQuest()
+        return QuestieQuestBlacklist:GetAQWarEffortQuests()[self.Id] == true
+    end
+
     --- Wrapper function for the GetQuestTagInfo API to correct
     --- quests that are falsely marked by Blizzard
     function QO:GetQuestTagInfo()
@@ -783,7 +801,11 @@ end
 
 ---@param quest Quest
 ---@return table<string, table> @List of creature names with their min-max level and rank
+QuestieDB._CreatureLevelCache = {}
 function QuestieDB:GetCreatureLevels(quest)
+    if quest and quest.Id and QuestieDB._CreatureLevelCache[quest.Id] then
+        return QuestieDB._CreatureLevelCache[quest.Id]
+    end
     local creatureLevels = {}
 
     local function _CollectCreatureLevels(npcList)
@@ -807,12 +829,15 @@ function QuestieDB:GetCreatureLevels(quest)
         end
         if quest.objectives[3] then -- Looting items from creatures
             for _, itemObjective in pairs(quest.objectives[3]) do
-                local item = QuestieDB:GetItem(itemObjective[1])
-                if item and item.npcDrops then
-                    _CollectCreatureLevels(item.npcDrops)
+                local drops = QuestieDB.QueryItemSingle(itemObjective[1], "npcDrops")
+                if drops then
+                    _CollectCreatureLevels(drops)
                 end
             end
         end
+    end
+    if quest.Id then
+        QuestieDB._CreatureLevelCache[quest.Id] = creatureLevels
     end
     return creatureLevels
 end

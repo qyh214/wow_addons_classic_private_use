@@ -146,13 +146,13 @@ L.VERSIONCHECK_HEADER		= "보스 모드 - 버전"
 L.VERSIONCHECK_ENTRY_NO_DBM	= "%s: 설치된 보스 모드 없음"
 L.VERSIONCHECK_FOOTER		= L.DBM .. "을 설치한 플레이어 %d명과 Bigwigs를 설치한 플레이어 %d명을 발견했습니다."
 L.VERSIONCHECK_OUTDATED		= "다음 %d명의 플레이어가 구버전 보스 모드를 사용중: %s"
-L.YOUR_VERSION_OUTDATED      = "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전이 사용 기한을 지났습니다. http://www.deadlybossmods.com에서 최신 버전을 받으세요."
+L.YOUR_VERSION_OUTDATED      = "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전이 사용 기한을 지났습니다. Curse/Twitch, WoWI 또는 GitHub 릴리즈 페이지에서 최신 버전을 받으세요."
 L.VOICE_PACK_OUTDATED		= "선택한 " .. L.DBM .. " 음성팩에 일부 음성이 들어있지 않습니다. 몇가지 경고 음성이 기본 효과음으로 재생됩니다. 최신 음성팩을 다운로드 받거나 제작자에게 누락된 음성 파일 업데이트를 요청하시기 바랍니다"
 L.VOICE_MISSING				= "선택한 " .. L.DBM .. " 음성팩을 찾을 수 없습니다. 오류일 경우 음성팩이 제대로 설치되어 있고 애드온 목록에서 활성화되어 있는지 확인해 보시기 바랍니다."
 L.VOICE_DISABLED				= "현재 " .. L.DBM .. " 음성팩이 한 개 이상 설치되어 있지만 사용하고 있는게 없습니다. 음성팩을 사용하려면 '음성 경고' 항목에서 음성팩이 지정되어 있는지 확인하세요. 음성팩을 사용할 의사가 없으면 음성팩을 삭제하시면 이 메시지는 더이상 출력되지 않습니다"
 L.VOICE_COUNT_MISSING		= "초읽기 음성 %d번으로 설정된 음성/초읽기 팩을 찾을 수 없습니다. 기본 설정으로 초기화 되었습니다: %s"
 
-L.UPDATEREMINDER_HEADER			= "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전의 사용 기한이 지났습니다.\n Curse/Twitch, WoWI, GitHub 프로젝트 페이지 등에서 %s (%s) 버전을 다운로드 할 수 있습니다."
+L.UPDATEREMINDER_HEADER			= "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전의 사용 기한이 지났습니다.\n Curse/Twitch, WoWI, GitHub 릴리즈 페이지 등에서 %s (%s) 버전을 다운로드 할 수 있습니다."
 L.UPDATEREMINDER_HEADER_ALPHA	= "사용중인 " .. L.DEADLY_BOSS_MODS .. " ALPHA 버전의 사용 기한이 지났습니다.\n 적어도 %s 테스트 버전 이상은 사용해야 합니다. ALPHA 버전을 선택한 " .. L.DBM .. " 이용자는 최신 ALPHA 버전을 실행하는걸 권장합니다. 아니면 최신 RELEASE 버전을 사용하는 것도 좋습니다. 오래된 ALPHA 버전은 개발용인 관계로 버전 검사 기능이 제한되어 있기 때문입니다."
 L.UPDATEREMINDER_FOOTER			= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
 L.UPDATEREMINDER_FOOTER_GENERIC	= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
@@ -205,8 +205,10 @@ L.RANGERADAR_IN_RANGE_TEXTONE	= "%s (%0.1fm)"--One target
 
 L.INFOFRAME_SHOW_SELF		= "내 자원 항상 보기"		-- Always show your own power value even if you are below the threshold
 L.INFOFRAME_SETLINES			= "최대 줄 갯수 지정"
+L.INFOFRAME_SETCOLS					= "최대 열 갯수 지정"
 L.INFOFRAME_LINESDEFAULT		= "모드 기본값"
 L.INFOFRAME_LINES_TO			= "줄 %d개"
+L.INFOFRAME_COLS_TO					= "열 %d개"
 L.INFOFRAME_POWER			= "기력"
 L.INFOFRAME_AGGRO			= "어그로"
 L.INFOFRAME_MAIN				= "주 기력:"--Main power
@@ -576,8 +578,9 @@ L.DUR_ENTRY					= "%s: 내구도 [%d 퍼센트] / 깨진 장비 [%s]"
 L.LAG_FOOTER					= "응답 없음: %s"
 
 --LDB
-L.LDB_TOOLTIP_HELP1	= "왼쪽 클릭으로 " .. L.DBM .. " 열기"
-L.LDB_TOOLTIP_HELP2	= "오른쪽 클릭으로 조용함 모드 켜고 끄기"
+L.LDB_TOOLTIP_HELP1	= "클릭으로 " .. L.DBM .. " 열기"
+L.LDB_TOOLTIP_HELP2	= "Alt+우클릭으로 조용함 모드 켜고 끄기"
+L.SILENTMODE_IS                     = "조용함 모드 "
 
 L.LDB_LOAD_MODS		= "보스 모드 로드"
 
@@ -598,4 +601,6 @@ L.WORLD_BUFFS.allianceOny	= "스톰윈드의 주민들과 모든 얼라이언스
 L.WORLD_BUFFS.hordeNef		= "네파리안이 쓰러졌다! 오그리마의 백성들이여"
 L.WORLD_BUFFS.allianceNef	= "얼라이언스의 시민들이여, 검은바위부족의 군주가 쓰러졌다!"
 L.WORLD_BUFFS.zgHeart		= "이제 한 가지 일만 더 하면 영혼의 약탈자의 위협을 완전히 제거할 수 있겠군..."
+L.WORLD_BUFFS.zgHeartBooty	= "공포의 혈신, 영혼의 약탈자 학카르가 패했군! 이제 더 이상 두려워할 필요 없어!"
+L.WORLD_BUFFS.zgHeartYojamba	= "나의 종복들이여, 의식을 시작하라! 학카르의 심장을 다시 공허의 차원으로 쫓아내야 한다!"
 L.WORLD_BUFFS.rendHead		= "가짜 대족장 렌드 블랙핸드가 쓰러졌도다!"

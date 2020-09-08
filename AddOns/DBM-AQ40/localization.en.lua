@@ -63,7 +63,11 @@ L:SetMiscLocalization{
 	Frozen	= "is frozen solid",
 	Phase4 	= "begins to crack",
 	Phase5 	= "looks ready to shatter",
-	Phase6 	= "Explodes."
+	Phase6 	= "Explodes.",
+
+	HitsRemain	= "Hits Remaining",
+	Frost		= "Frost",
+	Physical	= "Physical"
 }
 -------------
 -- Huhuran --
@@ -96,23 +100,37 @@ L:SetGeneralLocalization{
 }
 L:SetWarningLocalization{
 	WarnEyeTentacle			= "Eye Tentacle",
+	WarnClawTentacle2		= "Claw Tentacle",
+	WarnGiantEyeTentacle	= "Giant Eye Tentacle",
+	WarnGiantClawTentacle	= "Giant Claw Tentacle",
 	SpecWarnWeakened		= "C'Thun Weaken!"
 }
 L:SetTimerLocalization{
-	TimerEyeTentacle		= "Next Eye Tentacle",
+	TimerEyeTentacle		= "Eye Tentacle",
+	TimerClawTentacle		= "Claw Tentacle",
+	TimerGiantEyeTentacle	= "Giant Eye Tentacle",
+	TimerGiantClawTentacle	= "Giant Claw Tentacle",
 	TimerWeakened			= "Weaken ends"
 }
 L:SetOptionLocalization{
 	WarnEyeTentacle			= "Show warning for Eye Tentacle",
+	WarnClawTentacle2		= "Show warning for Claw Tentacle",
+	WarnGiantEyeTentacle	= "Show warning for Giant Eye Tentacle",
+	WarnGiantClawTentacle	= "Show warning for Giant Claw Tentacle",
 	SpecWarnWeakened		= "Show special warning when boss weaken",
 	TimerEyeTentacle		= "Show timer for next Eye Tentacle",
+	TimerClawTentacle		= "Show timer for next Claw Tentacle",
+	TimerGiantEyeTentacle	= "Show timer for next Giant Eye Tentacle",
+	TimerGiantClawTentacle	= "Show timer for next Giant Claw Tentacle",
 	TimerWeakened			= "Show timer for boss weaken duration",
 	RangeFrame				= "Show range frame (10)"
 }
 L:SetMiscLocalization{
+	Stomach		= "Stomach",
 	Eye			= "Eye of C'Thun",
+	FleshTent	= "Flesh Tentacle",--Localized so it shows on frame in users language, not senders
 	Weakened 	= "weaken",
-	NotValid	= "AQ40 partially cleared after %s. This is not a full clear so time will not be saved from this run."
+	NotValid	= "AQ40 partially cleared. %s optional bosses remain."
 }
 ----------------
 -- Ouro --
@@ -127,12 +145,12 @@ L:SetWarningLocalization{
 	WarnEmerge			= "Emerge"
 }
 L:SetTimerLocalization{
-	TimerSubmerge		= "Submerge",
+	TimerSubmerge		= "Forced Submerge",
 	TimerEmerge			= "Emerge"
 }
 L:SetOptionLocalization{
 	WarnSubmerge		= "Show warning for submerge",
-	TimerSubmerge		= "Show timer for submerge",
+	TimerSubmerge		= "Show timer for when submerge will be forced. Note: He can still submerge at any time what so ever if his target leaves melee range.",
 	WarnEmerge			= "Show warning for emerge",
 	TimerEmerge			= "Show timer for emerge"
 }

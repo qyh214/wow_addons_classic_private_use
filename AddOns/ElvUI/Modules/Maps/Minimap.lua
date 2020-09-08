@@ -3,6 +3,7 @@ local M = E:GetModule('Minimap')
 
 --Lua functions
 local _G = _G
+local unpack = unpack
 local utf8sub = string.utf8sub
 --WoW API / Variables
 local CloseAllWindows = CloseAllWindows
@@ -36,7 +37,7 @@ local menuList = {
 	{text = _G.CHAT_CHANNELS,
 	func = ToggleChannelFrame},
 	{text = _G.TIMEMANAGER_TITLE,
-	func = function() TimeManager_Toggle() end},
+	func = function() _G.TimeManager_Toggle() end},
 	{text = _G.SOCIAL_BUTTON,
 	func = ToggleFriendsFrame},
 	{text = _G.GUILD,
@@ -165,65 +166,15 @@ function M:UpdateSettings()
 
 	_G.Minimap:Size(E.MinimapSize, E.MinimapSize)
 
-	local LeftMiniPanel = _G.LeftMiniPanel
-	local RightMiniPanel = _G.RightMiniPanel
-	local BottomMiniPanel = _G.BottomMiniPanel
-	local BottomLeftMiniPanel = _G.BottomLeftMiniPanel
-	local BottomRightMiniPanel = _G.BottomRightMiniPanel
-	local TopMiniPanel = _G.TopMiniPanel
-	local TopLeftMiniPanel = _G.TopLeftMiniPanel
-	local TopRightMiniPanel = _G.TopRightMiniPanel
+	local MinimapPanel = _G.MinimapPanel
 	local MMHolder = _G.MMHolder
 	local Minimap = _G.Minimap
 
-	if E.db.datatexts.minimapPanels then
-		LeftMiniPanel:Show()
-		RightMiniPanel:Show()
-	else
-		LeftMiniPanel:Hide()
-		RightMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapBottom then
-		BottomMiniPanel:Show()
-	else
-		BottomMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapBottomLeft then
-		BottomLeftMiniPanel:Show()
-	else
-		BottomLeftMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapBottomRight then
-		BottomRightMiniPanel:Show()
-	else
-		BottomRightMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapTop then
-		TopMiniPanel:Show()
-	else
-		TopMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapTopLeft then
-		TopLeftMiniPanel:Show()
-	else
-		TopLeftMiniPanel:Hide()
-	end
-
-	if E.db.datatexts.minimapTopRight then
-		TopRightMiniPanel:Show()
-	else
-		TopRightMiniPanel:Hide()
-	end
-
 	MMHolder:Width((Minimap:GetWidth() + E.Border + E.Spacing*3))
+	MinimapPanel:SetShown(E.db.datatexts.panels.MinimapPanel.enable)
 
-	if E.db.datatexts.minimapPanels then
-		MMHolder:Height(Minimap:GetHeight() + (LeftMiniPanel and (LeftMiniPanel:GetHeight() + E.Border) or 24) + E.Spacing*3)
+	if E.db.datatexts.panels.MinimapPanel.enable then
+		MMHolder:Height(Minimap:GetHeight() + (MinimapPanel and (MinimapPanel:GetHeight() + E.Border) or 24) + E.Spacing*3)
 	else
 		MMHolder:Height(Minimap:GetHeight() + E.Border + E.Spacing*3)
 	end

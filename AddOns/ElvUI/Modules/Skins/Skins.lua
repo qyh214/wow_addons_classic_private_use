@@ -57,10 +57,10 @@ S.Blizzard.Regions = {
 
 -- Depends on the arrow texture to be up by default.
 S.ArrowRotation = {
-	['up'] = 0,
-	['down'] = 3.14,
-	['left'] = 1.57,
-	['right'] = -1.57,
+	up = 0,
+	down = 3.14,
+	left = 1.57,
+	right = -1.57,
 }
 
 function S:HandleInsetFrame(frame)
@@ -293,9 +293,53 @@ function S:HandleButton(button, strip, isDeclineButton, useCreateBackdrop, noSet
 	button.isSkinned = true
 end
 
+function S:HandleCategoriesButtons(button, strip)
+    if button.isSkinned then return end
+
+	local ButtonName = button.GetName and button:GetName()
+
+	if button.SetNormalTexture then button:SetNormalTexture("") end
+	if button.SetHighlightTexture then button:SetHighlightTexture("") end
+	if button.SetPushedTexture then button:SetPushedTexture("") end
+	if button.SetDisabledTexture then button:SetDisabledTexture("") end
+
+	if strip then button:StripTextures() end
+
+	for _, Region in pairs(S.Blizzard.Regions) do
+		Region = ButtonName and _G[ButtonName..Region] or button[Region]
+		if Region then
+			Region:SetAlpha(0)
+		end
+	end
+
+	local r, g, b = unpack(E.media.rgbvaluecolor)
+
+	button.HighlightTexture = button:CreateTexture(nil, "BACKGROUND")
+	button.HighlightTexture:SetBlendMode("BLEND")
+	button.HighlightTexture:SetSnapToPixelGrid(false)
+	button.HighlightTexture:SetTexelSnappingBias(0)
+	button.HighlightTexture:Size(button:GetSize())
+	button.HighlightTexture:Point("CENTER", button, 0, 2)
+	button.HighlightTexture:SetTexture(E.Media.Textures.Highlight)
+	button.HighlightTexture:SetVertexColor(0, 0, 0, 0)
+	button.HighlightTexture:Hide()
+
+	button:HookScript("OnEnter", function()
+		button.HighlightTexture:SetVertexColor(r, g, b, 0.50)
+		button.HighlightTexture:Show()
+	end)
+
+	button:HookScript("OnLeave", function()
+		button.HighlightTexture:SetVertexColor(0, 0, 0, 0)
+		button.HighlightTexture:Hide()
+	end)
+
+	button.isSkinned = true
+end
+
 do
 	local function GrabScrollBarElement(frame, element)
-		local FrameName = frame:GetDebugName()
+		local FrameName = frame:GetName()
 		return frame[element] or FrameName and (_G[FrameName..element] or strfind(FrameName, element)) or nil
 	end
 
@@ -1058,7 +1102,8 @@ function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
 
 	if not arrowDir then
 		arrowDir = 'down'
-		local ButtonName = btn:GetDebugName() and btn:GetDebugName():lower()
+		local name = btn:GetName()
+		local ButtonName = name and name:lower()
 		if ButtonName then
 			if (strfind(ButtonName, 'left') or strfind(ButtonName, 'prev') or strfind(ButtonName, 'decrement') or strfind(ButtonName, 'backward') or strfind(ButtonName, 'back')) then
 				arrowDir = 'left'
@@ -1339,7 +1384,7 @@ function S:Initialize()
 	end
 
 	-- Early Skin Handling (populated before ElvUI is loaded from the Ace3 file)
-	if E.private.skins.ace3.enable then
+	if E.private.skins.ace3Enable then
 		for _, n in next, S.EarlyAceWidgets do
 			if n.SetLayout then
 				S:Ace3_RegisterAsContainer(n)
@@ -1362,7 +1407,7 @@ function S:Initialize()
 				tex:SetDesaturated(false)
 				tex:SetVertexColor(unpack(E.media.rgbvaluecolor))
 			elseif checkButton.state == 1 then
-				tex:SetVertexColor(1, .82, 0, 0.8)
+				tex:SetVertexColor(0.6, 0.6, 0.6)
 			end
 		end
 	end)

@@ -15,7 +15,6 @@
 	<Script file="LibClassicCasterino-1.0\LibClassicCasterino.lua"/>
 	<Script file="LibHealComm-4.0\LibHealComm-4.0.lua"/>
 	<Script file="LibClassicSpellActionCount-1.0\LibClassicSpellActionCount-1.0.lua"/>
-	<Script file="LibTotemInfo\GetTotemInfo.lua"/>
 
 	<Include file="LibSharedMedia-3.0\lib.xml"/>
 	<Script file="LibSimpleSticky\LibSimpleSticky.lua"/>

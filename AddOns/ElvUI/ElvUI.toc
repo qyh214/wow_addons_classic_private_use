@@ -1,6 +1,6 @@
-## Interface: 11303
+## Interface: 11305
 ## Author: Elv
-## Version: 1.24
+## Version: 1.31
 ## Title: |cff1784d1ElvUI Classic|r
 ## Notes: User Interface replacement AddOn for World of Warcraft.
 ## SavedVariables: ElvDB, ElvPrivateDB
@@ -10,7 +10,6 @@
 ## X-Tukui-ProjectID: 2
 ## X-Tukui-ProjectFolders: ElvUI_OptionsUI, ElvUI
 
-Core\Colors.lua
 Developer\Load_Developer.xml
 Libraries\Load_Libraries.xml
 init.lua

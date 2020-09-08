@@ -6,6 +6,8 @@ local strjoin = strjoin
 --WoW API / Variables
 local GetHaste = GetHaste
 local STAT_HASTE = STAT_HASTE
+local CR_HASTE_MELEE = CR_HASTE_MELEE
+local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel = ''
 
@@ -25,4 +27,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Haste', {"UNIT_STATS", "UNIT_AURA", "UNIT_SPELL_HASTE"}, OnEvent, nil, nil, nil, nil, STAT_HASTE)
+DT:RegisterDatatext('Haste', STAT_CATEGORY_ENHANCEMENTS, {'UNIT_STATS', 'UNIT_AURA', 'PLAYER_TALENT_UPDATE', 'UNIT_SPELL_HASTE'}, OnEvent, nil, nil, OnEnter, nil, STAT_HASTE, nil, ValueColorUpdate)

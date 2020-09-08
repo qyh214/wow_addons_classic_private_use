@@ -8,7 +8,6 @@ local _G = _G
 local unpack, select = unpack, select
 --WoW API / Variables
 local hooksecurefunc = hooksecurefunc
-local CreateFrame = CreateFrame
 local GetLootSlotInfo = GetLootSlotInfo
 local UnitIsDead = UnitIsDead
 local UnitIsFriend = UnitIsFriend
@@ -185,7 +184,7 @@ function S:LootFrame()
 		elseif(not UnitIsFriend('player', 'target') and UnitIsDead'target') then
 			self.Title:SetText(UnitName('target'))
 		else
-			s.Title:SetText(LOOT)
+			self.Title:SetText(LOOT)
 		end
 	end)
 

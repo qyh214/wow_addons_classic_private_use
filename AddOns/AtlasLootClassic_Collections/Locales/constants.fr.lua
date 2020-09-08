@@ -4,7 +4,7 @@ if not AL then return end
 
 -- These localization strings are translated on Curseforge: https://www.curseforge.com/wow/addons/atlaslootclassic/localization
 -- Collections
-AL["%s Sets"] = "Sets %s"
+AL["%s Sets"] = "Ensembles de %s"
 AL["Abyssal Dukes"] = "Ducs abyssaux"
 AL["Abyssal Lords"] = "Seigneurs des abysses"
 AL["Abyssal Templars"] = "Templiers abyssaux"
@@ -26,7 +26,7 @@ AL["First Prize"] = "Premier Prix"
 AL["Gaily Wrapped Present"] = "Cadeau à l'emballage multicolore"
 AL["Gently Shaken Gift"] = "Cadeau secoué doucement"
 AL["Gift of Adoration"] = "Cadeau d'adoration"
-AL["Gurubashi Arena"] = "L'Arène Gurubashi"
+AL["Gurubashi Arena"] = "Arène des Gurubashi"
 AL["Hallow's End"] = "Sanssaint"
 AL["Harvest Festival"] = "Fête des moissons"
 AL["High Marshal Whirlaxis"] = "Haut maréchal Trombe"

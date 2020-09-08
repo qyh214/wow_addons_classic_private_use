@@ -2,6 +2,9 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "zhCN")
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = " |cff00ff00绑定到 |r"
 L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = "%s 个框架锚点冲突，请移动buff或者debuff锚点让他们彼此不依附。暂时强制debuff依附到主框架。"
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = "%s 试图与你分享过滤器配置. 你是否接受?"
@@ -47,7 +50,7 @@ L["Bank Mover (Grow Up)"] = "银行框架(向上)"
 L["Bank"] = "银行"
 L["Bar "] = "动作条 "
 L["Bars"] = "条"
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = "战场信息暂时隐藏, 你可以通过输入/bgstats 或右键点击小地图旁「C」按钮显示."
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = "当你处于战场时战场信息将再次显示."
 L["BfA Missions"] = "BfA战役"
 L["Binding"] = "绑定"
@@ -58,7 +61,6 @@ L["Blend"] = "混合"
 L["BNet Frame"] = "战网提示信息"
 L["Boss Button"] = "特殊技能键"
 L["Boss Frames"] = "首领框架"
-L["Building(s) Report:"] = "建筑报告:"
 L["Calendar"] = "日历"
 L["Can't buy anymore slots!"] = "银行背包栏位已达最大值"
 L["Can't Roll"] = "无法需求此装备"
@@ -88,7 +90,6 @@ L["Dead"] = "死亡"
 L["Deficit:"] = "亏损:"
 L["Delete gray items?"] = "删除灰色物品?"
 L["Deposit Reagents"] = "导入材料"
-L["Desaturate all grey items that can be vendored."] = "可出售的灰色物品褪色."
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = "检测到您的ElvUI设置插件已过期.这可能是因为您的 Tukui 客户端已过期.请访问我们的下载页面并更新 Tukui 客户端，然后重新安装ElvUI.ElvUI设置插件过期会造成某些选项丢失"
 L["Disable Warning"] = "禁用警告"
 L["Disable"] = "禁用"
@@ -123,7 +124,6 @@ L["FocusTarget"] = "焦点目标的目标框架"
 L["For technical support visit us at http://www.tukui.org."] = "如需技术支援请至 http://www.tukui.org."
 L["Friends List"] = "好友列表"
 L["G"] = "公会"
-L["Garrison"] = "要塞"
 L["Ghost"] = "鬼魂"
 L["GM Ticket Frame"] = "GM对话框"
 L["Gold"] = "金"
@@ -149,12 +149,11 @@ L["Icons Only"] = "图标"
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = "如果你不慎移除了对话框, 你可以重新安装一次重置他们."
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = "如果你遇到问题, ElvUI会尝试禁用你除了ElvUI之外的插件. 请记住你不能用不同的插件实现同一功能."
 L["IL"] = "副本领袖"
-L["Importance: |cff07D400High|r"] = "重要度: |cff07D400高|r"
+L["Importance: |cffFF3333High|r"] = "重要度: |cffFF3333高|r"
 L["Importance: |cffD3CF00Medium|r"] = "重要性: |cffD3CF00中|r"
-L["Importance: |cffFF0000Low|r"] = "重要性:|cffFF0000低|r"
+L["Importance: |cFF33FF33Low|r"] = "重要性:|cFF33FF33低|r"
 L["In Progress"] = "正在进行中"
 L["INCOMPATIBLE_ADDON"] = "插件 %s 不相容于 ElvUI 的 %s 模组, 请停用不相容的插件, 或停用模组."
-L["Info/Controls"] = true
 L["Installation Complete"] = "安装完成"
 L["Invalid Target"] = "无效的目标"
 L["is looking for members"] = "正在寻找队友"
@@ -185,7 +184,8 @@ L["Legs"] = "腿"
 L["Level Up Display / Boss Banner"] = "升级提示/Boss拾取"
 L["List of installations in queue:"] = "即将安装的列表:"
 L["Lock"] = "锁定"
-L["LOGIN_MSG"] = "Welcome to %sElvUI|r |cff1784d1Classic|r version %s%s|r, type /ec to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("Welcome to *ElvUI|r |cff1784d1Classic|r version *%s|r, type */ec|r to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = "拾取/提醒框"
 L["Loot Frame"] = "拾取框架"
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = "天啊! 太奇葩了! 下载消失了! 就像在风中放了一个屁... 再试一次吧!"
@@ -196,13 +196,11 @@ L["Main Hand"] = "主手"
 L["Micro Bar"] = "微型系统菜单"
 L["Minimap"] = "小地图"
 L["MirrorTimer"] = "镜像计时器"
-L["Mission(s) Report:"] = "任务报告:"
 L["Mitigation By Level: "] = "等级减伤: "
 L["Mobile"] = "App"
 L["Modulating Blend"] = true
 L["Mov. Speed:"] = _G.STAT_MOVEMENT_SPEED
 L["MT Frames"] = "主坦克框"
-L["Naval Mission(s) Report:"] = "海军任务报告:"
 L["No bindings set."] = "无绑定设定"
 L["No gray items to delete."] = "没有要删除的灰色物品"
 L["No Guild"] = "没有公会"
@@ -250,8 +248,8 @@ L["Remaining:"] = "剩余:"
 L["Remove Bar %d Action Page"] = "移除第%d动作条"
 L["Reputation Bar"] = "声望条"
 L["Request was denied by user."] = "请求被对方拒绝."
-L["Reset Counters: Hold Shift + Left Click"] = "重置计数器: 按住Shift + 左键点击"
-L["Reset Data: Hold Shift + Right Click"] = "重置数据: 按住 Shift + 右键点击"
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = "重设位置"
 L["Rested:"] = "休息:"
 L["Right Chat"] = "右侧对话框"
@@ -279,7 +277,6 @@ L["Spec"] = "专精"
 L["Spell/Heal Power"] = "法术/治疗强度"
 L["Spent:"] = "花费:"
 L["Stance Bar"] = "姿态条"
-L["Stats For:"] = "统计:"
 L["Steps"] = "步骤"
 L["Sticky Frames"] = "框架依附"
 L["System"] = "系统信息"
@@ -332,7 +329,6 @@ L["Welcome to ElvUI version %s!"] = "欢迎使用 ElvUI 版本 %s!"
 L["whispers"] = "密语"
 L["World Latency:"] = "世界延迟:"
 L["World Protocol:"] ="世界协议:"
-L["WoW Token:"] = "魔兽世界时光徽章:"
 L["Wrist"] = "护腕"
 L["XP:"] = "经验:"
 L["yells"] = "大喊"
@@ -371,3 +367,17 @@ L["DESC_MOVERCONFIG"] = [=[解除框架移动锁定. 现在可以移动它们, �
   Shift + 右键 - 暂时隐藏定位开关
   Ctrl + 右键 - 重置定位开关位置
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

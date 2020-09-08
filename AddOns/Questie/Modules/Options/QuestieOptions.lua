@@ -67,8 +67,7 @@ function QuestieOptions:SetGlobalOptionValue(info, value)
 end
 
 function QuestieOptions:AvailableQuestRedraw()
-    QuestieQuest:CalculateAvailableQuests()
-    QuestieQuest:DrawAllAvailableQuests()
+    QuestieQuest:CalculateAndDrawAvailableQuestsIterative()
 end
 
 function QuestieOptions:ClusterRedraw()
@@ -91,6 +90,7 @@ _CreateOptionsTable = function()
             dbm_hud_tab = QuestieOptions.tabs.dbm:Initialize(),
             tracker_tab = QuestieOptions.tabs.tracker:Initialize(),
             nameplate_tab = QuestieOptions.tabs.nameplate:Initialize(),
+            tooltip_tab = QuestieOptions.tabs.tooltip:Initialize(),
             advanced_tab = QuestieOptions.tabs.advanced:Initialize(),
         }
     }

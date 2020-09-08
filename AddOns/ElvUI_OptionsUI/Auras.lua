@@ -1,9 +1,9 @@
 local E, _, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local C, L = unpack(select(2, ...))
 local A = E:GetModule('Auras')
+local ACH = E.Libs.ACH
 
 local format = format
-
 -- GLOBALS: ElvUIPlayerBuffs, ElvUIPlayerDebuffs
 
 local function GetAuraOptions()
@@ -117,11 +117,7 @@ E.Options.args.auras = {
 		E:StaticPopup_Show("PRIVATE_RL")
 	end,
 	args = {
-		intro = {
-			order = 0,
-			type = 'description',
-			name = L["AURAS_DESC"],
-		},
+		intro = ACH:Description(L["AURAS_DESC"], 0),
 		enable = {
 			order = 1,
 			type = 'toggle',

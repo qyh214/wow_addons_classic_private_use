@@ -6,7 +6,7 @@ L.MainFrame = "Deadly Boss Mods"
 
 L.TranslationByPrefix		= "Translated by "
 L.TranslationBy 			= nil -- your name here, localizers!
-L.Website					= "Visit us on discord at |cFF73C2FBhttps://discord.gg/deadlybossmods|r. Follow on twitter @deadlybossmods or @MysticalOS"
+L.Website					= "Visit us on discord at |cFF73C2FBhttps://discord.gg/DF5mffk|r. Follow on twitter @deadlybossmods or @MysticalOS"
 L.WebsiteButton				= "Website"
 
 L.OTabBosses	= "Bosses"--Deprecated and will be deleted once tabs no longer use this
@@ -155,6 +155,10 @@ L.ShowGuildMessages 		= "Show engage/kill/wipe messages for guild raids in chat 
 L.Area_ChatAlerts			= "Additional Alert Options"
 L.WorldBossAlert			= "Show alert message when world bosses might have been engaged on your realm by guildies or friends"
 L.WorldBuffAlert			= "Show alert message and timer when world buff RP has been started on your realm"
+
+L.Area_BugAlerts			= "Bug Reporting Alert Options"
+L.BadTimerAlert				= "Show chat message when DBM detects a bad timer with at least 2 seconds of incorrectness"
+L.BadIDAlert				= "Show chat message when DBM detects an invalid spell or journal ID in use"
 
 -- Tab: Barsetup
 L.BarSetup					= "Timers"

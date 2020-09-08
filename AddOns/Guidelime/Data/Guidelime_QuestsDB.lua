@@ -10274,9 +10274,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["prev"] = 1097;
-	   ["prequests"] = {
-	      [1] = 1097;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 15;
 	   ["source"] = {
 	      [1] = {
@@ -18113,7 +18111,6 @@ addon.questsDB = {
 	      };
 	   };
 	   ["name"] = "The Captain's Chest";
-	   ["faction"] = "Alliance";
 	   ["level"] = 45;
 	   ["source"] = {
 	      [1] = {
@@ -21605,9 +21602,7 @@ addon.questsDB = {
 	   };
 	   ["sort"] = "Badlands";
 	   ["prev"] = 718;
-	   ["prequests"] = {
-	      [1] = 718;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 43;
 	   ["repgain"] = {
 	      [72] = 250;
@@ -33100,7 +33095,6 @@ addon.questsDB = {
 	[8553] = {
 	   ["objective"] = "Speak with Sprogger.";
 	   ["zone"] = "Stranglethorn Vale";
-	   ["faction"] = "Horde";
 	   ["name"] = "The Captain's Cutlass";
 	   ["next"] = 8554;
 	   ["sort"] = "Stranglethorn Vale";
@@ -37154,7 +37148,7 @@ addon.questsDB = {
 	   ["req"] = 50;
 	};
 	[5238] = {
-	   ["faction"] = "Alliance";
+	   ["faction"] = "Horde";
 	   ["name"] = "Mission Accomplished!";
 	   ["objective"] = "";
 	   ["zone"] = "Western Plaguelands";
@@ -124421,7 +124415,6 @@ addon.questsDB = {
 	};
 	[5092] = {
 	   ["name"] = "Clear the Way";
-	   ["oneOfPrequests"] = true;
 	   ["objective"] = "Kill 10 Skeletal Flayers and 10 Slavering Ghouls in Sorrow Hill.$B$BReturn to Commander Ashlam Valorfist at Chillwind Camp, Western Plaguelands.";
 	   ["zone"] = "Western Plaguelands";
 	   ["sort"] = "Western Plaguelands";
@@ -124439,11 +124432,7 @@ addon.questsDB = {
 	      };
 	   };
 	   ["faction"] = "Alliance";
-	   ["prequests"] = {
-	      [1] = 5090;
-	      [2] = 5066;
-	      [3] = 5091;
-	   };
+	   ["prequests"] = {};
 	   ["level"] = 52;
 	   ["source"] = {
 	      [1] = {
@@ -126722,7 +126711,6 @@ addon.questsDB = {
 	      };
 	   };
 	   ["name"] = "The Captain's Chest";
-	   ["faction"] = "Horde";
 	   ["level"] = 47;
 	   ["source"] = {
 	      [1] = {

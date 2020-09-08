@@ -2,15 +2,15 @@ local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, Private
 local B = E:GetModule('Blizzard')
 
 function B:Initialize()
-	self.Initialized = true
+	B.Initialized = true
 
-	self:EnhanceColorPicker()
-	self:KillBlizzard()
-	self:AlertMovers()
-	self:PositionCaptureBar()
-	self:PositionDurabilityFrame()
-	self:PositionGMFrames()
-	self:QuestWatchFrame()
+	B:EnhanceColorPicker()
+	B:KillBlizzard()
+	B:AlertMovers()
+	B:PositionCaptureBar()
+	B:PositionDurabilityFrame()
+	B:PositionGMFrames()
+	B:QuestWatchFrame()
 end
 
 E:RegisterModule(B:GetName())

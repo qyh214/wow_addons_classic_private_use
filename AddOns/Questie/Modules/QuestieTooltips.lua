@@ -16,6 +16,8 @@ local QuestieDB = QuestieLoader:ImportModule("QuestieDB");
 local QuestieQuest = QuestieLoader:CreateModule("QuestieQuest");
 ---@type QuestieProfessions
 local QuestieProfessions = QuestieLoader:CreateModule("QuestieProfessions");
+---@type QuestieTracker
+local QuestieTracker = QuestieLoader:ImportModule("QuestieTracker")
 
 local tinsert = table.insert
 local _QuestieTooltips = {};
@@ -57,6 +59,10 @@ function QuestieTooltips:GetTooltip(key)
         return nil
     end
 
+    if GetNumGroupMembers() > 15 then
+        return nil -- temporary disable tooltips in raids, we should make a proper fix
+    end
+    
     --Do not remove! This is the datastrucutre for tooltipData!
     --[[tooltipdata[questId] = {
         title = coloredTitle,
@@ -200,7 +206,7 @@ function QuestieTooltips:GetTooltip(key)
         if(tip == nil) then
             tip = {}
         end
-        tinsert(tip, questData.title);
+        local hasObjective = false
         local tempObjectives = {}
         for objectiveIndex, playerList in pairs(questData.objectivesText or {}) do -- Should we do or {} here?
             for playerName, objectiveInfo in pairs(playerList) do
@@ -209,7 +215,7 @@ function QuestieTooltips:GetTooltip(key)
                 local playerType = ""
                 if playerInfo then
                     playerColor = "|c" .. playerInfo.colorHex
-                elseif QuestieComms.remotePlayerEnabled[playerName] then 
+                elseif QuestieComms.remotePlayerEnabled[playerName] and QuestieComms.remoteQuestLogs[questId] and QuestieComms.remoteQuestLogs[questId][playerName] and (not Questie.db.global.onlyPartyShared or UnitInParty(playerName)) then
                     playerColor = QuestieComms.remotePlayerClasses[playerName]
                     if playerColor then
                         playerColor = Questie:GetClassColor(playerColor)
@@ -226,13 +232,18 @@ function QuestieTooltips:GetTooltip(key)
                 -- We want the player to be on top.
                 if (playerName == name) then
                     tinsert(tempObjectives, 1, objectiveInfo.text);
+                    hasObjective = true
                 elseif playerColor then
                     tinsert(tempObjectives, objectiveInfo.text);
+                    hasObjective = true
                 end
             end
         end
-        for index, text in pairs(tempObjectives) do
-            tinsert(tip, text);
+        if hasObjective then
+            tinsert(tip, questData.title);
+            for index, text in pairs(tempObjectives) do
+                tinsert(tip, text);
+            end
         end
     end
     return tip
@@ -632,7 +643,11 @@ hooksecurefunc("ChatFrame_OnHyperlinkShow", function(...)
             questId = tonumber(questId)
             local quest = QuestieDB:GetQuest(questId)
             if quest then
-                ChatEdit_InsertLink("[[" .. quest.level .. "] " .. quest.name .. " (" .. questId .. ")]")
+                local msg = ChatFrame1EditBox:GetText()
+                if msg then
+                    ChatFrame1EditBox:SetText("")
+                    ChatEdit_InsertLink(string.gsub(msg, "%|Hquestie:" .. questId .. ":.*%|h", "%[%[" .. quest.level .. "%] " .. quest.name .. " %(" .. questId .. "%)%]"))
+                end
             end
         end
     end

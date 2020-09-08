@@ -4,10 +4,8 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
---Lua functions
 local _G = _G
 local tinsert = tinsert
---WoW API / Variables
 -- GLOBALS: ElvUF_Player
 
 function UF:Construct_PetFrame(frame)
@@ -34,8 +32,8 @@ function UF:Construct_PetFrame(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 	frame.ThreatIndicator = self:Construct_Threat(frame)
 
-	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 118)
-	E:CreateMover(frame, frame:GetName()..'Mover', L["Pet Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,pet,generalGroup')
+	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', -342, 100)
+	E:CreateMover(frame, frame:GetName()..'Mover', L["Pet Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,pet,generalGroup')
 
 	frame.unitframeType = "pet"
 end
@@ -63,6 +61,15 @@ function UF:Update_PetFrame(frame, db)
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
 	end
 
+	if db.strataAndLevel and db.strataAndLevel.useCustomStrata then
+		frame:SetFrameStrata(db.strataAndLevel.frameStrata)
+	end
+
+	if db.strataAndLevel and db.strataAndLevel.useCustomLevel then
+		frame:SetFrameLevel(db.strataAndLevel.frameLevel)
+	end
+
+	frame.Health.colorPetByUnitClass = db.health.colorPetByUnitClass
 	frame.colors = ElvUF.colors
 	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)

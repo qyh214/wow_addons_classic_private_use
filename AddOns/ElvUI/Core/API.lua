@@ -16,8 +16,6 @@ local InCombatLockdown = InCombatLockdown
 local IsAddOnLoaded = IsAddOnLoaded
 local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 local UIParentLoadAddOn = UIParentLoadAddOn
-local UnitHasVehicleUI = UnitHasVehicleUI
-local C_UIWidgetManager_GetStatusBarWidgetVisualizationInfo = C_UIWidgetManager.GetStatusBarWidgetVisualizationInfo
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
 -- GLOBALS: ElvDB
 
@@ -42,8 +40,8 @@ end
 
 do -- other non-english locales require this
 	E.UnlocalizedClasses = {}
-	for k,v in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do E.UnlocalizedClasses[v] = k end
-	for k,v in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do E.UnlocalizedClasses[v] = k end
+	for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_MALE) do E.UnlocalizedClasses[v] = k end
+	for k, v in pairs(_G.LOCALIZED_CLASS_NAMES_FEMALE) do E.UnlocalizedClasses[v] = k end
 
 	function E:UnlocalizedClassName(className)
 		return (className and className ~= '') and E.UnlocalizedClasses[className]
@@ -145,24 +143,6 @@ do
 			_G.OrderHallCommandBar:HookScript('OnShow', SetModifiedHeight)
 			_G.OrderHallCommandBar:HookScript('OnHide', SetOriginalHeight)
 		end
-	end
-end
-
-do
-	E.MaxNazjatarBodyguardRank = 30
-	function E:GetNazjatarBodyguardXP(widgetID)
-		local widget = widgetID and C_UIWidgetManager_GetStatusBarWidgetVisualizationInfo(widgetID)
-		if not widget then return end
-
-		local rank = tonumber(strmatch(widget.overrideBarText, '%d+'))
-		if not rank then return end
-
-		local cur = widget.barValue - widget.barMin
-		local toNext = widget.barMax - widget.barMin
-		local total = widget.barValue
-		local isMax = rank == E.MaxNazjatarBodyguardRank
-
-		return rank, cur, toNext, total, isMax
 	end
 end
 
@@ -298,103 +278,6 @@ function E:Dump(object, inspect)
 	end
 end
 
-function E:AddNonPetBattleFrames()
-	if InCombatLockdown() then
-		E:UnregisterEventForObject('PLAYER_REGEN_DISABLED', E.AddNonPetBattleFrames, E.AddNonPetBattleFrames)
-		return
-	elseif E:IsEventRegisteredForObject('PLAYER_REGEN_DISABLED', E.AddNonPetBattleFrames) then
-		E:UnregisterEventForObject('PLAYER_REGEN_DISABLED', E.AddNonPetBattleFrames, E.AddNonPetBattleFrames)
-	end
-
-	for object, data in pairs(E.FrameLocks) do
-		local parent, strata
-		if type(data) == 'table' then
-			parent, strata = data.parent, data.strata
-		elseif data == true then
-			parent = _G.UIParent
-		end
-
-		local obj = _G[object] or object
-		obj:SetParent(parent)
-		if strata then
-			obj:SetFrameStrata(strata)
-		end
-	end
-end
-
-function E:RemoveNonPetBattleFrames()
-	if InCombatLockdown() then
-		E:RegisterEventForObject('PLAYER_REGEN_DISABLED', E.RemoveNonPetBattleFrames, E.RemoveNonPetBattleFrames)
-		return
-	elseif E:IsEventRegisteredForObject('PLAYER_REGEN_DISABLED', E.RemoveNonPetBattleFrames) then
-		E:UnregisterEventForObject('PLAYER_REGEN_DISABLED', E.RemoveNonPetBattleFrames, E.RemoveNonPetBattleFrames)
-	end
-
-	for object in pairs(E.FrameLocks) do
-		local obj = _G[object] or object
-		obj:SetParent(E.HiddenFrame)
-	end
-end
-
-function E:RegisterObjectForVehicleLock(object, originalParent)
-	if not object or not originalParent then
-		E:Print('Error. Usage: RegisterObjectForVehicleLock(object, originalParent)')
-		return
-	end
-
-	object = _G[object] or object
-	--Entering/Exiting vehicles will often happen in combat.
-	--For this reason we cannot allow protected objects.
-	if object.IsProtected and object:IsProtected() then
-		E:Print('Error. Object is protected and cannot be changed in combat.')
-		return
-	end
-
-	--Check if we are already in a vehicles
-	if UnitHasVehicleUI('player') then
-		object:SetParent(E.HiddenFrame)
-	end
-
-	--Add object to table
-	E.VehicleLocks[object] = originalParent
-end
-
-function E:UnregisterObjectForVehicleLock(object)
-	if not object then
-		E:Print('Error. Usage: UnregisterObjectForVehicleLock(object)')
-		return
-	end
-
-	object = _G[object] or object
-	--Check if object was registered to begin with
-	if not E.VehicleLocks[object] then
-		return
-	end
-
-	--Change parent of object back to original parent
-	local originalParent = E.VehicleLocks[object]
-	if originalParent then
-		object:SetParent(originalParent)
-	end
-
-	--Remove object from table
-	E.VehicleLocks[object] = nil
-end
-
-function E:EnterVehicleHideFrames(_, unit)
-	if unit ~= 'player' then return end
-	for object in pairs(E.VehicleLocks) do
-		object:SetParent(E.HiddenFrame)
-	end
-end
-
-function E:ExitVehicleShowFrames(_, unit)
-	if unit ~= 'player' then return end
-	for object, originalParent in pairs(E.VehicleLocks) do
-		object:SetParent(originalParent)
-	end
-end
-
 function E:RequestBGInfo()
 	RequestBattlefieldScoreData()
 end
@@ -402,6 +285,10 @@ end
 function E:PLAYER_ENTERING_WORLD(_, initLogin)
 	if initLogin or not ElvDB.LuaErrorDisabledAddOns then
 		ElvDB.LuaErrorDisabledAddOns = {}
+	end
+
+	if initLogin or isReload then
+		self:CheckIncompatible()
 	end
 
 	if not self.MediaUpdated then

@@ -25,6 +25,7 @@ local MasqueGroup = Masque and Masque:Group("ElvUI", "Pet Bar")
 
 local bar = CreateFrame('Frame', 'ElvUI_BarPet', E.UIParent, 'SecureHandlerStateTemplate')
 bar:SetFrameStrata("LOW")
+bar.buttons = {}
 
 function AB:UpdatePet(event, unit)
 	if (event == "UNIT_AURA" and unit ~= "pet") then return end
@@ -139,8 +140,7 @@ function AB:PositionAndSizeBarPet()
 
 	local barWidth = (size * (buttonsPerRow * widthMult)) + ((buttonSpacing * (buttonsPerRow - 1)) * widthMult) + (buttonSpacing * (widthMult-1)) + ((self.db.barPet.backdrop == true and (E.Border + backdropSpacing) or E.Spacing)*2)
 	local barHeight = (size * (numColumns * heightMult)) + ((buttonSpacing * (numColumns - 1)) * heightMult) + (buttonSpacing * (heightMult-1)) + ((self.db.barPet.backdrop == true and (E.Border + backdropSpacing) or E.Spacing)*2)
-	bar:Width(barWidth)
-	bar:Height(barHeight)
+	bar:Size(barWidth, barHeight)
 
 	if self.db.barPet.enabled then
 		bar:SetScale(1)
@@ -168,8 +168,10 @@ function AB:PositionAndSizeBarPet()
 	bar.mouseover = self.db.barPet.mouseover
 	if bar.mouseover then
 		bar:SetAlpha(0)
+		AB:FadeBarBlings(bar, 0)
 	else
 		bar:SetAlpha(bar.db.alpha)
+		AB:FadeBarBlings(bar, bar.db.alpha)
 	end
 
 	if self.db.barPet.inheritGlobalFade then
@@ -188,9 +190,12 @@ function AB:PositionAndSizeBarPet()
 		autoCast = _G["PetActionButton"..i..'AutoCastable']
 		lastColumnButton = _G["PetActionButton"..i-buttonsPerRow]
 
+		bar.buttons[i] = button
+
 		button:SetParent(bar)
 		button:ClearAllPoints()
 		button:Size(size)
+		button:Show()
 		button:EnableMouse(not self.db.barPet.clickThrough)
 		autoCast:SetOutside(button, autoCastSize, autoCastSize)
 
@@ -242,9 +247,6 @@ function AB:PositionAndSizeBarPet()
 	end
 
 	RegisterStateDriver(bar, "show", visibility)
-
-	--Fix issue with mover not updating size when bar is hidden
-	bar:GetScript("OnSizeChanged")(bar)
 
 	if MasqueGroup and E.private.actionbar.masque.petBar then MasqueGroup:ReSkin() end
 end

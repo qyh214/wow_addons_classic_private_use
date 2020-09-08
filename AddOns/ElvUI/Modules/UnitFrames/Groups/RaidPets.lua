@@ -4,14 +4,8 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
---Lua functions
 local _G = _G
---WoW API / Variables
 local CreateFrame = CreateFrame
-local GetInstanceInfo = GetInstanceInfo
-local InCombatLockdown = InCombatLockdown
-local RegisterStateDriver = RegisterStateDriver
-local UnregisterStateDriver = UnregisterStateDriver
 
 function UF:Construct_RaidpetFrames()
 	self:SetScript('OnEnter', _G.UnitFrame_OnEnter)
@@ -30,7 +24,7 @@ function UF:Construct_RaidpetFrames()
 	self.AuraWatch = UF:Construct_AuraWatch(self)
 	self.customTexts = {}
 	self.Cutaway = UF:Construct_Cutaway(self)
-	self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
+	self.AuraHighlight = UF:Construct_AuraHighlight(self)
 	self.Fader = UF:Construct_Fader()
 	self.HealthPrediction = UF:Construct_HealComm(self)
 	self.MouseGlow = UF:Construct_MouseGlow(self)
@@ -47,21 +41,14 @@ function UF:Construct_RaidpetFrames()
 end
 
 function UF:Update_RaidpetHeader(header, db)
-	header.db = db
+	local parent = header:GetParent()
+	parent.db = db
 
-	local headerHolder = header:GetParent()
-	headerHolder.db = db
-
-	if not headerHolder.positioned then
-		headerHolder:ClearAllPoints()
-		headerHolder:Point("BOTTOMLEFT", E.UIParent, "BOTTOMLEFT", 4, 574)
-		E:CreateMover(headerHolder, headerHolder:GetName()..'Mover', L["Raid Pet Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,raidpet,generalGroup')
-
-		headerHolder.positioned = true;
-	end
-
-	if not header.forceShow and db.enable then
-		RegisterStateDriver(headerHolder, "visibility", headerHolder.db.visibility)
+	if not parent.positioned then
+		parent:ClearAllPoints()
+		parent:Point('TOPLEFT', E.UIParent, 'BOTTOMLEFT', 4, 737)
+		E:CreateMover(parent, parent:GetName()..'Mover', L["Raid Pet Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,groupUnits,raidpet,generalGroup')
+		parent.positioned = true
 	end
 end
 
@@ -99,18 +86,17 @@ function UF:Update_RaidpetFrames(frame, db)
 		frame.BOTTOM_OFFSET = 0
 	end
 
+	frame.Health.colorPetByUnitClass = db.health.colorPetByUnitClass
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 
 	UF:Configure_HealthBar(frame)
 	UF:UpdateNameSettings(frame)
-
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_AllAuras(frame)
-
 	UF:Configure_AuraWatch(frame, true)
 	UF:Configure_CustomTexts(frame)
 	UF:Configure_Cutaway(frame)
-	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_AuraHighlight(frame)
 	UF:Configure_Fader(frame)
 	UF:Configure_HealComm(frame)
 	UF:Configure_Portrait(frame)

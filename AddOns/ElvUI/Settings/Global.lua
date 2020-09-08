@@ -3,10 +3,11 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 --Global Settings
 G.general = {
 	UIScale = 0.64,
-	version = 1.24,
+	version = 1.31,
 	locale = E:GetLocale(),
 	eyefinity = false,
 	smallerWorldMap = true,
+	allowDistributor = false,
 	smallerWorldMapScale = 0.9,
 	fadeMapWhenMoving = true,
 	mapAlphaWhenMoving = 0.2,
@@ -18,8 +19,8 @@ G.general = {
 		yOffset = 0
 	},
 	AceGUI = {
-		width = 1000,
-		height = 720
+		width = 960,
+		height = 730
 	},
 	disableTutorialButtons = true,
 	showMissingTalentAlert = false,
@@ -37,7 +38,70 @@ G.bags = {
 }
 
 G.datatexts = {
-	customCurrencies = {}
+	customPanels = {},
+	customCurrencies = {},
+	settings = {
+		Agility = { Label = '', NoLabel = false },
+		Armor = { Label = '', NoLabel = false },
+		Avoidance = { Label = '', NoLabel = false, decimalLength = 1 },
+		CallToArms = { Label = '', NoLabel = false },
+		Crit = { Label = '', NoLabel = false, decimalLength = 1 },
+		Currencies = { goldFormat = 'BLIZZARD', goldCoins = true, displayedCurrency = 'BACKPACK', displayStyle = 'ICON', tooltipData = {} },
+		Durability = { Label = '', NoLabel = false, percThreshold = 30 },
+		Experience = { textFormat = 'CUR' },
+		Friends = {
+			Label = '', NoLabel = false,
+			--status
+			hideAFK = false,
+			hideDND = false,
+			--clients
+			hideWoW = false,
+			hideD3 = false,
+			hideVIPR = false,
+			hideWTCG = false, --Hearthstone
+			hideHero = false, --Heros of the Storm
+			hidePro = false, --Overwatch
+			hideS1 = false,
+			hideS2 = false,
+			hideDST2 = false,
+			hideBSAp = false, --Mobile
+			hideApp = false, --Launcher
+		},
+		Gold = { goldFormat = 'BLIZZARD', goldCoins = true },
+		Guild = { Label = '', NoLabel = false },
+		QuickJoin = { Label = '', NoLabel = false },
+		Bags = { textFormat = 'USED_TOTAL' },
+		Reputation = { textFormat = 'CUR' },
+		Speed = { Label = '', NoLabel = false, decimalLength = 1 },
+		Stamina = { Label = '', NoLabel = false },
+		Strength = { Label = '', NoLabel = false },
+		Time = { time24 = _G.GetCurrentRegion() ~= 1, localTime = true },
+		Versatility = { Label = '', NoLabel = false, decimalLength = 1 },
+	},
+	newPanelInfo = {
+		name = '',
+		enable = true,
+		growth = 'HORIZONTAL',
+		width = 300,
+		height = 22,
+		frameStrata = 'LOW',
+		numPoints = 3,
+		frameLevel = 1,
+		backdrop = true,
+		panelTransparency = false,
+		mouseover = false,
+		border = true,
+		visibility = '[petbattle] hide;show',
+		tooltipAnchor = 'ANCHOR_TOPLEFT',
+		tooltipXOffset = -17,
+		tooltipYOffset = 4,
+		fonts = {
+			enable = false,
+			font = "PT Sans Narrow",
+			fontSize = 12,
+			fontOutline = "OUTLINE",
+		}
+	},
 }
 
 G.nameplate = {
@@ -66,7 +130,7 @@ G.unitframe = {
 
 G.profileCopy = {
 	--Specific values
-	selected = "Minimalistic",
+	selected = "Default",
 	movers = {},
 	--Modules
 	actionbar = {
@@ -80,7 +144,6 @@ G.profileCopy = {
 		barPet = true,
 		stanceBar = true,
 		microbar = true,
-		extraActionButton = true,
 		cooldown = true
 	},
 	auras = {

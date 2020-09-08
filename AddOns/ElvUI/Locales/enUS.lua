@@ -2,6 +2,9 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = true
 L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = true
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = true
@@ -47,7 +50,7 @@ L["Bank Mover (Grow Up)"] = true
 L["Bank"] = true
 L["Bar "] = true
 L["Bars"] = true
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = true
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = true
 L["BfA Missions"] = true
 L["Binding"] = true
@@ -58,7 +61,6 @@ L["Blend"] = true
 L["BNet Frame"] = true
 L["Boss Button"] = true
 L["Boss Frames"] = true
-L["Building(s) Report:"] = true
 L["Calendar"] = true
 L["Can't buy anymore slots!"] = true
 L["Can't Roll"] = true
@@ -88,7 +90,6 @@ L["Dead"] = true
 L["Deficit:"] = true
 L["Delete gray items?"] = true
 L["Deposit Reagents"] = true
-L["Desaturate all grey items that can be vendored."] = true
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = true
 L["Disable Warning"] = true
 L["Disable"] = true
@@ -123,7 +124,6 @@ L["FocusTarget"] = true
 L["For technical support visit us at http://www.tukui.org."] = true
 L["Friends List"] = true
 L["G"] = true
-L["Garrison"] = true
 L["Ghost"] = true
 L["GM Ticket Frame"] = true
 L["Gold"] = true
@@ -149,12 +149,11 @@ L["Icons Only"] = true
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = true
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = true
 L["IL"] = true
-L["Importance: |cff07D400High|r"] = true
+L["Importance: |cffFF3333High|r"] = true
 L["Importance: |cffD3CF00Medium|r"] = true
-L["Importance: |cffFF0000Low|r"] = true
+L["Importance: |cFF33FF33Low|r"] = true
 L["In Progress"] = true
-L["INCOMPATIBLE_ADDON"] = "The addon %s is not compatible with ElvUI's %s module. Please select either the addon or the ElvUI module to disable."
-L["Info/Controls"] = true
+L["INCOMPATIBLE_ADDON"] = "%s is not compatible with %s.\nPlease select the addon/module to use."
 L["Installation Complete"] = true
 L["Invalid Target"] = true
 L["is looking for members"] = true
@@ -185,7 +184,8 @@ L["Legs"] = true
 L["Level Up Display / Boss Banner"] = true
 L["List of installations in queue:"] = true
 L["Lock"] = true
-L["LOGIN_MSG"] = "Welcome to %sElvUI|r |cff1784d1Classic|r version %s%s|r, type /ec to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("Welcome to *ElvUI|r |cff1784d1Classic|r version *%s|r, type */ec|r to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = true
 L["Loot Frame"] = true
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = true
@@ -196,13 +196,11 @@ L["Main Hand"] = true
 L["Micro Bar"] = true
 L["Minimap"] = true
 L["MirrorTimer"] = true
-L["Mission(s) Report:"] = true
 L["Mitigation By Level: "] = true
 L["Mobile"] = true
 L["Modulating Blend"] = true
 L["Mov. Speed:"] = true
 L["MT Frames"] = true
-L["Naval Mission(s) Report:"] = true
 L["No bindings set."] = true
 L["No gray items to delete."] = true
 L["No Guild"] = true
@@ -250,8 +248,8 @@ L["Remaining:"] = true
 L["Remove Bar %d Action Page"] = true
 L["Reputation Bar"] = true
 L["Request was denied by user."] = true
-L["Reset Counters: Hold Shift + Left Click"] = true
-L["Reset Data: Hold Shift + Right Click"] = true
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = true
 L["Rested:"] = true
 L["Right Chat"] = true
@@ -279,7 +277,6 @@ L["Spec"] = true
 L["Spell/Heal Power"] = true
 L["Spent:"] = true
 L["Stance Bar"] = true
-L["Stats For:"] = true
 L["Steps"] = true
 L["Sticky Frames"] = true
 L["System"] = true
@@ -332,7 +329,6 @@ L["Welcome to ElvUI version %s!"] = true
 L["whispers"] = true
 L["World Latency:"] = true
 L["World Protocol:"] = true
-L["WoW Token:"] = true
 L["Wrist"] = true
 L["XP:"] = true
 L["yells"] = true
@@ -371,3 +367,17 @@ Options:
   Shift + RightClick - Hides mover temporarily.
   Ctrl + RightClick - Resets mover position to default.
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

@@ -2,11 +2,11 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local S = E:GetModule('Skins')
 local TT = E:GetModule('Tooltip')
 
---Cache global variables
---Lua functions
 local _G = _G
-local ipairs = ipairs
---WoW API / Variables
+local unpack = unpack
+local pairs = pairs
+local GameTooltip = GameTooltip
+local hooksecurefunc = hooksecurefunc
 
 function S:TooltipFrames()
 	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.tooltip) then return end
@@ -32,6 +32,8 @@ function S:TooltipFrames()
 		_G.ShoppingTooltip1,
 		_G.ShoppingTooltip2,
 		_G.EmbeddedItemTooltip,
+		_G.WorldMapTooltip,
+		_G.ElvUIConfigTooltip,
 		-- already have locals
 		GameTooltip,
 	}
@@ -51,7 +53,7 @@ function S:TooltipFrames()
 	TT:SecureHook('GameTooltip_ShowStatusBar') -- Skin Status Bars
 	TT:SecureHook('GameTooltip_ShowProgressBar') -- Skin Progress Bars
 	TT:SecureHook('GameTooltip_AddQuestRewardsToTooltip') -- Color Progress Bars
-	TT:SecureHook('GameTooltip_UpdateStyle', 'SetStyle')
+	TT:SecureHook('GameTooltip_UpdateStyle', 'SetStyle') -- GameTooltip_SetBackdropStyle
 
 	-- [Backdrop coloring] There has to be a more elegant way of doing this.
 	TT:SecureHookScript(GameTooltip, 'OnUpdate', 'CheckBackdropColor')

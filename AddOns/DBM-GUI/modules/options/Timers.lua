@@ -1,19 +1,5 @@
 local L = DBM_GUI_L
 
---Hard code STANDARD_TEXT_FONT since skinning mods like to taint it (or worse, set it to nil, wtf?)
-local standardFont
-if LOCALE_koKR then
-	standardFont = "Fonts\\2002.TTF"
-elseif LOCALE_zhCN then
-	standardFont = "Fonts\\ARKai_T.ttf"
-elseif LOCALE_zhTW then
-	standardFont = "Fonts\\blei00d.TTF"
-elseif LOCALE_ruRU then
-	standardFont = "Fonts\\FRIZQT___CYR.TTF"
-else
-	standardFont = "Fonts\\FRIZQT__.TTF"
-end
-
 local BarSetupPanel = DBM_GUI_Frame:CreateNewPanel(L.BarSetup, "option")
 
 local BarColors = BarSetupPanel:CreateArea(L.AreaTitle_BarColors)
@@ -593,7 +579,7 @@ TextureDropDown.myheight = 0
 local Fonts = DBM_GUI:MixinSharedMedia3("font", {
 	{
 		text	= "Default",
-		value	= standardFont
+		value	= "standardFont"
 	},
 	{
 		text	= "Arial",
@@ -696,7 +682,7 @@ DisableBarFade.myheight = 50 -- Extra padding because right buttons are offset f
 
 local BarBehaviors = BarSetupPanel:CreateArea(L.AreaTitle_Behavior)
 
-local DecimalSlider = BarBehaviors:CreateSlider(L.Bar_Decimal, 5, 60, 1)
+local DecimalSlider = BarBehaviors:CreateSlider(L.Bar_Decimal, 1, 60, 1)
 DecimalSlider:SetPoint("TOPLEFT", BarBehaviors.frame, "TOPLEFT", 20, -25)
 DecimalSlider:SetValue(DBM.Bars:GetOption("TDecimal"))
 DecimalSlider:HookScript("OnValueChanged", createDBTOnValueChangedHandler("TDecimal"))

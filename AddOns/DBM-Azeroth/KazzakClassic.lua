@@ -1,10 +1,9 @@
 local mod	= DBM:NewMod("KazzakClassic", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200611161557")
+mod:SetRevision("20200811024007")
 mod:SetCreatureID(12397)--121818 TW ID, 12397 classic ID
 --mod:SetModelID(17887)
-mod:SetZone()
 
 mod:RegisterCombat("combat_yell", L.Pull)
 

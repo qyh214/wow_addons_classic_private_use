@@ -31,10 +31,6 @@ QuestieLocale.locale['esMX'] = {
     ['ENABLE_TURNINS_DESC'] = "Cuando está habilitado los iconos de misión completada apareceran en el mapa y minimapa",
     ['ENABLE_AVAILABLE'] = "Habilitar iconos de misión disponible",
     ['ENABLE_AVAILABLE_DESC'] = "Cuando está habilitado los iconos de misión disponible apareceran en el mapa y minimapa",
-    ['ENABLE_TOOLTIPS'] = "Habilitar descripción emergente",
-    ['ENABLE_TOOLTIPS_DESC'] = "Cuando está habilitado la información de la mision aparecera en la descripcion de los monstruos/objetos relevantes",
-    ['ENABLE_TOOLTIPS_QUEST_LEVEL'] = "Mostrar nivel de misión en tooltips",
-    ['ENABLE_TOOLTIPS_QUEST_LEVEL_DESC'] = "Si está marcado, el nivel de misiones mostrará en los tooltips.",
     ['ICON_TYPE_HEADER'] = "Tipos de icono",
     ['ENABLE_MAP_ICONS'] = "Habilitar iconos en el mapa",
     ['ENABLE_MAP_ICONS_DESC'] = "Mostrar/Esconder todos los iconos del mapa principal",
@@ -58,6 +54,8 @@ QuestieLocale.locale['esMX'] = {
     ['ENABLE_DUNGEON_RAID_ICONS_DESC'] = "Si está marcado, la localización de misiones de bandas mostrará en el mapa y minimapa.",
     ['ENABLE_PVP_QUEST_ICONS'] = "Habilitar iconos de misiones de JcJ",
     ['ENABLE_PVP_QUEST_ICONS_DESC'] = "Si está marcado, la localización de misiones de JcJ mostrará en el mapa y minimapa.",
+    ['ENABLE_AQ_QUEST_ICONS'] = "Habilitar iconos de misiones de la Guerra de Ahn'Qiraj",
+    ['ENABLE_AQ_QUEST_ICONS_DESC'] = "Si está habilitado, las localizaciones de las misiones de la Guerra de Ahn'Qiraj mostrarán en el mapa/minimapa.",
     ['ENABLE_AUTO_ACCEPT_QUESTS'] = "Aceptar misiones automáticamente",
     ['ENABLE_AUTO_ACCEPT_QUESTS_DESC'] = "Habilita o deshabilita aceptar misiones automáticamente.",
     ['ENABLE_AUTO_COMPLETE'] = "Completar misiones automáticamente",
@@ -66,7 +64,9 @@ QuestieLocale.locale['esMX'] = {
     ['ENABLE_ACCEPT_TRIVIAL_DESC'] = "Si está habilitado, las misiones triviales (grises) también se aceptarán automáticamente.",
     ['AUTO_MODIFIER'] = "Auto modificador",
     ['AUTO_MODIFIER_DESC'] = "El modificador para NO aceptar/completar automáticamente las misiones cuando cualquiera de las opciones está habilitada e interactúas con un asignador de misión.",
-
+    ['ENABLE_YELL'] = "Compartir el progreso de la misión con jugadores cercanos",
+    ['ENABLE_YELL_DESC'] = "El progreso de tu misión se enviará periódicamente a los jugadores cercanos.",
+   
     -- Minimap tab
     ['MINIMAP_TAB'] = "Opciones de minimapa",
     ['MINIMAP_OPTIONS_HEADER'] = "Opciones de las notas del minimapa",
@@ -163,6 +163,16 @@ QuestieLocale.locale['esMX'] = {
     ['TARGET_SCALE_DESC'] = "Edita el tamaño del icono de misión en el marco de objetivo. ( Por defecto: %s )",
     ['TARGET_RESET_BTN'] = "Reiniciar marco de objetivo",
     ['TARGET_RESET_BTN_DESC'] = "Reinicia a valores por defecto el tamaño y la posición del marco de objetivo",
+
+    -- Tooltip tab
+    ['TOOLTIP_TAB'] = "Descripción emergente",
+    ['TOOLTIP_OPTIONS_HEADER'] = "Opciones de descripción emergente",
+    ['ENABLE_TOOLTIPS'] = "Habilitar descripción emergente",
+    ['ENABLE_TOOLTIPS_DESC'] = "Cuando está habilitado la información de la mision aparecera en la descripcion de los monstruos/objetos relevantes",
+    ['ENABLE_TOOLTIPS_QUEST_LEVEL'] = "Mostrar nivel de misión en tooltips",
+    ['ENABLE_TOOLTIPS_QUEST_LEVEL_DESC'] = "Si está marcado, el nivel de misiones mostrará en los tooltips.",
+    ['SHARED_TOOLTIP_PARTY_ONLY'] = "Fiesta compartida solo",
+    ['SHARED_TOOLTIP_PARTY_ONLY_DESC'] = "Cuando esto está habilitado, la información de misiones compartidas solo se mostrará si son de miembros del grupo.",
 
     -- Advanced tab
     ['ADVANCED_TAB'] = "Avanzado",
@@ -346,7 +356,7 @@ QuestieLocale.locale['esMX'] = {
     ['TOOLTIPS_START_QUEST'] = 'Empezado por',
     ['TOOLTIPS_END_QUEST'] = 'Terminado por',
     ['TOOLTIPS_FOUND_QUEST'] = 'Encontrado en',
-    ['TOOLTIPS_REQUIRE_QUEST'] = 'Requisitos',
+    ['TOOLTIPS_REQUIRE_QUEST'] = 'Objetivo',
     ['TOOLTIPS_PROGRESS_QUEST'] = 'Progreso',
     ['TOOLTIPS_FIN_QUEST'] = '(Completada)',
     ['TOOLTIPS_REPEAT_QUEST'] = 'Esta misión es repetible.',
@@ -382,7 +392,7 @@ QuestieLocale.locale['esMX'] = {
     ['JOURNEY_PREQUEST'] = "Misiones requisitas",
     ['JOURNEY_AUTO_QUEST'] = "Esta misión se completa automaticamente y no contiene objetivos.",
     ['JOURNEY_RECENT_EVENTS'] = "Tu historial reciente",
-    ['JOURNEY_LEVELUP'] = "¡Felicidades! has alcanzado %s !",
+    ['JOURNEY_LEVELUP'] = "¡Felicidades! has alcanzado %s!",
     ['JOURNEY_LEVELNUM'] = "Nivel %s",
     ['JOURNEY_LEVELREACH'] = "Alcanzaste el nivel %s",
     ['JOURNEY_QUEST_ACCEPT'] = "Aceptaste la misión %s",
@@ -446,5 +456,11 @@ QuestieLocale.locale['esMX'] = {
     ['Ends the following quests:'] = "Termina las siguientes misiones:",
     ['No quests to list.'] = "No hay misiones para enumerar.",
     ['No spawn data available.'] = "No hay datos de spawn disponibles.",
+    ["\124cFFAAEEFFQuestie DB has updated!\124r\124cFFFF6F22 Data is being processed, this may take a few moments and cause some lag..."] = "\124cFFAAEEFF¡Questie DB se ha actualizado!\124r\124cFFFF6F22 Los datos se están procesando, esto puede demorar unos minutos y causar latencia...",
+    ["\124cFF4DDBFF [1/4] Updating NPCs..."] = "\124cFF4DDBFF [1/4] Actualizando PNJs...",
+    ["\124cFF4DDBFF [2/4] Updating objects..."] = "\124cFF4DDBFF [2/4] Actualizando objetos...",  
+    ["\124cFF4DDBFF [3/4] Updating quests..."] = "\124cFF4DDBFF [3/4] Actualizando misiones...",  
+    ["\124cFF4DDBFF [4/4] Updating items..."] = "\124cFF4DDBFF [4/4] Actualizando items...", 
+    ["\124cFFAAEEFFQuestie DB update complete!"] = "\124cFFAAEEFF¡Actualización de Questie DB completada!",
     ["Nearby"] = "Cerca de",
 };

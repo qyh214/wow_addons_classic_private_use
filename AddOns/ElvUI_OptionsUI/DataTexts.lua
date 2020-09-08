@@ -4,96 +4,464 @@ local DT = E:GetModule('DataTexts')
 local Layout = E:GetModule('Layout')
 local Chat = E:GetModule('Chat')
 local Minimap = E:GetModule('Minimap')
-
-local datatexts = {}
+local ACH = E.Libs.ACH
 
 local _G = _G
 local tonumber = tonumber
+local tostring = tostring
+local format = format
 local pairs = pairs
 local type = type
 
+-- GLOBALS: AceGUIWidgetLSMlists
+
+local DTPanelOptions = {
+	numPoints = {
+		order = 2,
+		type = 'range',
+		name = L["Number of DataTexts"],
+		min = 1, max = 20, step = 1,
+	},
+	growth = {
+		order = 3,
+		type = 'select',
+		name = L["Growth"],
+		values = {
+			HORIZONTAL = 'HORIZONTAL',
+			VERTICAL = 'VERTICAL'
+		},
+	},
+	width = {
+		order = 4,
+		type = 'range',
+		name = L["Width"],
+		min = 24, max = E.screenwidth, step = 1,
+	},
+	height = {
+		order = 5,
+		type = 'range',
+		name = L["Height"],
+		min = 12, max = E.screenheight, step = 1,
+	},
+	templateGroup = {
+		order = 10,
+		type = "multiselect",
+		name = L['Template'],
+		sortByValue = true,
+		values = {
+			backdrop = L["Backdrop"],
+			panelTransparency = L["Backdrop Transparency"],
+			mouseover = L["Mouse Over"],
+			border = L["Show Border"],
+		},
+	},
+	strataAndLevel = {
+		order = 15,
+		type = "group",
+		name = L["Strata and Level"],
+		guiInline = true,
+		args = {
+			frameStrata = {
+				order = 2,
+				type = "select",
+				name = L["Frame Strata"],
+				values = {
+					["BACKGROUND"] = "BACKGROUND",
+					["LOW"] = "LOW",
+					["MEDIUM"] = "MEDIUM",
+					["HIGH"] = "HIGH",
+					["DIALOG"] = "DIALOG",
+					["TOOLTIP"] = "TOOLTIP",
+				},
+			},
+			frameLevel = {
+				order = 5,
+				type = "range",
+				name = L["Frame Level"],
+				min = 1, max = 128, step = 1,
+			},
+		},
+	},
+	tooltip = {
+		order = 20,
+		type = "group",
+		name = L["Tooltip"],
+		guiInline = true,
+		args = {
+			tooltipAnchor = {
+				order = 2,
+				type = "select",
+				name = L["Anchor"],
+				width = 'double',
+				values = {
+					ANCHOR_TOP = L["ANCHOR_TOP"],
+					ANCHOR_RIGHT = L["ANCHOR_RIGHT"],
+					ANCHOR_BOTTOM = L["ANCHOR_BOTTOM"],
+					ANCHOR_LEFT = L["ANCHOR_LEFT"],
+					ANCHOR_TOPRIGHT = L["ANCHOR_TOPRIGHT"],
+					ANCHOR_BOTTOMRIGHT = L["ANCHOR_BOTTOMRIGHT"],
+					ANCHOR_TOPLEFT = L["ANCHOR_TOPLEFT"],
+					ANCHOR_BOTTOMLEFT = L["ANCHOR_BOTTOMLEFT"],
+					ANCHOR_CURSOR = L["ANCHOR_CURSOR"],
+					ANCHOR_CURSOR_LEFT = L["ANCHOR_CURSOR_LEFT"],
+					ANCHOR_CURSOR_RIGHT = L["ANCHOR_CURSOR_RIGHT"],
+				},
+			},
+			tooltipXOffset = {
+				order = 2,
+				type = 'range',
+				name = L["X-Offset"],
+				min = -30, max = 30, step = 1,
+			},
+			tooltipYOffset = {
+				order = 3,
+				type = 'range',
+				name = L["Y-Offset"],
+				min = -30, max = 30, step = 1,
+			},
+		},
+	},
+	visibility = {
+		type = 'input',
+		order = 25,
+		name = L["Visibility State"],
+		desc = L["This works like a macro, you can run different situations to get the actionbar to show/hide differently.\n Example: '[combat] show;hide'"],
+		width = 'full',
+	},
+}
+
+local function ColorizeName(name, color)
+	return format('|cFF%s%s|r', color or 'ffd100', name)
+end
+
+local function PanelGroup_Delete(panel)
+	E.Options.args.datatexts.args.panels.args[panel] = nil
+end
+
+local function PanelGroup_Create(panel)
+	local opts = {
+		type = 'group',
+		name = ColorizeName(panel),
+		get = function(info) return E.db.datatexts.panels[panel][info[#info]] end,
+		set = function(info, value)
+			E.db.datatexts.panels[panel][info[#info]] = value
+			DT:UpdatePanelAttributes(panel, E.global.datatexts.customPanels[panel])
+		end,
+		args = {
+			enable = {
+				order = 0,
+				type = 'toggle',
+				name = L['Enable'],
+			},
+			panelOptions = {
+				order = -1,
+				name = L["Panel Options"],
+				type = 'group',
+				guiInline = true,
+				get = function(info) return E.global.datatexts.customPanels[panel][info[#info]] end,
+				set = function(info, value)
+					E.global.datatexts.customPanels[panel][info[#info]] = value
+					DT:UpdatePanelAttributes(panel, E.global.datatexts.customPanels[panel])
+					DT:PanelLayoutOptions()
+				end,
+				args = {
+					delete = {
+						order = -1,
+						type = 'execute',
+						name = L['Delete'],
+						width = 'full',
+						confirm = true,
+						func = function(info)
+							E.db.datatexts.panels[panel] = nil
+							E.global.datatexts.customPanels[panel] = nil
+							DT:ReleasePanel(panel)
+							PanelGroup_Delete(panel)
+							DT:PanelLayoutOptions()
+							E.Libs.AceConfigDialog:SelectGroup('ElvUI', 'datatexts', 'panels', 'newPanel')
+						end,
+					},
+					fonts = {
+						order = 10,
+						type = "group",
+						name = L["Fonts"],
+						guiInline = true,
+						get = function(info)
+							local settings = E.global.datatexts.customPanels[panel]
+							if not settings.fonts then settings.fonts = E:CopyTable({}, G.datatexts.newPanelInfo.fonts) end
+							return settings.fonts[info[#info]]
+						end,
+						set = function(info, value)
+							E.global.datatexts.customPanels[panel].fonts[info[#info]] = value
+							DT:UpdatePanelAttributes(panel, E.global.datatexts.customPanels[panel])
+						end,
+						args = {
+							enable = {
+								type = "toggle",
+								order = 1,
+								name = L["Enable"],
+								desc = L["This will override the global cooldown settings."],
+								disabled = E.noop,
+							},
+							fontSize = {
+								order = 3,
+								type = 'range',
+								name = L["Text Font Size"],
+								min = 10, max = 50, step = 1,
+							},
+							font = {
+								order = 4,
+								type = 'select',
+								name = L["Font"],
+								dialogControl = 'LSM30_Font',
+								values = AceGUIWidgetLSMlists.font,
+							},
+							fontOutline = {
+								order = 5,
+								type = "select",
+								name = L["Font Outline"],
+								values = C.Values.FontFlags,
+							},
+						}
+					},
+				},
+			}
+		},
+	}
+
+	local panelOpts = E:CopyTable(opts.args.panelOptions.args, DTPanelOptions)
+	panelOpts.tooltip.args.tooltipYOffset.disabled = function() return E.global.datatexts.customPanels[panel].tooltipAnchor == 'ANCHOR_CURSOR' end
+	panelOpts.tooltip.args.tooltipXOffset.disabled = function() return E.global.datatexts.customPanels[panel].tooltipAnchor == 'ANCHOR_CURSOR' end
+	panelOpts.templateGroup.get = function(info, key) return E.global.datatexts.customPanels[panel][key] end
+	panelOpts.templateGroup.set = function(info, key, value) E.global.datatexts.customPanels[panel][key] = value; DT:UpdatePanelAttributes(panel, E.global.datatexts.customPanels[panel]) end
+
+	E.Options.args.datatexts.args.panels.args[panel] = opts
+end
+
+local dts = {[''] = L["NONE"]}
 function DT:PanelLayoutOptions()
 	for name, data in pairs(DT.RegisteredDataTexts) do
-		datatexts[name] = data.localizedName or L[name]
+		dts[name] = data.localizedName or L[name]
 	end
-	datatexts[''] = L["NONE"]
 
-	local order
-	local table = E.Options.args.datatexts.args.panels.args
-	for pointLoc, tab in pairs(P.datatexts.panels) do
-		if not _G[pointLoc] then table[pointLoc] = nil; return; end
+	local options = E.Options.args.datatexts.args.panels.args
+
+	-- Custom Panels
+	for panel in pairs(E.global.datatexts.customPanels) do
+		PanelGroup_Create(panel)
+	end
+
+	-- This will mixin the options for the Custom Panels.
+	for name, tab in pairs(DT.db.panels) do
 		if type(tab) == 'table' then
-			if pointLoc:find("Chat") then
-				order = 15
-			else
-				order = 20
-			end
-			table[pointLoc] = {
-				type = 'group',
-				args = {},
-				name = L[pointLoc] or pointLoc,
-				order = order,
-			}
-			for option in pairs(tab) do
-				table[pointLoc].args[option] = {
-					type = 'select',
-					name = L[option] or option:upper(),
-					values = datatexts,
-					get = function(info) return E.db.datatexts.panels[pointLoc][info[#info]] end,
-					set = function(info, value) E.db.datatexts.panels[pointLoc][info[#info]] = value; DT:LoadDataTexts() end,
+			if not options[name] then
+				options[name] = {
+					type = 'group',
+					name = ColorizeName(name, 'ffffff'),
+					args = {},
+					get = function(info) return E.db.datatexts.panels[name][info[#info]] end,
+					set = function(info, value)
+						E.db.datatexts.panels[name][info[#info]] = value
+						DT:UpdatePanelInfo(name)
+					end,
 				}
 			end
-		elseif type(tab) == 'string' then
-			table.smallPanels.args[pointLoc] = {
-				type = 'select',
-				name = L[pointLoc] or pointLoc,
-				values = datatexts,
-				get = function(info) return E.db.datatexts.panels[pointLoc] end,
-				set = function(info, value) E.db.datatexts.panels[pointLoc] = value; DT:LoadDataTexts() end,
-			}
+
+			-- temp to delete old data in WIP testing
+			if not P.datatexts.panels[name] and not E.global.datatexts.customPanels[name] then
+				options[name].args.delete = {
+					order = -1,
+					type = 'execute',
+					name = L['Delete'],
+					func = function()
+						E.db.datatexts.panels[name] = nil
+						options[name] = nil
+						DT:PanelLayoutOptions()
+					end,
+				}
+			end
+
+			for option in pairs(tab) do
+				if type(option) == 'number' then
+					if E.global.datatexts.customPanels[name] and option > E.global.datatexts.customPanels[name].numPoints then
+						-- Number of Datatexts has been lowered, remove datatext entry in profile
+						tab[option] = nil
+					else
+						options[name].args[tostring(option)] = {
+							type = 'select',
+							order = option,
+							name = L[format("Position %d", option)],
+							values = dts,
+							get = function(info) return E.db.datatexts.panels[name][tonumber(info[#info])] end,
+							set = function(info, value)
+								E.db.datatexts.panels[name][tonumber(info[#info])] = value
+								DT:UpdatePanelInfo(name)
+							end,
+						}
+					end
+				end
+			end
 		end
 	end
 end
 
-local clientTable = {
-	['WoW'] = "WoW",
-	['D3'] = "D3",
-	['WTCG'] = "HS", --Hearthstone
-	['Hero'] = "HotS", --Heros of the Storm
-	['Pro'] = "OW", --Overwatch
-	['S1'] = "SC",
-	['S2'] = "SC2",
-	['DST2'] = "Dst2",
-	['VIPR'] = "VIPR", -- COD
-	['BSAp'] = L["Mobile"],
-	['App'] = "App", --Launcher
-}
+local function CreateDTOptions(name, data)
+	local settings = E.global.datatexts.settings[name]
+	if not settings then return end
 
-local function SetupFriendClient(client, order)
-	local hideGroup = E.Options.args.datatexts.args.friends.args.hideGroup.args
-	if not (hideGroup and client and order) then return end --safety
-	local clientName = 'hide'..client
-	hideGroup[clientName] = {
-		order = order,
-		type = 'toggle',
-		name = clientTable[client] or client,
-		get = function(info) return E.db.datatexts.friends[clientName] or false end,
-		set = function(info, value) E.db.datatexts.friends[clientName] = value; DT:LoadDataTexts() end,
+	local optionTable = {
+		order = 1,
+		type = "group",
+		name = data.localizedName or name,
+		guiInline = false,
+		get = function(info) return settings[info[#info]] end,
+		set = function(info, value) settings[info[#info]] = value DT:ForceUpdate_DataText(name) end,
+		args = {},
 	}
+
+	E.Options.args.datatexts.args.settings.args[name] = optionTable
+
+	for key in pairs(settings) do
+		if key == 'decimalLength' then
+			optionTable.args.decimalLength = {
+				type = 'range',
+				name = L['Decimal Length'],
+				min = 0, max = 5, step = 1,
+			}
+		elseif key == 'goldFormat' then
+			optionTable.args.goldFormat = {
+				type = 'select',
+				name = L["Gold Format"],
+				desc = L["The display format of the money text that is shown in the gold datatext and its tooltip."],
+				values = { SMART = L["Smart"], FULL = L["Full"], SHORT = L["SHORT"], SHORTINT = L["Short (Whole Numbers)"], CONDENSED = L["Condensed"], BLIZZARD = L["Blizzard Style"], BLIZZARD2 = L["Blizzard Style"].." 2" },
+			}
+		elseif key == 'goldCoins' then
+			optionTable.args.goldCoins = {
+				type = 'toggle',
+				name = L["Show Coins"],
+				desc = L["Use coin icons instead of colored text."],
+			}
+		elseif key == 'Label' then
+			optionTable.args.Label = {
+				order = 0,
+				type = 'input',
+				name = L['Label'],
+				get = function(info) return settings[info[#info]] and gsub(settings[info[#info]], '\124', '\124\124') end,
+				set = function(info, value) settings[info[#info]] = gsub(value, '\124\124+', '\124') end,
+			}
+		elseif key == 'NoLabel' then
+			optionTable.args.NoLabel = {
+				type = 'toggle',
+				name = L['No Label'],
+			}
+		elseif key == 'textFormat' then
+			optionTable.args.textFormat = {
+				type = 'select',
+				name = L["Text Format"],
+				width = "double",
+				get = function(info) return settings[info[#info]] end,
+				set = function(info, value) settings[info[#info]] = value; DT:ForceUpdate_DataText(name) end,
+				values = {},
+			}
+		end
+	end
+
+	if name == 'Time' then
+		optionTable.args.time24 = {
+			type = 'toggle',
+			name = L["24-Hour Time"],
+			desc = L["Toggle 24-hour mode for the time datatext."],
+		}
+		optionTable.args.localTime = {
+			type = 'toggle',
+			name = L["Local Time"],
+			desc = L["If not set to true then the server time will be displayed instead."],
+		}
+	elseif name == 'Durability' then
+		optionTable.args.percThreshold = {
+			type = "range",
+			name = L["Flash Threshold"],
+			desc = L["The durability percent that the datatext will start flashing.  Set to -1 to disable"],
+			min = -1, max = 99, step = 1,
+			get = function(info) return settings[info[#info]] end,
+			set = function(info, value) settings[info[#info]] = value; DT:ForceUpdate_DataText(name) end,
+		}
+	elseif name == 'Friends' then
+		optionTable.args.description = {
+			order = 1,
+			type = "description",
+			name = L["Hide specific sections in the datatext tooltip."],
+		}
+		optionTable.args.hideGroup1 = {
+			order = 2,
+			type = "multiselect",
+			name = L["Hide by Status"],
+			get = function(_, key) return settings[key] end,
+			set = function(_, key, value) settings[key] = value; DT:ForceUpdate_DataText(name) end,
+			values = {
+				hideAFK = L["AFK"],
+				hideDND = L["DND"],
+			},
+		}
+		optionTable.args.hideGroup2 = {
+			order = 2,
+			type = "multiselect",
+			name = L["Hide by Application"],
+			get = function(_, key) return settings['hide'..key] end,
+			set = function(_, key, value) settings['hide'..key] = value; DT:ForceUpdate_DataText(name) end,
+			sortByValue = true,
+			values = {
+				WoW = "World of Warcraft",
+				App = "App",
+				BSAp = L["Mobile"],
+				D3 = "Diablo 3",
+				WTCG = "Hearthstone",
+				Hero = "Heroes of the Storm",
+				Pro = "Overwatch",
+				S1 = "Starcraft",
+				S2 = "Starcraft 2",
+				VIPR = "COD: Black Ops 4",
+				ODIN = "COD: Modern Warfare",
+				LAZR = "COD: Modern Warfare 2",
+			},
+		}
+	elseif name == 'Reputation' or name == 'Experience' then
+		optionTable.args.textFormat.values = {
+			PERCENT = L["Percent"],
+			CUR = L["Current"],
+			REM = L["Remaining"],
+			CURMAX = L["Current - Max"],
+			CURPERC = L["Current - Percent"],
+			CURREM = L["Current - Remaining"],
+			CURPERCREM = L["Current - Percent (Remaining)"],
+		}
+	elseif name == 'Bags' then
+		optionTable.args.textFormat.values = {
+			["FREE"] = L["Only Free Slots"],
+			["USED"] = L["Only Used Slots"],
+			["FREE_TOTAL"] = L["Free/Total"],
+			["USED_TOTAL"] = L["Used/Total"],
+		}
+	end
 end
 
-local function SetupFriendClients() --this function is used to create the client options in order
-	SetupFriendClient('App', 3)
-	SetupFriendClient('BSAp', 4)
-	SetupFriendClient('WoW', 5)
-	SetupFriendClient('D3', 6)
-	SetupFriendClient('WTCG', 7)
-	SetupFriendClient('Hero', 8)
-	SetupFriendClient('Pro', 9)
-	SetupFriendClient('S1', 10)
-	SetupFriendClient('S2', 11)
-	SetupFriendClient('DST2', 12)
-	SetupFriendClient('VIPR', 13)
+local function SetupDTCustomization()
+	local currencyTable = {}
+	for name, data in pairs(DT.RegisteredDataTexts) do
+		currencyTable[name] = data
+	end
+
+	for _, info in pairs(E.global.datatexts.customCurrencies) do
+		local name = info.NAME
+		if currencyTable[name] then
+			currencyTable[name] = nil
+		end
+	end
+
+	for name, data in pairs(currencyTable) do
+		if not data.isLibDataBroker then
+			CreateDTOptions(name, data)
+		end
+	end
 end
 
 E.Options.args.datatexts = {
@@ -104,16 +472,8 @@ E.Options.args.datatexts = {
 	get = function(info) return E.db.datatexts[info[#info]] end,
 	set = function(info, value) E.db.datatexts[info[#info]] = value; DT:LoadDataTexts() end,
 	args = {
-		intro = {
-			order = 1,
-			type = "description",
-			name = L["DATATEXT_DESC"],
-		},
-		spacer = {
-			order = 2,
-			type = "description",
-			name = "",
-		},
+		intro = ACH:Description(L["DATATEXT_DESC"], 1),
+		spacer = ACH:Spacer(2),
 		general = {
 			order = 3,
 			type = "group",
@@ -130,24 +490,6 @@ E.Options.args.datatexts = {
 							type = 'toggle',
 							name = L["Battleground Texts"],
 							desc = L["When inside a battleground display personal scoreboard information on the main datatext bars."],
-						},
-						panelTransparency = {
-							order = 4,
-							name = L["Panel Transparency"],
-							type = 'toggle',
-							set = function(info, value)
-								E.db.datatexts[info[#info]] = value
-								Layout:SetDataPanelStyle()
-							end,
-						},
-						panelBackdrop = {
-							order = 5,
-							name = L["Backdrop"],
-							type = 'toggle',
-							set = function(info, value)
-								E.db.datatexts[info[#info]] = value
-								Layout:SetDataPanelStyle()
-							end,
 						},
 						noCombatClick = {
 							order = 6,
@@ -195,30 +537,6 @@ E.Options.args.datatexts = {
 						},
 					},
 				},
-				time = {
-					order = 6,
-					type = "group",
-					name = L["Time"],
-					guiInline = true,
-					args = {
-						time24 = {
-							order = 2,
-							type = 'toggle',
-							name = L["24-Hour Time"],
-							desc = L["Toggle 24-hour mode for the time datatext."],
-							get = function(info) return E.db.datatexts.time24 end,
-							set = function(info, value) E.db.datatexts.time24 = value; DT:LoadDataTexts() end,
-						},
-						localtime = {
-							order = 3,
-							type = 'toggle',
-							name = L["Local Time"],
-							desc = L["If not set to true then the server time will be displayed instead."],
-							get = function(info) return E.db.datatexts.localtime end,
-							set = function(info, value) E.db.datatexts.localtime = value; DT:LoadDataTexts() end,
-						},
-					},
-				},
 			},
 		},
 		panels = {
@@ -226,144 +544,188 @@ E.Options.args.datatexts = {
 			name = L["Panels"],
 			order = 4,
 			args = {
-				leftChatPanel = {
-					order = 2,
-					name = L["Datatext Panel (Left)"],
-					desc = L["Display data panels below the chat, used for datatexts."],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						if E.db.LeftChatPanelFaded then
-							E.db.LeftChatPanelFaded = true;
-							_G.HideLeftChat()
-						end
-						Chat:UpdateAnchors()
-						Layout:ToggleChatPanels()
-					end,
-				},
-				rightChatPanel = {
-					order = 3,
-					name = L["Datatext Panel (Right)"],
-					desc = L["Display data panels below the chat, used for datatexts."],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						if E.db.RightChatPanelFaded then
-							E.db.RightChatPanelFaded = true;
-							_G.HideRightChat()
-						end
-						Chat:UpdateAnchors()
-						Layout:ToggleChatPanels()
-					end,
-				},
-				minimapPanels = {
-					order = 4,
-					name = L["Minimap Panels"],
-					desc = L["Display minimap panels below the minimap, used for datatexts."],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapTop = {
-					order = 5,
-					name = L["TopMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapTopLeft = {
-					order = 6,
-					name = L["TopLeftMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapTopRight = {
-					order = 7,
-					name = L["TopRightMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapBottom = {
-					order = 8,
-					name = L["BottomMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapBottomLeft = {
-					order = 9,
-					name = L["BottomLeftMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				minimapBottomRight = {
-					order = 10,
-					name = L["BottomRightMiniPanel"],
-					type = 'toggle',
-					set = function(info, value)
-						E.db.datatexts[info[#info]] = value
-						Minimap:UpdateSettings()
-					end,
-				},
-				smallPanels = {
-					type = "group",
-					name = L["Small Panels"],
-					order = 12,
-					args = {},
-				},
-			},
-		},
-		friends = {
-			order = 7,
-			type = "group",
-			name = L["FRIENDS"],
-			args = {
-				description = {
-					order = 1,
-					type = "description",
-					name = L["Hide specific sections in the datatext tooltip."],
-				},
-				hideGroup = {
-					order = 2,
-					type = "group",
-					guiInline = true,
-					name = L["HIDE"],
+				newPanel = {
+					order = 0,
+					type = 'group',
+					name = ColorizeName(L['New Panel'], '33ff33'),
+					get = function(info) return E.global.datatexts.newPanelInfo[info[#info]] end,
+					set = function(info, value) E.global.datatexts.newPanelInfo[info[#info]] = value end,
 					args = {
-						hideAFK = {
-							order = 1,
-							type = 'toggle',
-							name = L["AFK"],
-							get = function(info) return E.db.datatexts.friends.hideAFK end,
-							set = function(info, value) E.db.datatexts.friends.hideAFK = value; DT:LoadDataTexts() end,
+						name = {
+							order = 0,
+							type = 'input',
+							width = 'full',
+							name = L["Name"],
+							validate = function(_, value)
+								return E.global.datatexts.customPanels[value] and L["Name Taken"] or true
+							end,
 						},
-						hideDND = {
-							order = 2,
+						add = {
+							order = 1,
+							type = 'execute',
+							name = L['Add'],
+							width = 'full',
+							hidden = function()
+								return E.global.datatexts.newPanelInfo.name == ''
+							end,
+							func = function()
+								local name = E.global.datatexts.newPanelInfo.name
+								E.global.datatexts.customPanels[name] = E:CopyTable({}, E.global.datatexts.newPanelInfo)
+								E.db.datatexts.panels[name] = { enable = true }
+
+								for i = 1, E.global.datatexts.newPanelInfo.numPoints do
+									E.db.datatexts.panels[name][i] = ''
+								end
+
+								PanelGroup_Create(name)
+								DT:BuildPanelFrame(name, E.global.datatexts.customPanels[name])
+								DT:PanelLayoutOptions()
+
+								E.Libs.AceConfigDialog:SelectGroup('ElvUI', 'datatexts', 'panels', name)
+								E.global.datatexts.newPanelInfo = E:CopyTable({}, G.datatexts.newPanelInfo)
+							end,
+						},
+					},
+				},
+				LeftChatDataPanel = {
+					type = "group",
+					name = ColorizeName(L["Datatext Panel (Left)"], 'cccccc'),
+					desc = L["Display data panels below the chat, used for datatexts."],
+					order = 2,
+					get = function(info) return E.db.datatexts.panels.LeftChatDataPanel[info[#info]] end,
+					set = function(info, value) E.db.datatexts.panels.LeftChatDataPanel[info[#info]] = value DT:UpdatePanelInfo('LeftChatDataPanel') Layout:SetDataPanelStyle() end,
+					args = {
+						enable = {
+							order = 0,
+							name = L['Enable'],
 							type = 'toggle',
-							name = L["DND"],
-							get = function(info) return E.db.datatexts.friends.hideDND end,
-							set = function(info, value) E.db.datatexts.friends.hideDND = value; DT:LoadDataTexts() end,
+							set = function(info, value)
+								E.db.datatexts.panels[info[#info - 1]][info[#info]] = value
+								if E.db.LeftChatPanelFaded then
+									E.db.LeftChatPanelFaded = true;
+									_G.HideLeftChat()
+								end
+
+								Chat:UpdateEditboxAnchors()
+								Layout:ToggleChatPanels()
+								Layout:SetDataPanelStyle()
+								DT:UpdatePanelInfo('LeftChatDataPanel')
+							end,
+						},
+						backdrop = {
+							order = 5,
+							name = L["Backdrop"],
+							type = "toggle",
+						},
+						border = {
+							order = 6,
+							name = L["Border"],
+							type = "toggle",
+						},
+						panelTransparency = {
+							order = 7,
+							type = 'toggle',
+							name = L["Panel Transparency"],
+						},
+					},
+				},
+				RightChatDataPanel = {
+					type = "group",
+					name = ColorizeName(L["Datatext Panel (Right)"], 'cccccc'),
+					desc = L["Display data panels below the chat, used for datatexts."],
+					order = 3,
+					get = function(info) return E.db.datatexts.panels.RightChatDataPanel[info[#info]] end,
+					set = function(info, value) E.db.datatexts.panels.RightChatDataPanel[info[#info]] = value DT:UpdatePanelInfo('RightChatDataPanel') Layout:SetDataPanelStyle() end,
+					args = {
+						enable = {
+							order = 0,
+							name = L['Enable'],
+							type = 'toggle',
+							set = function(info, value)
+								E.db.datatexts.panels[info[#info - 1]][info[#info]] = value
+								if E.db.RightChatPanelFaded then
+									E.db.RightChatPanelFaded = true;
+									_G.HideRightChat()
+								end
+
+								Chat:UpdateEditboxAnchors()
+								Layout:ToggleChatPanels()
+								Layout:SetDataPanelStyle()
+								DT:UpdatePanelInfo('RightChatDataPanel')
+							end,
+						},
+						backdrop = {
+							order = 5,
+							name = L["Backdrop"],
+							type = "toggle",
+						},
+						border = {
+							order = 6,
+							name = L["Border"],
+							type = "toggle",
+						},
+						panelTransparency = {
+							order = 7,
+							type = 'toggle',
+							name = L["Panel Transparency"],
+						},
+					},
+				},
+				MinimapPanel = {
+					type = "group",
+					name = ColorizeName(L["Minimap Panels"], 'cccccc'),
+					desc = L["Display minimap panels below the minimap, used for datatexts."],
+					get = function(info) return E.db.datatexts.panels.MinimapPanel[info[#info]] end,
+					set = function(info, value) E.db.datatexts.panels.MinimapPanel[info[#info]] = value DT:UpdatePanelInfo('MinimapPanel') end,
+					order = 4,
+					args = {
+						enable = {
+							order = 0,
+							name = L['Enable'],
+							type = 'toggle',
+							set = function(info, value)
+								E.db.datatexts.panels[info[#info - 1]][info[#info]] = value
+								DT:UpdatePanelInfo('MinimapPanel')
+								Minimap:UpdateSettings()
+							end,
+						},
+						numPoints = {
+							order = 5,
+							type = 'range',
+							name = L["Number of DataTexts"],
+							min = 1, max = 2, step = 1,
+						},
+						backdrop = {
+							order = 6,
+							name = L["Backdrop"],
+							type = "toggle",
+						},
+						border = {
+							order = 7,
+							name = L["Border"],
+							type = "toggle",
+						},
+						panelTransparency = {
+							order = 8,
+							type = 'toggle',
+							name = L["Panel Transparency"],
 						},
 					},
 				},
 			},
 		},
+		settings = {
+			order = 7,
+			type = "group",
+			name = L["DataText Customization"],
+			args = {},
+		}
 	},
 }
 
+E:CopyTable(E.Options.args.datatexts.args.panels.args.newPanel.args, DTPanelOptions)
+E.Options.args.datatexts.args.panels.args.newPanel.args.templateGroup.get = function(info, key) return E.global.datatexts.newPanelInfo[key] end
+E.Options.args.datatexts.args.panels.args.newPanel.args.templateGroup.set = function(info, key, value) E.global.datatexts.newPanelInfo[key] = value end
+
 DT:PanelLayoutOptions()
-SetupFriendClients()
+SetupDTCustomization()

@@ -1,7 +1,7 @@
 local E, L, V, P, G = unpack(select(2, ...))
-if E.myclass ~= "HUNTER" and E.myclass ~= "ROGUE" and E.myclass ~= "WARLOCK" and E.myclass ~= "WARRIOR" then return end
+if E.myclass ~= 'HUNTER' and E.myclass ~= 'ROGUE' and E.myclass ~= 'WARLOCK' and E.myclass ~= 'WARRIOR' then return end
 
-local DT = E:GetModule("DataTexts")
+local DT = E:GetModule('DataTexts')
 
 local _G = _G
 local select, wipe = select, wipe
@@ -25,8 +25,8 @@ local INVSLOT_AMMO = INVSLOT_AMMO
 local LE_ITEM_CLASS_QUIVER = LE_ITEM_CLASS_QUIVER
 local LE_ITEM_CLASS_CONTAINER = LE_ITEM_CLASS_CONTAINER
 
-local iconString = "|T%s:16:16:0:0:64:64:4:55:4:55|t"
-local displayString = ""
+local iconString = '|T%s:16:16:0:0:64:64:4:55:4:55|t'
+local displayString = ''
 
 local lastPanel
 local itemName = {}
@@ -48,7 +48,7 @@ local function OnEvent(self, event, ...)
 		self:UnregisterEvent('GET_ITEM_INFO_RECEIVED')
 	end
 
-	if E.myclass == "WARLOCK" then
+	if E.myclass == 'WARLOCK' then
 		name, count = itemName[6265] or GetItemInfo(6265), GetItemCount(6265)
 
 		if name and not itemName[6265] then
@@ -57,15 +57,15 @@ local function OnEvent(self, event, ...)
 
 		self.text:SetFormattedText(displayString, name or 'Soul Shard', count or 0) -- Does not need localized. It gets updated.
 	else
-		local RangeItemID = GetInventoryItemID("player", INVSLOT_RANGED)
+		local RangeItemID = GetInventoryItemID('player', INVSLOT_RANGED)
 		if RangeItemID then
 			itemEquipLoc = select(4, GetItemInfoInstant(RangeItemID))
 		end
 
-		if itemEquipLoc == "INVTYPE_THROWN" then
-			itemID, count = RangeItemID, GetInventoryItemCount("player", INVSLOT_RANGED)
+		if itemEquipLoc == 'INVTYPE_THROWN' then
+			itemID, count = RangeItemID, GetInventoryItemCount('player', INVSLOT_RANGED)
 		else
-			itemID, count = GetInventoryItemID("player", INVSLOT_AMMO), GetInventoryItemCount("player", INVSLOT_AMMO)
+			itemID, count = GetInventoryItemID('player', INVSLOT_AMMO), GetInventoryItemCount('player', INVSLOT_AMMO)
 		end
 
 		if (itemID and itemID > 0) and (count > 0) then
@@ -91,10 +91,8 @@ local function OnEvent(self, event, ...)
 end
 
 local itemCount = {}
-local function OnEnter(self)
-	DT:SetupTooltip(self)
-
-	if E.myclass == 'HUNTER' or E.myclass == "ROGUE" or E.myclass == "WARRIOR" then
+local function OnEnter()
+	if E.myclass == 'HUNTER' or E.myclass == 'ROGUE' or E.myclass == 'WARRIOR' then
 		wipe(itemCount)
 		DT.tooltip:AddLine(INVTYPE_AMMO)
 
@@ -104,19 +102,19 @@ local function OnEnter(self)
 				if itemID and not itemCount[itemID] then
 					local name, _, quality, _, _, _, _, _, equipLoc, texture = GetItemInfo(itemID)
 					local count = GetItemCount(itemID)
-					if equipLoc == "INVTYPE_AMMO" or equipLoc == "INVTYPE_THROWN" then
-						DT.tooltip:AddDoubleLine(strjoin("", format(iconString, texture), " ", name), count, GetItemQualityColor(quality))
+					if equipLoc == 'INVTYPE_AMMO' or equipLoc == 'INVTYPE_THROWN' then
+						DT.tooltip:AddDoubleLine(strjoin('', format(iconString, texture), ' ', name), count, GetItemQualityColor(quality))
 						itemCount[itemID] = count
 					end
 				end
 			end
 		end
 
-		DT.tooltip:AddLine(" ")
+		DT.tooltip:AddLine(' ')
 	end
 
 	for i = 1, NUM_BAG_SLOTS do
-		local itemID = GetInventoryItemID("player", ContainerIDToInventoryID(i))
+		local itemID = GetInventoryItemID('player', ContainerIDToInventoryID(i))
 		if itemID then
 			local name, _, quality, _, _, _, itemSubType, _, _, texture, itemClassID, itemSubClassID = GetItemInfo(itemID)
 			if itemSubClassID == LE_ITEM_CLASS_QUIVER or itemClassID == LE_ITEM_CLASS_CONTAINER and itemSubClassID == 1 then
@@ -124,7 +122,7 @@ local function OnEnter(self)
 				local used = total - free
 
 				DT.tooltip:AddLine(itemSubType)
-				DT.tooltip:AddDoubleLine(strjoin("", format(iconString, texture), "  ", name), format("%d / %d", used, total), GetItemQualityColor(quality))
+				DT.tooltip:AddDoubleLine(strjoin('', format(iconString, texture), '  ', name), format('%d / %d', used, total), GetItemQualityColor(quality))
 			end
 		end
 	end
@@ -133,10 +131,10 @@ local function OnEnter(self)
 end
 
 local function OnClick(_, btn)
-	if btn == "LeftButton" then
+	if btn == 'LeftButton' then
 		if not E.private.bags.enable then
 			for i = 1, NUM_BAG_SLOTS do
-				local itemID = GetInventoryItemID("player", ContainerIDToInventoryID(i))
+				local itemID = GetInventoryItemID('player', ContainerIDToInventoryID(i))
 				if itemID then
 					local itemClassID, itemSubClassID = select(11, GetItemInfo(itemID))
 					if itemSubClassID == LE_ITEM_CLASS_QUIVER or itemClassID == LE_ITEM_CLASS_CONTAINER and itemSubClassID == 1 then
@@ -151,7 +149,7 @@ local function OnClick(_, btn)
 end
 
 local function ValueColorUpdate(hex)
-	displayString = strjoin("", "%s: ", hex, "%d|r")
+	displayString = strjoin('', '%s: ', hex, '%d|r')
 
 	if lastPanel ~= nil then
 		OnEvent(lastPanel)
@@ -159,4 +157,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext(INVTYPE_AMMO, {"PLAYER_ENTERING_WORLD", "BAG_UPDATE", "UNIT_INVENTORY_CHANGED"}, OnEvent, nil, OnClick, OnEnter, nil, L["Ammo/Shard Counter"])
+DT:RegisterDatatext('Ammo', nil, {'BAG_UPDATE', 'UNIT_INVENTORY_CHANGED'}, OnEvent, nil, OnClick, OnEnter, nil, L["Ammo/Shard Counter"])

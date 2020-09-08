@@ -14,7 +14,6 @@ local EnableAddOn = EnableAddOn
 local LoadAddOn = LoadAddOn
 local GetAddOnMetadata = GetAddOnMetadata
 local GetAddOnInfo = GetAddOnInfo
-local GameTooltip = GameTooltip
 local CreateFrame = CreateFrame
 local IsAddOnLoaded = IsAddOnLoaded
 local InCombatLockdown = InCombatLockdown
@@ -24,6 +23,8 @@ local EditBox_ClearFocus = EditBox_ClearFocus
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
 local RESET = RESET
 -- GLOBALS: ElvUIMoverPopupWindow, ElvUIMoverNudgeWindow, ElvUIMoverPopupWindowDropDown
+
+local ConfigTooltip = CreateFrame("GameTooltip", "ElvUIConfigTooltip", E.UIParent, "GameTooltipTemplate")
 
 local grid
 E.ConfigModeLayouts = {
@@ -594,17 +595,17 @@ function E:Config_StopMoving()
 end
 
 local function Config_ButtonOnEnter(self)
-	if GameTooltip:IsForbidden() or not self.desc then return end
+	if ConfigTooltip:IsForbidden() or not self.desc then return end
 
-	GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 2)
-	GameTooltip:AddLine(self.desc, 1, 1, 1, true)
-	GameTooltip:Show()
+	ConfigTooltip:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 2)
+	ConfigTooltip:AddLine(self.desc, 1, 1, 1, true)
+	ConfigTooltip:Show()
 end
 
 local function Config_ButtonOnLeave()
-	if GameTooltip:IsForbidden() then return end
+	if ConfigTooltip:IsForbidden() then return end
 
-	GameTooltip:Hide()
+	ConfigTooltip:Hide()
 end
 
 local function Config_StripNameColor(name)
@@ -837,8 +838,8 @@ function E:Config_CloseWindow()
 		ACD:Close('ElvUI')
 	end
 
-	if not GameTooltip:IsForbidden() then
-		GameTooltip:Hide()
+	if not ConfigTooltip:IsForbidden() then
+		ConfigTooltip:Hide()
 	end
 end
 
@@ -853,8 +854,8 @@ function E:Config_OpenWindow()
 		end
 	end
 
-	if not GameTooltip:IsForbidden() then
-		GameTooltip:Hide()
+	if not ConfigTooltip:IsForbidden() then
+		ConfigTooltip:Hide()
 	end
 end
 
@@ -863,6 +864,13 @@ function E:Config_GetWindow()
 	local ConfigOpen = ACD and ACD.OpenFrames and ACD.OpenFrames[E.name]
 	return ConfigOpen and ConfigOpen.frame
 end
+
+local ConfigLogoTop
+E.valueColorUpdateFuncs[function(_, r, b, g)
+	if ConfigLogoTop then
+		ConfigLogoTop:SetVertexColor(r, b, g)
+	end
+end] = true
 
 function E:Config_WindowClosed()
 	if not self.bottomHolder then return end
@@ -875,6 +883,11 @@ function E:Config_WindowClosed()
 		self.leftHolder.slider:Hide()
 		self.closeButton:Hide()
 		self.originalClose:Show()
+
+		ConfigLogoTop = nil
+
+		E:StopElasticize(self.leftHolder.LogoTop)
+		E:StopElasticize(self.leftHolder.LogoBottom)
 
 		E:Config_RestoreOldPosition(self.topHolder.version)
 		E:Config_RestoreOldPosition(self.obj.content)
@@ -891,7 +904,13 @@ function E:Config_WindowOpened(frame)
 		frame.closeButton:Show()
 		frame.originalClose:Hide()
 
-		local unskinned = not E.private.skins.ace3.enable
+		frame.leftHolder.LogoTop:SetVertexColor(unpack(E.media.rgbvaluecolor))
+		ConfigLogoTop = frame.leftHolder.LogoTop
+
+		E:Elasticize(frame.leftHolder.LogoTop, 128, 64)
+		E:Elasticize(frame.leftHolder.LogoBottom, 128, 64)
+
+		local unskinned = not E.private.skins.ace3Enable
 		local offset = unskinned and 14 or 8
 		local version = frame.topHolder.version
 		E:Config_SaveOldPosition(version)
@@ -1096,7 +1115,7 @@ function E:ToggleOptionsUI(msg)
 				end
 			end
 
-			local unskinned = not E.private.skins.ace3.enable
+			local unskinned = not E.private.skins.ace3Enable
 			if unskinned then
 				for i=1, frame:GetNumRegions() do
 					local region = select(i, frame:GetRegions())
@@ -1133,11 +1152,17 @@ function E:ToggleOptionsUI(msg)
 			top:Height(24)
 			frame.topHolder = top
 
-			local logo = left:CreateTexture()
-			logo:SetTexture(E.Media.Textures.LogoSmall)
-			logo:Point("CENTER", left, "TOP", unskinned and 10 or 0, unskinned and -40 or -36)
-			logo:Size(128, 64)
-			left.logo = logo
+			local LogoBottom = left:CreateTexture()
+			LogoBottom:SetTexture(E.Media.Textures.LogoBottomSmall)
+			LogoBottom:Point("CENTER", left, "TOP", unskinned and 10 or 0, unskinned and -40 or -36)
+			LogoBottom:Size(128, 64)
+			left.LogoBottom = LogoBottom
+
+			local LogoTop = left:CreateTexture()
+			LogoTop:SetTexture(E.Media.Textures.LogoTopSmall)
+			LogoTop:Point("CENTER", left, "TOP", unskinned and 10 or 0, unskinned and -40 or -36)
+			LogoTop:Size(128, 64)
+			left.LogoTop = LogoTop
 
 			local buttonsHolder = CreateFrame('Frame', nil, left)
 			buttonsHolder:Point("BOTTOMLEFT", bottom, "TOPLEFT", 0, 1)

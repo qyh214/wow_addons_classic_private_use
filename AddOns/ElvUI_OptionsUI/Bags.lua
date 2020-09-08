@@ -1,6 +1,7 @@
 local E, _, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local C, L = unpack(select(2, ...))
 local B = E:GetModule('Bags')
+local ACH = E.Libs.ACH
 
 local _G = _G
 local gsub = gsub
@@ -16,11 +17,7 @@ E.Options.args.bags = {
 	get = function(info) return E.db.bags[info[#info]] end,
 	set = function(info, value) E.db.bags[info[#info]] = value end,
 	args = {
-		intro = {
-			order = 1,
-			type = 'description',
-			name = L["BAGS_DESC"],
-		},
+		intro = ACH:Description(L["BAGS_DESC"], 1),
 		enable = {
 			order = 2,
 			type = "toggle",
@@ -76,53 +73,60 @@ E.Options.args.bags = {
 					name = L["Transparent Buttons"],
 					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
 				},
-				junkIcon = {
+				questIcon = {
 					order = 5,
+					type = "toggle",
+					name = L["Show Quest Icon"],
+					desc = L["Display an exclamation mark on items that starts a quest."],
+					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAllBagSlots() end
+				},
+				junkIcon = {
+					order = 6,
 					type = 'toggle',
 					name = L["Show Junk Icon"],
 					desc = L["Display the junk icon on all grey items that can be vendored."],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				junkDesaturate = {
-					order = 6,
+					order = 7,
 					type = 'toggle',
 					name = L["Desaturate Junk Items"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				newItemGlow = {
-					order = 9,
+					order = 8,
 					type = 'toggle',
 					name = L["Show New Item Glow"],
 					desc = L["Display the New Item Glow"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				qualityColors = {
-					order = 11,
+					order = 9,
 					type = 'toggle',
 					name = L["Show Quality Color"],
 					desc = L["Colors the border according to the Quality of the Item."],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				specialtyColors = {
-					order = 12,
+					order = 10,
 					type = 'toggle',
 					name = L["Show Special Bags Color"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				showBindType = {
-					order = 13,
+					order = 11,
 					type = 'toggle',
 					name = L["Show Bind on Equip/Use Text"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:UpdateAllBagSlots(); end,
 				},
 				clearSearchOnClose = {
-					order = 14,
+					order = 12,
 					type = 'toggle',
 					name = L["Clear Search On Close"],
 					set = function(info, value) E.db.bags[info[#info]] = value; end
 				},
 				reverseLoot = {
-					order = 15,
+					order = 13,
 					type = "toggle",
 					name = L["REVERSE_NEW_LOOT_TEXT"],
 					set = function(info, value)
@@ -131,25 +135,25 @@ E.Options.args.bags = {
 					end,
 				},
 				reverseSlots = {
-					order = 16,
+					order = 14,
 					type = "toggle",
 					name = L["Reverse Bag Slots"],
 					set = function(info, value) E.db.bags[info[#info]] = value B:UpdateAll() end,
 				},
 				disableBagSort = {
-					order = 17,
+					order = 15,
 					type = "toggle",
 					name = L["Disable Bag Sort"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:ToggleSortButtonState(false); end
 				},
 				disableBankSort = {
-					order = 18,
+					order = 16,
 					type = "toggle",
 					name = L["Disable Bank Sort"],
 					set = function(info, value) E.db.bags[info[#info]] = value; B:ToggleSortButtonState(true); end
 				},
 				strata = {
-					order = 20,
+					order = 17,
 					type = "select",
 					name = L["Frame Strata"],
 					set = function(info, value) E.db.bags[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL") end,
@@ -521,78 +525,33 @@ E.Options.args.bags = {
 				},
 				splitbags = {
 					order = 4,
-					type = "group",
+					type = "multiselect",
 					name = L["Player"],
-					get = function(info) return E.db.bags.split[info[#info]] end,
-					set = function(info, value) E.db.bags.split[info[#info]] = value B:Layout() end,
-					guiInline = true,
-					args = {
-						bag1 = {
-							order = 2,
-							type = "toggle",
-							name = L["Bag 1"],
-						},
-						bag2 = {
-							order = 3,
-							type = "toggle",
-							name = L["Bag 2"],
-						},
-						bag3 = {
-							order = 4,
-							type = "toggle",
-							name = L["Bag 3"],
-						},
-						bag4 = {
-							order = 5,
-							type = "toggle",
-							name = L["Bag 4"],
-						},
+					get = function(info, key) return E.db.bags.split[key] end,
+					set = function(info, key, value) E.db.bags.split[key] = value B:Layout() end,
+					values = {
+						bag1 = L["Bag 1"],
+						bag2 = L["Bag 2"],
+						bag3 = L["Bag 3"],
+						bag4 = L["Bag 4"],
 					},
 					disabled = function() return not E.db.bags.split.player end,
 				},
 				splitbank = {
 					order = 5,
-					type = "group",
+					type = "multiselect",
 					name = L["Bank"],
-					get = function(info) return E.db.bags.split[info[#info]] end,
-					set = function(info, value) E.db.bags.split[info[#info]] = value B:Layout(true) end,
-					guiInline = true,
-					args = {
-						bag5 = {
-							order = 2,
-							type = "toggle",
-							name = L["Bank 1"],
-						},
-						bag6 = {
-							order = 3,
-							type = "toggle",
-							name = L["Bank 2"],
-						},
-						bag7 = {
-							order = 4,
-							type = "toggle",
-							name = L["Bank 3"],
-						},
-						bag8 = {
-							order = 5,
-							type = "toggle",
-							name = L["Bank 4"],
-						},
-						bag9 = {
-							order = 6,
-							type = "toggle",
-							name = L["Bank 5"],
-						},
-						bag10 = {
-							order = 7,
-							type = "toggle",
-							name = L["Bank 6"],
-						},
-						bag11 = {
-							order = 8,
-							type = "toggle",
-							name = L["Bank 7"],
-						},
+					get = function(info, key) return E.db.bags.split[key] end,
+					set = function(info, key, value) E.db.bags.split[key] = value B:Layout(true) end,
+					sortByValue = true,
+					values = {
+						bag5 = L["Bank 1"],
+						bag6 = L["Bank 2"],
+						bag7 = L["Bank 3"],
+						bag8 = L["Bank 4"],
+						bag9 = L["Bank 5"],
+						bag10 = L["Bank 6"],
+						bag11 = L["Bank 7"],
 					},
 					disabled = function() return not E.db.bags.split.bank end,
 				},
@@ -643,11 +602,7 @@ E.Options.args.bags = {
 					name = L["Sort Inverted"],
 					desc = L["Direction the bag sorting will use to allocate the items."],
 				},
-				description = {
-					order = 3,
-					type = "description",
-					name = L["Here you can add items or search terms that you want to be excluded from sorting. To remove an item just click on its name in the list."],
-				},
+				description = ACH:Description(L["Here you can add items or search terms that you want to be excluded from sorting. To remove an item just click on its name in the list."], 3),
 				addEntryGroup = {
 					order = 4,
 					type = "group",

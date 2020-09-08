@@ -31,10 +31,6 @@ QuestieLocale.locale['deDE'] = {
     ['ENABLE_TURNINS_DESC'] = "Aktiviert/Deaktiviert die Icons der abgeschlossenen Quests auf der Karte/Minimap.",
     ['ENABLE_AVAILABLE'] = "Icons zu verfügbaren Quests anzeigen",
     ['ENABLE_AVAILABLE_DESC'] = "Aktiviert/Deaktiviert die Icons der verfügbaren Quests auf der Karte/Minimap.",
-    ['ENABLE_TOOLTIPS'] = "Tooltips aktivieren",
-    ['ENABLE_TOOLTIPS_DESC'] = "Aktiviert/Deaktiviert zusätzliche Informationen zu Gegnern und Gegenständen als Tooltip.",
-    ['ENABLE_TOOLTIPS_QUEST_LEVEL'] = "Questlevel in Tooltips aktivieren",
-    ['ENABLE_TOOLTIPS_QUEST_LEVEL_DESC'] = "Aktiviert/Deaktiviert, ob das Questlevel in den Tooltips angezeigt wird.",
     ['ICON_TYPE_HEADER'] = "Icon-Arten",
     ['ENABLE_MAP_ICONS'] = "Karten-Icons anzeigen",
     ['ENABLE_MAP_ICONS_DESC'] = "Aktiviert/Deaktiviert alle Icons auf der Karte",
@@ -58,6 +54,8 @@ QuestieLocale.locale['deDE'] = {
     ['ENABLE_DUNGEON_RAID_ICONS_DESC'] = "Aktiviert/Deaktiviert die Icons von Raid-Quests auf der Karte/Minimap.",
     ['ENABLE_PVP_QUEST_ICONS'] = "PvP-Quests anzeigen",
     ['ENABLE_PVP_QUEST_ICONS_DESC'] = "Aktiviert/Deaktiviert die Icons von PvP-Quests auf der Karte/Minimap.",
+    ['ENABLE_AQ_QUEST_ICONS'] = "AQ Kriegsanstrengungen Quests anzeigen",
+    ['ENABLE_AQ_QUEST_ICONS_DESC'] = "Aktiviert/Deaktiviert die Icons der AQ Kriegsanstrengungen Quests auf der Karte/Minimap.",
     ['ENABLE_AUTO_ACCEPT_QUESTS'] = "Quests automatisch annehmen",
     ['ENABLE_AUTO_ACCEPT_QUESTS_DESC'] = "Aktiviert/Deaktiviert, ob Questie Quests automatisch annimmt.",
     ['ENABLE_AUTO_COMPLETE'] = "Quests automatisch abgeben",
@@ -164,6 +162,16 @@ QuestieLocale.locale['deDE'] = {
     ['TARGET_SCALE_DESC'] = "Skaliert wie groß die Quest-Icons am anvisierten Ziel sein sollen. ( Standard: %s )",
     ['TARGET_RESET_BTN'] = "Zielanzeige zurücksetzen",
     ['TARGET_RESET_BTN_DESC'] = "Setzt die Position und Skalierung der Icons am anvisierten Ziel zurück.",
+
+    -- Tooltip tab
+    ['TOOLTIP_TAB'] = "Tooltip",
+    ['TOOLTIP_OPTIONS_HEADER'] = "Tooltip-Optionen",
+    ['ENABLE_TOOLTIPS'] = "Tooltips aktivieren",
+    ['ENABLE_TOOLTIPS_DESC'] = "Aktiviert/Deaktiviert zusätzliche Informationen zu Gegnern und Gegenständen als Tooltip.",
+    ['ENABLE_TOOLTIPS_QUEST_LEVEL'] = "Questlevel in Tooltips aktivieren",
+    ['ENABLE_TOOLTIPS_QUEST_LEVEL_DESC'] = "Aktiviert/Deaktiviert, ob das Questlevel in den Tooltips angezeigt wird.",
+    ['SHARED_TOOLTIP_PARTY_ONLY'] = "Party nur geteilt",
+    ['SHARED_TOOLTIP_PARTY_ONLY_DESC'] = "Wenn dies aktiviert ist, werden freigegebene Questinformationen nur angezeigt, wenn sie von Gruppenmitgliedern stammen.",
 
     -- Advanced tab
     ['ADVANCED_TAB'] = "Erweitert",

@@ -2,6 +2,9 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "frFR")
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = "|cff00ff00assigné à |r"
 L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = "% du (des) cadre(s) à un point d'ancrage contradictoire(s), merci de changer le point d'ancrage des améliorations ou des affaiblissements de sorte qu'ils ne soient pas attachés les uns aux autres. Forcer les affaiblissements à être attachés au cadre d'unité principale jusqu'à ce qu'ils soient fixés."
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = "%s tente de partager ses filtres avec vous. Voulez-vous accepter la demande ?"
@@ -47,7 +50,7 @@ L["Bank Mover (Grow Up)"] = "Orientation de la banque (ajouter vers le haut)"
 L["Bank"] = "Banque"
 L["Bar "] = "Barre "
 L["Bars"] = "Barres"
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = "Textes d'informations du champ de bataille temporairement masqués, pour les afficher tapez /bgstats ou cliquez droit sur le 'C' près de la mini-carte."
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = "Les textes d'informations du champ de bataille seront à nouveau affichés si vous êtes dans un champ de bataille."
 L["BfA Missions"] = true
 L["Binding"] = "Raccourcis"
@@ -58,7 +61,6 @@ L["Blend"] = true
 L["BNet Frame"] = "Cadre BNet"
 L["Boss Button"] = "Bouton du Boss"
 L["Boss Frames"] = "Cadre du Boss"
-L["Building(s) Report:"] = "Rapport des bâtiments :"
 L["Calendar"] = "Calendrier"
 L["Can't buy anymore slots!"] = "Impossible d'acheter plus emplacements !"
 L["Can't Roll"] = "Ne peut pas jeter les dés"
@@ -88,7 +90,6 @@ L["Dead"] = "Mort"
 L["Deficit:"] = "Déficit :"
 L["Delete gray items?"] = true
 L["Deposit Reagents"] = "Déposer les composants"
-L["Desaturate all grey items that can be vendored."] = true
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = "Nous avons détecté que votre installation d'ElvUI est périmée. Cela peut venir du client Tukui qui est également périmé. Merci de visiter notre page de téléchargement pour mettre à jour le client Tukui, puis réinstallez ElvUI. Ne pas avoir la version à jour ElvUI peut entrainer des erreurs."
 L["Disable Warning"] = "Désactiver l'alerte"
 L["Disable"] = "Désactiver"
@@ -123,7 +124,6 @@ L["FocusTarget Frame"] = "Cadre de la cible de votre focus"
 L["For technical support visit us at http://www.tukui.org."] = "Pour tout support technique, merci de nous rendre visite sur http://www.tukui.org."
 L["Friends List"] = "Liste d'amis"
 L["G"] = "G"
-L["Garrison"] = "Fief"
 L["Ghost"] = "Fantôme"
 L["GM Ticket Frame"] = "Cadre du ticket MJ"
 L["Gold"] = "Or"
@@ -144,17 +144,16 @@ L["Hover your mouse over any actionbutton or spellbook button to bind it. Press 
 L["HP"] = "PV"
 L["HPS"] = "HPS"
 L["I Swear"] = "Je le jure"
-L["I"] = "I"
+L["I"] = true
 L["Icons Only"] = "Icônes seulement"
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = "Si vous supprimez accidentellement un cadre de discussion, vous pouvez toujours aller dans le menu de configuration d'ElvUI. Cliquez ensuite sur Installation puis passez à l'étape concernant les fenêtres de discussion pour remettre à zéro les paramètres."
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = "Si vous rencontrez des problèmes avec ElvUI, essayez de désactiver tous vos addons sauf ElvUI. Rappelez-vous qu'ElvUi est une interface utilisateur complète et que vous ne pouvez pas exécuter deux addons qui font la même chose."
 L["IL"] = "IL"
-L["Importance: |cff07D400High|r"] = "Importance : |cff07D400Haute|r"
+L["Importance: |cffFF3333High|r"] = "Importance : |cffFF3333Haute|r"
 L["Importance: |cffD3CF00Medium|r"] = "Importance : |cffD3CF00Moyenne|r"
-L["Importance: |cffFF0000Low|r"] = "Importance : |cffFF0000Faible|r"
+L["Importance: |cFF33FF33Low|r"] = "Importance : |cFF33FF33Faible|r"
 L["In Progress"] = "En cours"
 L["INCOMPATIBLE_ADDON"] = "L'addon %s n'est pas compatible avec le module %s d'ElvUI. Merci de sélectionner soit l'addon, soit le module d'ElvUI, pour le désactiver."
-L["Info/Controls"] = true
 L["Installation Complete"] = "Installation terminée"
 L["Invalid Target"] = "Cible incorrecte"
 L["is looking for members"] = true
@@ -185,7 +184,8 @@ L["Legs"] = "Jambes"
 L["Level Up Display / Boss Banner"] = "Affichage du gain de niveau / de la bannière du boss"
 L["List of installations in queue:"] = "Liste des installations en file d'attente"
 L["Lock"] = "Verrouiller"
-L["LOGIN_MSG"] = "Welcome to %sElvUI|r |cff1784d1Classic|r version %s%s|r, type /ec to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("Welcome to *ElvUI|r |cff1784d1Classic|r version *%s|r, type */ec|r to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = "Cadres de butin / Alerte"
 L["Loot Frame"] = "Cadre de butin"
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = "Seigneur ! C'est un miracle ! Le téléchargement s'est envolé et a disparu comme un pet dans le vent ! Essayez encore !"
@@ -196,13 +196,11 @@ L["Main Hand"] = "Main droite"
 L["Micro Bar"] = "Micro Barre"
 L["Minimap"] = "Minicarte"
 L["MirrorTimer"] = "Timer mirroir"
-L["Mission(s) Report:"] = "Rapport de mission :"
 L["Mitigation By Level: "] = "Réduction par niveau : "
 L["Mobile"] = true
 L["Modulating Blend"] = true
 L["Mov. Speed:"] = "Vitesse :"
 L["MT Frames"] = "Cadres du tank principal"
-L["Naval Mission(s) Report:"] = "Rapport de mission(s) navale(s) :"
 L["No bindings set."] = "Aucune assignation"
 L["No gray items to delete."] = "Aucun objet gris à détruire."
 L["No Guild"] = "Pas de Guilde"
@@ -250,8 +248,8 @@ L["Remaining:"] = "Restant :"
 L["Remove Bar %d Action Page"] = "Retirer la pagination de la barre d'action"
 L["Reputation Bar"] = "Barre de réputation"
 L["Request was denied by user."] = "La requête a été refusée par l'utilisateur."
-L["Reset Counters: Hold Shift + Left Click"] = true
-L["Reset Data: Hold Shift + Right Click"] = "RAZ des données : MAJ + Clic droit"
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = "Réinitialiser la position"
 L["Rested:"] = "Reposé :"
 L["Right Chat"] = "Chat de droite"
@@ -279,7 +277,6 @@ L["Spec"] = "Spec"
 L["Spell/Heal Power"] = "Puissance d'attaque / de soin"
 L["Spent:"] = "Dépensé :"
 L["Stance Bar"] = "Barre de posture"
-L["Stats For:"] = "Statistiques pour :"
 L["Steps"] = "Etapes"
 L["Sticky Frames"] = "Cadres aimantés"
 L["System"] = "Système"
@@ -332,7 +329,6 @@ L["Welcome to ElvUI version %s!"] = "Bienvenue sur la version %s d'ElvUI!"
 L["whispers"] = "chuchote"
 L["World Latency:"] = true
 L["World Protocol:"] = true
-L["WoW Token:"] = true
 L["Wrist"] = "Poignets"
 L["XP:"] = "XP :"
 L["yells"] = "crie"
@@ -371,3 +367,17 @@ Options:
   Shift + clic droit - Cacher temporairement.
   Ctrl + clic droit - Réinitialiser la position par défaut.
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

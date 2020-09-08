@@ -2,7 +2,7 @@ Guidelime.registerGuide([[
 
 [N55-58 Bustea's Horde Guide]
 [D Bustea's  Horde Leveling guide https://twitch.tv/bustea/ ]
-[NX58-60 Bustea's Horde Guide PHASE 1-4]
+[NX58-60 Bustea's Horde Guide PHASE 1-5]
 [GA Horde]
 
 You should be level [XP55 55] to start this guide.

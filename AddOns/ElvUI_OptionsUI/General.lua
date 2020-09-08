@@ -110,12 +110,6 @@ E.Options.args.general = {
 					desc = L["Automatically accept invites from guild/friends."],
 					type = 'toggle',
 				},
-				questRewardMostValueIcon = {
-					order = 12,
-					type = "toggle",
-					name = L["Mark Quest Reward"],
-					desc = L["Marks the most valuable quest reward with a gold coin."],
-				},
 				messageRedirect = {
 					order = 13,
 					name = L["Chat Output"],
@@ -134,11 +128,12 @@ E.Options.args.general = {
 						E:StaticPopup_Show("CONFIG_RL")
 					end,
 					values = {
-						["CHINESE"] = "Chinese (万, 亿)",
-						["ENGLISH"] = "English (K, M, B)",
-						["GERMAN"] = "German (Tsd, Mio, Mrd)",
-						["KOREAN"] = "Korean (천, 만, 억)",
-						["METRIC"] = "Metric (k, M, G)"
+						["TCHINESE"] = "萬, 億",
+						["CHINESE"] = "万, 亿",
+						["ENGLISH"] = "K, M, B",
+						["GERMAN"] = "Tsd, Mio, Mrd",
+						["KOREAN"] = "천, 만, 억",
+						["METRIC"] = "k, M, G"
 					},
 				},
 				decimalLength = {
@@ -216,6 +211,11 @@ E.Options.args.general = {
 					desc = L["Automatically repair using the following method when visiting a merchant."],
 					type = 'toggle',
 				},
+				autoTrackReputation = {
+					order = 20,
+					name = L["Auto Track Reputation"],
+					type = 'toggle',
+				},
 			},
 		},
 		media = {
@@ -231,61 +231,84 @@ E.Options.args.general = {
 					type = 'group',
 					guiInline = true,
 					args = {
-						fontSize = {
+						main = {
 							order = 1,
-							name = L["FONT_SIZE"],
-							desc = L["Set the font size for everything in UI. Note: This doesn't effect somethings that have their own seperate options (UnitFrame Font, Datatext Font, ect..)"],
-							type = "range",
-							min = 4, max = 32, step = 1,
-							set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
+							type = 'group',
+							name = ' ',
+							args = {
+								font = {
+									type = "select", dialogControl = 'LSM30_Font',
+									order = 1,
+									name = L["Default Font"],
+									desc = L["The font that the core of the UI will use."],
+									values = AceGUIWidgetLSMlists.font,
+									set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
+								},
+								fontSize = {
+									order = 2,
+									name = L["FONT_SIZE"],
+									desc = L["Set the font size for everything in UI. Note: This doesn't effect somethings that have their own seperate options (UnitFrame Font, Datatext Font, ect..)"],
+									type = "range",
+									min = 4, max = 32, step = 1,
+									set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
+								},
+								fontStyle = {
+									type = "select",
+									order = 3,
+									name = L["Font Outline"],
+									values = C.Values.FontFlags,
+									set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
+								},
+								applyFontToAll = {
+									order = 4,
+									type = 'execute',
+									name = L["Apply Font To All"],
+									desc = L["Applies the font and font size settings throughout the entire user interface. Note: Some font size settings will be skipped due to them having a smaller font size by default."],
+									func = function() E:StaticPopup_Show("APPLY_FONT_WARNING"); end,
+								},
+								replaceBlizzFonts = {
+									order = 5,
+									type = 'toggle',
+									name = L["Replace Blizzard Fonts"],
+									desc = L["Replaces the default Blizzard fonts on various panels and frames with the fonts chosen in the Media section of the ElvUI Options. NOTE: Any font that inherits from the fonts ElvUI usually replaces will be affected as well if you disable this. Enabled by default."],
+									get = function(info) return E.private.general[info[#info]] end,
+									set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
+								},
+							},
 						},
-						font = {
-							type = "select", dialogControl = 'LSM30_Font',
-							order = 2,
-							name = L["Default Font"],
-							desc = L["The font that the core of the UI will use."],
-							values = AceGUIWidgetLSMlists.font,
-							set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
-						},
-						fontStyle = {
-							type = "select",
-							order = 3,
-							name = L["Font Outline"],
-							values = C.Values.FontFlags,
-							set = function(info, value) E.db.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); end,
-						},
-						applyFontToAll = {
-							order = 4,
-							type = 'execute',
-							name = L["Apply Font To All"],
-							desc = L["Applies the font and font size settings throughout the entire user interface. Note: Some font size settings will be skipped due to them having a smaller font size by default."],
-							func = function() E:StaticPopup_Show("APPLY_FONT_WARNING"); end,
+						replaceCombatFont = {
+							order = 6,
+							type = 'toggle',
+							name = L["Replace Combat Font"],
+							get = function(info) return E.private.general[info[#info]] end,
+							set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
 						},
 						dmgfont = {
 							type = "select", dialogControl = 'LSM30_Font',
-							order = 5,
+							order = 7,
 							name = L["CombatText Font"],
 							desc = L["The font that combat text will use. |cffFF0000WARNING: This requires a game restart or re-log for this change to take effect.|r"],
+							disabled = function() return not E.private.general.replaceCombatFont end,
 							values = AceGUIWidgetLSMlists.font,
 							get = function(info) return E.private.general[info[#info]] end,
 							set = function(info, value) E.private.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); E:StaticPopup_Show("PRIVATE_RL"); end,
+						},
+						replaceNameFont = {
+							order = 8,
+							type = 'toggle',
+							name = L["Replace Name Font"],
+							get = function(info) return E.private.general[info[#info]] end,
+							set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
 						},
 						namefont = {
 							type = "select", dialogControl = 'LSM30_Font',
-							order = 6,
+							order = 9,
 							name = L["Name Font"],
 							desc = L["The font that appears on the text above players heads. |cffFF0000WARNING: This requires a game restart or re-log for this change to take effect.|r"],
+							disabled = function() return not E.private.general.replaceNameFont end,
 							values = AceGUIWidgetLSMlists.font,
 							get = function(info) return E.private.general[info[#info]] end,
 							set = function(info, value) E.private.general[info[#info]] = value; E:UpdateMedia(); E:UpdateFontTemplates(); E:StaticPopup_Show("PRIVATE_RL"); end,
-						},
-						replaceBlizzFonts = {
-							order = 7,
-							type = 'toggle',
-							name = L["Replace Blizzard Fonts"],
-							desc = L["Replaces the default Blizzard fonts on various panels and frames with the fonts chosen in the Media section of the ElvUI Options. NOTE: Any font that inherits from the fonts ElvUI usually replaces will be affected as well if you disable this. Enabled by default."],
-							get = function(info) return E.private.general[info[#info]] end,
-							set = function(info, value) E.private.general[info[#info]] = value; E:StaticPopup_Show("PRIVATE_RL"); end,
 						},
 					},
 				},
@@ -478,106 +501,14 @@ E.Options.args.general = {
 					get = function(info) return E.db.general.durabilityScale end,
 					set = function(info, value) E.db.general.durabilityScale = value; E:StaticPopup_Show("PRIVATE_RL") end,
 				},
-				--itemLevelInfo = {
-				--	order = 13,
-				--	name = L["Item Level"],
-				--	type = 'group',
-				--	guiInline = true,
-				--	get = function(info) return E.db.general.itemLevel[info[#info]] end,
-				--	args = {
-				--		displayCharacterInfo = {
-				--			order = 1,
-				--			type = "toggle",
-				--			name = L["Display Character Info"],
-				--			desc = L["Shows item level of each item, enchants, and gems on the character page."],
-				--			set = function(info, value)
-				--				E.db.general.itemLevel.displayCharacterInfo = value;
-				--				Misc:ToggleItemLevelInfo()
-				--			end
-				--		},
-				--		displayInspectInfo = {
-				--			order = 2,
-				--			type = "toggle",
-				--			name = L["Display Inspect Info"],
-				--			desc = L["Shows item level of each item, enchants, and gems when inspecting another player."],
-				--			set = function(info, value)
-				--				E.db.general.itemLevel.displayInspectInfo = value;
-				--				Misc:ToggleItemLevelInfo()
-				--			end
-				--		},
-				--		fontGroup = {
-				--			order = 3,
-				--			type = 'group',
-				--			name = L["Fonts"],
-				--			disabled = function() return not E.db.general.itemLevel.displayCharacterInfo and not E.db.general.itemLevel.displayInspectInfo end,
-				--			get = function(info) return E.db.general.itemLevel[info[#info]] end,
-				--			set = function(info, value)
-				--				E.db.general.itemLevel[info[#info]] = value
-				--				Misc:UpdateInspectPageFonts("Character")
-				--				Misc:UpdateInspectPageFonts("Inspect")
-				--			end,
-				--			args = {
-				--				itemLevelFont = {
-				--					order = 1,
-				--					type = "select",
-				--					name = L["Font"],
-				--					dialogControl = 'LSM30_Font',
-				--					values = AceGUIWidgetLSMlists.font,
-				--				},
-				--				itemLevelFontSize = {
-				--					order = 2,
-				--					type = "range",
-				--					name = L["FONT_SIZE"],
-				--					min = 4, max = 40, step = 1,
-				--				},
-				--				itemLevelFontOutline = {
-				--					order = 3,
-				--					type = "select",
-				--					name = L["Font Outline"],
-				--					values = C.Values.FontFlags,
-				--				},
-				--			},
-				--		},
-				--	},
-				--},
-				--objectiveFrameGroup = {
-				--	order = 14,
-				--	type = "group",
-				--	guiInline = true,
-				--	name = L["Objective Frame"],
-				--	get = function(info) return E.db.general[info[#info]] end,
-				--	args = {
-				--		objectiveFrameAutoHide = {
-				--			order = 31,
-				--			type = "toggle",
-				--			name = L["Auto Hide"],
-				--			desc = L["Automatically hide the objetive frame during boss or arena fights."],
-				--			disabled = function() return IsAddOnLoaded("!KalielsTracker") end,
-				--			set = function(info, value) E.db.general.objectiveFrameAutoHide = value; Blizzard:SetObjectiveFrameAutoHide(); end,
-				--		},
-				--		objectiveFrameHeight = {
-				--			order = 32,
-				--			type = 'range',
-				--			name = L["Objective Frame Height"],
-				--			desc = L["Height of the objective tracker. Increase size to be able to see more objectives."],
-				--			min = 400, max = E.screenheight, step = 1,
-				--			set = function(info, value) E.db.general.objectiveFrameHeight = value; Blizzard:SetObjectiveFrameHeight(); end,
-				--		},
-				--		bonusObjectivePosition = {
-				--			order = 33,
-				--			type = 'select',
-				--			name = L["Bonus Reward Position"],
-				--			desc = L["Position of bonus quest reward frame relative to the objective tracker."],
-				--			values = {
-				--				['RIGHT'] = L["Right"],
-				--				['LEFT'] = L["Left"],
-				--				['AUTO'] = L["Automatic"],
-				--			},
-				--		},
-				--	},
-				--},
-				chatBubblesGroup = {
+								questRewardMostValueIcon = {
 					order = 13,
+					type = "toggle",
+					name = L["Mark Quest Reward"],
+					desc = L["Marks the most valuable quest reward with a gold coin."],
+				},
+				chatBubblesGroup = {
+					order = 16,
 					type = "group",
 					guiInline = true,
 					name = L["Chat Bubbles"],

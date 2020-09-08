@@ -9,8 +9,8 @@ local Skins = E:GetModule('Skins')
 local _G = _G
 local pairs, type, unpack, assert = pairs, type, unpack, assert
 local tremove, tContains, tinsert, wipe = tremove, tContains, tinsert, wipe
-local strlower, format, error = strlower, format, error
---WoW API / Variables
+local format, error = format, error
+
 local CreateFrame = CreateFrame
 local IsAddOnLoaded = IsAddOnLoaded
 local UnitIsDeadOrGhost, InCinematic = UnitIsDeadOrGhost, InCinematic
@@ -169,8 +169,14 @@ E.PopupDialogs.TUKUI_ELVUI_INCOMPATIBLE = {
 
 E.PopupDialogs.DISABLE_INCOMPATIBLE_ADDON = {
 	text = L["Do you swear not to post in technical support about something not working without first disabling the addon/module combination first?"],
-	OnAccept = function() E.global.ignoreIncompatible = true; end,
-	OnCancel = function() E:StaticPopup_Hide('DISABLE_INCOMPATIBLE_ADDON'); E:StaticPopup_Show('INCOMPATIBLE_ADDON', E.PopupDialogs.INCOMPATIBLE_ADDON.addon, E.PopupDialogs.INCOMPATIBLE_ADDON.module) end,
+	OnAccept = function()
+		E.global.ignoreIncompatible = true
+	end,
+	OnCancel = function()
+		local popup = E.PopupDialogs.INCOMPATIBLE_ADDON
+		E:StaticPopup_Hide('DISABLE_INCOMPATIBLE_ADDON')
+		E:StaticPopup_Show('INCOMPATIBLE_ADDON', popup.button1, popup.button2)
+	end,
 	button1 = L["I Swear"],
 	button2 = DECLINE,
 	whileDead = 1,
@@ -179,10 +185,10 @@ E.PopupDialogs.DISABLE_INCOMPATIBLE_ADDON = {
 
 E.PopupDialogs.INCOMPATIBLE_ADDON = {
 	text = L["INCOMPATIBLE_ADDON"],
-	OnAccept = function() DisableAddOn(E.PopupDialogs.INCOMPATIBLE_ADDON.addon); ReloadUI(); end,
-	OnCancel = function() E.private[strlower(E.PopupDialogs.INCOMPATIBLE_ADDON.module)].enable = false; ReloadUI(); end,
+	OnAccept = function() local popup = E.PopupDialogs.INCOMPATIBLE_ADDON; popup.accept(popup) end,
+	OnCancel = function() local popup = E.PopupDialogs.INCOMPATIBLE_ADDON; popup.cancel(popup) end,
 	button3 = L["Disable Warning"],
-	OnAlt = function ()
+	OnAlt = function()
 		E:StaticPopup_Hide('INCOMPATIBLE_ADDON')
 		E:StaticPopup_Show('DISABLE_INCOMPATIBLE_ADDON')
 	end,
@@ -221,21 +227,21 @@ E.PopupDialogs.RESET_UF_UNIT = {
 	text = L["Accepting this will reset the UnitFrame settings for %s. Are you sure?"],
 	button1 = ACCEPT,
 	button2 = CANCEL,
-	OnAccept = function(self)
-		if self.data and self.data.unit then
-			UF:ResetUnitSettings(self.data.unit)
-			if self.data.mover then
-				E:ResetMovers(self.data.mover)
+	OnAccept = function(_, data)
+		if data and data.unit then
+			UF:ResetUnitSettings(data.unit)
+			if data.mover then
+				E:ResetMovers(data.mover)
 			end
 
-			if self.data.unit == 'raidpet' then
-				UF:CreateAndUpdateHeaderGroup(self.data.unit, nil, nil, true)
+			if data.unit == 'raidpet' then
+				UF:CreateAndUpdateHeaderGroup(data.unit, nil, nil, true)
 			end
 
 			if IsAddOnLoaded('ElvUI_OptionsUI') then
 				local ACD = E.Libs.AceConfigDialog
 				if ACD and ACD.OpenFrames and ACD.OpenFrames.ElvUI then
-					ACD:SelectGroup('ElvUI', 'unitframe', self.data.unit)
+					ACD:SelectGroup('ElvUI', 'unitframe', data.unit)
 				end
 			end
 		else
@@ -398,6 +404,14 @@ E.PopupDialogs.RESET_PROFILE_PROMPT = {
 	OnAccept = function() E:ResetProfile() end,
 }
 
+E.PopupDialogs.RESET_PRIVATE_PROFILE_PROMPT = {
+	text = L["Are you sure you want to reset all the settings on this profile?"],
+	button1 = YES,
+	button2 = NO,
+	hideOnEscape = 1,
+	OnAccept = function() E:ResetPrivateProfile() end,
+}
+
 E.PopupDialogs.WARNING_BLIZZARD_ADDONS = {
 	text = L["It appears one of your AddOns have disabled the AddOn Blizzard_CompactRaidFrames. This can cause errors and other issues. The AddOn will now be re-enabled."],
 	button1 = OKAY,
@@ -476,11 +490,10 @@ E.PopupDialogs.SCRIPT_PROFILE = {
 }
 
 E.PopupDialogs.ELVUI_CONFIG_FOUND = {
-    text = L["You still have ElvUI_Config installed.  ElvUI_Config has been renamed to ElvUI_OptionsUI, please remove it."],
-    button1 = ACCEPT,
-    whileDead = 1,
-    hideOnEscape = false,
-
+	text = L["You still have ElvUI_Config installed.  ElvUI_Config has been renamed to ElvUI_OptionsUI, please remove it."],
+	button1 = ACCEPT,
+	whileDead = 1,
+	hideOnEscape = false,
 }
 
 local MAX_STATIC_POPUPS = 4

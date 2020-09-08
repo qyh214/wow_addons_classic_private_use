@@ -2,6 +2,34 @@
 
 This mod is distributed under Version 2 of the GPL.  A copy of the GPL is included in this zip file with links to non-english translations.
 
+## v1.5.5 (Aug. 21, 2020)
+
+- Add Gyromatic Icemaker in Gnomeregan
+- Replace "The Darksoul" in "Misc Sets" with "Shard of the Gods"
+- Add General Rajaxx encounter loot
+- Add Warblade of the Hakkari (Off hand) for Hakkar
+
+## v1.5.4 (Jul. 31, 2020)
+
+- update loot sources for Phase 5
+
+## v1.5.3 (Jul. 30, 2020)
+
+- Update content phase
+
+## v1.5.2 (Jul. 10, 2020)
+
+- Update .toc version
+- Add Eternal Quintessence
+- Add required reputation into faction tooltip
+- Add Circle of Cenarius P5 dailies rewards
+- Flag some items that are Alli/Horde only
+- Add AQ40 Bug Trio Kill order
+- Add Talisman of Binding Shard
+- Add missing Darkmoon items
+- Update droprates and content phases
+- Fix a bug that sometimes cause vanishing text
+
 ## v1.5.1 (Apr. 25, 2020)
 
 - Tome of Polymorph: Turtle available in P4

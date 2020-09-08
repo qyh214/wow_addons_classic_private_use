@@ -20,7 +20,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "This place is under my protection. The mysteries of the arcane shall remain inviolate."
+	Pull		= "Este lugar está sob minha proteção. Os mistérios do arcano devem permanecer intactos."
 })
 
 -- Taerar (Ashenvale)
@@ -31,7 +31,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "Peace is but a fleeting dream! Let the NIGHTMARE reign!"
+	Pull		= "A paz é um sonho efêmero! Que os PESADELOS reinem soberanos!"
 })
 
 -- Ysondre (Feralas)
@@ -42,7 +42,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
-	Pull		= "The strands of LIFE have been severed! The Dreamers must be avenged!"
+	Pull		= "Os fios da VIDA foram cortados! Os Sonhadores serão vingados!"
 })
 
 -- Lethon (Hinterlands)
@@ -53,7 +53,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetMiscLocalization({
---	Pull		= "The strands of LIFE have been severed! The Dreamers must be avenged!"--Does not have one :\
+	Pull		= "Eu sinto as TREVAS no coração de vocês. Não há descanso para os perversos!"
 })
 
 -- Emeriss (Duskwood)

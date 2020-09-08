@@ -1,13 +1,12 @@
 local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local strjoin = strjoin
---WoW API / Variables
 local BASE_MOVEMENT_SPEED = BASE_MOVEMENT_SPEED
 local GetUnitSpeed = GetUnitSpeed
 local IsFalling = IsFalling
 local IsSwimming = IsSwimming
+local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel = ''
 local movementSpeedText, beforeFalling = L["Mov. Speed:"]
@@ -39,4 +38,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('MovementSpeed', {"UNIT_STATS", "UNIT_AURA", "UNIT_SPELL_HASTE"}, OnEvent, nil, nil, nil, nil, STAT_MOVEMENT_SPEED)
+DT:RegisterDatatext('Movement Speed', STAT_CATEGORY_ENHANCEMENTS, {'UNIT_STATS', 'UNIT_AURA', 'UNIT_SPELL_HASTE'}, OnEvent, nil, nil, nil, nil, _G.STAT_MOVEMENT_SPEED, nil, ValueColorUpdate)

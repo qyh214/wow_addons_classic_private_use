@@ -15,11 +15,15 @@ function S:WorldMapFrame()
 	S:HandleDropDownBox(_G.WorldMapContinentDropDown)
 	S:HandleDropDownBox(_G.WorldMapZoneDropDown)
 
-	_G.WorldMapContinentDropDown:Point('TOPLEFT', WorldMapFrame, 'TOPLEFT', 289, -40)
-	_G.WorldMapZoneDropDown:Point('LEFT', _G.WorldMapContinentDropDown, 'RIGHT', -32, 0)
+	_G.WorldMapContinentDropDown:Point('TOPLEFT', WorldMapFrame, 'TOPLEFT', 330, -35)
+	_G.WorldMapContinentDropDown:Width(205)
+	_G.WorldMapContinentDropDown:Height(33)
+	_G.WorldMapZoneDropDown:Point('LEFT', _G.WorldMapContinentDropDown, 'RIGHT', -20, 0)
+	_G.WorldMapZoneDropDown:Width(205)
+	_G.WorldMapZoneDropDown:Height(33)
 
-	_G.WorldMapZoomOutButton:Point('LEFT', _G.WorldMapZoneDropDown, 'RIGHT', -12, 2)
-	_G.WorldMapZoomOutButton:Height(20)
+	_G.WorldMapZoomOutButton:Point('LEFT', _G.WorldMapZoneDropDown, 'RIGHT', 3, 3)
+	_G.WorldMapZoomOutButton:Height(21)
 
 	S:HandleButton(_G.WorldMapZoomOutButton)
 
@@ -28,4 +32,3 @@ function S:WorldMapFrame()
 end
 
 S:AddCallback('WorldMapFrame')
-

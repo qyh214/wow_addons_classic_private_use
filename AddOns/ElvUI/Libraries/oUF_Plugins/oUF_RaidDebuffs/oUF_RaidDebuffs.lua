@@ -237,10 +237,10 @@ local function Update(self, event, unit)
 	DispellPriority['Poison'] = 1
 end
 
-
 local function Enable(self)
 	if self.RaidDebuffs then
 		self:RegisterEvent('UNIT_AURA', Update)
+
 		return true
 	end
 end
@@ -248,6 +248,7 @@ end
 local function Disable(self)
 	if self.RaidDebuffs then
 		self:UnregisterEvent('UNIT_AURA', Update)
+
 		self.RaidDebuffs:Hide()
 	end
 end

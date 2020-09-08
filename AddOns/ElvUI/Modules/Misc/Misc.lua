@@ -6,6 +6,7 @@ local Bags = E:GetModule('Bags')
 local _G = _G
 local select = select
 local format = format
+local strmatch = strmatch
 --WoW API / Variables
 local CreateFrame = CreateFrame
 local AcceptGroup = AcceptGroup
@@ -30,18 +31,27 @@ local LeaveParty = LeaveParty
 local RaidNotice_AddMessage = RaidNotice_AddMessage
 local RepairAllItems = RepairAllItems
 local SendChatMessage = SendChatMessage
+local StaticPopup_Hide = StaticPopup_Hide
+local StaticPopupSpecial_Hide = StaticPopupSpecial_Hide
 local UninviteUnit = UninviteUnit
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitInRaid = UnitInRaid
 local UnitName = UnitName
 local PlaySound = PlaySound
+local IsInInstance = IsInInstance
+local GetWatchedFactionInfo = GetWatchedFactionInfo
+local ExpandAllFactionHeaders = ExpandAllFactionHeaders
+local GetNumFactions = GetNumFactions
+local GetFactionInfo = GetFactionInfo
+local SetWatchedFactionIndex = SetWatchedFactionIndex
+local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
 
+local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY = LE_GAME_ERR_GUILD_NOT_ENOUGH_MONEY
 local LE_GAME_ERR_NOT_ENOUGH_MONEY = LE_GAME_ERR_NOT_ENOUGH_MONEY
 local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS
-
+local UNKNOWN = UNKNOWN
 local BOOST_THANKSFORPLAYING_SMALLER = SOUNDKIT.UI_70_BOOST_THANKSFORPLAYING_SMALLER
 local INTERRUPT_MSG = INTERRUPTED.." %s's [%s]!"
 
@@ -75,6 +85,24 @@ function M:COMBAT_LOG_EVENT_UNFILTERED()
 		SendChatMessage(msg, "YELL")
 	elseif interruptAnnounce == "EMOTE" then
 		SendChatMessage(msg, "EMOTE")
+	end
+end
+
+function M:COMBAT_TEXT_UPDATE(_, messagetype)
+	if not E.db.general.autoTrackReputation then return end
+
+	if messagetype == 'FACTION' then
+		local faction = GetCurrentCombatTextEventInfo()
+		if faction ~= 'Guild' and faction ~= GetWatchedFactionInfo() then
+			ExpandAllFactionHeaders()
+
+			for i = 1, GetNumFactions() do
+				if faction == GetFactionInfo(i) then
+					SetWatchedFactionIndex(i)
+					break
+				end
+			end
+		end
 	end
 end
 
@@ -254,6 +282,7 @@ function M:Initialize()
 	self:RegisterEvent('PARTY_INVITE_REQUEST', 'AutoInvite')
 	self:RegisterEvent('GROUP_ROSTER_UPDATE', 'AutoInvite')
 	self:RegisterEvent('CVAR_UPDATE', 'ForceCVars')
+	self:RegisterEvent('COMBAT_TEXT_UPDATE')
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
 	self:RegisterEvent('QUEST_COMPLETE')
 

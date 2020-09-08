@@ -10,56 +10,68 @@ local GetContainerNumFreeSlots = GetContainerNumFreeSlots
 local GetContainerNumSlots = GetContainerNumSlots
 local ToggleAllBags = ToggleAllBags
 local NUM_BAG_SLOTS = NUM_BAG_SLOTS
+local GetInventoryItemQuality = GetInventoryItemQuality
+local GetItemQualityColor = GetItemQualityColor
+local GetInventoryItemTexture = GetInventoryItemTexture
+
+local displayString, lastPanel = ''
 
 local BAG_TYPES = {
 	[0x0001]  = 'Quiver',
 	[0x0002]  = 'Ammo Pouch',
 	[0x0004]  = 'Soul Bag',
-	[0x0008]  = 'Leatherworking Bag',
-	[0x0010]  = 'Inscription Bag',
-	[0x0020]  = 'Herb Bag',
-	[0x0040]  = 'Enchanting Bag',
-	[0x0080]  = 'Engineering Bag',
-	[0x0100]  = 'Keyring',
-	[0x0200]  = 'Gem Bag',
-	[0x0400]  = 'Mining Bag',
-	[0x0800]  = 'Unused (800)',
-	[0x1000]  = 'Vanity Pets',
-	[0x2000]  = 'Unused (2000)',
-	[0x4000]  = 'Unused (4000)',
-	[0x8000]  = 'Tackle Box',
-	[0x10000] = 'Cooking Bag'
- }
-
-local displayString, lastPanel = ''
+}
 
 local function OnEvent(self)
 	lastPanel = self
-	local free, total = 0, 0
+	local free, total, used = 0, 0
 	for i = 0, NUM_BAG_SLOTS do
 		local bagFreeSlots, bagType = GetContainerNumFreeSlots(i)
 		if not bagType or bagType == 0 then
 			free, total = free + bagFreeSlots, total + GetContainerNumSlots(i)
 		end
 	end
-	self.text:SetFormattedText(displayString, L["Bags"]..': ', free, total)
+	used = total - free
+
+	local textFormat = E.global.datatexts.settings.Bags.textFormat
+
+	if textFormat == "FREE" then
+		self.text:SetFormattedText(displayString, L["Bags"]..": ", free)
+	elseif textFormat == "USED" then
+		self.text:SetFormattedText(displayString, L["Bags"]..": ", used)
+	elseif textFormat == "FREE_TOTAL" then
+		self.text:SetFormattedText(displayString, L["Bags"]..": ", free, total)
+	else
+		self.text:SetFormattedText(displayString, L["Bags"]..": ", used, total)
+	end
 end
 
 local function OnClick()
 	ToggleAllBags()
 end
 
-local function OnEnter(self)
-	DT:SetupTooltip(self)
-
+local function OnEnter()
 	for i = 0, NUM_BAG_SLOTS do
-		local bagFreeSlots, bagType = GetContainerNumFreeSlots(i)
-		local bagTypeName = BAG_TYPES[bagType]
-
-		if bagTypeName then
-			local bagName = GetBagName(i)
+		local bagName = GetBagName(i)
+		if bagName then
+			local bagFreeSlots, bagType = GetContainerNumFreeSlots(i)
 			local bagSlots = GetContainerNumSlots(i)
-			DT.tooltip:AddDoubleLine(bagName, format('%d/%d', bagFreeSlots, bagSlots))
+			local r, g, b, icon = 1, 1, 1, 'Interface/Buttons/Button-Backpack-Up'
+			local r2, g2, b2
+
+			if BAG_TYPES[bagType] then
+				r2, g2, b2 = E:ColorGradient(bagFreeSlots/bagSlots, 1, .1, .1, 1, 1, .1, .1, 1, .1) -- red, yellow, green
+			else
+				r2, g2, b2 = E:ColorGradient(bagFreeSlots/bagSlots, .1, 1, .1, 1, 1, .1, 1, .1, .1) -- green, yellow, red
+			end
+
+				if i > 0 then
+					local quality = GetInventoryItemQuality("player", 19 + i)
+					r, g, b = GetItemQualityColor(quality or 1)
+					icon = GetInventoryItemTexture("player", 19 + i)
+				end
+
+			DT.tooltip:AddDoubleLine(format('|T%s:14:14:0:0:64:64:4:60:4:60|t  %s', icon, bagName), format('%d / %d', bagFreeSlots, bagSlots), r, g, b, r2, g2, b2)
 		end
 	end
 
@@ -67,7 +79,12 @@ local function OnEnter(self)
 end
 
 local function ValueColorUpdate(hex)
-	displayString = strjoin("", "%s", hex, "%d/%d|r")
+	local textFormat = E.global.datatexts.settings.Bags.textFormat
+	if textFormat == "FREE" or textFormat == "USED" then
+		displayString = strjoin('', '%s', hex, '%d|r')
+	else
+		displayString = strjoin('', '%s', hex, '%d/%d|r')
+	end
 
 	if lastPanel ~= nil then
 		OnEvent(lastPanel)
@@ -75,4 +92,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Bags', {"PLAYER_ENTERING_WORLD", "BAG_UPDATE"}, OnEvent, nil, OnClick, OnEnter, nil, L["Bags"])
+DT:RegisterDatatext('Bags', nil, {'BAG_UPDATE'}, OnEvent, nil, OnClick, OnEnter, nil, L["Bags"], nil, ValueColorUpdate)

@@ -12,13 +12,8 @@ function UF:Construct_NameText(frame)
 	return name
 end
 
-function UF:UpdateNameSettings(frame, childType)
+function UF:UpdateNameSettings(frame)
 	local db = frame.db
-	if childType == "pet" then
-		db = frame.db.petsGroup
-	elseif childType == "target" then
-		db = frame.db.targetsGroup
-	end
 
 	local name = frame.Name
 	if not db.power or not db.power.enable or not db.power.hideonnpc then
@@ -32,6 +27,7 @@ end
 
 function UF:PostNamePosition(frame, unit)
 	if not frame.Power.value:IsShown() then return end
+
 	local db = frame.db
 	if UnitIsPlayer(unit) or (db.power and not db.power.enable) then
 		local position = db.name.position

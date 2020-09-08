@@ -24,16 +24,19 @@ local minorGUI, minorConfigDialog = 36, 76
 
 function S:Ace3_SkinDropdown()
 	if self and self.obj then
-		if self.obj.pullout and self.obj.pullout.frame then
-			self.obj.pullout.frame:SetTemplate(nil, true)
-		elseif self.obj.dropdown then -- this will be LSM
-			self.obj.dropdown:SetTemplate(nil, true)
+		local pullout = self.obj.dropdown -- Don't ask questions.. Just FUCKING ACCEPT IT
+		if pullout then
+			if pullout.frame then
+				pullout.frame:SetTemplate(nil, true)
+			else
+				pullout:SetTemplate(nil, true)
+			end
 
-			if self.obj.dropdown.slider then
-				self.obj.dropdown.slider:SetTemplate()
-				self.obj.dropdown.slider:SetThumbTexture(E.Media.Textures.White8x8)
+			if pullout.slider then
+				pullout.slider:SetTemplate()
+				pullout.slider:SetThumbTexture(E.Media.Textures.White8x8)
 
-				local t = self.obj.dropdown.slider:GetThumbTexture()
+				local t = pullout.slider:GetThumbTexture()
 				t:SetVertexColor(1, .82, 0, 0.8)
 			end
 		end
@@ -105,7 +108,9 @@ function S:Ace3_SkinTab(tab)
 	tab:CreateBackdrop(nil, true, true)
 	tab.backdrop:Point('TOPLEFT', 10, -3)
 	tab.backdrop:Point('BOTTOMRIGHT', -10, 0)
-	tab.text:SetPoint("LEFT", 14, -1)
+	if tab.text.SetPoint then
+		tab.text:SetPoint("LEFT", 14, -1)
+	end
 
 	hooksecurefunc(tab, 'SetSelected', S.Ace3_TabSetSelected)
 end
@@ -154,8 +159,8 @@ function S:Ace3_RegisterAsWidget(widget)
 	elseif TYPE == 'Dropdown' or TYPE == 'LQDropdown' then
 		local frame = widget.dropdown
 		local button = widget.button
-		local button_cover = widget.button_cover
 		local text = widget.text
+
 		frame:StripTextures()
 
 		S:HandleNextPrevButton(button, nil, {1, .8, 0})
@@ -179,8 +184,6 @@ function S:Ace3_RegisterAsWidget(widget)
 
 		button:SetParent(frame.backdrop)
 		text:SetParent(frame.backdrop)
-		button:HookScript('OnClick', S.Ace3_SkinDropdown)
-		button_cover:HookScript('OnClick', S.Ace3_SkinDropdown)
 	elseif TYPE == 'LSM30_Font' or TYPE == 'LSM30_Sound' or TYPE == 'LSM30_Border' or TYPE == 'LSM30_Background' or TYPE == 'LSM30_Statusbar' then
 		local frame = widget.frame
 		local button = frame.dropButton
@@ -288,6 +291,16 @@ function S:Ace3_RegisterAsWidget(widget)
 		end
 	elseif TYPE == 'Icon' then
 		widget.frame:StripTextures()
+	elseif TYPE == 'Dropdown-Pullout' then
+		local pullout = widget
+		pullout.frame:SetTemplate(nil, true)
+
+		if pullout.slider then
+			pullout.slider:SetTemplate()
+			pullout.slider:SetThumbTexture(E.Media.Textures.White8x8)
+			local t = pullout.slider:GetThumbTexture()
+			t:SetVertexColor(1, .82, 0, 0.8)
+		end
 	end
 end
 
@@ -315,7 +328,7 @@ function S:Ace3_RefreshTree(scrollToSelection)
 		self.treeframe:Show()
 	end
 
-	if not E.private.skins.ace3.enable then return end
+	if not E.private.skins.ace3Enable then return end
 
 	local status = self.status or self.localstatus
 	local groupstatus = status.groups
@@ -407,13 +420,13 @@ function S:Ace3_RegisterAsContainer(widget)
 end
 
 function S:Ace3_StyleTooltip()
-	if not self:IsForbidden() and E.private.skins.ace3.enable then
+	if not self:IsForbidden() and E.private.skins.ace3Enable then
 		self:SetTemplate('Transparent', nil, true)
 	end
 end
 
 function S:Ace3_StylePopup()
-	if not self.template and not self:IsForbidden() and E.private.skins.ace3.enable then
+	if not self.template and not self:IsForbidden() and E.private.skins.ace3Enable then
 		self:SetTemplate('Transparent', nil, true)
 		self:GetChildren():StripTextures()
 		S:HandleButton(self.accept, true)
@@ -457,7 +470,7 @@ function S:Ace3_MetaIndex(k, v)
 		S:SecureHookScript(v, 'OnShow', S.Ace3_StylePopup)
 	elseif k == 'RegisterAsContainer' then
 		rawset(self, k, function(s, w, ...)
-			if E.private.skins.ace3.enable then
+			if E.private.skins.ace3Enable then
 				S.Ace3_RegisterAsContainer(s, w, ...)
 			end
 
@@ -470,7 +483,7 @@ function S:Ace3_MetaIndex(k, v)
 		end)
 	elseif k == 'RegisterAsWidget' then
 		rawset(self, k, function(...)
-			if E.private.skins.ace3.enable then
+			if E.private.skins.ace3Enable then
 				S.Ace3_RegisterAsWidget(...)
 			end
 

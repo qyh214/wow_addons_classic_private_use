@@ -16,6 +16,8 @@ V.general = {
 	chatBubbleFontOutline = 'NONE',
 	chatBubbleName = false,
 	pixelPerfect = true,
+	replaceNameFont = true,
+	replaceCombatFont = true,
 	replaceBlizzFonts = true,
 	minimap = {
 		enable = true,
@@ -53,13 +55,9 @@ V.chat = {
 }
 
 V.skins = {
-	ace3 = {
-		enable = true,
-	},
+	ace3Enable = true,
 	checkBoxSkin = true,
-	parchmentRemover = {
-		enable = false,
-	},
+	parchmentRemoverEnable = false,
 	blizzard = {
 		enable = true,
 		bags = true,

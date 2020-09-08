@@ -42,6 +42,13 @@ local DUNGEON_CONTENT = data:AddContentType(AL["Dungeons"], ATLASLOOT_DUNGEON_CO
 local RAID20_CONTENT = data:AddContentType(AL["20 Raids"], ATLASLOOT_RAID20_COLOR)
 local RAID40_CONTENT = data:AddContentType(AL["40 Raids"], ATLASLOOT_RAID40_COLOR)
 
+local BLUE = "|cff6666ff"
+local GREY = "|cff999999"
+local GREN = "|cff66cc33"
+local _RED = "|cffcc6666"
+local PURP = "|cff9900ff"
+local WHIT = "|cffffffff"
+
 local KEYS = {	-- Keys
 	name = AL["Keys"],
 	TableType = NORMAL_ITTYPE,
@@ -151,6 +158,49 @@ local T3_SET = {
 		GetItemsFromDiff = ALLIANCE_DIFF,
 		{ 22, 527 }, -- Shaman
 		{ 24 }, -- Paladin
+	},
+}
+
+local AQ_SCARABS = { -- AQ40Trash2
+	name = AL["Ahn'Qiraj scarabs"],
+	ExtraList = true,
+	[NORMAL_DIFF] = {
+		{ 1,  20876 }, -- Idol of Death
+		{ 2,  20879 }, -- Idol of Life
+		{ 3,  20875 }, -- Idol of Night
+		{ 4,  20878 }, -- Idol of Rebirth
+		{ 5,  20881 }, -- Idol of Strife
+		{ 6,  20877 }, -- Idol of the Sage
+		{ 7,  20874 }, -- Idol of the Sun
+		{ 8,  20882 }, -- Idol of War
+		{ 10, 21762 }, -- Greater Scarab Coffer Key
+		{ 12, 21156 }, -- Scarab Bag
+		{ 14, 21230 }, -- Ancient Qiraji Artifact
+		{ 16, 20864 }, -- Bone Scarab
+		{ 17, 20861 }, -- Bronze Scarab
+		{ 18, 20863 }, -- Clay Scarab
+		{ 19, 20862 }, -- Crystal Scarab
+		{ 20, 20859 }, -- Gold Scarab
+		{ 21, 20865 }, -- Ivory Scarab
+		{ 22, 20860 }, -- Silver Scarab
+		{ 23, 20858 }, -- Stone Scarab
+		{ 26, 22203 }, -- Large Obsidian Shard
+		{ 27, 22202 }, -- Small Obsidian Shard
+		{ 29, 21229 }, -- Qiraji Lord's Insignia
+	},
+}
+
+local AQ_ENCHANTS = { -- AQEnchants
+	name = AL["Ahn'Qiraj enchants"],
+	ExtraList = true,
+	[NORMAL_DIFF] = {
+		{ 1,  20728 }, -- Formula: Enchant Gloves - Frost Power
+		{ 2,  20731 }, -- Formula: Enchant Gloves - Superior Agility
+		{ 3,  20734 }, -- Formula: Enchant Cloak - Stealth
+		{ 4,  20729 }, -- Formula: Enchant Gloves - Fire Power
+		{ 5,  20736 }, -- Formula: Enchant Cloak - Dodge
+		{ 6,  20730 }, -- Formula: Enchant Gloves - Healing Power
+		{ 7,  20727 }, -- Formula: Enchant Gloves - Shadow Power
 	},
 }
 
@@ -952,6 +1002,7 @@ data["Gnomeregan"] = {
 				{ 7,  9488 }, -- Oscillating Power Hammer
 				{ 8,  9486 }, -- Supercharger Battle Axe
 				{ 9,  9490 }, -- Gizmotron Megachopper
+				{ 11, 9489 }, -- Gyromatic Icemaker
 				{ 16, 9327 }, -- Security DELTA Data Access Card
 				{ 18, 7191 }, -- Fused Wiring
 				{ 19, 9308 }, -- Grime-Encrusted Object
@@ -2570,7 +2621,7 @@ data["BlackrockDepths"] = {
 			DisplayIDs = {{8761}},
 			AtlasMapBossID = 5,
 			[NORMAL_DIFF] = {
-				{ 1,  11623 }, -- Spritecaster Cape
+				{ 1,  11626 }, -- Blackveil Cape
 				{ 2,  11624 }, -- Kentic Amice
 				{ 3,  22240 }, -- Greaves of Withering Despair
 				{ 4,  11625 }, -- Enthralled Sphere
@@ -2585,7 +2636,7 @@ data["BlackrockDepths"] = {
 			DisplayIDs = {{9212}},
 			AtlasMapBossID = 6,
 			[NORMAL_DIFF] = {
-				{ 1,  11626 }, -- Blackveil Cape
+				{ 1,  11623 }, -- Spritecaster Cape
 				{ 2,  11627 }, -- Fleetfoot Greaves
 				{ 3,  11628 }, -- Houndmaster's Bow
 				{ 4,  11629 }, -- Houndmaster's Rifle
@@ -2600,13 +2651,9 @@ data["BlackrockDepths"] = {
 			AtlasMapBossID = 6,
 			[NORMAL_DIFF] = {
 				{ 1,  11726 }, -- Savage Gladiator Chain
-				{ 2,  11729 }, -- Savage Gladiator Helm
-				{ 3,  11730 }, -- Savage Gladiator Grips
-				{ 4,  11728 }, -- Savage Gladiator Leggings
-				{ 5,  11731 }, -- Savage Gladiator Greaves
-				{ 7,  22271 }, -- Leggings of Frenzied Magic
-				{ 8,  22257 }, -- Bloodclot Band
-				{ 9,  22266 }, -- Flarethorn
+				{ 2,  22271 }, -- Leggings of Frenzied Magic
+				{ 3,  22257 }, -- Bloodclot Band
+				{ 4,  22266 }, -- Flarethorn
 			},
 		},
 		{ -- BRDGrizzle
@@ -2634,6 +2681,7 @@ data["BlackrockDepths"] = {
 				{ 1,  11685 }, -- Splinthide Shoulders
 				{ 2,  11679 }, -- Rubicund Armguards
 				{ 4,  11686 }, -- Girdle of Beastial Fury
+				{ 5,  11730 }, -- Savage Gladiator Grips
 			},
 		},
 		{ -- BRDOkthor
@@ -2645,7 +2693,8 @@ data["BlackrockDepths"] = {
 			[NORMAL_DIFF] = {
 				{ 1,  11665 }, -- Ogreseer Fists
 				{ 2,  11662 }, -- Ban'thok Sash
-				{ 3,  11824 }, -- Cyclopean Band
+				{ 3,  11728 }, -- Savage Gladiator Leggings
+				{ 4,  11824 }, -- Cyclopean Band
 			},
 		},
 		{ -- BRDAnubshiah
@@ -2658,6 +2707,7 @@ data["BlackrockDepths"] = {
 				{ 1,  11678 }, -- Carapace of Anub'shiah
 				{ 2,  11677 }, -- Graverot Cape
 				{ 3,  11675 }, -- Shadefiend Boots
+				{ 4,  11731 }, -- Savage Gladiator Greaves
 			},
 		},
 		{ -- BRDHedrum
@@ -2670,6 +2720,7 @@ data["BlackrockDepths"] = {
 				{ 1,  11633 }, -- Spiderfang Carapace
 				{ 2,  11634 }, -- Silkweb Gloves
 				{ 3,  11635 }, -- Hookfang Shanker
+				{ 4,  11729 }, -- Savage Gladiator Helm
 			},
 		},
 		-- RING END
@@ -2808,7 +2859,7 @@ data["BlackrockDepths"] = {
 			[NORMAL_DIFF] = {
 				{ 1,  11820 }, -- Royal Decorated Armor
 				{ 2,  11821 }, -- Warstrife Leggings
-				{ 3,  11815 }, -- Hand of Justice
+				{ 3, 11810 }, -- Force of Will
 				{ 4,  11817 }, -- Lord General's Sword
 				{ 5,  11816 }, -- Angerforge's Battle Axe
 				{ 6,  11841 }, -- Senior Designer's Pantaloons
@@ -2866,11 +2917,10 @@ data["BlackrockDepths"] = {
 			DisplayIDs = {{8177}},
 			AtlasMapBossID = 15,
 			[NORMAL_DIFF] = {
-				{ 1,  11746 }, -- Golem Skull Helm
-				{ 2,  22212 }, -- Golem Fitted Pauldrons
-				{ 3,  11745 }, -- Fists of Phalanx
-				{ 4, 11744 }, -- Bloodfist
-				{ 5, 11743 }, -- Rockfist
+				{ 1,  22212 }, -- Golem Fitted Pauldrons
+				{ 2,  11745 }, -- Fists of Phalanx
+				{ 3, 11744 }, -- Bloodfist
+				{ 4, 11743 }, -- Rockfist
 			},
 		},
 		{ -- BRDFlamelash
@@ -2931,10 +2981,11 @@ data["BlackrockDepths"] = {
 			DisplayIDs = {{12162}},
 			AtlasMapBossID = 20,
 			[NORMAL_DIFF] = {
-				{ 1,  11935 }, -- Magmus Stone
-				{ 2,  22395 }, -- Totem of Rage
-				{ 3,  22400 }, -- Libram of Truth
-				{ 4,  22208 }, -- Lavastone Hammer
+				{ 1,  11746 }, -- Golem Skull Helm
+				{ 2,  11935 }, -- Magmus Stone
+				{ 3,  22395 }, -- Totem of Rage
+				{ 4,  22400 }, -- Libram of Truth
+				{ 5,  22208 }, -- Lavastone Hammer
 			},
 		},
 		{ -- BRDPrincess
@@ -2960,17 +3011,16 @@ data["BlackrockDepths"] = {
 			AtlasMapBossID = 21,
 			[NORMAL_DIFF] = {
 				{ 1,  11684 }, -- Ironfoe
-				{ 3,  16724 }, -- Lightforge Gauntlets
-				{ 4,  11933 }, -- Imperial Jewel
-				{ 5,  11930 }, -- The Emperor's New Cape
-				{ 6,  11924 }, -- Robes of the Royal Crown
-				{ 7,  22204 }, -- Wristguards of Renown
-				{ 8,  22207 }, -- Sash of the Grand Hunt
-				{ 9,  11934 }, -- Emperor's Seal
-				{ 10, 11810 }, -- Force of Will
-				{ 11, 11928 }, -- Thaurissan's Royal Scepter
-				{ 12, 11931 }, -- Dreadforge Retaliator
-				{ 13, 11932 }, -- Guiding Stave of Wisdom
+				{ 3,  11933 }, -- Imperial Jewel
+				{ 4,  11930 }, -- The Emperor's New Cape
+				{ 5,  11924 }, -- Robes of the Royal Crown
+				{ 6,  22204 }, -- Wristguards of Renown
+				{ 7,  22207 }, -- Sash of the Grand Hunt
+				{ 8,  11934 }, -- Emperor's Seal
+				{ 9,  11815 }, -- Hand of Justice
+				{ 10, 11928 }, -- Thaurissan's Royal Scepter
+				{ 11, 11931 }, -- Dreadforge Retaliator
+				{ 12, 11932 }, -- Guiding Stave of Wisdom
 				{ 16, 12033 }, -- Thaurissan Family Jewels
 			},
 		},
@@ -3071,13 +3121,14 @@ data["LowerBlackrockSpire"] = {
 			DisplayIDs = {{11565}},
 			AtlasMapBossID = 5,
 			[NORMAL_DIFF] = {
-				{ 1,  13166 }, -- Slamshot Shoulders
-				{ 2,  13168 }, -- Plate of the Shaman King
-				{ 3,  13170 }, -- Skyshroud Leggings
-				{ 4,  13169 }, -- Tressermane Leggings
-				{ 5,  13167 }, -- Fist of Omokk
-				{ 7,  12336 }, -- Gemstone of Spirestone
-				{ 9, 12534 }, -- Omokk's Head
+				{ 1,  16670 }, -- Boots of Elements
+				{ 3,  13166 }, -- Slamshot Shoulders
+				{ 4,  13168 }, -- Plate of the Shaman King
+				{ 5,  13170 }, -- Skyshroud Leggings
+				{ 6,  13169 }, -- Tressermane Leggings
+				{ 7,  13167 }, -- Fist of Omokk
+				{ 8,  12336 }, -- Gemstone of Spirestone
+				{ 16, 12534 }, -- Omokk's Head
 			},
 		},
 		{ -- LBRSSpirestoneBattleLord
@@ -3132,12 +3183,11 @@ data["LowerBlackrockSpire"] = {
 			[NORMAL_DIFF] = {
 				{ 1,  16676 }, -- Beaststalker's Gloves
 				{ 3,  13177 }, -- Talisman of Evasion
-				{ 4,  13178 }, -- Rosewine Circle
-				{ 5,  13179 }, -- Brazecore Armguards
-				{ 6,  22231 }, -- Kayser's Boots of Precision
-				{ 7,  13173 }, -- Flightblade Throwing Axe
-				{ 8,  12582 }, -- Keris of Zul'Serak
-				{ 10,  12335 }, -- Gemstone of Smolderthorn
+				{ 4,  13179 }, -- Brazecore Armguards
+				{ 5,  22231 }, -- Kayser's Boots of Precision
+				{ 6,  13173 }, -- Flightblade Throwing Axe
+				{ 7,  12582 }, -- Keris of Zul'Serak
+				{ 9,  12335 }, -- Gemstone of Smolderthorn
 			},
 		},
 		{ -- LBRSGrimaxe
@@ -3190,11 +3240,11 @@ data["LowerBlackrockSpire"] = {
 			DisplayIDs = {{11583}},
 			AtlasMapBossID = 15,
 			[NORMAL_DIFF] = {
-				{ 1,  16670 }, -- Boots of Elements
-				{ 3,  13258 }, -- Slaghide Gauntlets
-				{ 4,  22232 }, -- Marksman's Girdle
-				{ 5,  13259 }, -- Ribsteel Footguards
-				{ 7,  18784 }, -- Top Half of Advanced Armorsmithing: Volume III
+				{ 1,  13258 }, -- Slaghide Gauntlets
+				{ 2,  22232 }, -- Marksman's Girdle
+				{ 3,  13259 }, -- Ribsteel Footguards
+				{ 4,  13178 }, -- Rosewine Circle
+				{ 16,  18784 }, -- Top Half of Advanced Armorsmithing: Volume III
 			},
 		},
 		{ -- LBRSZigris
@@ -4476,7 +4526,7 @@ data["Stratholme"] = {
 	LevelRange = {37, 58, 60},
 	items = {
 		{ -- STRATSkull
-			name = AL["Skul"],
+			name = GREN..AL["Skul"],
 			npcID = 10393,
 			Level = 58,
 			DisplayIDs = {{2606}},
@@ -4489,7 +4539,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATStratholmeCourier
-			name = AL["Stratholme Courier"],
+			name = GREN..AL["Stratholme Courier"],
 			npcID = 11082,
 			Level = 57,
 			DisplayIDs = {{10547}},
@@ -4504,7 +4554,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATHearthsingerForresten
-			name = AL["Hearthsinger Forresten"],
+			name = GREN..AL["Hearthsinger Forresten"],
 			npcID = 10558,
 			Level = 57,
 			SubAreaID = 32277,
@@ -4512,14 +4562,15 @@ data["Stratholme"] = {
 			AtlasMapBossID = 3,
 			specialType = "rare",
 			[NORMAL_DIFF] = {
-				{ 1,  13378 }, -- Songbird Blouse
-				{ 2,  13384 }, -- Rainbow Girdle
-				{ 3,  13383 }, -- Woollies of the Prancing Minstrel
-				{ 4,  13379 }, -- Piccolo of the Flaming Fire
+				{ 1,  16682 }, -- Magister's Boots
+				{ 3,  13378 }, -- Songbird Blouse
+				{ 4,  13384 }, -- Rainbow Girdle
+				{ 5,  13383 }, -- Woollies of the Prancing Minstrel
+				{ 6,  13379 }, -- Piccolo of the Flaming Fire
 			},
 		},
 		{ -- STRATTheUnforgiven
-			name = AL["The Unforgiven"],
+			name = GREN..AL["The Unforgiven"],
 			npcID = 10516,
 			Level = 57,
 			SubAreaID = 32281,
@@ -4533,22 +4584,38 @@ data["Stratholme"] = {
 				{ 6,  13408 }, -- Soul Breaker
 			},
 		},
+		{ -- STRATPostmaster
+			name = GREN..AL["Postmaster Malown"],
+			npcID = 11143,
+			Level = 60,
+			DisplayIDs = {{10669}},
+			AtlasMapBossID = "6'",
+			[NORMAL_DIFF] = {
+				{ 1,  13390 }, -- The Postmaster's Band
+				{ 2,  13388 }, -- The Postmaster's Tunic
+				{ 3,  13389 }, -- The Postmaster's Trousers
+				{ 4,  13391 }, -- The Postmaster's Treads
+				{ 5,  13392 }, -- The Postmaster's Seal
+				{ 6,  13393 }, -- Malown's Slam
+			},
+		},
 		{ -- STRATTimmytheCruel
-			name = AL["Timmy the Cruel"],
+			name = GREN..AL["Timmy the Cruel"],
 			npcID = 10808,
 			Level = 58,
 			SubAreaID = 32319,
 			DisplayIDs = {{571}},
 			AtlasMapBossID = 6,
 			[NORMAL_DIFF] = {
-				{ 1,  13400 }, -- Vambraces of the Sadist
-				{ 2,  13403 }, -- Grimgore Noose
-				{ 3,  13402 }, -- Timmy's Galoshes
-				{ 4,  13401 }, -- The Cruel Hand of Timmy
+				{ 1,  16724 }, -- Lightforge Gauntlets
+				{ 3,  13400 }, -- Vambraces of the Sadist
+				{ 4,  13403 }, -- Grimgore Noose
+				{ 5,  13402 }, -- Timmy's Galoshes
+				{ 6,  13401 }, -- The Cruel Hand of Timmy
 			},
 		},
 		{ -- STRATMalorsStrongbox
-			name = AL["Malor the Zealous"],
+			name = GREN..AL["Malor the Zealous"],
 			npcID = 11032,
 			ObjectID = 176112,
 			Level = 60,
@@ -4561,7 +4628,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATCrimsonHammersmith
-			name = AL["Crimson Hammersmith"],
+			name = GREN..AL["Crimson Hammersmith"],
 			npcID = 11120,
 			Level = 60,
 			SubAreaID = 32357,
@@ -4573,7 +4640,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATCannonMasterWilley
-			name = AL["Cannon Master Willey"],
+			name = GREN..AL["Cannon Master Willey"],
 			npcID = 10997,
 			Level = 60,
 			SubAreaID = 32357,
@@ -4595,7 +4662,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATArchivistGalford
-			name = AL["Archivist Galford"],
+			name = GREN..AL["Archivist Galford"],
 			npcID = 10811,
 			Level = 60,
 			SubAreaID = 32331,
@@ -4612,7 +4679,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATBalnazzar
-			name = AL["Balnazzar"],
+			name = GREN..AL["Balnazzar"],
 			npcID = {10812, 10813},
 			Level = 999,
 			SubAreaID = 32367,
@@ -4637,7 +4704,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATMagistrateBarthilas
-			name = AL["Magistrate Barthilas"],
+			name = PURP..AL["Magistrate Barthilas"],
 			npcID = 10435,
 			Level = 58,
 			SubAreaID = 32342,
@@ -4654,7 +4721,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATStonespine
-			name = AL["Stonespine"],
+			name = PURP..AL["Stonespine"],
 			npcID = 10809,
 			Level = 60,
 			SubAreaID = 32303,
@@ -4668,7 +4735,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATBaronessAnastari
-			name = AL["Baroness Anastari"],
+			name = PURP..AL["Baroness Anastari"],
 			npcID = 10436,
 			Level = 59,
 			SubAreaID = 32344,
@@ -4688,7 +4755,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATBlackGuardSwordsmith
-			name = AL["Black Guard Swordsmith"],
+			name = PURP..AL["Black Guard Swordsmith"],
 			npcID = 11121,
 			Level = {61, 62},
 			SubAreaID = 32345,
@@ -4703,7 +4770,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATNerubenkan
-			name = AL["Nerub'enkan"],
+			name = PURP..AL["Nerub'enkan"],
 			npcID = 10437,
 			Level = 60,
 			SubAreaID = 32345,
@@ -4723,7 +4790,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATMalekithePallid
-			name = AL["Maleki the Pallid"],
+			name = PURP..AL["Maleki the Pallid"],
 			npcID = 10438,
 			Level = 61,
 			SubAreaID = 32349,
@@ -4744,7 +4811,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATRamsteintheGorger
-			name = AL["Ramstein the Gorger"],
+			name = PURP..AL["Ramstein the Gorger"],
 			npcID = 10439,
 			Level = 61,
 			SubAreaID = 32301,
@@ -4761,7 +4828,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATBaronRivendare
-			name = AL["Baron Rivendare"],
+			name = PURP..AL["Baron Rivendare"],
 			npcID = 10440,
 			Level = 62,
 			SubAreaID = 32352,
@@ -4791,22 +4858,6 @@ data["Stratholme"] = {
 				{ 22, 16668 }, -- Kilt of Elements
 				{ 23, 16728 }, -- Lightforge Legplates
 				{ 24, 16732 }, -- Legplates of Valor
-			},
-		},
-		{ -- STRATPostmaster
-			name = AL["Postmaster Malown"],
-			npcID = 11143,
-			Level = 60,
-			DisplayIDs = {{10669}},
-			AtlasMapBossID = "6'",
-			[NORMAL_DIFF] = {
-				{ 1,  16682 }, -- Magister's Boots
-				{ 3,  13390 }, -- The Postmaster's Band
-				{ 4,  13388 }, -- The Postmaster's Tunic
-				{ 5,  13389 }, -- The Postmaster's Trousers
-				{ 6,  13391 }, -- The Postmaster's Treads
-				{ 7,  13392 }, -- The Postmaster's Seal
-				{ 8,  13393 }, -- Malown's Slam
 			},
 		},
 		{ -- STRATTrash
@@ -4855,7 +4906,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATAtiesh
-			name = AL["Atiesh"],
+			name = GREN..AL["Atiesh"],
 			ExtraList = true,
 			AtlasMapBossID = 2,
 			ContentPhase = 6,
@@ -4864,7 +4915,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATBalzaphon
-			name = AL["Balzaphon"],
+			name = GREN..AL["Balzaphon"],
 			ExtraList = true,
 			npcID = 14684,
 			DisplayIDs = {{7919}},
@@ -4877,7 +4928,7 @@ data["Stratholme"] = {
 			},
 		},
 		{ -- STRATSothosJarien
-			name = AL["Sothos and Jarien's Heirlooms"].." - "..format(AL["Tier %s Sets"], "0.5"),
+			name = GREN..AL["Sothos and Jarien's Heirlooms"].." - "..format(AL["Tier %s Sets"], "0.5"),
 			ExtraList = true,
 			ContentPhase = 5,
 			AtlasMapBossID = 11,
@@ -5753,21 +5804,22 @@ data["Zul'Gurub"] = {
 				{ 2,  20257, [ATLASLOOT_IT_ALLIANCE] = 20264 }, -- Seafury Gauntlets
 				--{ 3,  20264, [ATLASLOOT_IT_HORDE] = 20257 }, -- Peacekeeper Gauntlets
 				{ 3,  19855 }, -- Bloodsoaked Legplates
-				{ 6,  19876 }, -- Soul Corrupter's Necklace
-				{ 7,  19856 }, -- The Eye of Hakkar
-				{ 8,  19861 }, -- Touch of Chaos
-				{ 9,  19853 }, -- Gurubashi Dwarf Destroyer
-				{ 10, 19862 }, -- Aegis of the Blood God
-				{ 11, 19864 }, -- Bloodcaller
-				{ 12, 19865 }, -- Warblade of the Hakkari
-				{ 13, 19852 }, -- Ancient Hakkari Manslayer
-				{ 14, 19859 }, -- Fang of the Faceless
-				{ 15, 19854 }, -- Zin'rokh, Destroyer of Worlds
-				{ 16, 19802 }, -- Heart of Hakkar
+				{ 4,  19876 }, -- Soul Corrupter's Necklace
+				{ 5,  19856 }, -- The Eye of Hakkar
+				{ 7, 19802 }, -- Heart of Hakkar
+				{ 16,  19861 }, -- Touch of Chaos
+				{ 17,  19853 }, -- Gurubashi Dwarf Destroyer
+				{ 18, 19862 }, -- Aegis of the Blood God
+				{ 19, 19864 }, -- Bloodcaller
+				{ 20, 19865 }, -- Warblade of the Hakkari
+				{ 21, 19866 }, -- Warblade of the Hakkari
+				{ 22, 19852 }, -- Ancient Hakkari Manslayer
+				{ 23, 19859 }, -- Fang of the Faceless
+				{ 24, 19854 }, -- Zin'rokh, Destroyer of Worlds
 			},
 		},
 		{ -- ZGShared
-			name = AL["Shared loot"],
+			name = AL["High Priest Shared loot"],
 			ExtraList = true,
 			[NORMAL_DIFF] = {
 				{ 1,  22721 }, -- Band of Servitude
@@ -5791,38 +5843,29 @@ data["Zul'Gurub"] = {
 				{ 3,  20261 }, -- Shadow Panther Hide Belt
 				{ 4,  19921 }, -- Zulian Hacker
 				{ 5,  19908 }, -- Sceptre of Smiting
-				{ 6,  20258 }, -- Zulian Ceremonial Staff
-				{ 8, 19726 }, -- Bloodvine
-				{ 9, 19774 }, -- Souldarite
-				{ 10, 19767 }, -- Primal Bat Leather
-				{ 11, 19768 }, -- Primal Tiger Leather
-				{ 16, 19820 }, -- Punctured Voodoo Doll
-				{ 17, 19818 }, -- Punctured Voodoo Doll
-				{ 18, 19819 }, -- Punctured Voodoo Doll
-				{ 19, 19814 }, -- Punctured Voodoo Doll
-				{ 20, 19821 }, -- Punctured Voodoo Doll
-				{ 21, 19816 }, -- Punctured Voodoo Doll
-				{ 22, 19817 }, -- Punctured Voodoo Doll
-				{ 23, 19815 }, -- Punctured Voodoo Doll
-				{ 24, 19813 }, -- Punctured Voodoo Doll
-				{ 101, 19706 }, -- Bloodscalp Coin
-				{ 102, 19701 }, -- Gurubashi Coin
-				{ 103, 19700 }, -- Hakkari Coin
-				{ 104, 19699 }, -- Razzashi Coin
-				{ 105, 19704 }, -- Sandfury Coin
-				{ 106, 19705 }, -- Skullsplitter Coin
-				{ 107, 19702 }, -- Vilebranch Coin
-				{ 108, 19703 }, -- Witherbark Coin
-				{ 109, 19698 }, -- Zulian Coin
-				{ 116, 19708 }, -- Blue Hakkari Bijou
-				{ 117, 19713 }, -- Bronze Hakkari Bijou
-				{ 118, 19715 }, -- Gold Hakkari Bijou
-				{ 119, 19711 }, -- Green Hakkari Bijou
-				{ 120, 19710 }, -- Orange Hakkari Bijou
-				{ 121, 19712 }, -- Purple Hakkari Bijou
-				{ 122, 19707 }, -- Red Hakkari Bijou
-				{ 123, 19714 }, -- Silver Hakkari Bijou
-				{ 124, 19709 }, -- Yellow Hakkari Bijou
+				{ 16,  20258 }, -- Zulian Ceremonial Staff
+				{ 17, 19726 }, -- Bloodvine
+				{ 18, 19774 }, -- Souldarite
+				{ 19, 19767 }, -- Primal Bat Leather
+				{ 20, 19768 }, -- Primal Tiger Leather
+				{ 7, 19706 }, -- Bloodscalp Coin
+				{ 8, 19701 }, -- Gurubashi Coin
+				{ 9, 19700 }, -- Hakkari Coin
+				{ 10, 19699 }, -- Razzashi Coin
+				{ 11, 19704 }, -- Sandfury Coin
+				{ 12, 19705 }, -- Skullsplitter Coin
+				{ 13, 19702 }, -- Vilebranch Coin
+				{ 14, 19703 }, -- Witherbark Coin
+				{ 15, 19698 }, -- Zulian Coin
+				{ 22, 19708 }, -- Blue Hakkari Bijou
+				{ 23, 19713 }, -- Bronze Hakkari Bijou
+				{ 24, 19715 }, -- Gold Hakkari Bijou
+				{ 25, 19711 }, -- Green Hakkari Bijou
+				{ 26, 19710 }, -- Orange Hakkari Bijou
+				{ 27, 19712 }, -- Purple Hakkari Bijou
+				{ 28, 19707 }, -- Red Hakkari Bijou
+				{ 29, 19714 }, -- Silver Hakkari Bijou
+				{ 30, 19709 }, -- Yellow Hakkari Bijou
 			},
 		},
 		{ -- ZGEnchants
@@ -6177,6 +6220,10 @@ data["TheRuinsofAhnQiraj"] = { -- AQ20
 				{ 5,  21494 }, -- Southwind's Grasp
 				{ 6,  21495 }, -- Legplates of the Qiraji Command
 				{ 7,  21497 }, -- Boots of the Qiraji General
+				{ 9,  "INV_Box_01", nil, AL["Trash"] },
+				{ 10,  21810 }, -- Treads of the Wandering Nomad
+				{ 11,  21809 }, -- Fury of the Forgotten Swarm
+				{ 12,  21806 }, -- Gavel of Qiraji Authority
 				{ 19, 20885 }, -- Qiraji Martial Drape
 				{ 20, 20889 }, -- Qiraji Regal Drape
 				{ 21, 20888 }, -- Qiraji Ceremonial Ring
@@ -6348,6 +6395,8 @@ data["TheRuinsofAhnQiraj"] = { -- AQ20
 				{ 27, 21297 }, -- Manual of Heroic Strike IX
 			},
 		},
+		AQ_SCARABS,
+		AQ_ENCHANTS,
 		AQ_OPENING,
 	},
 }
@@ -6599,57 +6648,12 @@ data["TheTempleofAhnQiraj"] = { -- AQ40
 				{ 19, 21321 }, -- Red Qiraji Resonating Crystal
 			},
 		},
-		{ -- AQ40Trash2
-			name = AL["Ahn'Qiraj scarabs"],
-			ExtraList = true,
-			[NORMAL_DIFF] = {
-				{ 1,  20876 }, -- Idol of Death
-				{ 2,  20879 }, -- Idol of Life
-				{ 3,  20875 }, -- Idol of Night
-				{ 4,  20878 }, -- Idol of Rebirth
-				{ 5,  20881 }, -- Idol of Strife
-				{ 6,  20877 }, -- Idol of the Sage
-				{ 7,  20874 }, -- Idol of the Sun
-				{ 8,  20882 }, -- Idol of War
-				{ 10, 21762 }, -- Greater Scarab Coffer Key
-				{ 12, 21156 }, -- Scarab Bag
-				{ 14, 21230 }, -- Ancient Qiraji Artifact
-				{ 16, 20864 }, -- Bone Scarab
-				{ 17, 20861 }, -- Bronze Scarab
-				{ 18, 20863 }, -- Clay Scarab
-				{ 19, 20862 }, -- Crystal Scarab
-				{ 20, 20859 }, -- Gold Scarab
-				{ 21, 20865 }, -- Ivory Scarab
-				{ 22, 20860 }, -- Silver Scarab
-				{ 23, 20858 }, -- Stone Scarab
-				{ 26, 22203 }, -- Large Obsidian Shard
-				{ 27, 22202 }, -- Small Obsidian Shard
-				{ 29, 21229 }, -- Qiraji Lord's Insignia
-			},
-		},
-		{ -- AQEnchants
-			name = AL["Ahn'Qiraj enchants"],
-			ExtraList = true,
-			[NORMAL_DIFF] = {
-				{ 1,  20728 }, -- Formula: Enchant Gloves - Frost Power
-				{ 2,  20731 }, -- Formula: Enchant Gloves - Superior Agility
-				{ 3,  20734 }, -- Formula: Enchant Cloak - Stealth
-				{ 4,  20729 }, -- Formula: Enchant Gloves - Fire Power
-				{ 5,  20736 }, -- Formula: Enchant Cloak - Dodge
-				{ 6,  20730 }, -- Formula: Enchant Gloves - Healing Power
-				{ 7,  20727 }, -- Formula: Enchant Gloves - Shadow Power
-			},
-		},
+		AQ_SCARABS,
+		AQ_ENCHANTS,
 		AQ_OPENING,
 	},
 }
 
-local BLUE = "|cff6666ff"
-local GREY = "|cff999999"
-local GREN = "|cff66cc33"
-local _RED = "|cffcc6666"
-local PURP = "|cff9900ff"
-local WHIT = "|cffffffff"
 data["Naxxramas"] = {
 	MapID = 3456,
 	InstanceID = 533,

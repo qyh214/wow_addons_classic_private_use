@@ -85,8 +85,9 @@ function UF:Configure_HealComm(frame)
 		healPrediction.healType = HealComm[frame.db.healPrediction.healType]
 
 		local health = frame.Health
-		local orientation = frame.db.health and frame.db.health.orientation or health:GetOrientation()
-		local reverseFill = frame.db.health and frame.db.health.reverseFill or false
+		local orientation = health:GetOrientation()
+		local reverseFill = health:GetReverseFill()
+		local healthBarTexture = health:GetStatusBarTexture()
 
 		myBar:SetOrientation(orientation)
 		otherBar:SetOrientation(orientation)
@@ -96,13 +97,12 @@ function UF:Configure_HealComm(frame)
 			width = (width > 0 and width) or health.WIDTH
 			local p1 = reverseFill and "RIGHT" or "LEFT"
 			local p2 = reverseFill and "LEFT" or "RIGHT"
-			local healthTexture = health:GetStatusBarTexture()
 
 			myBar:Size(width, 0)
 			myBar:ClearAllPoints()
 			myBar:Point("TOP", health, "TOP")
 			myBar:Point("BOTTOM", health, "BOTTOM")
-			myBar:Point(p1, healthTexture, p2)
+			myBar:Point(p1, healthBarTexture, p2)
 
 			otherBar:Size(width, 0)
 			otherBar:ClearAllPoints()
@@ -114,13 +114,12 @@ function UF:Configure_HealComm(frame)
 			height = (height > 0 and height) or health.HEIGHT
 			local p1 = reverseFill and "TOP" or "BOTTOM"
 			local p2 = reverseFill and "BOTTOM" or "TOP"
-			local healthTexture = health:GetStatusBarTexture()
 
 			myBar:Size(0, height)
 			myBar:ClearAllPoints()
 			myBar:Point("LEFT", health, "LEFT")
 			myBar:Point("RIGHT", health, "RIGHT")
-			myBar:Point(p1, healthTexture, p2)
+			myBar:Point(p1, healthBarTexture, p2)
 
 			otherBar:Size(0, height)
 			otherBar:ClearAllPoints()

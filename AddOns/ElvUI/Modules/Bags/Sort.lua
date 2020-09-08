@@ -55,7 +55,6 @@ local coreGroups = {
 local bagCache = {}
 local bagIDs = {}
 local bagQualities = {}
-local bagPetIDs = {}
 local bagStacks = {}
 local bagMaxStacks = {}
 local bagGroups = {}
@@ -103,9 +102,59 @@ local inventorySlots = {
 }
 
 local conjured_items = {
-	[5512] = true, -- Healthstone
-	[162518] = true, -- Mystical Flask
-	[113509] = true, -- Conjured Mana Bun
+	-- Mage water
+	[5350] = true, -- Conjured Water
+	[2288] = true, -- Conjured Fresh Water (Level 5)
+	[2136] = true, -- Conjured Purified Water (Level 15)
+	[3772] = true, -- Conjured Spring Water (Level 25)
+	[8077] = true, -- Conjured Mineral Water (Level 35)
+	[8078] = true, -- Conjured Sparkling Water (Level 45)
+	[8079] = true, -- Conjured Crystal Water (Level 55)
+
+	-- Mage food
+	[5349] = true,  -- Conjured Muffin
+	[1113] = true,  -- Conjured Bread (Level 5)
+	[1114] = true,  -- Conjured Rye (Level 15)
+	[1487] = true,  -- Conjured Pumpernickel (Level 25)
+	[8075] = true,  -- Conjured Sourdough (Level 35)
+	[8076] = true,  -- Conjured Sweet Roll (Level 45)
+	[22895] = true, -- Conjured Cinnamon Roll (Level 55)
+
+	-- Mage mana
+	[5514] = true, -- Mana Agate
+	[5513] = true, -- Mana Jade
+	[8007] = true, -- Mana Citrine
+	[8008] = true, -- Mana Ruby
+
+	-- Warlock soulstones
+	[5232] = true,  -- Minor Soulstone
+	[16892] = true, -- Lesser Soulstone
+	[16893] = true, -- Soulstone
+	[16895] = true, -- Greater Soulstone
+	[16896] = true, -- Major Soulstone
+
+	-- Warlock firestones
+	[1254] = true,  -- Lesser Firestone
+	[13699] = true, -- Firestone
+	[13700] = true, -- Greater Firestone
+	[13701] = true, -- Major Firestone
+
+	-- Warlock healthstones
+	[5512] = true,  -- Minor Healthstone
+	[19004] = true, -- Minor Healthstone (1 tp)
+	[19005] = true, -- Minor Healthstone (2 tp)
+	[5511] = true,  -- Lesser Healthstone
+	[19006] = true, -- Lesser Healthstone (1 tp)
+	[19007] = true, -- Lesser Healthstone (2 tp)
+	[5509] = true,  -- Healthstone
+	[19008] = true, -- Healthstone (1 tp)
+	[19009] = true, -- Healthstone (2 tp)
+	[5510] = true,  -- Greater Healthstone
+	[19010] = true, -- Greater Healthstone (1 tp)
+	[19011] = true, -- Greater Healthstone (2 tp)
+	[9421] = true,  -- Major Healthstone
+	[19012] = true, -- Major Healthstone (1 tp)
+	[19013] = true, -- Major Healthstone (2 tp)
 }
 
 local safe = {
@@ -187,14 +236,6 @@ local function DefaultSort(a, b)
 	local _, _, _, _, _, _, _, _, bEquipLoc, _, _, bItemClassId, bItemSubClassId = GetItemInfo(bID)
 
 	local aRarity, bRarity = bagQualities[a], bagQualities[b]
-
-	if bagPetIDs[a] then
-		aRarity = 1
-	end
-
-	if bagPetIDs[b] then
-		bRarity = 1
-	end
 
 	if conjured_items[aID] then
 		aRarity = -99
@@ -326,12 +367,6 @@ function B:ConvertLinkToID(link)
 
 	local item = strmatch(link, "item:(%d+)")
 	if item then return tonumber(item) end
-
-	local ks = strmatch(link, "keystone:(%d+)")
-	if ks then return tonumber(ks), nil, true end
-
-	local bp = strmatch(link, "battlepet:(%d+)")
-	if bp then return tonumber(bp), true end
 end
 
 local function DefaultCanMove()
@@ -372,24 +407,13 @@ function B:ScanBags()
 	for _, bag, slot in B:IterateBags(allBags) do
 		local bagSlot = B:Encode_BagSlot(bag, slot)
 		local itemLink = B:GetItemLink(bag, slot)
-		local itemID, isBattlePet, isKeystone = B:ConvertLinkToID(itemLink)
+		local itemID = B:ConvertLinkToID(itemLink)
 		if itemID then
-			if isBattlePet then
-				bagPetIDs[bagSlot] = itemID
-				bagMaxStacks[bagSlot] = 1
-			elseif isKeystone then
-				bagMaxStacks[bagSlot] = 1
-				bagQualities[bagSlot] = 4
-				bagStacks[bagSlot] = 1
-			else
-				bagMaxStacks[bagSlot] = select(8, GetItemInfo(itemID))
-			end
-
+			local _, _, quality, _, _, _, _, maxStacks = GetItemInfo(itemID)
+			bagMaxStacks[bagSlot] = maxStacks
+			bagQualities[bagSlot] = quality
 			bagIDs[bagSlot] = itemID
-			if not isKeystone then
-				bagQualities[bagSlot] = select(3, GetItemInfo(itemLink))
-				bagStacks[bagSlot] = select(2, B:GetItemInfo(bag, slot))
-			end
+			bagStacks[bagSlot] = select(2, B:GetItemInfo(bag, slot))
 		end
 	end
 end
@@ -652,7 +676,6 @@ function B:StartStacking()
 	wipe(bagStacks)
 	wipe(bagIDs)
 	wipe(bagQualities)
-	wipe(bagPetIDs)
 	wipe(moveTracker)
 
 	if #moves > 0 then

@@ -43,7 +43,9 @@ function UF:Configure_ClassBar(frame, cur)
 	local CLASSBAR_WIDTH = frame.CLASSBAR_WIDTH
 
 	local color = E.db.unitframe.colors.borderColor
-	bars.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+	if not bars.backdrop.ignoreBorderColors then
+		bars.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+	end
 
 	if frame.USE_MINI_CLASSBAR and not frame.CLASSBAR_DETACHED then
 		if frame.MAX_CLASS_BAR == 1 or frame.ClassBar == "AdditionalPower" then
@@ -251,23 +253,13 @@ local function ToggleResourceBar(bars, overrideVisibility)
 
 	frame.CLASSBAR_SHOWN = (not not overrideVisibility) or frame[frame.ClassBar]:IsShown()
 
-	local height
-	if db.classbar then
-		height = db.classbar.height
-	elseif frame.AlternativePower then
-		height = db.power.height
-	end
+	if bars.text then bars.text:SetAlpha(frame.CLASSBAR_SHOWN and 1 or 0) end
 
-	if bars.text then
-		if frame.CLASSBAR_SHOWN then
-			bars.text:SetAlpha(1)
-		else
-			bars.text:SetAlpha(0)
-		end
-	end
-
+	local height = (db.classbar and db.classbar.height) or (frame.AlternativePower and db.power.height)
 	frame.CLASSBAR_HEIGHT = (frame.USE_CLASSBAR and (frame.CLASSBAR_SHOWN and height) or 0)
 	frame.CLASSBAR_YOFFSET = (not frame.USE_CLASSBAR or not frame.CLASSBAR_SHOWN or frame.CLASSBAR_DETACHED) and 0 or (frame.USE_MINI_CLASSBAR and ((frame.SPACING+(frame.CLASSBAR_HEIGHT/2))) or (frame.CLASSBAR_HEIGHT - (frame.BORDER-frame.SPACING)))
+
+	UF:Configure_CustomTexts(frame)
 
 	if not frame.CLASSBAR_DETACHED then --Only update when necessary
 		UF:Configure_HealthBar(frame)
@@ -280,7 +272,7 @@ UF.ToggleResourceBar = ToggleResourceBar --Make available to combobar
 -- MONK, PALADIN, WARLOCK, MAGE, and COMBOS
 -------------------------------------------------------------
 function UF:Construct_ClassBar(frame)
-	local bars = CreateFrame("Frame", nil, frame)
+	local bars = CreateFrame("Frame", '$parent_ClassBar', frame)
 	bars:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
 	bars:Hide()
 
@@ -366,13 +358,17 @@ function UF:Construct_AdditionalPowerBar(frame)
 	additionalPower:SetStatusBarTexture(E.media.blankTex)
 	UF.statusbars[additionalPower] = true
 
+	additionalPower.RaisedElementParent = CreateFrame('Frame', nil, additionalPower)
+	additionalPower.RaisedElementParent:SetFrameLevel(additionalPower:GetFrameLevel() + 100)
+	additionalPower.RaisedElementParent:SetAllPoints()
+
+	additionalPower.text = additionalPower.RaisedElementParent:CreateFontString(nil, 'OVERLAY')
+	UF:Configure_FontString(additionalPower.text)
+
 	additionalPower.bg = additionalPower:CreateTexture(nil, "BORDER")
 	additionalPower.bg:SetAllPoints(additionalPower)
 	additionalPower.bg:SetTexture(E.media.blankTex)
 	additionalPower.bg.multiplier = 0.35
-
-	additionalPower.text = additionalPower:CreateFontString(nil, 'OVERLAY')
-	UF:Configure_FontString(additionalPower.text)
 
 	additionalPower:SetScript("OnShow", ToggleResourceBar)
 	additionalPower:SetScript("OnHide", ToggleResourceBar)
@@ -385,56 +381,6 @@ function UF:PostUpdateAdditionalPower(_, MIN, MAX, event)
 	local db = frame.db
 
 	if frame.USE_CLASSBAR and ((MIN ~= MAX or (not db.classbar.autoHide)) and (event ~= "ElementDisable")) then
-		if db.classbar.additionalPowerText then
-			local powerValue = frame.Power.value
-			local powerValueText = powerValue:GetText()
-			local powerValueParent = powerValue:GetParent()
-			local powerTextPosition = db.power.position
-			local color = ElvUF.colors.power.MANA
-			color = E:RGBToHex(color[1], color[2], color[3])
-
-			--Attempt to remove |cFFXXXXXX color codes in order to determine if power text is really empty
-			if powerValueText then
-				local _, endIndex = strfind(powerValueText, "|cff")
-				if endIndex then
-					endIndex = endIndex + 7 --Add hex code
-					powerValueText = strsub(powerValueText, endIndex)
-					powerValueText = gsub(powerValueText, "%s+", "")
-				end
-			end
-
-			self.text:ClearAllPoints()
-			if not frame.CLASSBAR_DETACHED then
-				self.text:SetParent(powerValueParent)
-				if (powerValueText and (powerValueText ~= "" and powerValueText ~= " ")) then
-					if strfind(powerTextPosition, "RIGHT") then
-						self.text:Point("RIGHT", powerValue, "LEFT", 3, 0)
-						self.text:SetFormattedText(color.."%d%%|r |cffD7BEA5- |r", floor(MIN / MAX * 100))
-					elseif strfind(powerTextPosition, "LEFT") then
-						self.text:Point("LEFT", powerValue, "RIGHT", -3, 0)
-						self.text:SetFormattedText("|cffD7BEA5-|r"..color.." %d%%|r", floor(MIN / MAX * 100))
-					else
-						if select(4, powerValue:GetPoint()) <= 0 then
-							self.text:Point("LEFT", powerValue, "RIGHT", -3, 0)
-							self.text:SetFormattedText("|cffD7BEA5-|r"..color.." %d%%|r", floor(MIN / MAX * 100))
-						else
-							self.text:Point("RIGHT", powerValue, "LEFT", 3, 0)
-							self.text:SetFormattedText(color.."%d%%|r |cffD7BEA5- |r", floor(MIN / MAX * 100))
-						end
-					end
-				else
-					self.text:Point(powerValue:GetPoint())
-					self.text:SetFormattedText(color.."%d%%|r", floor(MIN / MAX * 100))
-				end
-			else
-				self.text:SetParent(frame.RaisedElementParent) -- needs to be 'frame.RaisedElementParent' otherwise the new PowerPrediction Bar will overlap
-				self.text:Point("CENTER", self)
-				self.text:SetFormattedText(color.."%d%%|r", floor(MIN / MAX * 100))
-			end
-		else --Text disabled
-			self.text:SetText('')
-		end
-
 		local custom_backdrop = UF.db.colors.customclasspowerbackdrop and UF.db.colors.classpower_backdrop
 		if custom_backdrop then
 			self.bg:SetVertexColor(custom_backdrop.r, custom_backdrop.g, custom_backdrop.b)
@@ -442,7 +388,6 @@ function UF:PostUpdateAdditionalPower(_, MIN, MAX, event)
 
 		self:Show()
 	else --Bar disabled
-		self.text:SetText('')
 		self:Hide()
 	end
 end
@@ -454,7 +399,6 @@ function UF:PostVisibilityAdditionalPower(enabled, stateChanged)
 		frame.ClassBar = 'AdditionalPower'
 	else
 		frame.ClassBar = 'ClassPower'
-		self.text:SetText('')
 	end
 
 	if stateChanged then
@@ -462,7 +406,7 @@ function UF:PostVisibilityAdditionalPower(enabled, stateChanged)
 		UF:Configure_ClassBar(frame)
 		UF:Configure_HealthBar(frame)
 		UF:Configure_Power(frame)
-		UF:Configure_InfoPanel(frame, true) --2nd argument is to prevent it from setting template, which removes threat border
+		UF:Configure_InfoPanel(frame)
 	end
 end
 

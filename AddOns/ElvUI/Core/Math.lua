@@ -16,7 +16,8 @@ local C_Timer_After = C_Timer.After
 
 E.ShortPrefixValues = {}
 E.ShortPrefixStyles = {
-	['CHINESE'] = {{1e8,'Y'}, {1e4,'W'}},
+	['TCHINESE'] = {{1e8,'億'}, {1e4,'萬'}},
+	['CHINESE'] = {{1e8,'亿'}, {1e4,'万'}},
 	['ENGLISH'] = {{1e12,'T'}, {1e9,'B'}, {1e6,'M'}, {1e3,'K'}},
 	['GERMAN'] = {{1e12,'Bio'}, {1e9,'Mrd'}, {1e6,'Mio'}, {1e3,'Tsd'}},
 	['KOREAN'] = {{1e8,'억'}, {1e4,'만'}, {1e3,'천'}},
@@ -53,7 +54,7 @@ function E:ShortValue(value, dec)
 	local abs_value = value<0 and -value or value
 	local decimal = dec and format('%%.%df', tonumber(dec) or 0)
 
-	for i=1, #E.ShortPrefixValues do
+	for i = 1, #E.ShortPrefixValues do
 		if abs_value >= E.ShortPrefixValues[i][1] then
 			if decimal then
 				return format(decimal..E.ShortPrefixValues[i][2], value / E.ShortPrefixValues[i][1])
@@ -89,7 +90,7 @@ end
 function E:TextGradient(text, ...)
 	local msg, len, idx = '', utf8len(text), 0
 
-	for i=1, len do
+	for i = 1, len do
 		local x = utf8sub(text, i, i)
 		if strmatch(x, '%s') then
 			msg = msg .. x

@@ -4,10 +4,8 @@ local _, ns = ...
 local ElvUF = ns.oUF
 assert(ElvUF, "ElvUI was unable to locate oUF.")
 
---Lua functions
 local _G = _G
 local tinsert = tinsert
---WoW API / Variables
 local IsAddOnLoaded = IsAddOnLoaded
 
 function UF:Construct_TargetFrame(frame)
@@ -23,15 +21,14 @@ function UF:Construct_TargetFrame(frame)
 	frame.Debuffs = self:Construct_Debuffs(frame)
 	frame.RaidRoleFramesAnchor = UF:Construct_RaidRoleFrames(frame)
 	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.DebuffHighlight = self:Construct_DebuffHighlight(frame)
+	frame.AuraHighlight = UF:Construct_AuraHighlight(frame)
 	frame.ThreatIndicator = self:Construct_Threat(frame)
 	frame.PvPIndicator = self:Construct_PvPIcon(frame)
+	frame.CombatIndicator = UF:Construct_CombatIndicator(frame)
 
 	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
 	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
 
-	frame.AuraBars = self:Construct_AuraBarHeader(frame)
-	frame.customTexts = {}
 	frame.Cutaway = self:Construct_Cutaway(frame)
 	frame.Fader = self:Construct_Fader()
 	frame.HealthPrediction = self:Construct_HealComm(frame)
@@ -40,8 +37,10 @@ function UF:Construct_TargetFrame(frame)
 	frame.ResurrectIndicator = UF:Construct_ResurrectionIcon(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 
-	frame:Point('BOTTOMRIGHT', E.UIParent, 'BOTTOM', 413, 68)
-	E:CreateMover(frame, frame:GetName()..'Mover', L["Target Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,target,generalGroup')
+	frame.AuraBars = self:Construct_AuraBarHeader(frame)
+	frame.customTexts = {}
+	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 342, 139)
+	E:CreateMover(frame, frame:GetName()..'Mover', L["Target Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,target,generalGroup')
 
 	frame.unitframeType = "target"
 end
@@ -69,6 +68,14 @@ function UF:Update_TargetFrame(frame, db)
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
 	end
 
+	if db.strataAndLevel and db.strataAndLevel.useCustomStrata then
+		frame:SetFrameStrata(db.strataAndLevel.frameStrata)
+	end
+
+	if db.strataAndLevel and db.strataAndLevel.useCustomLevel then
+		frame:SetFrameLevel(db.strataAndLevel.frameLevel)
+	end
+
 	frame.colors = ElvUF.colors
 	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
@@ -94,7 +101,7 @@ function UF:Update_TargetFrame(frame, db)
 	UF:Configure_AuraBars(frame)
 	UF:Configure_CustomTexts(frame)
 	UF:Configure_Cutaway(frame)
-	UF:Configure_DebuffHighlight(frame)
+	UF:Configure_AuraHighlight(frame)
 	UF:Configure_Fader(frame)
 	UF:Configure_HealComm(frame)
 	UF:Configure_Portrait(frame)
@@ -104,6 +111,7 @@ function UF:Update_TargetFrame(frame, db)
 	UF:Configure_RaidRoleIcons(frame)
 	UF:Configure_ResurrectionIcon(frame)
 	UF:Configure_Threat(frame)
+	UF:Configure_CombatIndicator(frame)
 
 	E:SetMoverSnapOffset(frame:GetName()..'Mover', -(12 + db.castbar.height))
 	frame:UpdateAllElements("ElvUI_UpdateAllElements")

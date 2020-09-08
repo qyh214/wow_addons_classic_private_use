@@ -159,20 +159,20 @@ Now do the Muisek stuff again with Faerie Dragons for [QC3125]
 Turn in [QT3125] and accept [QA3126]
 Go to [G71,57 Feralas] and clear the Gnoll camp and wait for a *Wandering Forest Walker* to pass by, do your Muisek stuff on 3 on them for [QC3126]
 Turn in [QT3126] and accept [QA3127]
-Accept [QA7725]
+Accept [Q7725]
 Follow the road north until youre at *The Twin Colossals*
 Go to [G40,22 Feralas] and do the miniaturization stuff on more giants for [QC7725] and use your muisek on them for [QC3127]
 Complete the rest of [QC3128]
 Abandon [Q7725] we had to accept it for the zapper only, also destroy the residue in your bags.
 Kill Yetis for [QC7734] and wait until you get a *Perfect Yeti Hide*
-Accept [QA7738] from the Perfect Hide*
+Accept [Q7738] from the Perfect Hide*
 If you went to Zul'Farrak, you should be level [XP50 50] now, if not just grind here until you are.
 Kill Harpies for [QC3063] and until you get a *Horn of Hatetalon*
 Go to [G40,9 Feralas] make sure your cooldowns are ready and youre full HP, this is a lvl 50 Elite were gonna summon.
 Blow your Horn of Hate and wait for Edana to spawn, kill her and loot the Dark Heart for [QC3062]
 Hearth to [H Camp Mojache]
 Turn in [QT3127][QT3128] accept [QA3129] wait 20 seconds and then turn it back in [QT3129]
-Turn in [QT7734][QT7738][QT3063][QT3062]
+Turn in [QT7734][Q7738][QT3063][QT3062]
 Fly to [F Orgrimmar]
 Turn in [QT3002]
 Turn in [QT32] and accept [QA4494]

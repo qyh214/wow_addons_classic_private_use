@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("ArcanistDoan", "DBM-Party-Classic", 12)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200611161557")
+mod:SetRevision("20200811024007")
 mod:SetCreatureID(6487)
 --mod:SetEncounterID(585)
 

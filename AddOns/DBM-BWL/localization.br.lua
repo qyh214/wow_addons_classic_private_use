@@ -146,31 +146,28 @@ L:SetGeneralLocalization{
 L:SetWarningLocalization{
 	WarnAddsLeft		= "%d restante",
 	WarnClassCall		= "Chamada de %s",
-	specwarnClassCall	= "Sua chamada de classe!"
---	WarnClassCall		= "Chamada: %s",
---	WarnPhase			= "Fase %s"
+	specwarnClassCall	= "Chamada da sua classe!"
 }
 L:SetTimerLocalization{
-	TimerClassCall		= "Chamada de %s finalizada"
+	TimerClassCall		= "Chamada de %s acaba"
 }
 L:SetOptionLocalization{
 	TimerClassCall		= "Exibir cronômetro para duração da chamada em cada classe",
 	WarnAddsLeft		= "Anunciar as mortes restantes até a Fase 2",
 	WarnClassCall		= "Exibir aviso para chamadas de classe",
 	specwarnClassCall	= "Exibir aviso especial quando afetado por chamada em classe"
---	WarnPhase			= "Anunciar mudanças de fase"
 }
 L:SetMiscLocalization{
 	YellP1		= "Que comecem os jogos!",
 	YellP2		= "Muito bem, meus lacaios. A coragem dos mortais começa a vacilar! Agora vejamos como eles enfrentarão o verdadeiro Senhor dos Rocha Negra!!!",
 	YellP3		= "Impossível! Ergam-se, meus lacaios! Sirvam ao seu mestre mais uma vez!",
-	YellShaman	= "¡Chamanes, mostradme lo que pueden hacer vuestros tótems!", --needs localization
-	YellPaladin	= "Paladines... He oído que tenéis muchas vidas. Demostrádmelo.", --needs localization
-	YellDruid	= "Los druidas y vuestro estúpido poder de cambiar de forma. ¡Veámoslo en acción!", --needs localization
+	YellShaman	= "Xamãs, mostrem-me do que seus totens são capazes!",
+	YellPaladin	= "Paladinos... ouvi dizer que vocês têm muitas vidas. Isso eu quero ver.",
+	YellDruid	= "Druidas e suas metamorfoses idiotas. Vamos vê-las em ação!",
 	YellPriest	= "Sacerdotes! Se vocês continuarem a curar desse jeito, acho que podemos tornar as coisas um pouquinho mais interessantes!",
 	YellWarrior	= "Guerreiros, sei que vocês conseguem bater mais forte que isso! Vamos!",
 	YellRogue	= "Ladinos? Parem de se esconder e venham me enfrentar!",
 	YellWarlock	= "Bruxos, vocês não deveriam brincar com magias que não compreendem. Viram só o que acontece?",
 	YellHunter	= "Caçadores e seus irritantes atiradores de ervilhas!",
-	YellMage	= "¡Magos también? Deberíais tener más cuidado cuando jugáis con la magia..." --needs localization
+	YellMage	= "Magos também? Vocês deveriam ter mais cuidado ao brincar com magia..."
 }

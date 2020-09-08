@@ -78,6 +78,9 @@ function QuestieItemFixes:Load()
             [itemKeys.name] = "Flagon of Dwarven Honeymead",
             [itemKeys.npcDrops] = {1464},
         },
+        [2676] = {
+            [itemKeys.objectDrops] = {276,},
+        },
         [2837] = {
             [itemKeys.name] = "Thurman's Letter",
             [itemKeys.relatedQuests] = {361},
@@ -208,6 +211,9 @@ function QuestieItemFixes:Load()
             [itemKeys.relatedQuests] = {592,593},
             [itemKeys.npcDrops] = {2530},
             [itemKeys.objectDrops] = {},
+        },
+        [3917] = {
+            [itemKeys.npcDrops] = {674,675,676,677},
         },
         [4016] = {
             [itemKeys.npcDrops] = {1488,1489,1490,1491,2530,2534,2535,2536,2537},
@@ -763,8 +769,8 @@ function QuestieItemFixes:Load()
         [11522] = {
             [itemKeys.name] = "Silver Totem of Aquementas",
             [itemKeys.relatedQuests] = {4005},
-            [itemKeys.npcDrops] = {},
-            [itemKeys.objectDrops] = {148507},
+            [itemKeys.npcDrops] = {9453},
+            [itemKeys.objectDrops] = {},
         },
         [11947] = { -- #1315
             [itemKeys.name] = "Filled Cursed Ooze Jar",
@@ -784,14 +790,23 @@ function QuestieItemFixes:Load()
             [itemKeys.npcDrops] = {6556,6557,6559,},
             [itemKeys.objectDrops] = {},
         },
+        [12234] = {
+            [itemKeys.name] = "Corrupted Felwood Sample",
+            [itemKeys.relatedQuests] = {4293},
+            [itemKeys.npcDrops] = {},
+            [itemKeys.objectDrops] = {174848},
+        },
         [12236] = {
             [itemKeys.name] = "Pure Un'Goro Sample",
             [itemKeys.relatedQuests] = {4294},
             [itemKeys.npcDrops] = {},
-            [itemKeys.objectDrops] = {},
+            [itemKeys.objectDrops] = {175265},
         },
         [12283] = {
             [itemKeys.npcDrops] = {7047,7048,7049,},
+        },
+        [12291] = {
+            [itemKeys.npcDrops] = {6557,9621,},
         },
         [12324] = {
             [itemKeys.npcDrops] = {10321}, -- #1175
@@ -824,11 +839,23 @@ function QuestieItemFixes:Load()
         [12366] = {
             [itemKeys.npcDrops] = {7457,7458},
         },
+        [12368] = {
+            [itemKeys.name] = "Dawn's Gambit",
+            [itemKeys.relatedQuests] = {4771},
+            [itemKeys.npcDrops] = {},
+            [itemKeys.objectDrops] = {},
+        },
         [12567] = {
             [itemKeys.name] = "Filled Flasket",
             [itemKeys.relatedQuests] = {4505},
             [itemKeys.npcDrops] = {},
             [itemKeys.objectDrops] = {148501},
+        },
+        [12733] = { 
+            [itemKeys.name] = "Sacred Frostsaber Meat",
+            [itemKeys.relatedQuests] = {5056},
+            [itemKeys.npcDrops] = {7434,7433,7430,7432,7431,},
+            [itemKeys.objectDrops] = {},
         },
         [12813] = { -- #1313
             [itemKeys.name] = "Flask of Mystery Goo",
@@ -998,6 +1025,12 @@ function QuestieItemFixes:Load()
         [17309] = {
             [itemKeys.npcDrops] = {8519,8520,8521,8522,},
         },
+        [17696] = {
+            [itemKeys.name] = "Filled Cerulean Vial",
+            [itemKeys.relatedQuests] = {7029,7041},
+            [itemKeys.npcDrops] = {},
+            [itemKeys.objectDrops] = {178907},
+        },
         [18151] = {
             [itemKeys.name] = "Filled Amethyst Phial",
             [itemKeys.relatedQuests] = {7383},
@@ -1055,6 +1088,24 @@ function QuestieItemFixes:Load()
             [itemKeys.relatedQuests] = {8309,},
             [itemKeys.objectDrops] = {180453,},
             [itemKeys.npcDrops] = {},
+        },
+        [21158] = {
+            [itemKeys.name] = "Hive'Zora Scout Report",
+            [itemKeys.relatedQuests] = {8534},
+            [itemKeys.npcDrops] = {15610},
+            [itemKeys.objectDrops] = {},
+        },
+        [21160] = {
+            [itemKeys.name] = "Hive'Regal Scout Report",
+            [itemKeys.relatedQuests] = {8738},
+            [itemKeys.npcDrops] = {15609},
+            [itemKeys.objectDrops] = {},
+        },
+        [21161] = {
+            [itemKeys.name] = "Hive'Ashi Scout Report",
+            [itemKeys.relatedQuests] = {8739},
+            [itemKeys.npcDrops] = {15611},
+            [itemKeys.objectDrops] = {},
         },
         [21557] = {
             [itemKeys.name] = "Small Red Rocket",

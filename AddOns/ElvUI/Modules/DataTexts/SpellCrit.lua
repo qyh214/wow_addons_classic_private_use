@@ -6,6 +6,7 @@ local strjoin = strjoin
 --WoW API / Variables
 local GetSpellCritChance = GetSpellCritChance
 local CRIT_ABBR = CRIT_ABBR
+local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel = ''
 
@@ -24,4 +25,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Spell Crit Chance', {"UNIT_STATS", "UNIT_AURA", "PLAYER_DAMAGE_DONE_MODS"}, OnEvent, nil, nil, nil, nil, 'Spell Crit Chance')
+DT:RegisterDatatext('Spell Crit Chance', STAT_CATEGORY_ENHANCEMENTS, {"UNIT_STATS", "UNIT_AURA", "PLAYER_DAMAGE_DONE_MODS"}, OnEvent, nil, nil, nil, nil, 'Spell Crit Chance')

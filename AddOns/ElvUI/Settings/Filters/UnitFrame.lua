@@ -4,8 +4,11 @@ local UF = E:GetModule('UnitFrames');
 --Lua functions
 local unpack = unpack
 local strlower = strlower
+local strfind = strfind
 --WoW API / Variables
 local IsPlayerSpell = IsPlayerSpell
+local GetSpellSubtext = GetSpellSubtext
+local GetSpellInfo = GetSpellInfo
 
 local function Defaults(priorityOverride)
 	return {
@@ -399,6 +402,7 @@ G.unitframe.aurafilters.RaidDebuffs = {
 		[24664] = Defaults(2), --Sleep
 		[17172] = Defaults(2), --Hex
 		[24306] = Defaults(2), --Delusions of Jin'do
+		[24099] = Defaults(2), --Poison Bolt Volley
 	-- Ahn'Qiraj Ruins
 		[25646] = Defaults(2), --Mortal Wound
 		[25471] = Defaults(2), --Attack Order
@@ -428,6 +432,10 @@ G.unitframe.aurafilters.RaidDebuffs = {
 G.unitframe.aurafilters.DungeonDebuffs = {
 	type = 'Whitelist',
 	spells = {
+	--Multiple Dungeons
+		[744] = Defaults(2), --Poison
+		[18267] = Defaults(2), --Curse of Weakness
+		[20800] = Defaults(2), --Immolate
 		[246] = Defaults(2), --Slow
 		[6533] = Defaults(2), --Net
 		[8399] = Defaults(2), --Sleep
@@ -443,10 +451,6 @@ G.unitframe.aurafilters.DungeonDebuffs = {
 	-- Maraudon
 		[7964] = Defaults(2), --Smoke Bomb
 		[21869] = Defaults(2), --Repulsive Gaze
-	--
-		[744] = Defaults(2), --Poison
-		[18267] = Defaults(2), --Curse of Weakness
-		[20800] = Defaults(2), --Immolate
 	-- Razorfen Downs
 		[12255] = Defaults(2), --Curse of Tuten'kash
 		[12252] = Defaults(2), --Web Spray
@@ -520,6 +524,9 @@ G.unitframe.aurafilters.RaidBuffsElvUI = {
 		[20620] = Defaults(), --Aegis of Ragnaros
 		[21075] = Defaults(), --Damage Shield
 		[20619] = Defaults(), --Magic Reflection
+	--Zul'Gurub
+		--High Priest Venoxis
+		[23895] = Defaults(), --Renew
 	},
 }
 
@@ -817,6 +824,12 @@ G.unitframe.ChannelTicks = {
 	[17314] = 3, -- Mind Flay(Rank 5)
 	[18807] = 3, -- Mind Flay(Rank 6)
 	-- Mage
+	[10] = 8, --Blizzard(Rank 1)
+	[6141] = 8, --Blizzard(Rank 2)
+	[8427] = 8, --Blizzard(Rank 3)
+	[10185] = 8, --Blizzard(Rank 4)
+	[10186] = 8, --Blizzard(Rank 5)
+	[10187] = 8, --Blizzard(Rank 6)
 	[5143] = 3, -- Arcane Missiles(Rank 1)
 	[5144] = 4, -- Arcane Missiles(Rank 2)
 	[5145] = 5, -- Arcane Missiles(Rank 3)

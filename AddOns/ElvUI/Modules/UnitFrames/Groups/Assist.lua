@@ -9,6 +9,8 @@ local _G = _G
 local max = math.max
 --WoW API / Variables
 local CreateFrame = CreateFrame
+local IsAddOnLoaded = IsAddOnLoaded
+local InCombatLockdown = InCombatLockdown
 local RegisterAttributeDriver = RegisterAttributeDriver
 
 function UF:Construct_AssistFrames()
@@ -34,8 +36,8 @@ function UF:Construct_AssistFrames()
 		self.Debuffs = UF:Construct_Debuffs(self)
 		self.AuraWatch = UF:Construct_AuraWatch(self)
 		self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
-		self.DebuffHighlight = UF:Construct_DebuffHighlight(self)
 		self.HealthPrediction = UF:Construct_HealComm(self)
+		self.AuraHighlight = UF:Construct_AuraHighlight(self)
 
 		self.unitframeType = "assist"
 	else
@@ -43,9 +45,6 @@ function UF:Construct_AssistFrames()
 	end
 
 	self.originalParent = self:GetParent()
-
-	UF:Update_StatusBars()
-	UF:Update_FontStrings()
 
 	return self
 end
@@ -56,37 +55,38 @@ function UF:Update_AssistHeader(header, db)
 
 	UF:ClearChildPoints(header:GetChildren())
 
-	if not header.forceShow and db.enable then
+	if not header.isForced and db.enable then
 		RegisterAttributeDriver(header, 'state-visibility', '[@raid1,exists] show;hide')
 	end
 
 	header:SetAttribute('point', 'BOTTOM')
 	header:SetAttribute('columnAnchorPoint', 'LEFT')
-	header:SetAttribute("yOffset", db.verticalSpacing)
+	header:SetAttribute('yOffset', db.verticalSpacing)
 
 	if not header.positioned then
 		header:ClearAllPoints()
-		header:Point("TOPLEFT", E.UIParent, "TOPLEFT", 4, -248)
+		header:Point('TOPLEFT', E.UIParent, 'TOPLEFT', 4, -248)
 
 		local width, height = header:GetSize()
-		header.dirtyWidth, header.dirtyHeight = width, max(height, 2*db.height + db.verticalSpacing)
+		local minHeight = max(height, 2 * db.height + db.verticalSpacing)
+		header:SetAttribute('minHeight', minHeight)
+		header:SetAttribute('minWidth', width)
 
-		E:CreateMover(header, header:GetName()..'Mover', L["MA Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,assist,generalGroup')
-		header:SetAttribute('minHeight', header.dirtyHeight)
-		header:SetAttribute('minWidth', header.dirtyWidth)
-		header.positioned = true;
+		E:CreateMover(header, header:GetName()..'Mover', L["MA Frames"], nil, nil, nil, 'ALL,RAID', nil, 'unitframe,groupUnits,assist,generalGroup')
+		header.mover:SetSize(width, minHeight)
+
+		header.positioned = true
 	end
 end
 
 function UF:Update_AssistFrames(frame, db)
 	frame.db = db
 	frame.colors = ElvUF.colors
-	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
+	frame:RegisterForClicks(UF.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 
 	do
 		frame.ORIENTATION = db.orientation --allow this value to change when unitframes position changes on screen?
-
-		if(self.thinBorders) then
+		if(UF.thinBorders) then
 			frame.SPACING = 0
 			frame.BORDER = E.mult
 		else
@@ -141,11 +141,19 @@ function UF:Update_AssistFrames(frame, db)
 	UF:Configure_Cutaway(frame)
 
 	if not frame.isChild then
+		if not IsAddOnLoaded("Clique") then
+			if db.middleClickFocus then
+				frame:SetAttribute("type3", "focus")
+			elseif frame:GetAttribute("type3") == "focus" then
+				frame:SetAttribute("type3", nil)
+			end
+		end
+
 		UF:EnableDisable_Auras(frame)
 		UF:Configure_AllAuras(frame)
-
+		UF:Configure_RaidDebuffs(frame)
+		UF:Configure_AuraHighlight(frame)
 		UF:Configure_AuraWatch(frame)
-		UF:Configure_DebuffHighlight(frame)
 		UF:Configure_RaidDebuffs(frame)
 		UF:Configure_HealComm(frame)
 	end

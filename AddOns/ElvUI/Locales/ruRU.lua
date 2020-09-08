@@ -2,8 +2,11 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "ruRU")
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = " |cff00ff00назначено для |r"
-L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = "Обнаружен конфликт точек фиксирования во фрейме(ах) %s. Пожалуйста, переназначьте фиксирование баффов и дебаффов так, чтобы они не крепились друг к другу. Установлено принудительное крепление дебаффов к фрейму."
+L["%s frame has a conflicting anchor point. Forcing the Buffs to be attached to the main unitframe."] = "Фрейм %s содержит конфликтующие точки крепления. Баффы будут принудительно закреплены на самом фрейме."
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = "%s хочет передать Вам свои фильтры. Желаете ли Вы принять их?"
 L["%s is attempting to share the profile %s with you. Would you like to accept the request?"] = "%s хочет передать Вам профиль %s. Желаете ли Вы принять его?"
 L["%s: %s tried to call the protected function '%s'."] = "%s: %s tried to call the protected function '%s'."
@@ -18,6 +21,7 @@ L["Accepting this will reset your Filter Priority lists for all auras on UnitFra
 L["Additive Blend"] = true
 L["Adjust the UI Scale to fit your screen, press the autoscale button to set the UI Scale automatically."] = "Измените масштаб интерфейса для вашего экрана. Нажмите автомасштаб, чтобы мы установили его сами."
 L["AFK"] = "АФК"
+L["Alliance: "] = "Альянс: "
 L["All keybindings cleared for |cff00ff00%s|r."] = "Сброшены все назначения для |cff00ff00%s|r."
 L["Alpha Key"] = true
 L["Already Running.. Bailing Out!"] = "Уже выполняется.. Бобер, выдыхай!"
@@ -47,7 +51,7 @@ L["Bank Mover (Grow Up)"] = "Банк (Рост вверх)"
 L["Bank"] = "Банк"
 L["Bar "] = "Панель "
 L["Bars"] = "Полосы"
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = "Информация поля боя временно скрыта. Для отображения введите /bgstat или ПКМ на иконке 'С' у миникарты."
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = "Информация поля боя снова будет отображаться, если Вы находитесь на них."
 L["BfA Missions"] = "Миссии BfA"
 L["Binding"] = "Назначение"
@@ -58,7 +62,6 @@ L["Blend"] = true
 L["BNet Frame"] = "Оповещения BNet"
 L["Boss Button"] = "Кнопка босса"
 L["Boss Frames"] = "Боссы"
-L["Building(s) Report:"] = "Отчет зданий:"
 L["Calendar"] = "Календарь"
 L["Can't buy anymore slots!"] = "Невозможно приобрести больше слотов!"
 L["Can't Roll"] = "Не могу бросить кости"
@@ -88,7 +91,6 @@ L["Dead"] = "Труп"
 L["Deficit:"] = "Убыток:"
 L["Delete gray items?"] = "Удалить серый предметы?"
 L["Deposit Reagents"] = "Сложить материалы"
-L["Desaturate all grey items that can be vendored."] = true
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = "Мы обнаружили, что ElvUI OptionsUI устарел. Это может быть результатом устаревшей версии Tukui Client. Пожалуйста, посетите нашу страницу загрузок и обновите Tukui Client, а затем переустановите ElvUI. Устаревший ElvUI OptionsUI может привести к отсутствию некоторых опций."
 L["Disable Warning"] = "Отключить предупреждение"
 L["Disable"] = "Выключить"
@@ -107,6 +109,7 @@ L["ElvUI is five or more revisions out of date. You can download the newest vers
 L["ElvUI is out of date. You can download the newest version from www.tukui.org. Get premium membership and have ElvUI automatically updated with the Tukui Client!"] = "ElvUI устарел. Вы можете скачать последнюю версию с www.tukui.org. С премиум аккаунтом ElvUI будет автоматически обновляться через TukUI клиент."
 L["ElvUI needs to perform database optimizations please be patient."] = "ElvUI нужно провести оптимизацию базы данных. Подождите, пожалуйста."
 L["ElvUI Plugin Installation"] = "Установка плагина ElvUI"
+L["ElvUI Status"] = "Статус ElvUI"
 L["ElvUI was updated while the game is still running. Please relaunch the game, as this is required for the files to be properly updated."] = "ElvUI обновился, пока игра была запущена. Перезапустите игру, чтобы обновления могли по человечески примениться."
 L["Empty Slot"] = "Пустой слот"
 L["Enable"] = "Включить"
@@ -123,7 +126,6 @@ L["FocusTarget Frame"] = "Цель фокуса"
 L["For technical support visit us at http://www.tukui.org."] = "За технической поддержкой обращайтесь на http://www.tukui.org."
 L["Friends List"] = "Список друзей"
 L["G"] = "Г"
-L["Garrison"] = "Гарнизон"
 L["Ghost"] = "Призрак"
 L["GM Ticket Frame"] = "Запрос ГМу"
 L["Gold"] = "Золото"
@@ -140,6 +142,7 @@ L["Home Protocol:"] = "Домашний протокол:"
 L["Honor Bar"] = "Полоса Чести"
 L["Honor Remaining:"] = "Осталось Чести"
 L["Honor XP:"] = "Честь: "
+L["Horde: "] = "Орда: "
 L["Hover your mouse over any actionbutton or spellbook button to bind it. Press the ESC key to clear the current actionbutton's keybinding."] = "Наведите мышку на любую кнопку панели команд или книги заклинаний, чтобы создать назначение. Нажатие ESC убирает текущее назначение."
 L["HP"] = "+ Исцел."
 L["HPS"] = "ИВС"
@@ -149,14 +152,14 @@ L["Icons Only"] = "Только иконки"
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = "Если Вы случайно удалили вкладку чата, всегда можно сделать следующее: зайти в конфигурацию, запустить установку, дойти до шага настроек чата и сбросить их."
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = "Если Вы испытываете проблемы с ElvUI, попробуйте отключить все аддоны, кроме самого ElvUI. Помните, ElvUI это аддон, полностью заменяющий интерфейс, Вы не можете одновременно использовать два аддона, выполняющих одинаковые функции."
 L["IL"] = "ЛП"
-L["Importance: |cff07D400High|r"] = "Важность: |cff07D400Высокая|r"
+L["Importance: |cffFF3333High|r"] = "Важность: |cffFF3333Высокая|r"
 L["Importance: |cffD3CF00Medium|r"] = "Важность: |cffD3CF00Средняя|r"
-L["Importance: |cffFF0000Low|r"] = "Важность: |cffFF0000Низкая|r"
+L["Importance: |cFF33FF33Low|r"] = "Важность: |cFF33FF33Низкая|r"
 L["In Progress"] = "В процессе"
 L["INCOMPATIBLE_ADDON"] = "Аддон %s не совместим с модулем %s ElvUI. Пожалуйста, выберите отключить ли несовместимый аддон или модуль."
-L["Info/Controls"] = "Инфо/Контроль"
 L["Installation Complete"] = "Установка завершена"
 L["Invalid Target"] = "Неверная цель"
+L["Interrupted %s's \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r!"] = "Прерван %s. Сбито \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r!"
 L["is looking for members"] = "ищет игроков"
 L["It appears one of your AddOns have disabled the AddOn Blizzard_CompactRaidFrames. This can cause errors and other issues. The AddOn will now be re-enabled."] = "Похоже, что один из ваших аддонов отключил Blizzard_CompactRaidFrames. Это может вызвать ошибки и другие проблемы, мы рекомендуем включить. Включить аддоны Blizzard сейчас?"
 L["Item level: %.2f"] = "Уровень предмета: %.2f"
@@ -185,7 +188,8 @@ L["Legs"] = "Ноги"
 L["Level Up Display / Boss Banner"] = "Уровень / Баннер босса"
 L["List of installations in queue:"] = "Очередь установки:"
 L["Lock"] = "Закрепить"
-L["LOGIN_MSG"] = "Добро пожаловать в %sElvUI|r |cff1784d1Classic|r версии %s%s|r, наберите /ec для доступа в меню настроек. Если Вам нужна техническая поддержка, посетите наш форум на https://www.tukui.org или присоединяйтесь к серверу Discord: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("Добро пожаловать в *ElvUI|r |cff1784d1Classic|r версии *%s|r, наберите */ec|r для доступа в меню настроек. Если Вам нужна техническая поддержка, посетите наш форум на https://www.tukui.org или присоединяйтесь к серверу Discord: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = "Розыгрыш/оповещения"
 L["Loot Frame"] = "Окно добычи"
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = "Чтоб его! Загрузка была... да всплыла. Попробуйте еще раз!"
@@ -196,13 +200,11 @@ L["Main Hand"] = "Правая рука"
 L["Micro Bar"] = "Микроменю"
 L["Minimap"] = "Миникарта"
 L["MirrorTimer"] = "Таймер"
-L["Mission(s) Report:"] = "Отчет миссий:"
 L["Mitigation By Level: "] = "Снижение на уровне: "
 L["Mobile"] = "Мобильный"
 L["Modulating Blend"] = true
 L["Mov. Speed:"] = _G.STAT_MOVEMENT_SPEED
 L["MT Frames"] = "Танки"
-L["Naval Mission(s) Report:"] = "Отчет морских миссий:"
 L["No bindings set."] = "Нет назначений"
 L["No gray items to delete."] = "Нет предметов серого качества для удаления."
 L["No Guild"] = "Нет гильдии"
@@ -250,8 +252,8 @@ L["Remaining:"] = "Осталось:"
 L["Remove Bar %d Action Page"] = "Удалить панель %d из списка переключаемых"
 L["Reputation Bar"] = "Полоса репутации"
 L["Request was denied by user."] = "Запрос отклонен пользователем."
-L["Reset Counters: Hold Shift + Left Click"] = "Сбросить счётчики: Shift + ЛКМ"
-L["Reset Data: Hold Shift + Right Click"] = "Сбросить данные: Shift + ПКМ"
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = "Сбросить позицию"
 L["Rested:"] = "Бодрость:"
 L["Right Chat"] = "Правый чат"
@@ -271,6 +273,7 @@ L["Setup Chat"] = "Настроить чат"
 L["Setup CVars"] = "Сбросить настройки"
 L["Shoulder"] = "Плечо"
 L["Show/Hide Reagents"] = "Показать/скрыть материалы"
+L["Shows a frame with needed info for support."] = "Отображает окно с необходимой информацией для получения поддержки."
 L["silverabbrev"] = "|cffc7c7cfс|r"
 L["Skip Process"] = "Пропустить установку"
 L["Sort Tab"] = "Сортировать вкладки"
@@ -279,7 +282,6 @@ L["Spec"] = "Спек"
 L["Spell/Heal Power"] = "Сила заклинаний"
 L["Spent:"] = "Потрачено:"
 L["Stance Bar"] = "Панель стоек"
-L["Stats For:"] = "Статистика для:"
 L["Steps"] = "Шаги"
 L["Sticky Frames"] = "Клейкие фреймы"
 L["System"] = "Система"
@@ -330,9 +332,8 @@ L["Voice Overlay"] = "Индикатор голоса"
 L["Waist"] = "Пояс"
 L["Welcome to ElvUI version %s!"] = "Добро пожаловать в ElvUI версии %s!"
 L["whispers"] = "шепчет"
-L["World Latency:"] = true
-L["World Protocol:"] = "Мировой протокол:"
-L["WoW Token:"] = "WoW токен:"
+L["World Latency:"] = "Глобальная задержка:"
+L["World Protocol:"] = "Глобальный протокол:"
 L["Wrist"] = "Запястья"
 L["XP:"] = "Опыт:"
 L["yells"] = "кричит"
@@ -370,3 +371,17 @@ Options:
   Shift + RightClick - Hides mover temporarily.
   Ctrl + RightClick - Resets mover position to default.
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

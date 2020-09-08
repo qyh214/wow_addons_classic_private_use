@@ -5,16 +5,16 @@ local UF = E:GetModule('UnitFrames');
 local CreateFrame = CreateFrame
 
 function UF:Construct_InfoPanel(frame)
-	local infoPanel = CreateFrame("Frame", nil, frame)
-
+	local infoPanel = CreateFrame("Frame", '$parent_InfoPanel', frame)
 	infoPanel:SetFrameLevel(7) --Health is 10 and filled power is 5 by default
+
 	local thinBorders = self.thinBorders
 	infoPanel:CreateBackdrop(nil, true, nil, thinBorders, true)
 
 	return infoPanel
 end
 
-function UF:Configure_InfoPanel(frame, noTemplateChange)
+function UF:Configure_InfoPanel(frame)
 	local db = frame.db
 
 	if frame.USE_INFO_PANEL then
@@ -37,13 +37,11 @@ function UF:Configure_InfoPanel(frame, noTemplateChange)
 			end
 		end
 
-		if (not noTemplateChange) then
-			local thinBorders = self.thinBorders
-			if db.infoPanel.transparent then
-				frame.InfoPanel.backdrop:SetTemplate("Transparent", nil, nil, thinBorders, true)
-			else
-				frame.InfoPanel.backdrop:SetTemplate(nil, true, nil, thinBorders, true)
-			end
+		local thinBorders = self.thinBorders
+		if db.infoPanel.transparent then
+			frame.InfoPanel.backdrop:SetTemplate("Transparent", nil, nil, thinBorders, true)
+		else
+			frame.InfoPanel.backdrop:SetTemplate(nil, true, nil, thinBorders, true)
 		end
 	else
 		frame.InfoPanel:Hide()

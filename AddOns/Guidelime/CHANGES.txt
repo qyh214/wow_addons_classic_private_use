@@ -1,18 +1,18 @@
-tag f5dc7d5f7471c5ea557320fad65d9bbbc021b204 v1.040
-Author:	max-ri <51713394+max-ri@users.noreply.github.com>
-Date:	Fri Nov 29 12:21:19 2019 +0100
+tag d57c2f3e75e3a08ca1d27762eda2e39a9e200670 v1.042
+Author:	max-ri <max_r_@web.de>
+Date:	Mon Sep 7 09:34:22 2020 +0200
 
-v1.040
+v1.042
 
-commit d635da35afee1b1207c60a6b8270ef43ed246a90
-Author: max-ri <51713394+max-ri@users.noreply.github.com>
-Date:   Fri Nov 29 12:21:19 2019 +0100
+commit 1fdf83a147a1f769c26dae093735d62bb3c92cb9
+Author: max-ri <max_r_@web.de>
+Date:   Mon Sep 7 09:34:21 2020 +0200
 
-    v1.040
+    v1.042
 
-commit be9e00bee845b8ff6e3ae6a9e2f92965de24a954
-Author: max-ri <51713394+max-ri@users.noreply.github.com>
-Date:   Fri Nov 29 12:21:08 2019 +0100
+commit 872ca8c0a9b0bd1d6b7984732e7de0a4280b2a31
+Author: max-ri <max_r_@web.de>
+Date:   Mon Sep 7 09:32:48 2020 +0200
 
-    bugfix: wrong default size for second arrow
+    old corrections got reverted by accident
 

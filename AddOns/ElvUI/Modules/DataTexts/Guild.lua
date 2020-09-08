@@ -3,8 +3,8 @@ local DT = E:GetModule('DataTexts')
 
 --Lua functions
 local _G = _G
-local ipairs, sort, unpack, wipe, ceil = ipairs, sort, unpack, wipe, ceil
-local format, strjoin, strsplit = format, strjoin, strsplit
+local ipairs, select, sort, unpack, wipe, ceil = ipairs, select, sort, unpack, wipe, ceil
+local format, strfind, strjoin, strsplit, strmatch = format, strfind, strjoin, strsplit, strmatch
 --WoW API / Variables
 local GetDisplayedInviteType = GetDisplayedInviteType
 local GetGuildInfo = GetGuildInfo
@@ -23,11 +23,15 @@ local ToggleFriendsFrame = ToggleFriendsFrame
 local ToggleGuildFrame = ToggleGuildFrame
 local UnitInParty = UnitInParty
 local UnitInRaid = UnitInRaid
+local GuildRoster = GuildRoster
 local InCombatLockdown = InCombatLockdown
+local IsAltKeyDown = IsAltKeyDown
 
+local COMBAT_FACTION_CHANGE = COMBAT_FACTION_CHANGE
 local GUILD = GUILD
 local GUILD_MOTD = GUILD_MOTD
 local REMOTE_CHAT = REMOTE_CHAT
+local FRIEND_ONLINE = FRIEND_ONLINE
 local PRIEST_COLOR = RAID_CLASS_COLORS.PRIEST
 
 local tthead, ttsubh, ttoff = {r=0.4, g=0.78, b=1}, {r=0.75, g=0.9, b=1}, {r=.3,g=1,b=.3}
@@ -78,6 +82,10 @@ local mobilestatus = {
 	[2] = "|TInterface\\ChatFrame\\UI-ChatIcon-ArmoryChat-BusyMobile:14:14:0:0:16:16:0:16:0:16|t",
 }
 
+local function inGroup(name)
+	return (UnitInParty(name) or UnitInRaid(name)) and "|cffaaaaaa*|r" or ""
+end
+
 local function BuildGuildTable()
 	GuildRoster()
 	wipe(guildTable)
@@ -102,8 +110,9 @@ end
 
 local resendRequest = false
 local eventHandlers = {
-	['CHAT_MSG_SYSTEM'] = function(self, arg1)
-		if(FRIEND_ONLINE ~= nil and arg1 and strfind(arg1, FRIEND_ONLINE)) then
+	["PLAYER_GUILD_UPDATE"] = C_GuildInfo_GuildRoster,
+	["CHAT_MSG_SYSTEM"] = function(_, arg1)
+		if FRIEND_ONLINE ~= nil and arg1 and strfind(arg1, FRIEND_ONLINE) then
 			resendRequest = true
 		end
 	end,-- when we enter the world and guildframe is not available then
@@ -132,32 +141,17 @@ local eventHandlers = {
 	-- our guild message of the day changed
 	["GUILD_MOTD"] = function (self, arg1)
 		guildMotD = arg1
-	end,
-	["ELVUI_FORCE_RUN"] = E.noop,
-	["ELVUI_COLOR_UPDATE"] = E.noop,
+	end
 }
 
-local function OnEvent(self, event, ...)
-	lastPanel = self
-
-	if IsInGuild() then
-		eventHandlers[event](self, ...)
-
-		self.text:SetFormattedText(displayString, #guildTable)
-	else
-		self.text:SetText(noGuildString)
-	end
-end
-
-local menuFrame = CreateFrame("Frame", "GuildDatatTextRightClickMenu", E.UIParent, "UIDropDownMenuTemplate")
 local menuList = {
 	{ text = _G.OPTIONS_MENU, isTitle = true, notCheckable=true},
 	{ text = _G.INVITE, hasArrow = true, notCheckable=true,},
 	{ text = _G.CHAT_MSG_WHISPER_INFORM, hasArrow = true, notCheckable=true,}
 }
 
-local function inviteClick(self, name, guid)
-	menuFrame:Hide()
+local function inviteClick(_, name, guid)
+	DT.EasyMenu:Hide()
 
 	if not (name and name ~= "") then return end
 
@@ -175,8 +169,8 @@ local function inviteClick(self, name, guid)
 	end
 end
 
-local function whisperClick(self, playerName)
-	menuFrame:Hide()
+local function whisperClick(_, playerName)
+	DT.EasyMenu:Hide()
 	SetItemRef( "player:"..playerName, format("|Hplayer:%1$s|h[%1$s]|h",playerName), "LeftButton" )
 end
 
@@ -207,7 +201,8 @@ local function Click(self, btn)
 			end
 		end
 
-		_G.EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
+		DT:SetEasyMenuAnchor(DT.EasyMenu, self)
+		_G.EasyMenu(menuList, DT.EasyMenu, nil, nil, nil, "MENU")
 	elseif InCombatLockdown() then
 		_G.UIErrorsFrame:AddMessage(E.InfoColor.._G.ERR_NOT_IN_COMBAT)
 	else
@@ -220,10 +215,8 @@ local function Click(self, btn)
 	end
 end
 
-local function OnEnter(self, _, noUpdate)
+local function OnEnter()
 	if not IsInGuild() then return end
-
-	DT:SetupTooltip(self)
 
 	local total, _, online = GetNumGuildMembers()
 	if #guildTable == 0 or #guildTable < online then BuildGuildTable() end
@@ -270,6 +263,23 @@ local function OnEnter(self, _, noUpdate)
 	DT.tooltip:Show()
 end
 
+local function OnEvent(self, event, ...)
+	lastPanel = self
+
+	if IsInGuild() then
+		local func = eventHandlers[event]
+		if func then func(self, ...) end
+
+		if not IsAltKeyDown() and event == 'MODIFIER_STATE_CHANGED' and GetMouseFocus() == self then
+			OnEnter(self)
+		end
+
+		self.text:SetFormattedText(displayString, #guildTable)
+	else
+		self.text:SetText(noGuildString)
+	end
+end
+
 local function ValueColorUpdate(hex)
 	displayString = strjoin("", GUILD, ": ", hex, "%d|r")
 	noGuildString = hex..L["No Guild"]
@@ -280,4 +290,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Guild', {'PLAYER_ENTERING_WORLD', 'CHAT_MSG_SYSTEM', "GUILD_ROSTER_UPDATE", "PLAYER_GUILD_UPDATE", "GUILD_MOTD"}, OnEvent, nil, Click, OnEnter, nil, GUILD)
+DT:RegisterDatatext('Guild', _G.SOCIAL_LABEL, {'CHAT_MSG_SYSTEM', 'GUILD_ROSTER_UPDATE', 'PLAYER_GUILD_UPDATE', 'GUILD_MOTD', 'MODIFIER_STATE_CHANGED'}, OnEvent, nil, Click, OnEnter, nil, GUILD, nil, ValueColorUpdate)

@@ -4,58 +4,228 @@ local TT = E:GetModule('Tooltip')
 local LDB = E.Libs.LDB
 local LSM = E.Libs.LSM
 
---Lua functions
 local _G = _G
-local pairs, type, error, strlen = pairs, type, error, strlen
-local pcall = pcall
---WoW API / Variables
+local format, type, pcall = format, type, pcall
+local tinsert, ipairs, pairs, wipe, sort = tinsert, ipairs, pairs, wipe, sort
+local next, strfind, strlen, strsplit = next, strfind, strlen, strsplit
+local CloseDropDownMenus = CloseDropDownMenus
 local CreateFrame = CreateFrame
-local IsInInstance = IsInInstance
+local EasyMenu = EasyMenu
 local InCombatLockdown = InCombatLockdown
+local IsInInstance = IsInInstance
+local MouseIsOver = MouseIsOver
+local RegisterStateDriver = RegisterStateDriver
+local UIDropDownMenu_SetAnchor = UIDropDownMenu_SetAnchor
+local UnregisterStateDriver = UnregisterStateDriver
+local MISCELLANEOUS = MISCELLANEOUS
 
-function DT:Initialize()
-	--if E.db.datatexts.enable ~= true then return end
-	self.Initialized = true
-	self.db = E.db.datatexts
+local ActivateHyperMode
+local HyperList = {}
 
-	self.tooltip = CreateFrame("GameTooltip", "DatatextTooltip", E.UIParent, "GameTooltipTemplate")
-	TT:HookScript(self.tooltip, 'OnShow', 'SetStyle')
+DT.tooltip = CreateFrame('GameTooltip', 'DataTextTooltip', E.UIParent, 'GameTooltipTemplate')
+DT.EasyMenu = CreateFrame('Frame', 'DataTextEasyMenu', E.UIParent, 'UIDropDownMenuTemplate')
 
-	-- Ignore header font size on DatatextTooltip
-	local font = E.Libs.LSM:Fetch("font", E.db.tooltip.font)
-	local fontOutline = E.db.tooltip.fontOutline
-	local textSize = E.db.tooltip.textFontSize
-	_G.DatatextTooltipTextLeft1:FontTemplate(font, textSize, fontOutline)
-	_G.DatatextTooltipTextRight1:FontTemplate(font, textSize, fontOutline)
-
-	LDB.RegisterCallback(E, "LibDataBroker_DataObjectCreated", DT.SetupObjectLDB)
-	self:RegisterLDB('ElvUI') -- LibDataBroker
-	self:LoadDataTexts() -- Fire it up!
-	-- self:RegisterCustomCurrencyDT() -- Register all the user created currency datatexts from the "CustomCurrency" DT.
-	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-end
-
+DT.SelectedDatatext = nil
+DT.HyperList = HyperList
 DT.RegisteredPanels = {}
 DT.RegisteredDataTexts = {}
-DT.PointLocation = {
-	[1] = 'middle',
-	[2] = 'left',
-	[3] = 'right',
+DT.LoadedInfo = {}
+DT.PanelPool = {
+	InUse = {},
+	Free = {},
+	Count = 0
 }
 
-function DT:PLAYER_ENTERING_WORLD(_, initLogin, isReload)
-	-- update on zone changed for BG Stats
-	if not initLogin and not isReload then
-		DT:LoadDataTexts()
+DT.FontStrings = {}
+DT.AssignedDatatexts = {}
+DT.UnitEvents = {
+	UNIT_AURA = true,
+	UNIT_RESISTANCES = true,
+	UNIT_STATS = true,
+	UNIT_ATTACK_POWER = true,
+	UNIT_RANGED_ATTACK_POWER = true,
+	UNIT_TARGET = true,
+	UNIT_SPELL_HASTE = true
+}
+
+function DT:SetEasyMenuAnchor(menu, dt)
+	local point = E:GetScreenQuadrant(dt)
+	local bottom = point and strfind(point, 'BOTTOM')
+	local left = point and strfind(point, 'LEFT')
+
+	local anchor1 = (bottom and left and 'BOTTOMLEFT') or (bottom and 'BOTTOMRIGHT') or (left and 'TOPLEFT') or 'TOPRIGHT'
+	local anchor2 = (bottom and left and 'TOPLEFT') or (bottom and 'TOPRIGHT') or (left and 'BOTTOMLEFT') or 'BOTTOMRIGHT'
+
+	UIDropDownMenu_SetAnchor(menu, 0, 0, anchor1, dt, anchor2)
+end
+
+--> [HyperDT Credits] <--
+--> Original Work: NihilisticPandemonium
+--> Modified by Azilroka! :)
+
+function DT:SingleHyperMode(_, key, active)
+	if DT.SelectedDatatext and (key == 'LALT' or key == 'RALT') then
+		if active == 1 and MouseIsOver(DT.SelectedDatatext) then
+			DT:OnLeave()
+			DT:SetEasyMenuAnchor(DT.EasyMenu, DT.SelectedDatatext)
+			EasyMenu(HyperList, DT.EasyMenu, nil, nil, nil, 'MENU')
+		elseif _G.DropDownList1:IsShown() and not _G.DropDownList1:IsMouseOver() then
+			CloseDropDownMenus()
+		end
 	end
 end
 
-local LDBHex = '|cffFFFFFF'
-function DT:SetupObjectLDB(name, obj, elvui) --self will now be the event
-	local curFrame = nil
+function DT:HyperClick()
+	DT.SelectedDatatext = self
+	DT:SetEasyMenuAnchor(DT.EasyMenu, DT.SelectedDatatext)
+	EasyMenu(HyperList, DT.EasyMenu, nil, nil, nil, 'MENU')
+end
+
+function DT:EnableHyperMode(Panel)
+	DT:OnLeave()
+
+	if Panel then
+		for _, dt in pairs(Panel.dataPanels) do
+			dt.overlay:Show()
+			dt:SetScript('OnEnter', nil)
+			dt:SetScript('OnLeave', nil)
+			dt:SetScript('OnClick', DT.HyperClick)
+		end
+	else
+		for _, panel in pairs(DT.RegisteredPanels) do
+			for _, dt in pairs(panel.dataPanels) do
+				dt.overlay:Show()
+				dt:SetScript('OnEnter', nil)
+				dt:SetScript('OnLeave', nil)
+				dt:SetScript('OnClick', DT.HyperClick)
+			end
+		end
+	end
+end
+
+function DT:OnEnter()
+	if E.db.datatexts.noCombatHover and InCombatLockdown() then return end
+
+	if self.parent then
+		DT.SelectedDatatext = self
+		DT:SetupTooltip(self)
+	end
+
+	if self.MouseEnters then
+		for _, func in ipairs(self.MouseEnters) do
+			func(self)
+		end
+	end
+
+	DT.MouseEnter(self)
+end
+
+function DT:OnLeave()
+	if self.MouseLeaves then
+		for _, func in ipairs(self.MouseLeaves) do
+			func(self)
+		end
+	end
+
+	DT.MouseLeave(self)
+	DT.tooltip:Hide()
+end
+
+function DT:MouseEnter()
+	local frame = self.parent or self
+	if frame.db and frame.db.mouseover then
+		E:UIFrameFadeIn(frame, 0.2, frame:GetAlpha(), 1)
+	end
+end
+
+function DT:MouseLeave()
+	local frame = self.parent or self
+	if frame.db and frame.db.mouseover then
+		E:UIFrameFadeOut(frame, 0.2, frame:GetAlpha(), 0)
+	end
+end
+
+function DT:FetchFrame(givenName)
+	local panelExists = DT.PanelPool.InUse[givenName]
+	if panelExists then return panelExists end
+
+	local count = DT.PanelPool.Count
+	local name = 'ElvUI_DTPanel' .. count
+	local frame
+
+	local poolName, poolFrame = next(DT.PanelPool.Free)
+	if poolName then
+		frame = poolFrame
+		DT.PanelPool.Free[poolName] = nil
+	else
+		frame = CreateFrame('Frame', name, E.UIParent)
+		DT.PanelPool.Count = DT.PanelPool.Count + 1
+	end
+
+	DT.PanelPool.InUse[givenName] = frame
+
+	return frame
+end
+
+function DT:EmptyPanel(panel)
+	panel:Hide()
+
+	for _, dt in ipairs(panel.dataPanels) do
+		dt:UnregisterAllEvents()
+		dt:SetScript('OnUpdate', nil)
+		dt:SetScript('OnEvent', nil)
+		dt:SetScript('OnEnter', nil)
+		dt:SetScript('OnLeave', nil)
+		dt:SetScript('OnClick', nil)
+	end
+
+	UnregisterStateDriver(panel, 'visibility')
+	E:DisableMover(panel.moverName)
+end
+
+function DT:ReleasePanel(givenName)
+	local panel = DT.PanelPool.InUse[givenName]
+	if panel then
+		DT:EmptyPanel(panel)
+		DT.PanelPool.Free[givenName] = panel
+		DT.PanelPool.InUse[givenName] = nil
+		DT.RegisteredPanels[givenName] = nil
+		E.db.movers[panel.moverName] = nil
+	end
+end
+
+function DT:BuildPanelFrame(name, db, fromInit)
+	db = db or E.global.datatexts.customPanels[name] or DT:Panel_DefaultGlobalSettings(name)
+
+	local Panel = DT:FetchFrame(name)
+	Panel:ClearAllPoints()
+	Panel:Point('CENTER')
+	Panel:Size(db.width, db.height)
+
+	local MoverName = 'DTPanel'..name..'Mover'
+	Panel.moverName = MoverName
+	Panel.givenName = name
+
+	local holder = E:GetMoverHolder(MoverName)
+	if holder then
+		E:SetMoverPoints(MoverName, Panel)
+	else
+		E:CreateMover(Panel, MoverName, name, nil, nil, nil, nil, nil, 'general,solo')
+	end
+
+	DT:RegisterPanel(Panel, db.numPoints, db.tooltipAnchor, db.tooltipXOffset, db.tooltipYOffset, db.growth == 'VERTICAL')
+
+	if not fromInit then
+		DT:UpdatePanelAttributes(name, db)
+	end
+end
+
+local LDBhex, LDBna = '|cffFFFFFF', {['N/A'] = true, ['n/a'] = true, ['N/a'] = true}
+function DT:BuildPanelFunctions(name, obj)
+	local panel
 
 	local function OnEnter(dt)
-		DT:SetupTooltip(dt)
+		DT.tooltip:ClearLines()
 		if obj.OnTooltipShow then obj.OnTooltipShow(DT.tooltip) end
 		if obj.OnEnter then obj.OnEnter(dt) end
 		DT.tooltip:Show()
@@ -63,252 +233,501 @@ function DT:SetupObjectLDB(name, obj, elvui) --self will now be the event
 
 	local function OnLeave(dt)
 		if obj.OnLeave then obj.OnLeave(dt) end
-		DT.tooltip:Hide()
 	end
 
 	local function OnClick(dt, button)
-		if obj.OnClick then obj.OnClick(dt, button) end
-	end
-
-	local function textUpdate(_, Name, _, Value)
-		if Value == nil or (strlen(Value) >= 3) or Value == 'n/a' or Name == Value then
-			curFrame.text:SetText(Value ~= 'n/a' and Value or Name)
-		else
-			curFrame.text:SetFormattedText("%s: %s%s|r", Name, LDBHex, Value)
+		if obj.OnClick then
+			obj.OnClick(dt, button)
 		end
 	end
 
-	local function OnCallback(newHex)
+	local function UpdateText(_, Name, _, Value)
+		if not Value or (strlen(Value) >= 3) or (Value == Name or LDBna[Value]) then
+			panel.text:SetText((not LDBna[Value] and Value) or Name)
+		else
+			panel.text:SetFormattedText('%s: %s%s|r', Name, LDBhex, Value)
+		end
+	end
+
+	local function OnCallback(Hex)
 		if name and obj then
-			LDBHex = newHex
-			LDB.callbacks:Fire("LibDataBroker_AttributeChanged_"..name.."_text", name, nil, obj.text, obj)
+			LDBhex = Hex
+			LDB.callbacks:Fire('LibDataBroker_AttributeChanged_'..name..'_text', name, nil, obj.text, obj)
 		end
 	end
 
 	local function OnEvent(dt)
-		curFrame = dt
-		LDB:RegisterCallback("LibDataBroker_AttributeChanged_"..name.."_text", textUpdate)
-		LDB:RegisterCallback("LibDataBroker_AttributeChanged_"..name.."_value", textUpdate)
-		OnCallback(LDBHex)
+		panel = dt
+		LDB:RegisterCallback('LibDataBroker_AttributeChanged_'..name..'_text', UpdateText)
+		LDB:RegisterCallback('LibDataBroker_AttributeChanged_'..name..'_value', UpdateText)
+		OnCallback(LDBhex)
 	end
 
-	DT:RegisterDatatext(name, {'PLAYER_ENTERING_WORLD'}, OnEvent, nil, OnClick, OnEnter, OnLeave)
-	E.valueColorUpdateFuncs[OnCallback] = true
+	return OnEnter, OnLeave, OnClick, OnCallback, OnEvent, UpdateText
+end
+
+function DT:SetupObjectLDB(name, obj)
+	local onEnter, onLeave, onClick, onCallback, onEvent = DT:BuildPanelFunctions(name, obj)
+	local data = DT:RegisterDatatext(name, 'Data Broker', nil, onEvent, nil, onClick, onEnter, onLeave)
+	E.valueColorUpdateFuncs[onCallback] = true
+	data.isLibDataBroker = true
 
 	-- Update config if it has been loaded
 	if DT.PanelLayoutOptions then
 		DT:PanelLayoutOptions()
 	end
-
-	if elvui ~= 'ElvUI' then
-		DT:LoadDataTexts()
-	end
 end
 
-function DT:RegisterLDB(elvui)
+function DT:RegisterLDB()
 	for name, obj in LDB:DataObjectIterator() do
-		self:SetupObjectLDB(name, obj, elvui)
+		DT:SetupObjectLDB(name, obj)
 	end
 end
 
-function DT:GetDataPanelPoint(panel, i, numPoints)
+function DT:GetDataPanelPoint(panel, i, numPoints, vertical)
 	if numPoints == 1 then
 		return 'CENTER', panel, 'CENTER'
 	else
-		if i == 1 then
-			return 'CENTER', panel, 'CENTER'
-		elseif i == 2 then
-			return 'RIGHT', panel.dataPanels.middle, 'LEFT', -4, 0
-		elseif i == 3 then
-			return 'LEFT', panel.dataPanels.middle, 'RIGHT', 4, 0
+		local point, relativePoint, xOffset, yOffset = 'LEFT', i == 1 and 'LEFT' or 'RIGHT', 4, 0
+		if vertical then
+			point, relativePoint, xOffset, yOffset = 'TOP', i == 1 and 'TOP' or 'BOTTOM', 0, -4
 		end
-	end
-end
 
-function DT:UpdateAllDimensions()
-	for _, panel in pairs(DT.RegisteredPanels) do
-		local width = (panel:GetWidth() / panel.numPoints) - 4
-		local height = panel:GetHeight() - 4
-		for i=1, panel.numPoints do
-			local pointIndex = DT.PointLocation[i]
-			local dt = panel.dataPanels[pointIndex]
-			dt:Width(width)
-			dt:Height(height)
-			dt:Point(DT:GetDataPanelPoint(panel, i, panel.numPoints))
-		end
+		local lastPanel = (i == 1 and panel) or panel.dataPanels[i - 1]
+		return point, lastPanel, relativePoint, xOffset, yOffset
 	end
-end
-
-function DT:Data_OnLeave()
-	DT.tooltip:Hide()
 end
 
 function DT:SetupTooltip(panel)
 	local parent = panel:GetParent()
-	self.tooltip:Hide()
-	self.tooltip:SetOwner(parent, parent.anchor, parent.xOff, parent.yOff)
-	self.tooltip:ClearLines()
+	DT.tooltip:SetOwner(panel, parent.anchor, parent.xOff, parent.yOff)
+
 	if not _G.GameTooltip:IsForbidden() then
 		_G.GameTooltip:Hide() -- WHY??? BECAUSE FUCK GAMETOOLTIP, THATS WHY!!
 	end
 end
 
-function DT:RegisterPanel(panel, numPoints, anchor, xOff, yOff)
-	DT.RegisteredPanels[panel:GetName()] = panel
-	panel.dataPanels = {}
+function DT:RegisterPanel(panel, numPoints, anchor, xOff, yOff, vertical)
+	local realName = panel:GetName()
+	local name = panel.givenName or realName
+
+	if not name then
+		E:Print('DataTexts: Requires a panel name.')
+		return
+	end
+
+	DT.RegisteredPanels[name] = panel
+
+	panel:SetScript('OnEnter', DT.OnEnter)
+	panel:SetScript('OnLeave', DT.OnLeave)
+	panel:SetScript('OnSizeChanged', DT.PanelSizeChanged)
+
+	panel.dataPanels = panel.dataPanels or {}
 	panel.numPoints = numPoints
 	panel.xOff = xOff
 	panel.yOff = yOff
 	panel.anchor = anchor
-
-	for i=1, numPoints do
-		local pointIndex = DT.PointLocation[i]
-		local dt = panel.dataPanels[pointIndex]
-		if not dt then
-			dt = CreateFrame('Button', 'DataText'..i, panel)
-			dt:RegisterForClicks("AnyUp")
-			dt.text = dt:CreateFontString(nil, 'OVERLAY')
-			dt.text:SetAllPoints()
-			dt.text:FontTemplate()
-			dt.text:SetJustifyH("CENTER")
-			dt.text:SetJustifyV("MIDDLE")
-			panel.dataPanels[pointIndex] = dt
-		end
-
-		dt:Point(DT:GetDataPanelPoint(panel, i, numPoints))
-	end
-
-	panel:SetScript('OnSizeChanged', DT.UpdateAllDimensions)
-	DT.UpdateAllDimensions(panel)
+	panel.vertical = vertical
 end
 
-function DT:AssignPanelToDataText(panel, data)
-	data.panel = panel
-	panel.name = ""
+function DT:Panel_DefaultGlobalSettings(name)
+	local db = E:CopyTable({}, G.datatexts.newPanelInfo)
 
-	if data.name then
-		panel.name = data.name
-	end
+	E.global.datatexts.customPanels[name] = db
+
+	return db
+end
+
+function DT:AssignPanelToDataText(dt, data, event, ...)
+	dt.name = data.name or '' -- This is needed for Custom Currencies
 
 	if data.events then
-		for _, event in pairs(data.events) do
-			if data.objectEvent then
-				if not E:HasFunctionForObject(event, data.objectEvent, data.objectEventFunc) then
-					E:RegisterEventForObject(event, data.objectEvent, data.objectEventFunc)
-				end
-			elseif data.eventFunc then
-				-- use new filtered event registration for appropriate events
-				if event == "UNIT_AURA" or event == "UNIT_RESISTANCES"  or event == "UNIT_STATS" or event == "UNIT_ATTACK_POWER"
-				or event == "UNIT_RANGED_ATTACK_POWER" or event == "UNIT_TARGET" or event == "UNIT_SPELL_HASTE" then
-					pcall(panel.RegisterUnitEvent, panel, event, 'player')
+		for _, ev in pairs(data.events) do
+			if data.eventFunc then
+				if data.objectEvent then
+					if not dt.objectEventFunc then
+						dt.objectEvent = data.objectEvent
+						dt.objectEventFunc = function(_, ...)
+							if data.eventFunc then
+								data.eventFunc(dt, ...)
+							end
+						end
+					end
+					if not E:HasFunctionForObject(ev, data.objectEvent, dt.objectEventFunc) then
+						E:RegisterEventForObject(ev, data.objectEvent, dt.objectEventFunc)
+					end
+				elseif DT.UnitEvents[ev] then
+					pcall(dt.RegisterUnitEvent, dt, ev, 'player')
 				else
-					pcall(panel.RegisterEvent, panel, event)
+					pcall(dt.RegisterEvent, dt, ev)
 				end
 			end
 		end
 	end
 
-	if data.objectEvent then
-		data.objectEventFunc(data.objectEvent, 'ELVUI_FORCE_RUN')
-	elseif data.eventFunc then
-		panel:SetScript('OnEvent', data.eventFunc)
-		data.eventFunc(panel, 'ELVUI_FORCE_RUN')
+	local ev = event or 'ELVUI_FORCE_UPDATE'
+	if data.eventFunc then
+		if not data.objectEvent then
+			dt:SetScript('OnEvent', data.eventFunc)
+		end
+
+		data.eventFunc(dt, ev, ...)
 	end
 
 	if data.onUpdate then
-		panel:SetScript('OnUpdate', data.onUpdate)
-		data.onUpdate(panel, 20000)
+		dt:SetScript('OnUpdate', data.onUpdate)
+		data.onUpdate(dt, 20000)
 	end
 
 	if data.onClick then
-		panel:SetScript('OnClick', function(p, button)
+		dt:SetScript('OnClick', function(p, button)
 			if E.db.datatexts.noCombatClick and InCombatLockdown() then return end
 			data.onClick(p, button)
+			DT.tooltip:Hide()
 		end)
 	end
 
 	if data.onEnter then
-		panel:SetScript('OnEnter', function(p)
-			if E.db.datatexts.noCombatHover and InCombatLockdown() then return end
-			data.onEnter(p)
-		end)
+		tinsert(dt.MouseEnters, data.onEnter)
 	end
-
 	if data.onLeave then
-		panel:SetScript('OnLeave', data.onLeave)
-	else
-		panel:SetScript('OnLeave', DT.Data_OnLeave)
+		tinsert(dt.MouseLeaves, data.onLeave)
 	end
 end
 
-function DT:LoadDataTexts()
-	for _, _ in LDB:DataObjectIterator() do
-		LDB:UnregisterAllCallbacks(self)
-	end
-
-	local fontTemplate = LSM:Fetch("font", self.db.font)
-	local inInstance, instanceType = IsInInstance()
-	local isInPVP = inInstance and instanceType == "pvp"
-	local pointIndex, isBGPanel, enableBGPanel
-	for panelName, panel in pairs(DT.RegisteredPanels) do
-		isBGPanel = isInPVP and (panelName == 'LeftChatDataPanel' or panelName == 'RightChatDataPanel')
-		enableBGPanel = isBGPanel and (not DT.ForceHideBGStats and E.db.datatexts.battleground)
-
-		--Restore Panels
-		for i=1, panel.numPoints do
-			pointIndex = DT.PointLocation[i]
-			local dt = panel.dataPanels[pointIndex]
-			dt:UnregisterAllEvents()
-			dt:SetScript('OnUpdate', nil)
-			dt:SetScript('OnEnter', nil)
-			dt:SetScript('OnLeave', nil)
-			dt:SetScript('OnClick', nil)
-			dt.text:FontTemplate(fontTemplate, self.db.fontSize, self.db.fontOutline)
-			dt.text:SetWordWrap(self.db.wordWrap)
-			dt.text:SetText('')
-			dt.pointIndex = pointIndex
-
-			if enableBGPanel then
-				dt:RegisterEvent('UPDATE_BATTLEFIELD_SCORE')
-				dt:SetScript('OnEvent', DT.UPDATE_BATTLEFIELD_SCORE)
-				dt:SetScript('OnEnter', DT.BattlegroundStats)
-				dt:SetScript('OnLeave', DT.Data_OnLeave)
-				dt:SetScript('OnClick', DT.HideBattlegroundTexts)
-				DT.UPDATE_BATTLEFIELD_SCORE(dt)
-				DT.ShowingBGStats = true
-			else
-				-- we aren't showing BGStats anymore
-				if (isBGPanel or not isInPVP) and DT.ShowingBGStats then
-					DT.ShowingBGStats = nil
-				end
-
-				--Register Panel to Datatext
-				for name, data in pairs(DT.RegisteredDataTexts) do
-					for option, value in pairs(self.db.panels) do
-						if value and type(value) == 'table' then
-							if option == panelName and self.db.panels[option][pointIndex] and self.db.panels[option][pointIndex] == name then
-								DT:AssignPanelToDataText(dt, data)
-							end
-						elseif value and type(value) == 'string' and value == name then
-							if self.db.panels[option] == name and option == panelName then
-								DT:AssignPanelToDataText(dt, data)
-							end
-						end
-					end
-				end
+function DT:ForceUpdate_DataText(name)
+	for dtSlot, dtName in pairs(DT.AssignedDatatexts) do
+		if dtName.name == name then
+			if dtName.colorUpdate then
+				dtName.colorUpdate(E.media.hexvaluecolor)
+			end
+			if dtName.eventFunc then
+				dtName.eventFunc(dtSlot, 'ELVUI_FORCE_UPDATE')
 			end
 		end
 	end
+end
 
-	if DT.ForceHideBGStats then
-		DT.ForceHideBGStats = nil
+function DT:GetTextAttributes(panel, db)
+	local panelWidth, panelHeight = panel:GetSize()
+	local numPoints = db and db.numPoints or panel.numPoints or 1
+	local vertical = db and db.vertical or panel.vertical
+
+	local width, height = (panelWidth / numPoints) - 4, panelHeight - 4
+	if vertical then width, height = panelWidth - 4, (panelHeight / numPoints) - 4 end
+
+	return width, height, vertical, numPoints
+end
+
+-- this is used to make texts show on init load, when the font was added after elvui but registers
+-- during the load screen, for some reason blizzard doesnt render the font unless we change the
+-- text after the first frame? its probably related to the texture not inheriting alpha problem.
+-- also, this seems to be a problem with SetJustifyH not triggering a rerender too. ~Simpy
+local RerenderFont = function(fs)
+	local text = fs:GetText()
+	fs:SetText('\10')
+	fs:SetText(text)
+end
+
+local FixFonts = CreateFrame('Frame')
+FixFonts:Hide()
+FixFonts:SetScript('OnUpdate', function(self)
+	for fs in pairs(DT.FontStrings) do
+		RerenderFont(fs)
 	end
+
+	self:Hide()
+end)
+
+function DT:UpdatePanelInfo(panelName, panel, ...)
+	if not panel then panel = DT.RegisteredPanels[panelName] end
+	local db = panel.db or P.datatexts.panels[panelName] and DT.db.panels[panelName]
+	if not db then return end
+
+	local info = DT.LoadedInfo
+	local font, fontSize, fontOutline = info.font, info.fontSize, info.fontOutline
+	if db and db.fonts and db.fonts.enable then
+		font, fontSize, fontOutline = LSM:Fetch('font', db.fonts.font), db.fonts.fontSize, db.fonts.fontOutline
+	end
+
+	local chatPanel = panelName == 'LeftChatDataPanel' or panelName == 'RightChatDataPanel'
+	local battlePanel = info.isInBattle and chatPanel and (not DT.ForceHideBGStats and E.db.datatexts.battleground)
+	if battlePanel then
+		DT:RegisterEvent('UPDATE_BATTLEFIELD_SCORE')
+		DT.ShowingBattleStats = info.instanceType
+	elseif chatPanel and DT.ShowingBattleStats then
+		DT:UnregisterEvent('UPDATE_BATTLEFIELD_SCORE')
+		DT.ShowingBattleStats = nil
+	end
+
+	local width, height, vertical, numPoints = DT:GetTextAttributes(panel, db)
+
+	for i = 1, numPoints do
+		local dt = panel.dataPanels[i]
+		if not dt then
+			dt = CreateFrame('Button', panelName..'_DataText'..i, panel)
+			dt.MouseEnters = {}
+			dt.MouseLeaves = {}
+			dt:RegisterForClicks('AnyUp')
+
+			local text = dt:CreateFontString(nil, 'ARTWORK')
+			text:SetAllPoints()
+			text:SetJustifyV('MIDDLE')
+			dt.text = text
+			DT.FontStrings[text] = true
+
+			local overlay = dt:CreateTexture(nil, 'OVERLAY')
+			overlay:SetTexture(E.media.blankTex)
+			overlay:SetVertexColor(0.3, 0.9, 0.3, .3)
+			overlay:SetAllPoints()
+			dt.overlay = overlay
+
+			panel.dataPanels[i] = dt
+		end
+	end
+
+	panel:SetTemplate(db.backdrop and (db.panelTransparency and 'Transparent' or 'Default') or 'NoBackdrop', true)
+
+	--Restore Panels
+	for i, dt in ipairs(panel.dataPanels) do
+		dt:SetShown(i <= numPoints)
+		dt:Size(width, height)
+		dt:ClearAllPoints()
+		dt:Point(DT:GetDataPanelPoint(panel, i, numPoints, vertical))
+		dt:UnregisterAllEvents()
+		dt:SetScript('OnUpdate', nil)
+		dt:SetScript('OnEvent', nil)
+		dt:SetScript('OnClick', nil)
+		dt:SetScript('OnEnter', DT.OnEnter)
+		dt:SetScript('OnLeave', DT.OnLeave)
+		wipe(dt.MouseEnters)
+		wipe(dt.MouseLeaves)
+
+		dt.overlay:Hide()
+		dt.pointIndex = i
+		dt.parent = panel
+		dt.parentName = panelName
+		dt.battleStats = battlePanel
+		dt.db = db
+
+		E:StopFlash(dt)
+
+		if dt.objectEvent and dt.objectEventFunc then
+			E:UnregisterAllEventsForObject(dt.objectEvent, dt.objectEventFunc)
+			dt.objectEvent, dt.objectEventFunc = nil, nil
+		end
+
+		dt.text:FontTemplate(font, fontSize, fontOutline)
+		dt.text:SetJustifyH(db.textJustify or 'CENTER')
+		dt.text:SetWordWrap(DT.db.wordWrap)
+		RerenderFont(dt.text) -- SetJustifyH wont update without a rerender?
+
+		if battlePanel then
+			dt:SetScript('OnClick', DT.ToggleBattleStats)
+			tinsert(dt.MouseEnters, DT.HoverBattleStats)
+		else
+			local assigned = DT.RegisteredDataTexts[ DT.db.panels[panelName][i] ]
+			DT.AssignedDatatexts[dt] = assigned
+			if assigned then DT:AssignPanelToDataText(dt, assigned, ...) end
+		end
+	end
+end
+
+function DT:LoadDataTexts(...)
+	local data = DT.LoadedInfo
+	data.font, data.fontSize, data.fontOutline = LSM:Fetch('font', DT.db.font), DT.db.fontSize, DT.db.fontOutline
+	data.inInstance, data.instanceType = IsInInstance()
+	data.isInBattle = data.inInstance and (data.instanceType == 'pvp' or data.instanceType == 'arena')
+
+	for panel, db in pairs(E.global.datatexts.customPanels) do
+		DT:UpdatePanelAttributes(panel, db, true)
+	end
+
+	for panelName, panel in pairs(DT.RegisteredPanels) do
+		local db = DT.db.panels[panelName]
+		if db and db.enable then
+			DT:UpdatePanelInfo(panelName, panel, ...)
+		end
+	end
+
+	if DT.ShowingBattleStats then
+		DT:UPDATE_BATTLEFIELD_SCORE()
+	end
+end
+
+function DT:PanelSizeChanged()
+	if not self.dataPanels then return end
+	local db = self.db or P.datatexts.panels[self.name] and DT.db.panels[self.name]
+	local width, height, vertical, numPoints = DT:GetTextAttributes(self, db)
+
+	for i, dt in ipairs(self.dataPanels) do
+		dt:Size(width, height)
+		dt:ClearAllPoints()
+		dt:Point(DT:GetDataPanelPoint(self, i, numPoints, vertical))
+	end
+end
+
+function DT:UpdatePanelAttributes(name, db, fromLoad)
+	local Panel = DT.PanelPool.InUse[name]
+	DT.OnLeave(Panel)
+
+	Panel.db = db
+	Panel.name = name
+	Panel.numPoints = db.numPoints
+	Panel.xOff = db.tooltipXOffset
+	Panel.yOff = db.tooltipYOffset
+	Panel.anchor = db.tooltipAnchor
+	Panel.vertical = db.growth == 'VERTICAL'
+	Panel:Size(db.width, db.height)
+	Panel:SetFrameStrata(db.frameStrata)
+	Panel:SetFrameLevel(db.frameLevel)
+
+	E:UIFrameFadeIn(Panel, 0.2, Panel:GetAlpha(), db.mouseover and 0 or 1)
+
+	if not DT.db.panels[name] then
+		DT.db.panels[name] = { enable = false }
+	end
+
+	for i = 1, E.global.datatexts.customPanels[name].numPoints do
+		if not DT.db.panels[name][i] then
+			DT.db.panels[name][i] = ''
+		end
+	end
+
+	if DT.db.panels[name].enable then
+		E:EnableMover(Panel.moverName)
+		RegisterStateDriver(Panel, 'visibility', db.visibility)
+
+		if not fromLoad then
+			DT:UpdatePanelInfo(name, Panel)
+		end
+	else
+		DT:EmptyPanel(Panel)
+	end
+end
+
+function DT:GetMenuListCategory(category)
+	for i, info in ipairs(HyperList) do
+		if info.text == category then
+			return i
+		end
+	end
+end
+
+do
+	local function menuSort(a, b)
+		if a.order and b.order then
+			return a.order < b.order
+		end
+
+		return a.text < b.text
+	end
+
+	function DT:SortMenuList(list)
+		for _, menu in pairs(list) do
+			if menu.menuList then
+				DT:SortMenuList(menu.menuList)
+			end
+		end
+
+		sort(list, menuSort)
+	end
+end
+
+function DT:HyperDT()
+	if ActivateHyperMode then
+		ActivateHyperMode = nil
+		DT:LoadDataTexts()
+	else
+		ActivateHyperMode = true
+		DT:EnableHyperMode()
+	end
+end
+
+function DT:RegisterHyperDT()
+	for name, info in pairs(DT.RegisteredDataTexts) do
+		local category = DT:GetMenuListCategory(info.category or MISCELLANEOUS)
+		if not category then
+			category = #HyperList + 1
+			tinsert(HyperList, { order = 0, text = info.category or MISCELLANEOUS, notCheckable = true, hasArrow = true, menuList = {} } )
+		end
+
+		tinsert(HyperList[category].menuList, {
+			text = info.localizedName or name,
+			checked = function() return DT.EasyMenu.MenuGetItem(DT.SelectedDatatext, name) end,
+			func = function() DT.EasyMenu.MenuSetItem(DT.SelectedDatatext, name) end
+		})
+	end
+
+	tinsert(HyperList, {
+		order = 100, text = L["NONE"],
+		checked = function() return DT.EasyMenu.MenuGetItem(DT.SelectedDatatext, '') end,
+		func = function() DT.EasyMenu.MenuSetItem(DT.SelectedDatatext, '') end
+	})
+
+	DT:SortMenuList(HyperList)
+	DT:RegisterEvent('MODIFIER_STATE_CHANGED', 'SingleHyperMode')
+end
+
+function DT:PLAYER_ENTERING_WORLD(_, initLogin)
+	DT:LoadDataTexts()
+
+	if initLogin then
+		FixFonts:Show()
+	end
+end
+
+function DT:Initialize()
+	DT.Initialized = true
+	DT.db = E.db.datatexts
+
+	DT.EasyMenu:SetClampedToScreen(true)
+	DT.EasyMenu:EnableMouse(true)
+	DT.EasyMenu.MenuSetItem = function(dt, value)
+		DT.db.panels[dt.parentName][dt.pointIndex] = value
+		DT:UpdatePanelInfo(dt.parentName, dt.parent)
+
+		if ActivateHyperMode then
+			DT:EnableHyperMode(dt.parent)
+		end
+
+		DT.SelectedDatatext = nil
+		CloseDropDownMenus()
+	end
+	DT.EasyMenu.MenuGetItem = function(dt, value)
+		return dt and (DT.db.panels[dt.parentName] and DT.db.panels[dt.parentName][dt.pointIndex] == value)
+	end
+
+	TT:HookScript(DT.tooltip, 'OnShow', 'SetStyle')
+
+	-- Ignore header font size on DatatextTooltip
+	local font = E.Libs.LSM:Fetch('font', E.db.tooltip.font)
+	local fontOutline = E.db.tooltip.fontOutline
+	local textSize = E.db.tooltip.textFontSize
+	_G.DataTextTooltipTextLeft1:FontTemplate(font, textSize, fontOutline)
+	_G.DataTextTooltipTextRight1:FontTemplate(font, textSize, fontOutline)
+
+	LDB.RegisterCallback(E, 'LibDataBroker_DataObjectCreated', DT.SetupObjectLDB)
+	DT:RegisterLDB() -- LibDataBroker
+
+	for name, db in pairs(E.global.datatexts.customPanels) do
+		DT:BuildPanelFrame(name, db, true)
+	end
+
+	do -- we need to register the panels to access them for the text
+		DT.BattleStats.LEFT.panel = _G.LeftChatDataPanel.dataPanels
+		DT.BattleStats.RIGHT.panel = _G.RightChatDataPanel.dataPanels
+	end
+
+	DT:RegisterHyperDT()
+	DT:RegisterEvent('PLAYER_ENTERING_WORLD')
 end
 
 --[[
 	DT:RegisterDatatext(name, events, eventFunc, updateFunc, clickFunc, onEnterFunc, onLeaveFunc, localizedName)
 
 	name - name of the datatext (required)
+	category - name of the category the datatext belongs to.
 	events - must be a table with string values of event names to register
 	eventFunc - function that gets fired when an event gets triggered
 	updateFunc - onUpdate script target function
@@ -317,22 +736,20 @@ end
 	onLeaveFunc - function to fire OnLeave, if not provided one will be set for you that hides the tooltip.
 	localizedName - localized name of the datetext
 	objectEvent - register events on an object, using E.RegisterEventForObject instead of panel.RegisterEvent
+	colorUpdate - function that fires when called from the config when you change the dt options.
 ]]
-function DT:RegisterDatatext(name, events, eventFunc, updateFunc, clickFunc, onEnterFunc, onLeaveFunc, localizedName, objectEvent)
-	if not name then error('Cannot register datatext no name was provided.') end
-	local data = {name = name}
+function DT:RegisterDatatext(name, category, events, eventFunc, updateFunc, clickFunc, onEnterFunc, onLeaveFunc, localizedName, objectEvent, colorUpdate)
+	if not name then return end
+	if type(category) ~= 'string' and category ~= nil then return E:Print(format('%s is an invalid DataText.', name)) end
 
-	if type(events) ~= 'table' and events ~= nil then
-		error('Events must be registered as a table.')
+	local data = { name = name, category = category }
+
+	if type(events) == 'function' then
+		return E:Print(format('%s is an invalid DataText. Events must be registered as a table or a string.', name))
 	else
-		data.events = events
+		data.events = type(events) == 'string' and { strsplit('[, ]', events) } or events
 		data.eventFunc = eventFunc
 		data.objectEvent = objectEvent
-		data.objectEventFunc = data.objectEvent and function(_, ...)
-			if data.eventFunc then
-				data.eventFunc(data.panel, ...)
-			end
-		end
 	end
 
 	if updateFunc and type(updateFunc) == 'function' then
@@ -355,7 +772,13 @@ function DT:RegisterDatatext(name, events, eventFunc, updateFunc, clickFunc, onE
 		data.localizedName = localizedName
 	end
 
+	if colorUpdate and type(colorUpdate) == 'function' then
+		data.colorUpdate = colorUpdate
+	end
+
 	DT.RegisteredDataTexts[name] = data
+
+	return data
 end
 
 E:RegisterModule(DT:GetName())

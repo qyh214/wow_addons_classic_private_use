@@ -61,7 +61,7 @@ L:SetOptionLocalization{
 	WarnDismember	= DBM_CORE_L.AUTO_ANNOUNCE_OPTIONS.spell:format(96)
 }
 L:SetMiscLocalization{
-	PursueEmote 	= "%s sets eyes on %s!"
+	PursueEmote 	= "%s sets eyes on"
 }
 
 -------------
@@ -90,4 +90,13 @@ L:SetTimerLocalization{
 L:SetOptionLocalization{
 	WarnVulnerable	= "Announce weaknesses",
 	TimerVulnerable	= "Show timer for weaknesses"
+}
+
+----------------
+-- AQ20 Trash --
+----------------
+L = DBM:GetModLocalization("AQ20Trash")
+
+L:SetGeneralLocalization{
+	name = "AQ20 Trash"
 }

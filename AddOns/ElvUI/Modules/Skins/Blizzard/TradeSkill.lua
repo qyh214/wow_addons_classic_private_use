@@ -48,11 +48,11 @@ function S:Blizzard_TradeSkillUI()
 	TradeSkillCollapseAllButton:GetDisabledTexture():Size(15)
 	TradeSkillCollapseAllButton:GetDisabledTexture():SetDesaturated(true)
 
-	S:HandleDropDownBox(_G.TradeSkillInvSlotDropDown, 120)
-	_G.TradeSkillSubClassDropDown:ClearAllPoints()
-	_G.TradeSkillInvSlotDropDown:Point('TOPRIGHT', TradeSkillFrame, 'TOPRIGHT', -75, -68)
+	S:HandleDropDownBox(_G.TradeSkillInvSlotDropDown, 140)
+	_G.TradeSkillInvSlotDropDown:ClearAllPoints()
+	_G.TradeSkillInvSlotDropDown:Point('TOPRIGHT', TradeSkillFrame, 'TOPRIGHT', -32, -68)
 
-	S:HandleDropDownBox(_G.TradeSkillSubClassDropDown, 120)
+	S:HandleDropDownBox(_G.TradeSkillSubClassDropDown, 140)
 	_G.TradeSkillSubClassDropDown:ClearAllPoints()
 	_G.TradeSkillSubClassDropDown:Point('RIGHT', _G.TradeSkillInvSlotDropDown, 'RIGHT', -120, 0)
 
@@ -120,7 +120,7 @@ function S:Blizzard_TradeSkillUI()
 	S:HandleButton(_G.TradeSkillCreateAllButton)
 
 	S:HandleNextPrevButton(_G.TradeSkillDecrementButton)
-	_G.TradeSkillInputBox:Height(16)
+	_G.TradeSkillInputBox:Size(36, 16)
 	S:HandleEditBox(_G.TradeSkillInputBox)
 	S:HandleNextPrevButton(_G.TradeSkillIncrementButton)
 

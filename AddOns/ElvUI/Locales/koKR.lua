@@ -2,6 +2,9 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "koKR")
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = " 키로 다음의 행동을 실행합니다: |cff2eb7e4"
 L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = "%s 의 위치 기준 프레임이 상충되고 있습니다. 서로가 서로의 위치를 참조하지 않게 버프나 디버프 중 하나의 위치를 바꿔주세요. 수정되기 전까지 강제로 유닛프레임이 기준으로 됩니다. "
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = "%s 유저가 필터설정을 전송하려 합니다. 받으시겠습니까?"
@@ -47,7 +50,7 @@ L["Bank Mover (Grow Up)"] = "은행 조정자(위로 성장)'"
 L["Bank"] = "은행"
 L["Bar "] = "바 "
 L["Bars"] = "바"
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = "전장전용 정보문자를 일시적으로 표시하지 않습니다. 다시 보고 싶으면 |cffceff00/bgstats|r 나 미니맵에 있는 C 버튼을 우클릭하세요."
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = "전장전용 정보문자를 다시 표시합니다."
 L["BfA Missions"] = "격아 임무"
 L["Binding"] = " "
@@ -58,7 +61,6 @@ L["Blend"] = true
 L["BNet Frame"] = "배틀넷 알림"
 L["Boss Button"] = "특수능력 버튼"
 L["Boss Frames"] = "보스 프레임"
-L["Building(s) Report:"] = "건축 보고서"
 L["Calendar"] = "달력"
 L["Can't buy anymore slots!"] = "더 이상 가방 칸을 늘릴 수 없습니다."
 L["Can't Roll"] = "주사위를 굴릴 수 없습니다."
@@ -88,7 +90,6 @@ L["Dead"] = "죽음"
 L["Deficit:"] = "손해:"
 L["Delete gray items?"] = "잡템을 삭제하시겠습니까?"
 L["Deposit Reagents"] = _G.REAGENTBANK_DEPOSIT
-L["Desaturate all grey items that can be vendored."] = true
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = "ElvUI_OptionsUI 가 오래된 버전입니다. Tukui Client 프로그램을 쓰고 있으면 클라이언트를 업데이트하고 ElvUI를 재설치하세요."
 L["Disable Warning"] = "비활성화 경고"
 L["Disable"] = "비활성화"
@@ -123,7 +124,6 @@ L["FocusTarget Frame"] = "주시대상의 대상 프레임"
 L["For technical support visit us at http://www.tukui.org."] = "궁금한 사항이나 기술지원은 |cff2eb7e4www.tukui.org|r에서 해결하세요."
 L["Friends List"] = "친구 목록"
 L["G"] = "길드"
-L["Garrison"] = "주둔지"
 L["Ghost"] = "유령"
 L["GM Ticket Frame"] = "GM요청 번호표"
 L["Gold"] = "골드"
@@ -149,12 +149,11 @@ L["Icons Only"] = "아이콘만 표시"
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = "ElvUI 에서 지원하는 대부분의 기능은 |cff2eb7e4/ec|r 에서 조정이 가능합니다. 하고 싶은 조절 기능이 없다면 직접 lua수정으로 고쳐야 합니다."
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = "ElvUI에서 지원하는 기능과 겹치는 다른 애드온을 쓰고 싶으면 ElvUI 설정에서 해당 기능을 사용 체크해제 해야합니다. (예: Bartender, Dominos)"
 L["IL"] = "인스장"
-L["Importance: |cff07D400High|r"] = "중요도: |cff07D400높음|r"
+L["Importance: |cffFF3333High|r"] = "중요도: |cffFF3333높음|r"
 L["Importance: |cffD3CF00Medium|r"] = "중요도: |cffD3CF00보통|r"
-L["Importance: |cffFF0000Low|r"] = "중요도 : |cffFF0000낮음|r"
+L["Importance: |cFF33FF33Low|r"] = "중요도 : |cFF33FF33낮음|r"
 L["In Progress"] = "진행 중"
 L["INCOMPATIBLE_ADDON"] = "%s 애드온의 기능이 ElvUI의 %s 모듈과 상충됩니다. 그 애드온을 쓰지 않거나 ElvUI의 기능을 사용해제하세요."
-L["Info/Controls"] = true
 L["Installation Complete"] = "설치 완료"
 L["Invalid Target"] = "잘못된 대상"
 L["is looking for members"] = "구성원 찾는 중"
@@ -185,7 +184,8 @@ L["Legs"] = "다리"
 L["Level Up Display / Boss Banner"] = "레벨업 표시 / 보스 배너"
 L["List of installations in queue:"] = "설치 대기열 목록"
 L["Lock"] = "잠금"
-L["LOGIN_MSG"] = "Welcome to %sElvUI|r |cff1784d1Classic|r version %s%s|r, type /ec to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("Welcome to *ElvUI|r |cff1784d1Classic|r version *%s|r, type */ec|r to access the in-game configuration menu. If you are in need of technical support you can visit us at https://www.tukui.org or join our Discord: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = "획득/알림 창"
 L["Loot Frame"] = "전리품 프레임"
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = "데이터를 받는 중 혼선이 생겼습니다. 다시 시도해주세요."
@@ -196,13 +196,11 @@ L["Main Hand"] = "주장비"
 L["Micro Bar"] = "메뉴모음 바"
 L["Minimap"] = "미니맵"
 L["MirrorTimer"] = "미러 타이머"
-L["Mission(s) Report:"] = "임무 보고서"
 L["Mitigation By Level: "] = "레벨별 데미지 경감률"
 L["Mobile"] = true
 L["Modulating Blend"] = true
 L["Mov. Speed:"] = _G.STAT_MOVEMENT_SPEED
 L["MT Frames"] = "방어전담 프레임"
-L["Naval Mission(s) Report:"] = "해상 임무 보고서"
 L["No bindings set."] = "설정한 단축키가 없습니다."
 L["No gray items to delete."] = "잡동사니가 없습니다."
 L["No Guild"] = "길드 없음"
@@ -250,8 +248,8 @@ L["Remaining:"] = "다음 레벨까지: "
 L["Remove Bar %d Action Page"] = "Blizzard %d번 행동단축바 숨기기"
 L["Reputation Bar"] = "평판 바"
 L["Request was denied by user."] = "상대방이 전송을 거절했습니다."
-L["Reset Counters: Hold Shift + Left Click"] = "통계 초기화: 쉬프트+우클릭"
-L["Reset Data: Hold Shift + Right Click"] = "자료 초기화: Shift + 우클릭"
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = "위치 초기화"
 L["Rested:"] = "휴식 경험치:"
 L["Right Chat"] = "우측 패널"
@@ -279,7 +277,6 @@ L["Spec"] = "전문화"
 L["Spell/Heal Power"] = "주문력"
 L["Spent:"] = "지출:"
 L["Stance Bar"] = "태세 바"
-L["Stats For:"] = "점수:"
 L["Steps"] = "단계"
 L["Sticky Frames"] = "자석"
 L["System"] = "시스템"
@@ -332,7 +329,6 @@ L["Welcome to ElvUI version %s!"] = "ElvUI 버전 %s에 오신 것을 환영합�
 L["whispers"] = "귓"
 L["World Latency:"] = true
 L["World Protocol:"] = true
-L["WoW Token:"] = true
 L["Wrist"] = "손목"
 L["XP:"] = "경험치:"
 L["yells"] = "외침"
@@ -371,3 +367,17 @@ L["DESC_MOVERCONFIG"] = [=[프레임을 드래그로 원하는 위치로 이동�
   Shift + 우클릭 - 조정자를 일시적으로 숨깁니다.
   Ctrl + 우클릭 - 조정자의 위치를 기본값으로 초기화합니다.
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

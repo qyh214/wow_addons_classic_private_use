@@ -6,7 +6,10 @@ local L = DBM_GUI_L
 
 L.MainFrame = "Deadly Boss Mods"
 
+L.TranslationByPrefix		= "Traduzido por "
 L.TranslationBy 			= "GlitterStorm @ Azralon"
+L.Website					= "Visita nosso canal Discord: |cFF73C2FBhttps://discord.gg/DF5mffk|r."
+L.WebsiteButton				= "Pagina web"
 
 L.OTabBosses	= "Chefes"
 L.OTabRaids		= "Raide"--Raids & PVP
@@ -23,8 +26,8 @@ L.TabCategory_MOP	 		= "Mists of Pandaria"
 L.TabCategory_CATA	 		= "Cataclysm"
 L.TabCategory_WOTLK 		= "Wrath of the Lich King"
 L.TabCategory_BC 			= "The Burning Crusade"
-L.TabCategory_CLASSIC		= "Wow Vanilla"
-L.TabCategory_PVP 			= "PVP"
+L.TabCategory_CLASSIC		= "Classic"
+L.TabCategory_PVP 			= "JxJ"
 L.TabCategory_OTHER    		= "Outros módulos"
 
 L.BossModLoaded 			= "%s estatísticas"
@@ -278,7 +281,10 @@ L.SpamBlockNoSpecWarnSound	= "Não reproduzir soms especiais de anúncio (ainda 
 L.SpamBlockNoSetIcon		= "Não marcar jogadores com ícones"
 L.SpamBlockNoRangeFrame		= "Não exibir quadro de distancia"
 L.SpamBlockNoInfoFrame		= "Não exibir quadro de informação"
-L.SpamBlockNoHudMap			= "Não Exibir mapas HudMap (heads up display Map)"
+L.SpamBlockNoHudMap			= "Não Exibir mapas HudMap"
+L.SpamBlockNoNameplate		= "Não mostrar auras da placa de identificação"
+L.SpamBlockNoYells			= "Não envie gritos de bate-papo"
+L.SpamBlockNoNoteSync		= "Não aceite notas compartilhadas"
 L.SpamBlockNoCountdowns		= "Não tocar sons de contagem regressiva"
 L.SpamBlockNoIconRestore	= "Não guardar estado dos ícones e restaura-los ao fim do combate"
 L.SpamBlockNoRangeRestore	= "Não restaurar o quadro de distancia para o estado anterior ( show/hide ) quando a mod pedir hide'"

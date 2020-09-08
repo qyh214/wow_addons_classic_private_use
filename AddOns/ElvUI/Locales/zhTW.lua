@@ -2,8 +2,11 @@
 local E = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local L = E.Libs.ACL:NewLocale("ElvUI", "zhTW")
 
+local COLOR1 = '|cFF1784d1'
+local COLOR2 = '|cfd9b9b9b'
+
 L[" |cff00ff00bound to |r"] = " |cff00ff00綁定到 |r"
-L["%s frame(s) has a conflicting anchor point, please change either the buff or debuff anchor point so they are not attached to each other. Forcing the debuffs to be attached to the main unitframe until fixed."] = " %s 個框架錨點衝突, 請移動buff或者debuff錨點讓他們彼此不依附. 暫時強制debuff依附到主框架."
+L["%s frame has a conflicting anchor point. Forcing the Buffs to be attached to the main unitframe."] = "%s 框架存在一個衝突錨點，將強制將Buff附加到主單位框架之上。"
 L["%s is attempting to share his filters with you. Would you like to accept the request?"] = "%s 試圖與你分享過濾器設定. 你是否接受?"
 L["%s is attempting to share the profile %s with you. Would you like to accept the request?"] = "%s 試圖與你分享設定檔 %s. 你是否接受?"
 L["%s: %s tried to call the protected function '%s'."] = "%s: %s 嘗試調用保護函數'%s'."
@@ -18,6 +21,7 @@ L["Accepting this will reset your Filter Priority lists for all auras on UnitFra
 L["Additive Blend"] = "覆蓋混合"
 L["Adjust the UI Scale to fit your screen, press the autoscale button to set the UI Scale automatically."] = "調節適合你螢幕的介面縮放比例, 按下自動調節按鍵可自動設置介面縮放比例。"
 L["AFK"] = "暫離"
+L["Alliance: "] = "聯盟: "
 L["All keybindings cleared for |cff00ff00%s|r."] = "取消|cff00ff00%s|r 所有綁定的快捷鍵."
 L["Alpha Key"] = "單位元 Alpha 通道混合"
 L["Already Running.. Bailing Out!"] = "正在運行"
@@ -47,7 +51,7 @@ L["Bank Mover (Grow Up)"] = "銀行錨點 (向上增長)"
 L["Bank"] = "銀行"
 L["Bar "] = "快捷列 "
 L["Bars"] = "條"
-L["Battleground datatexts temporarily hidden, to show type /bgstats or right click the 'C' icon near the minimap."] = "戰場資訊暫時隱藏, 你可以通過輸入/bgstats 或右鍵點擊小地圖旁「C」按鈕顯示."
+L["Battleground datatexts temporarily hidden, to show type /bgstats"] = true
 L["Battleground datatexts will now show again if you are inside a battleground."] = "當你處於戰場時戰場資訊將再次顯示."
 L["BfA Missions"] = "決戰艾澤拉斯任務"
 L["Binding"] = "綁定"
@@ -58,7 +62,6 @@ L["Blend"] = "常規混合"
 L["BNet Frame"] = "戰網提示資訊"
 L["Boss Button"] = "特殊技能鍵"
 L["Boss Frames"] = "首領框架"
-L["Building(s) Report:"] = "建築報告"
 L["Calendar"] = "行事曆"
 L["Can't buy anymore slots!"] = "無法再購買更多銀行欄位!"
 L["Can't Roll"] = "無法需求此裝備"
@@ -88,7 +91,6 @@ L["Dead"] = "死亡"
 L["Deficit:"] = "赤字:"
 L["Delete gray items?"] = "刪除灰色物品?"
 L["Deposit Reagents"] = "存入材料"
-L["Desaturate all grey items that can be vendored."] = "降低所有能被售賣的垃圾物品的飽和度."
 L["Detected that your ElvUI OptionsUI addon is out of date. This may be a result of your Tukui Client being out of date. Please visit our download page and update your Tukui Client, then reinstall ElvUI. Not having your ElvUI OptionsUI addon up to date will result in missing options."] = "偵測到你的 ElvUI 設定插件已過期. 這可能是因為你的 Tukui 客戶端已過期. 請拜訪我們的下載頁面並更新 Tukui 客戶端然後再重新安裝 ElvUI. ElvUI 設定插件過期會造成某些選項遺失"
 L["Disable Warning"] = "停用警告"
 L["Disable"] = "停用"
@@ -107,6 +109,7 @@ L["ElvUI is five or more revisions out of date. You can download the newest vers
 L["ElvUI is out of date. You can download the newest version from www.tukui.org. Get premium membership and have ElvUI automatically updated with the Tukui Client!"] = "ElvUI 已過期. 你可以在 www.tukui.org 下載到最新的版本. 購買會員可以使用 Tukui 客戶端自動下載最新的 ElvUI."
 L["ElvUI needs to perform database optimizations please be patient."] = "ElvUI 需要進行資料庫優化, 請稍待."
 L["ElvUI Plugin Installation"] = "ElvUI 插件安裝"
+L["ElvUI Status"] = "ElvUI 訊息"
 L["ElvUI was updated while the game is still running. Please relaunch the game, as this is required for the files to be properly updated."] = "ElvUI 在遊戲運行時被更新了. 請重開遊戲以確保文件的完整更新."
 L["Empty Slot"] = "空格"
 L["Enable"] = "啟用"
@@ -123,7 +126,6 @@ L["FocusTarget Frame"] = "焦點目標的目標框架"
 L["For technical support visit us at http://www.tukui.org."] = "如需技術支援請至 http://www.tukui.org."
 L["Friends List"] = "好友列表"
 L["G"] = "公會"
-L["Garrison"] = "要塞"
 L["Ghost"] = "鬼魂"
 L["GM Ticket Frame"] = "GM 對話框"
 L["Gold"] = "金錢"
@@ -140,6 +142,7 @@ L["Home Protocol:"] = "本機協議:"
 L["Honor Bar"] = "榮譽條"
 L["Honor Remaining:"] = "剩餘:"
 L["Honor XP:"] = "榮譽:"
+L["Horde: "] = "部落: "
 L["Hover your mouse over any actionbutton or spellbook button to bind it. Press the ESC key to clear the current actionbutton's keybinding."] = "將你的滑鼠游標放在任意快捷鍵或是法術書上來完成綁定。按下 ESC 可以清除當前快捷鍵的綁定."
 L["HP"] = "生命值"
 L["HPS"] = "治療輸出"
@@ -149,12 +152,11 @@ L["Icons Only"] = "圖示"
 L["If you accidently remove a chat frame you can always go the in-game configuration menu, press install, go to the chat portion and reset them."] = "如果你不慎移除了對話框, 你可以重新安裝一次重置他們."
 L["If you are experiencing issues with ElvUI try disabling all your addons except ElvUI, remember ElvUI is a full UI replacement addon, you cannot run two addons that do the same thing."] = "如果你使用 ElvUI 時遇到問題, 請嘗試停用除了ElvUI之外的插件. 請記住ElvUI是一套全套的UI替換插件, 你不能同時使用不同的插件來完成同一件事."
 L["IL"] = "副本隊長"
-L["Importance: |cff07D400High|r"] = "重要性: |cff07D400高|r"
+L["Importance: |cffFF3333High|r"] = "重要性: |cffFF3333高|r"
 L["Importance: |cffD3CF00Medium|r"] = "重要性: |cffD3CF00中|r"
-L["Importance: |cffFF0000Low|r"] = "重要性: |cffFF0000低|r"
+L["Importance: |cFF33FF33Low|r"] = "重要性: |cFF33FF33低|r"
 L["In Progress"] = "進行中"
 L["INCOMPATIBLE_ADDON"] = "插件 %s 與 ElvUI 的 %s 模組不相容。請停用不相容的插件, 或停用相關的模組."
-L["Info/Controls"] = true
 L["Installation Complete"] = "安裝完畢"
 L["Invalid Target"] = "無效的目標"
 L["is looking for members"] = "正在尋找團隊成員"
@@ -185,7 +187,8 @@ L["Legs"] = "腿部"
 L["Level Up Display / Boss Banner"] = "升級提示 / 首領旗幟"
 L["List of installations in queue:"] = "即將安裝的列表"
 L["Lock"] = "鎖定"
-L["LOGIN_MSG"] = "歡迎使用 %sElvUI|r |cff1784d1Classic|r %s%s 版本|r, 輸入 /ec 可打開遊戲內設置介面. 如果你需要技術協助, 可訪問我們的網址 https://www.tukui.org 或是加入我們的 Discord 伺服器: https://discord.gg/xFWcfgE"
+L["LOGIN_MSG"] = ("歡迎使用 *ElvUI|r |cff1784d1Classic|r *%s 版本|r, 輸入 */ec|r 可打開遊戲內設置介面. 如果你需要技術協助, 可訪問我們的網址 https://www.tukui.org 或是加入我們的 Discord 伺服器: https://discord.gg/xFWcfgE"):gsub('*', COLOR1)
+L["LOGIN_MSG_HELP"] = ("Please use */ehelp|r for a list of available *ElvUI|r commands."):gsub('*', COLOR1)
 L["Loot / Alert Frames"] = "拾取 / 提醒框架"
 L["Loot Frame"] = "拾取框架"
 L["Lord! It's a miracle! The download up and vanished like a fart in the wind! Try Again!"] = "天啊! 太奇葩啦! 下載消失了! 就像是在風中放了個屁... 再試一次吧!"
@@ -193,16 +196,15 @@ L["Loss Control Icon"] = "失去控制圖示"
 L["lvl"] = "等級"
 L["MA Frames"] = "主助理框架"
 L["Main Hand"] = "主手"
+L["Max Rank"] = "最高等級"
 L["Micro Bar"] = "微型系統菜單"
 L["Minimap"] = "小地圖"
 L["MirrorTimer"] = "鏡像計時器"
-L["Mission(s) Report:"] = "任務報告"
 L["Mitigation By Level: "] = "等級減傷: "
 L["Mobile"] = "掌上設備"
 L["Modulating Blend"] = "無視 Alpha 通道混合"
 L["Mov. Speed:"] = _G.STAT_MOVEMENT_SPEED
 L["MT Frames"] = "主坦克框架"
-L["Naval Mission(s) Report:"] = "海軍任務報告"
 L["No bindings set."] = "未設定快捷綁定."
 L["No gray items to delete."] = "沒有可刪除的灰色物品."
 L["No Guild"] = "沒有公會"
@@ -232,7 +234,7 @@ L["Player Powerbar"] = "玩家能量條"
 L["Please click the button below so you can setup variables and ReloadUI."] = "請按下方按鈕設定變數並重載介面."
 L["Please click the button below to setup your CVars."] = "請按下方按鈕設定參數."
 L["Please press the continue button to go onto the next step."] = "請按「繼續」按鈕, 執行下一個步驟."
-L["Plugins"] = true
+L["Plugins"] = "插件"
 L["Preview"] = "預覽"
 L["Profile download complete from %s, but the profile %s already exists. Change the name or else it will overwrite the existing profile."] = "設定文件從 %s 下載完成, 但是設定文件 %s 已存在. 請更改名稱, 否則它會覆蓋你的現有設定檔."
 L["Profile download complete from %s, would you like to load the profile %s now?"] = "設定檔從 %s 下載完成, 你是否要加載設定檔 %s?"
@@ -250,8 +252,8 @@ L["Remaining:"] = "剩餘:"
 L["Remove Bar %d Action Page"] = "移除第 %d 快捷列"
 L["Reputation Bar"] = "聲望條"
 L["Request was denied by user."] = "請求被對方拒絕."
-L["Reset Counters: Hold Shift + Left Click"] = "重置計數器: 按住 Shift + 左鍵點擊"
-L["Reset Data: Hold Shift + Right Click"] = "重置數據: 按住 Shift + 右鍵點擊"
+L["Reset Session Data: Hold Ctrl + Right Click"] = true
+L["Reset Character Data: Hold Shift + Right Click"] = true
 L["Reset Position"] = "重設位置"
 L["Rested:"] = "休息:"
 L["Right Chat"] = "右側對話框"
@@ -271,6 +273,7 @@ L["Setup Chat"] = "設定對話視窗"
 L["Setup CVars"] = "設定參數"
 L["Shoulder"] = "肩部"
 L["Show/Hide Reagents"] = "顯示/隱藏材料"
+L["Shows a frame with needed info for support."] = "顯示支持訊息。"
 L["silverabbrev"] = "|cffc7c7cf銀|r"
 L["Skip Process"] = "略過"
 L["Sort Tab"] = "選項排列"
@@ -279,7 +282,6 @@ L["Spec"] = "專精"
 L["Spell/Heal Power"] = "法術/治療強度"
 L["Spent:"] = "花費:"
 L["Stance Bar"] = "姿態列"
-L["Stats For:"] = "統計:"
 L["Steps"] = "步驟"
 L["Sticky Frames"] = "框架依附"
 L["System"] = "系統信息"
@@ -332,7 +334,6 @@ L["Welcome to ElvUI version %s!"] = "歡迎使用 ElvUI %s 版！"
 L["whispers"] = "密語"
 L["World Latency:"] = "世界延遲:"
 L["World Protocol:"] = "世界協議:"
-L["WoW Token:"] = "魔獸代幣:"
 L["Wrist"] = "護腕"
 L["XP:"] = "經驗:"
 L["yells"] = "大喊"
@@ -370,3 +371,17 @@ L["DESC_MOVERCONFIG"] = [=[解除框架移動鎖定. 現在可以移動它們, �
   Shift + 右鍵 - 暫時隱藏定位器.
   Ctrl + 右鍵 - 重置定位器位置到預設值.
 ]=]
+
+L["EHELP_COMMANDS"] = ([=[Here is a list of all important *ElvUI|r commands:
+ */ec|r or */elvui|r  -  Toggle the *OptionsUI|r.
+ */moveui|r  -  Toggle anchors to reposition various elements.
+ */kb|r  -  Toggle the keybind mode.
+ */resetui|r  -  Reset all frames to their original positions.
+ */bgstats|r  -  Toggle Battleground stats on your DataTexts.
+ */hdt|r  -  Edit your DataTexts without opening the *OptionsUI|r.
+ */estatus|r  -  Important informations for support questions.
+ */egrid|r ^64|r or ^128|r or ^256|r  -  Toggle a pixel grid.
+ */luaerror|r ^on|r or ^off|r  -  Disable all AddOns except ElvUI.
+  NOTE: */luaerror|r ^off|r will re-enable the addons disabled from
+  using */luaerror|r ^on|r within that session.
+]=]):gsub('*', COLOR1):gsub('%^', COLOR2)

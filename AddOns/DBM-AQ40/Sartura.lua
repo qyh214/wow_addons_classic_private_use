@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Sartura", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200611161557")
+mod:SetRevision("20200821020339")
 mod:SetCreatureID(15516)
 mod:SetEncounterID(711)
 mod:SetModelID(15583)
@@ -17,9 +17,7 @@ local warnEnrageSoon	= mod:NewSoonAnnounce(8269, 2)
 local warnEnrage		= mod:NewSpellAnnounce(8269, 4)
 local warnWhirlwind		= mod:NewSpellAnnounce(26083, 3)
 
-local specWarnWhirlwind	= mod:NewSpecialWarningRun(26083, nil, nil, 2, 4, 2)
-
-local timerWhirlwind	= mod:NewBuffActiveTimer(15, 26083, nil, nil, nil, 2)
+local specWarnWhirlwind	= mod:NewSpecialWarningRun(26083, false, nil, nil, 4, 2)
 
 mod.vb.prewarn_enrage = false
 
@@ -31,8 +29,7 @@ do
 	local Whirlwind, Enrage = DBM:GetSpellInfo(26083), DBM:GetSpellInfo(8269)
 	function mod:SPELL_CAST_SUCCESS(args)
 		--if args:IsSpellID(26083) and self:AntiSpam() then--26084
-		if args.spellName == Whirlwind and args:IsSrcTypeHostile() and self:AntiSpam() then--26084
-			timerWhirlwind:Start()
+		if args.spellName == Whirlwind and args:IsSrcTypeHostile() and self:AntiSpam(4, 1) then--26084
 			if self:CheckInterruptFilter(args.sourceGUID, true) and self.Options.SpecWarn26083run then
 				specWarnWhirlwind:Show()
 				specWarnWhirlwind:Play("justrun")

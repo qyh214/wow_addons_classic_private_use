@@ -28,8 +28,8 @@ function UF:Construct_TargetTargetFrame(frame)
 	frame.TargetGlow = self:Construct_TargetGlow(frame)
 	frame.ThreatIndicator = self:Construct_Threat(frame)
 
-	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 0, 75) --Set to default position
-	E:CreateMover(frame, frame:GetName()..'Mover', L["TargetTarget Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,targettarget,generalGroup')
+	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 342, 100) --Set to default position
+	E:CreateMover(frame, frame:GetName()..'Mover', L["TargetTarget Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,targettarget,generalGroup')
 
 	frame.unitframeType = "targettarget"
 end
@@ -55,6 +55,14 @@ function UF:Update_TargetTargetFrame(frame, db)
 		frame.USE_INFO_PANEL = not frame.USE_MINI_POWERBAR and not frame.USE_POWERBAR_OFFSET and db.infoPanel.enable
 		frame.INFO_PANEL_HEIGHT = frame.USE_INFO_PANEL and db.infoPanel.height or 0
 		frame.BOTTOM_OFFSET = UF:GetHealthBottomOffset(frame)
+	end
+
+	if db.strataAndLevel and db.strataAndLevel.useCustomStrata then
+		frame:SetFrameStrata(db.strataAndLevel.frameStrata)
+	end
+
+	if db.strataAndLevel and db.strataAndLevel.useCustomLevel then
+		frame:SetFrameLevel(db.strataAndLevel.frameLevel)
 	end
 
 	frame.colors = ElvUF.colors

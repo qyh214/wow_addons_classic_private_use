@@ -163,13 +163,14 @@ Back to the big plateau, northbound bridge, take the bridge going east after tha
 Accept [QA4904] and [QC4904 escort her out]
 Run back to Freewind Post
 Turn in [QT4904][QT4767][QT5147][QT5064]
-Now you should grind until youre level [XP30 30] you can either grind on Harpies as melee or on the Wyverns as a caster.
+Now you should grind until youre level [XP30.4 30] you can either grind on Harpies as melee or on the Wyverns as a caster.
+Now you should do Razorfen Kraul to be [XP30.9 10% from Dinging 31]. Get all the quests for it that you can find.
 Now for a longer walk to Feralas. Get the FP [P Camp Mojache]
 Fly to [F Thunder Bluff]
 Turn in [QT1130] accept [QA1131]
 Turn in [QT5062] accept [QA5088]
 Hearth to [H Orgrimmar]
 [T] Train you level 30 spells.(Druids will have to go to Moonglade and then fly back)
-Now you should do Razorfen Kraul to hit level [XP31 31] if it doesnt do the trick, then grind in the same spot that you grinded last level.
+
 
 ]], "Bustea's Horde Leveling guide")
