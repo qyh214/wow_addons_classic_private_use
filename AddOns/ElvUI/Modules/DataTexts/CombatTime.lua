@@ -1,8 +1,7 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
 local floor, format, strjoin = floor, format, strjoin
---WoW API / Variables
 local GetTime = GetTime
 
 local displayString, lastPanel = ''
@@ -17,15 +16,7 @@ local function OnUpdate(self)
 	self.text:SetFormattedText(displayString, timerText, UpdateText())
 end
 
-local function DelayOnUpdate(self, elapsed)
-	startTime = startTime - elapsed
-	if startTime <= 0 then
-		timer, startTime = 0, GetTime()
-		self:SetScript("OnUpdate", OnUpdate)
-	end
-end
-
-local function OnEvent(self, event, _, timeSeconds)
+local function OnEvent(self, event)
 	if event == "PLAYER_REGEN_ENABLED" then
 		self:SetScript("OnUpdate", nil)
 	elseif event == "PLAYER_REGEN_DISABLED" then
@@ -33,7 +24,7 @@ local function OnEvent(self, event, _, timeSeconds)
 		self:SetScript("OnUpdate", OnUpdate)
 	else
 		local txt = self.text:GetText()
-		if not txt or txt == ' ' or txt ~= format(displayString, timerText, UpdateText()) then
+		if not txt or txt == '' then
 			self.text:SetFormattedText(displayString, timerText, UpdateText())
 		end
 	end

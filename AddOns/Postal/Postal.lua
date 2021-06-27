@@ -62,6 +62,10 @@ local _G = getfenv(0)
 local t = {}
 Postal.keepFreeOptions = {0, 1, 2, 3, 5, 10, 15, 20, 25, 30}
 
+Postal.WOWClassic = false
+Postal.WOWBCClassic = false
+Postal.WOWRetail = false
+
 -- Use a common frame and setup some common functions for the Postal dropdown menus
 local Postal_DropDownMenu = CreateFrame("Frame", "Postal_DropDownMenu")
 Postal_DropDownMenu.displayMode = "MENU"
@@ -96,6 +100,17 @@ end
 ---------------------------
 
 function Postal:OnInitialize()
+
+	--print("Postal is Active and Running");
+
+	-- Detect which release of WOW is running and set appropriate flags
+	if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC then Postal.WOWClassic = true end
+	if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC then Postal.WOWBCClassic = true end
+	if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE then Postal.WOWRetail = true end
+-- if Postal.WOWClassic then DEFAULT_CHAT_FRAME:AddMessage("Postal WOW Classic", 0.0, 0.69, 0.94) end
+-- if Postal.WOWBCClassic then DEFAULT_CHAT_FRAME:AddMessage("Postal WOW BC Classic", 0.0, 0.69, 0.94) end
+-- if Postal.WOWRetail then DEFAULT_CHAT_FRAME:AddMessage("Postal WOW Retail", 0.0, 0.69, 0.94) end
+
 	-- Version number
 	if not self.version then self.version = GetAddOnMetadata("Postal", "Version") end
 
@@ -164,7 +179,7 @@ function Postal:OnModuleEnable_Common()
 end
 
 -- Hides the minimap unread mail button if there are no unread mail on closing the mailbox.
--- Does not scan past the first 50 items since only the first 50 are viewable.
+-- Does not scan past the first 100 items since only the first 100 are viewable.
 function Postal:MAIL_CLOSED()
 	for i = 1, GetInboxNumItems() do
 		if not select(9, GetInboxHeaderInfo(i)) then return end
@@ -324,6 +339,14 @@ function Postal.Menu(self, level)
 	elseif level == 2 then
 		if UIDROPDOWNMENU_MENU_VALUE == "OpenSpeed" then
 			local speed = Postal.db.profile.OpenSpeed
+			for i = 0, 0 do
+				local s = 0
+				info.text = format("%0.2f", s)
+				info.func = Postal.SetOpenSpeed
+				info.checked = s == speed
+				info.arg1 = s
+				UIDropDownMenu_AddButton(info, level)
+			end
 			for i = 0, 13 do
 				local s = 0.3 + i*0.05
 				info.text = format("%0.2f", s)
@@ -447,7 +470,7 @@ function Postal:CreateAboutFrame()
 		aboutFrame.editBox = Chatter:GetModule("Chat Copy").editBox
 	end
 	if not aboutFrame or not aboutFrame.editBox then
-		aboutFrame = CreateFrame("Frame", "PostalAboutFrame", UIParent)
+		aboutFrame = CreateFrame("Frame", "PostalAboutFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate")
 		tinsert(UISpecialFrames, "PostalAboutFrame")
 		aboutFrame:SetBackdrop({
 			bgFile = [[Interface\DialogFrame\UI-DialogBox-Background]],
@@ -506,7 +529,7 @@ function Postal.About()
 		tinsert(t, "")
 	end
 	tinsert(t, "-----")
-	tinsert(t, L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."]:format(version))
+	tinsert(t, L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."]:format(version))
 	tinsert(t, "")
 	tinsert(t, "- Xinhuan (Blackrock/Barthilas US Alliance)")
 	tinsert(t, "")

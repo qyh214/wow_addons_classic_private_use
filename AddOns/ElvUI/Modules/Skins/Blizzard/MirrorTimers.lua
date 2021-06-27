@@ -1,8 +1,6 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 
 function S:MirrorTimers()
@@ -41,7 +39,7 @@ function S:MirrorTimers()
 		text:Hide()
 
 		local timerText = mirrorTimer:CreateFontString(nil, 'OVERLAY')
-		timerText:FontTemplate()
+		timerText:FontTemplate(nil, nil, 'OUTLINE')
 		timerText:Point('CENTER', statusBar, 'CENTER', 0, 0)
 		mirrorTimer.TimerText = timerText
 

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(481, "DBM-Party-Classic", 19, 240)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(3654)
 mod:SetEncounterID(592)
 
@@ -28,35 +28,26 @@ function mod:OnCombatStart(delay)
 	timerThundercrackCD:Start(1-delay)
 end
 
-do
-	local NaralexsNightmar = DBM:GetSpellInfo(7967)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 7967 then
-		if args.spellName == NaralexsNightmar then
-			timerNaralexsNightmareCD:Start()
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnNaralexsNightmare:Show(args.sourceName)
-				specWarnNaralexsNightmare:Play("kickcast")
-			end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 7967 then
+		timerNaralexsNightmareCD:Start()
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnNaralexsNightmare:Show(args.sourceName)
+			specWarnNaralexsNightmare:Play("kickcast")
 		end
 	end
 end
 
-do
-	local Terrify, Thundercrack = DBM:GetSpellInfo(7399), DBM:GetSpellInfo(8150)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 7399 then
-		if args.spellName == Terrify then
-			timerTerrifyCD:Start()
-		--elseif args.spellId == 8150 then
-		elseif args.spellName == Thundercrack then
-			timerThundercrackCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 7399 then
+		timerTerrifyCD:Start()
+	elseif args.spellId == 8150 then
+		timerThundercrackCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		if args.spellName == Terrify then
-			warningTerrify:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 7399 then
+		warningTerrify:Show(args.destName)
 	end
 end

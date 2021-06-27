@@ -1,17 +1,16 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
---WoW API / Variables
 local unpack = unpack
 local CreateFrame = CreateFrame
 
 function UF:Construct_AuraWatch(frame)
-	local auras = CreateFrame("Frame", frame:GetName() .. 'AuraWatch', frame)
+	local auras = CreateFrame('Frame', frame:GetName() .. 'AuraWatch', frame)
 	auras:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 10)
 	auras:SetInside(frame.Health)
 	auras.presentAlpha = 1
 	auras.missingAlpha = 0
-	auras.strictMatching = true;
+	auras.strictMatching = true
 	auras.PostCreateIcon = UF.BuffIndicator_PostCreateIcon
 	auras.PostUpdateIcon = UF.BuffIndicator_PostUpdateIcon
 
@@ -26,11 +25,19 @@ function UF:Configure_AuraWatch(frame, isPet)
 		end
 
 		frame.AuraWatch.size = db.size
+		frame.AuraWatch.countFontSize = db.countFontSize
 
 		if frame.unit == 'pet' or isPet then
-			frame.AuraWatch:SetNewTable(E.global.unitframe.buffwatch.PET)
+			frame.AuraWatch:SetNewTable(E.global.unitframe.aurawatch.PET)
 		else
-			frame.AuraWatch:SetNewTable(db.profileSpecific and E.db.unitframe.filters.buffwatch or E.global.unitframe.buffwatch[E.myclass])
+			local auraTable
+			if db.profileSpecific then
+				auraTable = E.db.unitframe.filters.aurawatch
+			else
+				auraTable = E:CopyTable({}, E.global.unitframe.aurawatch[E.myclass])
+				E:CopyTable(auraTable, E.global.unitframe.aurawatch.GLOBAL)
+			end
+			frame.AuraWatch:SetNewTable(auraTable)
 		end
 	elseif frame:IsElementEnabled('AuraWatch') then
 		frame:DisableElement('AuraWatch')
@@ -43,56 +50,75 @@ function UF:BuffIndicator_PostCreateIcon(button)
 
 	E:RegisterCooldown(button.cd)
 
+	local blizzCooldownText = button.cd:GetRegions()
+	if blizzCooldownText:IsObjectType('FontString') then
+		button.cd.blizzText = blizzCooldownText
+	end
+
 	button.overlay:Hide()
 
-	button.icon.border = button:CreateTexture(nil, "BACKGROUND");
+	button.icon.border = button:CreateTexture(nil, 'BACKGROUND')
 	button.icon.border:SetOutside(button.icon, 1, 1)
 	button.icon.border:SetTexture(E.media.blankTex)
 	button.icon.border:SetVertexColor(0, 0, 0)
 
-	UF:Configure_FontString(button.count)
-	UF:Update_FontString(button.count)
+	button.count:ClearAllPoints()
+	button.count:Point('BOTTOMRIGHT', 1, 1)
+	button.count:SetJustifyH('RIGHT')
 end
 
 function UF:BuffIndicator_PostUpdateIcon(_, button)
 	local settings = self.watched[button.spellID]
 	if settings then -- This should never fail.
-		button.cd.textThreshold = settings.textThreshold ~= -1 and settings.textThreshold
+		local onlyText = settings.style == 'timerOnly'
+		local colorIcon = settings.style == 'coloredIcon'
+		local textureIcon = settings.style == 'texturedIcon'
 
-		local timer = button.cd.timer
-		if (settings.style == 'coloredIcon' or settings.style == 'texturedIcon') and not button.icon:IsShown() then
+		if (colorIcon or textureIcon) and not button.icon:IsShown() then
 			button.icon:Show()
 			button.icon.border:Show()
 			button.cd:SetDrawSwipe(true)
-		elseif settings.style == 'timerOnly' and button.icon:IsShown() then
+		elseif onlyText and button.icon:IsShown() then
 			button.icon:Hide()
 			button.icon.border:Hide()
 			button.cd:SetDrawSwipe(false)
 		end
 
-		if settings.style == 'timerOnly' then
-			button.cd.hideText = nil
-			if timer then
-				timer.skipTextColor = true
+		if not E.db.cooldown.enable then -- cooldown module is off, handle blizzards cooldowns
+			if onlyText then
+				button.cd:SetHideCountdownNumbers(false)
 
-				if timer.text then
-					timer.text:SetTextColor(settings.color.r, settings.color.g, settings.color.b)
+				if button.cd.blizzText then
+					button.cd.blizzText:SetTextColor(settings.color.r, settings.color.g, settings.color.b)
+				end
+			else
+				button.cd:SetHideCountdownNumbers(not settings.displayText)
+
+				if button.cd.blizzText then
+					button.cd.blizzText:SetTextColor(1, 1, 1)
 				end
 			end
-		else
-			button.cd.hideText = not settings.displayText
-			if timer then timer.skipTextColor = nil end
+		elseif button.cd.timer then
+			button.cd.textThreshold = settings.textThreshold ~= -1 and settings.textThreshold
+			button.cd.hideText = (not onlyText and not settings.displayText) or nil
+			button.cd.timer.skipTextColor = onlyText or nil
 
-			if settings.style == 'coloredIcon' then
-				button.icon:SetTexture(E.media.blankTex)
-				button.icon:SetVertexColor(settings.color.r, settings.color.g, settings.color.b)
-			elseif settings.style == 'texturedIcon' then
-				button.icon:SetVertexColor(1, 1, 1)
-				button.icon:SetTexCoord(unpack(E.TexCoords))
+			if button.cd.timer.text then
+				button.cd.timer.text:SetTextColor(settings.color.r, settings.color.g, settings.color.b)
 			end
 		end
 
-		if settings.style == 'texturedIcon' and button.filter == "HARMFUL" then
+		if colorIcon then
+			button.icon:SetTexture(E.media.blankTex)
+			button.icon:SetVertexColor(settings.color.r, settings.color.g, settings.color.b)
+		elseif textureIcon then
+			button.icon:SetVertexColor(1, 1, 1)
+			button.icon:SetTexCoord(unpack(E.TexCoords))
+		end
+
+		button.count:FontTemplate(nil, self.countFontSize or 12, 'OUTLINE')
+
+		if textureIcon and button.filter == 'HARMFUL' then
 			button.icon.border:SetVertexColor(1, 0, 0)
 		else
 			button.icon.border:SetVertexColor(0, 0, 0)

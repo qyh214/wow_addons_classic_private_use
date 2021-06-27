@@ -1,5 +1,6 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule('NamePlates')
+local LSM = E.Libs.LSM
 
 local ipairs = ipairs
 local unpack = unpack
@@ -59,8 +60,8 @@ function NP:Construct_Health(nameplate)
 	local Health = CreateFrame('StatusBar', nameplate:GetName()..'Health', nameplate)
 	Health:SetFrameStrata(nameplate:GetFrameStrata())
 	Health:SetFrameLevel(5)
-	Health:CreateBackdrop('Transparent')
-	Health:SetStatusBarTexture(E.Libs.LSM:Fetch('statusbar', NP.db.statusbar))
+	Health:CreateBackdrop('Transparent', nil, nil, nil, nil, true)
+	Health:SetStatusBarTexture(LSM:Fetch('statusbar', NP.db.statusbar))
 
 	local clipFrame = CreateFrame('Frame', nil, Health)
 	clipFrame:SetClipsChildren(true)
@@ -68,24 +69,18 @@ function NP:Construct_Health(nameplate)
 	clipFrame:EnableMouse(false)
 	Health.ClipFrame = clipFrame
 
-	--[[Health.bg = Health:CreateTexture(nil, "BACKGROUND")
-	Health.bg:SetAllPoints()
-	Health.bg:SetTexture(E.media.blankTex)
-	Health.bg.multiplier = 0.2]]
-
 	NP.StatusBars[Health] = true
 
 	local statusBarTexture = Health:GetStatusBarTexture()
-	local healthFlashTexture = Health:CreateTexture(nameplate:GetName()..'FlashTexture', "OVERLAY")
-	healthFlashTexture:SetTexture(E.Libs.LSM:Fetch("background", "ElvUI Blank"))
-	healthFlashTexture:Point("BOTTOMLEFT", statusBarTexture, "BOTTOMLEFT")
-	healthFlashTexture:Point("TOPRIGHT", statusBarTexture, "TOPRIGHT")
+	local healthFlashTexture = Health:CreateTexture(nameplate:GetName()..'FlashTexture', 'OVERLAY')
+	healthFlashTexture:SetTexture(LSM:Fetch('background', 'ElvUI Blank'))
+	healthFlashTexture:Point('BOTTOMLEFT', statusBarTexture, 'BOTTOMLEFT')
+	healthFlashTexture:Point('TOPRIGHT', statusBarTexture, 'TOPRIGHT')
 	healthFlashTexture:Hide()
 	nameplate.HealthFlashTexture = healthFlashTexture
 
 	Health.colorTapping = true
 	Health.colorReaction = true
-	Health.frequentUpdates = true --Azil, keep this for now. It seems it may prevent event bugs
 	Health.UpdateColor = NP.Health_UpdateColor
 
 	return Health
@@ -95,8 +90,8 @@ function NP:Update_Health(nameplate, skipUpdate)
 	local db = NP:PlateDB(nameplate)
 
 	nameplate.Health.colorTapping = true
-	nameplate.Health.colorClass = db.health.useClassColor
 	nameplate.Health.colorReaction = true
+	nameplate.Health.colorClass = db.health.useClassColor
 	if skipUpdate then return end
 
 	if db.health.enable then
@@ -123,12 +118,14 @@ end
 
 local bars = { 'myBar', 'otherBar' }
 function NP:Construct_HealthPrediction(nameplate)
+	if nameplate then return end
+
 	local HealthPrediction = CreateFrame('Frame', nameplate:GetName()..'HealthPrediction', nameplate)
 
 	for _, name in ipairs(bars) do
 		local bar = CreateFrame('StatusBar', nil, nameplate.Health.ClipFrame)
 		bar:SetFrameStrata(nameplate:GetFrameStrata())
-		bar:SetStatusBarTexture(E.LSM:Fetch('statusbar', NP.db.statusbar))
+		bar:SetStatusBarTexture(LSM:Fetch('statusbar', NP.db.statusbar))
 		bar:Point('TOP')
 		bar:Point('BOTTOM')
 		bar:Width(150)
@@ -138,14 +135,13 @@ function NP:Construct_HealthPrediction(nameplate)
 
 	local healthTexture = nameplate.Health:GetStatusBarTexture()
 	local healthFrameLevel = nameplate.Health:GetFrameLevel()
-
+	HealthPrediction.myBar:Point('LEFT', healthTexture, 'RIGHT')
 	HealthPrediction.myBar:SetFrameLevel(healthFrameLevel + 2)
 	HealthPrediction.myBar:SetStatusBarColor(NP.db.colors.healPrediction.personal.r, NP.db.colors.healPrediction.personal.g, NP.db.colors.healPrediction.personal.b)
 	HealthPrediction.myBar:SetMinMaxValues(0, 1)
-	HealthPrediction.myBar:SetPoint('LEFT', healthTexture, 'RIGHT')
 
-	HealthPrediction.otherBar:SetFrameLevel(healthFrameLevel + 3)
-	HealthPrediction.otherBar:SetPoint('LEFT', healthTexture, 'RIGHT')
+	HealthPrediction.otherBar:Point('LEFT', HealthPrediction.myBar:GetStatusBarTexture(), 'RIGHT')
+	HealthPrediction.otherBar:SetFrameLevel(healthFrameLevel + 1)
 	HealthPrediction.otherBar:SetStatusBarColor(NP.db.colors.healPrediction.others.r, NP.db.colors.healPrediction.others.g, NP.db.colors.healPrediction.others.b)
 
 	HealthPrediction.maxOverflow = 1
@@ -155,6 +151,8 @@ function NP:Construct_HealthPrediction(nameplate)
 end
 
 function NP:Update_HealthPrediction(nameplate)
+	if nameplate then return end
+
 	local db = NP:PlateDB(nameplate)
 
 	if db.health.enable and db.health.healPrediction then

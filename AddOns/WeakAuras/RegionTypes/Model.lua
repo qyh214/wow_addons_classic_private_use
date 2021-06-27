@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, Private = ...
 
 local SharedMedia = LibStub("LibSharedMedia-3.0");
 local L = WeakAuras.L;
@@ -84,7 +85,7 @@ local function create(parent)
   region:SetMinResize(1, 1);
 
   -- Border region
-  local border = CreateFrame("frame", nil, region);
+  local border = CreateFrame("frame", nil, region, BackdropTemplateMixin and "BackdropTemplate");
   region.border = border;
 
   WeakAuras.regionPrototype.create(region);
@@ -105,9 +106,7 @@ end
 local poolOldApi = CreateObjectPool(CreateModel)
 local poolNewApi = CreateObjectPool(CreateModel)
 
-local function AcquireModel(region, data)
-  local pool = data.api and poolNewApi or poolOldApi
-  local model = pool:Acquire()
+local function ConfigureModel(region, model, data)
   model.api = data.api
 
   model:ClearAllPoints()
@@ -133,7 +132,7 @@ local function AcquireModel(region, data)
     model:RegisterEvent("UNIT_MODEL_CHANGED");
 
     local unit
-    if WeakAuras.IsClassic() then
+    if not WeakAuras.IsRetail() then
       unit = data.model_path
     else
       unit = data.model_fileId
@@ -145,11 +144,11 @@ local function AcquireModel(region, data)
       model:RegisterEvent("PLAYER_FOCUS_CHANGED");
     end
     model:SetScript("OnEvent", function(self, event, unitId)
-      WeakAuras.StartProfileSystem("model");
+      Private.StartProfileSystem("model");
       if (event ~= "UNIT_MODEL_CHANGED" or UnitIsUnit(unitId, unit)) then
         WeakAuras.SetModel(model, data.model_path, data.model_fileId, data.modelIsUnit, data.modelDisplayInfo)
       end
-      WeakAuras.StopProfileSystem("model");
+      Private.StopProfileSystem("model");
     end
     );
   else
@@ -165,14 +164,20 @@ local function AcquireModel(region, data)
   if(data.advance) then
     local elapsed = 0;
     model:SetScript("OnUpdate", function(self, elaps)
-      WeakAuras.StartProfileSystem("model");
+      Private.StartProfileSystem("model");
       elapsed = elapsed + (elaps * 1000);
       model:SetSequenceTime(data.sequence, elapsed);
-      WeakAuras.StopProfileSystem("model");
+      Private.StopProfileSystem("model");
     end)
   else
     model:SetScript("OnUpdate", nil)
   end
+end
+
+local function AcquireModel(region, data)
+  local pool = data.api and poolNewApi or poolOldApi
+  local model = pool:Acquire()
+  ConfigureModel(region, model, data)
   return model
 end
 
@@ -286,6 +291,8 @@ local function modify(parent, region, data)
   function region:PreShow()
     if not region.model then
       region.model = AcquireModel(self, data)
+    else
+      ConfigureModel(region, region.model, data)
     end
   end
 
@@ -301,18 +308,21 @@ end
 
 -- Work around for movies and world map hiding all models
 do
-  function WeakAuras.PreShowModels(self, event)
-    WeakAuras.StartProfileSystem("model");
+  function Private.PreShowModels(self, event)
+    Private.StartProfileSystem("model");
     for id, data in pairs(WeakAuras.regions) do
-      WeakAuras.StartProfileAura(id);
+      Private.StartProfileAura(id);
       if data.region.toShow then
         if (data.regionType == "model") then
           data.region:PreShow();
         end
       end
-      WeakAuras.StopProfileAura(id);
+      Private.StopProfileAura(id);
     end
-    WeakAuras.StopProfileSystem("model");
+    for model in pairs(Private.barmodels) do
+      model:PreShow()
+    end
+    Private.StopProfileSystem("model");
   end
  end
 

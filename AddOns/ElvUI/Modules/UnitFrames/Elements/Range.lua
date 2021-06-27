@@ -1,9 +1,24 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
-local RC = E.Libs.RC
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+local RangeCheck = E.Libs.RangeCheck
 
---WoW API / Variables
-local CheckInteractDistance = CheckInteractDistance
+local UnitCanAttack = UnitCanAttack
+local UnitInRange = UnitInRange
+local UnitIsConnected = UnitIsConnected
+local UnitIsUnit = UnitIsUnit
+
+local function friendlyIsInRange(realUnit)
+	local unit = E:GetGroupUnit(realUnit) or realUnit
+
+
+	local inRange, checkedRange = UnitInRange(unit)
+	if checkedRange and not inRange then
+		return false -- blizz checked and said the unit is out of range
+	end
+
+	local _, maxRange = RangeCheck:GetRange(unit, true, true)
+	return maxRange
+end
 
 function UF:UpdateRange(unit)
 	if not self.Fader then return end
@@ -16,12 +31,12 @@ function UF:UpdateRange(unit)
 	elseif self.forceNotInRange then
 		alpha = self.Fader.MinAlpha
 	elseif unit then
-	    local _, inRange = RC:GetRange(unit, true)
-        if not inRange then
-            alpha = self.Fader.MinAlpha
-        elseif inRange then
-            alpha = self.Fader.MaxAlpha
-        end
+		if UnitCanAttack('player', unit) or UnitIsUnit(unit, 'pet') then
+			local _, maxRange = RangeCheck:GetRange(unit, true, true)
+			alpha = (maxRange and self.Fader.MaxAlpha) or self.Fader.MinAlpha
+		else
+			alpha = (UnitIsConnected(unit) and friendlyIsInRange(unit) and self.Fader.MaxAlpha) or self.Fader.MinAlpha
+		end
 	else
 		alpha = self.Fader.MaxAlpha
 	end

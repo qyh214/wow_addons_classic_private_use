@@ -1,8 +1,6 @@
 local _, ns = ...
 local oUF = ns.oUF
 
-local LCD = LibStub('LibClassicDurations', true)
-
 local VISIBLE = 1
 local HIDDEN = 0
 
@@ -17,8 +15,9 @@ local _G = _G
 local GetTime = GetTime
 local UnitAura = UnitAura
 local CreateFrame = CreateFrame
-local UnitIsFriend = UnitIsFriend
-local UnitIsUnit = UnitIsUnit
+local UnitIsEnemy = UnitIsEnemy
+local UnitReaction = UnitReaction
+local GameTooltip = GameTooltip
 
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 local function FormatTime(s)
@@ -36,15 +35,16 @@ local function FormatTime(s)
 end
 
 local function onEnter(self)
-	if _G.GameTooltip:IsForbidden() or not self:IsVisible() then return end
+	if GameTooltip:IsForbidden() or not self:IsVisible() then return end
 
-	_G.GameTooltip:SetOwner(self, self.tooltipAnchor)
-	_G.GameTooltip:SetUnitAura(self.unit, self.index, self.filter)
+	GameTooltip:SetOwner(self, self.tooltipAnchor)
+	GameTooltip:SetUnitAura(self.unit, self.index, self.filter)
 end
 
 local function onLeave()
-	if _G.GameTooltip:IsForbidden() then return end
-	_G.GameTooltip:Hide()
+	if GameTooltip:IsForbidden() then return end
+
+	GameTooltip:Hide()
 end
 
 local function onUpdate(self, elapsed)
@@ -105,22 +105,7 @@ local function customFilter(element, unit, button, name)
 end
 
 local function updateBar(element, unit, index, offset, filter, isDebuff, visible)
-	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3
-
-	if LCD and not UnitIsUnit('player', unit) then
-		local durationNew, expirationTimeNew
-		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = LCD:UnitAura(unit, index, filter)
-
-		if spellID then
-			durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
-		end
-
-		if durationNew and durationNew > 0 then
-			duration, expiration = durationNew, expirationTimeNew
-		end
-	else
-		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
-	end
+	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
 
 	if(name) then
 		local position = visible + offset + 1
@@ -177,6 +162,7 @@ local function updateBar(element, unit, index, offset, filter, isDebuff, visible
 			statusBar:SetSize(element.width, element.height)
 			statusBar.icon:SetSize(element.height, element.height)
 			statusBar:SetScript('OnUpdate', onUpdate)
+			statusBar:EnableMouse(not element.disableMouse)
 			statusBar:SetID(index)
 			statusBar:Show()
 
@@ -240,8 +226,9 @@ local function UpdateAuras(self, event, unit)
 	if(element) then
 		if(element.PreUpdate) then element:PreUpdate(unit) end
 
-		local isFriend = UnitIsFriend('player', unit)
-		local filter = (isFriend and (element.friendlyAuraType or 'HELPFUL') or (element.enemyAuraType or 'HARMFUL'))
+		local isEnemy = UnitIsEnemy(unit, 'player')
+		local reaction = UnitReaction(unit, 'player')
+		local filter = (not isEnemy and (not reaction or reaction > 4) and (element.friendlyAuraType or 'HELPFUL')) or element.enemyAuraType or 'HARMFUL'
 		local visible, hidden = filterBars(element, unit, filter, element.maxBars, filter == 'HARMFUL', 0)
 
 		local fromRange, toRange
@@ -297,11 +284,6 @@ local function Enable(self)
 		element.gap = element.gap or 2
 		element.maxBars = element.maxBars or 32
 
-		if not UnitIsUnit("player", self.unit) then
-			LCD.RegisterCallback('ElvUI', "UNIT_BUFF", function(event, unit)
-				Update(element, "UNIT_AURA", unit)
-			end)
-		end
 		-- Avoid parenting GameTooltip to frames with anchoring restrictions,
 		-- otherwise it'll inherit said restrictions which will cause issues
 		-- with its further positioning, clamping, etc

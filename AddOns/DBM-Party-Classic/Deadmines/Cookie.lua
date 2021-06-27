@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Cookie", "DBM-Party-Classic", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(645)
 --mod:SetEncounterID(1144)
 
@@ -19,16 +19,12 @@ function mod:OnCombatStart(delay)
 	timerHealCD:Start(1-delay)
 end
 
-do
-	local CookieCooking = DBM:GetSpellInfo(5174)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 5174 then
-		if args.spellName == CookieCooking then
-			timerHealCD:Start()
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnHeal:Show(args.sourceName)
-				specWarnHeal:Play("kickcast")
-			end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 5174 then
+		timerHealCD:Start()
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnHeal:Show(args.sourceName)
+			specWarnHeal:Play("kickcast")
 		end
 	end
 end

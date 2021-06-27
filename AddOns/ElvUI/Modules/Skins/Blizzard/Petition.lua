@@ -1,8 +1,6 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 
 function S:PetitionFrame()
@@ -11,10 +9,17 @@ function S:PetitionFrame()
 	local PetitionFrame = _G.PetitionFrame
 	S:HandleFrame(PetitionFrame, true, nil, 12, -17, -28, 65)
 
-	S:HandleButton(_G.PetitionFrameSignButton)
-	S:HandleButton(_G.PetitionFrameRequestButton)
-	S:HandleButton(_G.PetitionFrameRenameButton)
-	S:HandleButton(_G.PetitionFrameCancelButton)
+	local buttons = {
+		_G.PetitionFrameSignButton,
+		_G.PetitionFrameRequestButton,
+		_G.PetitionFrameRenameButton,
+		_G.PetitionFrameCancelButton
+	}
+
+	for _, button in pairs(buttons) do
+		S:HandleButton(button)
+	end
+
 	S:HandleCloseButton(_G.PetitionFrameCloseButton)
 
 	_G.PetitionFrameCharterTitle:SetTextColor(1, 1, 0)

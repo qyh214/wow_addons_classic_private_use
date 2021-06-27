@@ -67,12 +67,12 @@
 		instance.modo = modo_raid
 		
 		--> hide rows, scrollbar
-		gump:Fade (instance, 1, nil, "barras")
+		Details.FadeHandler.Fader (instance, 1, nil, "barras")
 		if (instance.rolagem) then
 			instance:EsconderScrollBar (true) --> hida a scrollbar
 		end
 		_detalhes:ResetaGump (instance)
-		instance:AtualizaGumpPrincipal (true)
+		instance:RefreshMainWindow (true)
 		
 		--> get the plugin name
 		
@@ -241,14 +241,14 @@
 				BNSendWhisper (towho, msg)
 			
 			elseif (type (towho) == "string") then
-				local BnetFriends = BNGetNumFriends()
-				for i = 1, BnetFriends do 
-					local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, messageText, noteText, isRIDFriend, broadcastTime, canSoR = BNGetFriendInfo (i)
-					if ((presenceName == towho or toonName == towho) and isOnline) then
-						BNSendWhisper (presenceID, msg)
-						break
-					end
-				end
+				--local BnetFriends = BNGetNumFriends()
+				--for i = 1, BnetFriends do 
+				--	local presenceID, presenceName, battleTag, isBattleTagPresence, toonName, toonID, client, isOnline, lastOnline, isAFK, isDND, messageText, noteText, isRIDFriend, broadcastTime, canSoR = BNGetFriendInfo (i)
+				--	if ((presenceName == towho or toonName == towho) and isOnline) then
+				--		BNSendWhisper (presenceID, msg)
+				--		break
+				--	end
+				--end
 			end
 		
 		elseif (channel == "CHANNEL") then
@@ -260,8 +260,10 @@
 		elseif (channel == "PRINT") then
 			print (msg)
 		
-		else
-			SendChatMessage (msg, channel)
+		else --say channel?
+			if (IsInInstance()) then --patch 80205 cannot use 'say' channel outside instances
+				SendChatMessage (msg, channel)
+			end
 		
 		--elseif (channel == "SAY" or channel == "YELL" or channel == "RAID_WARNING" or channel == "OFFICER" or channel == "GUILD" or channel == "EMOTE") then
 		
@@ -284,7 +286,12 @@
 			local next = _detalhes.announce_interrupts.next
 			local custom = _detalhes.announce_interrupts.custom
 			
-			local spellname = Details.GetSpellInfoC (extraSpellID)
+			local spellname
+			if (spellid > 10) then
+				spellname = GetSpellLink (extraSpellID)
+			else
+				spellname = _GetSpellInfo (extraSpellID)
+			end
 
 			if (channel == "RAID") then
 				local zone = _detalhes:GetZoneType()
@@ -320,7 +327,13 @@
 		elseif (channel == "PRINT") then
 
 			local custom = _detalhes.announce_interrupts.custom
-			local spellname = Details.GetSpellInfoC (extraSpellID)
+			
+			local spellname
+			if (spellid > 10) then
+				spellname = GetSpellLink (extraSpellID)
+			else
+				spellname = _GetSpellInfo (extraSpellID)
+			end
 
 			if (custom ~= "") then
 				custom = custom:gsub ("{spell}", spellname)
@@ -389,7 +402,13 @@
 				end
 			end
 
-			local spellname = Details.GetSpellInfoC (spellid)
+			local spellname
+			if (spellid > 10) then
+				spellname = GetSpellLink (spellid)
+			else
+				spellname = _GetSpellInfo (spellid)
+			end
+
 			local custom = _detalhes.announce_cooldowns.custom
 			
 			if (custom ~= "") then
@@ -445,8 +464,13 @@
 				alvo_name = ""
 			end
 			
-			local spellname Details.GetSpellInfoC (spellid)
-		
+			local spellname
+			if (spellid > 10) then
+				spellname = GetSpellLink (spellid)
+			else
+				spellname = _GetSpellInfo (spellid)
+			end
+			
 			if (second < 10) then
 				second = "0" .. second
 			end
@@ -533,8 +557,9 @@
 			end
 			
 			local spells = ""
+			death_table = death_table[1]
 			local last = #death_table
-			
+
 			for i = 1, _detalhes.announce_deaths.last_hits do
 				for o = last, 1, -1 do
 					local this_death = death_table [o]

@@ -1,14 +1,11 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local pairs = pairs
 local unpack = unpack
---WoW API / Variables
+
 local hooksecurefunc = hooksecurefunc
-local IsAddOnLoaded = IsAddOnLoaded
 local CreateFrame = CreateFrame
 
 local function SkinNavBarButtons(self)
@@ -51,7 +48,7 @@ function S:BlizzardMiscFrames()
 
 	S:HandleButton(_G.StaticPopup1ExtraButton)
 
-	if not IsAddOnLoaded('ConsolePortUI_Menu') then
+	if not E:IsAddOnEnabled('ConsolePortUI_Menu') then
 		-- reskin all esc/menu buttons
 		for _, Button in pairs({_G.GameMenuFrame:GetChildren()}) do
 			if Button.IsObjectType and Button:IsObjectType("Button") then
@@ -66,7 +63,7 @@ function S:BlizzardMiscFrames()
 		_G.GameMenuFrameHeader:Point('TOP', _G.GameMenuFrame, 0, 7)
 	end
 
-	if IsAddOnLoaded('OptionHouse') then
+	if E:IsAddOnEnabled('OptionHouse') then
 		S:HandleButton(_G.GameMenuButtonOptionHouse)
 	end
 
@@ -113,7 +110,6 @@ function S:BlizzardMiscFrames()
 			_G[ChatMenus[i]]:HookScript('OnShow', function(self) self:SetTemplate('Transparent', true) self:SetBackdropColor(unpack(E.media.backdropfadecolor)) end)
 		end
 	end
-
 
 	-- reskin popup buttons
 	for i = 1, 4 do
@@ -190,12 +186,16 @@ function S:BlizzardMiscFrames()
 		end
 
 		local Backdrop = _G[listFrameName..'Backdrop']
-		if not Backdrop.template then Backdrop:StripTextures() end
-		Backdrop:SetTemplate('Transparent')
+		if Backdrop and not Backdrop.template then
+			Backdrop:StripTextures()
+			Backdrop:SetTemplate('Transparent')
+		end
 
 		local menuBackdrop = _G[listFrameName..'MenuBackdrop']
-		if not menuBackdrop.template then menuBackdrop:StripTextures() end
-		menuBackdrop:SetTemplate('Transparent')
+		if menuBackdrop and not menuBackdrop.template then
+			menuBackdrop:StripTextures()
+			menuBackdrop:SetTemplate('Transparent')
+		end
 	end)
 
 	hooksecurefunc('UIDropDownMenu_SetIconImage', function(icon, texture)
@@ -207,7 +207,7 @@ function S:BlizzardMiscFrames()
 	end)
 
 	hooksecurefunc('ToggleDropDownMenu', function(level)
-		if ( not level ) then
+		if not level then
 			level = 1
 		end
 
@@ -218,7 +218,6 @@ function S:BlizzardMiscFrames()
 			local check = _G['DropDownList'..level..'Button'..i..'Check']
 			local uncheck = _G['DropDownList'..level..'Button'..i..'UnCheck']
 			local highlight = _G['DropDownList'..level..'Button'..i..'Highlight']
-			local text = _G['DropDownList'..level..'Button'..i..'NormalText']
 
 			highlight:SetTexture(E.Media.Textures.Highlight)
 			highlight:SetBlendMode('BLEND')
@@ -229,15 +228,12 @@ function S:BlizzardMiscFrames()
 				button:CreateBackdrop()
 			end
 
-			button.backdrop:Hide()
-
 			if not button.notCheckable then
-				S:HandlePointXY(text, 5)
-
 				uncheck:SetTexture()
+
 				local _, co = check:GetTexCoord()
 				if co == 0 then
-					check:SetTexture('Interface\\Buttons\\UI-CheckBox-Check')
+					check:SetTexture([[Interface\Buttons\UI-CheckBox-Check]])
 					check:SetVertexColor(r, g, b, 1)
 					check:Size(20, 20)
 					check:SetDesaturated(true)
@@ -253,6 +249,7 @@ function S:BlizzardMiscFrames()
 				button.backdrop:Show()
 				check:SetTexCoord(0, 1, 0, 1)
 			else
+				button.backdrop:Hide()
 				check:Size(16, 16)
 			end
 		end
@@ -269,7 +266,7 @@ function S:BlizzardMiscFrames()
 	-- StackSplit
 	local StackSplitFrame = _G.StackSplitFrame
 	StackSplitFrame:StripTextures()
-	StackSplitFrame:CreateBackdrop('Transparent')
+	StackSplitFrame:SetTemplate('Transparent')
 
 	StackSplitFrame.bg1 = CreateFrame('Frame', nil, StackSplitFrame)
 	StackSplitFrame.bg1:SetTemplate('Transparent')

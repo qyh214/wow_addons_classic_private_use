@@ -4,6 +4,8 @@ if not AL then return end
 
 -- These localization strings are translated on Curseforge: https://www.curseforge.com/wow/addons/atlaslootclassic/localization
 -- Options
+--[[Translation missing --]]
+--[[ AL["Add line break before source."] = "Add line break before source."--]] 
 AL["Add new list"] = "Añade nueva lista"
 AL["Added |cff00ff00%d|r items into list |cff00ff00%s|r."] = "|cff00ff00%d|r añadidos a la lista |cff00ff00%s|r"
 AL["Always active for all Profiles."] = "Siempre activo para todos los perfiles."
@@ -12,12 +14,15 @@ AL["Always marks items as favourite for every profile if enabled."] = "Siempre m
 AL["Always marks items as favourite for profile |cff00ff00%s|r if enabled."] = "Siempre marcar como favorito para perfil |cff00ff00%s|r si está activado."
 AL["Background"] = "Fondo"
 AL["Background color/alpha"] = "Color/alfa del fondo"
+AL["Class Filter"] = "Filtro de clase"
 AL["Clear list"] = "Limpiar lista"
 AL["Content"] = "Contenido"
 AL["Content bottom bar"] = "Barra inferior de contenido"
 AL["Content phase settings"] = "Configuración de fase de contenido"
 AL["Content top bar"] = "Barra superior de contenido"
 AL["Delete list"] = "Quitar lista"
+--[[Translation missing --]]
+--[[ AL["Enable Atlas map integration if available."] = "Enable Atlas map integration if available."--]] 
 AL["Enable auto selection of bosses if available."] = "Activar selección automática si el jefe está disponible"
 AL["Enable auto selection of instances if available."] = "Activar selección automática si la instancia está disponible"
 AL["Enable WoWHead links."] = "Activar enlaces de WoWHead."
@@ -28,7 +33,6 @@ AL["Font size"] = "Tamaño del fuente"
 AL["Icon"] = "Icono"
 AL["Import item list"] = "Importar lista de objetos"
 AL["Lock minimap button."] = "Bloquear botón del minimapa."
-AL["Main"] = "Principal"
 AL["Minimap Button"] = "Botón de Minimapa"
 AL["Remove |cffff0000%d|r items from list."] = "Quitar |cffff0000%d|r objetos de la lista."
 AL["Replace existing items"] = "Reemplazar objetos existentes"

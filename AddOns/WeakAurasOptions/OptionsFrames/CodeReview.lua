@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, OptionsPrivate = ...
 
 -- Lua APIs
 local pairs = pairs
@@ -101,8 +102,10 @@ local function ConstructCodeReview(frame)
       return
     end
 
+    local _, firstEntry = next(data)
     self.data = data;
     self.codeTree:SetTree(data);
+    self.codeTree:SelectByValue(firstEntry.value)
 
     WeakAuras.ShowOptions();
     frame.window = "codereview";
@@ -117,7 +120,7 @@ local function ConstructCodeReview(frame)
   return group
 end
 
-function WeakAuras.CodeReview(frame)
+function OptionsPrivate.CodeReview(frame)
   codeReview = codeReview or ConstructCodeReview(frame)
   return codeReview
 end

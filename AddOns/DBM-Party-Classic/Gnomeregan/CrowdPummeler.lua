@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(418, "DBM-Party-Classic", 7, 231)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(6229)
 mod:SetEncounterID(381)
 
@@ -22,17 +22,12 @@ function mod:OnCombatStart(delay)
 	timerArcingSmashD:Start(1-delay)
 end
 
-do
-	local CrowdPummel, ArcingSmash = DBM:GetSpellInfo(10887), DBM:GetSpellInfo(8374)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 10887 then
-		if args.spellName == CrowdPummel then
-			specWarnCrowdPummel:Show()
-			specWarnCrowdPummel:Play("carefly")
-			timerCrowdPummelCD:Start()
-		--elseif args.spellId == 8374 then
-		elseif args.ArcingSmash == 8374 then
-			timerArcingSmashD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 10887 then
+		specWarnCrowdPummel:Show()
+		specWarnCrowdPummel:Play("carefly")
+		timerCrowdPummelCD:Start()
+	elseif args.spellId == 8374 then
+		timerArcingSmashD:Start()
 	end
 end

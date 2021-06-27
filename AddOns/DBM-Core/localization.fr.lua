@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "frFR" then return end
+if GetLocale() ~= "frFR" then return end
 
 if not DBM_CORE_L then DBM_CORE_L = {} end
 
@@ -85,6 +85,7 @@ L.MPROFILE_DELETE_SELF_ERROR = "Impossible de supprimer les paramètres du mod a
 L.MPROFILE_DELETE_S_ERROR	= "La source est corrompue. Les paramètres n'ont pas été supprimés ou supprimés partiellement. Echec de la suppression."
 
 L.NOTE_SHARE_SUCCESS		= "%s a partagé sa note pour %s"
+L.NOTE_SHARE_LINK			= "Cliquez ici pour ouvrir les notes"
 L.NOTE_SHARE_FAIL			= "%s a essayé de partager un texte de note pour %s. Malheureusement, le mod associé avec cette note n'est pas installé ou activé. Si vous avez besoin de celle-ci, Assurez vous d'avoir activé le mod pour lequel cette note est destinée."
 
 L.NOTEHEADER				= "Entrez votre texte de note ici pour %s. Entourer le nom d'un joueur avec >< affichera la couleur associée. Pour les alertes vaec des notes multiples, séparez les par '/'"
@@ -158,14 +159,12 @@ L.VOICE_COUNT_MISSING		= "Le compte à rebours de la voix %d se trouve dans un p
 L.BIG_WIGS					= "BigWigs"
 
 L.UPDATEREMINDER_HEADER			= "Votre version de Deadly Boss Mods est périmée.\nLa version %s (%s) est disponible au téléchargement ici:"
-L.UPDATEREMINDER_HEADER_ALPHA	= "Votre version Alpha de DBM-alpha est périmée.\n Vous avez au moins %d versions de test de retard. Il est recommandé au utilisateurs d'utiliser la dernière version alpha ou la dernière version stable. Les versions alpha périmées peuvent mener à des fonctionnalités absentes ou cassées."
 L.UPDATEREMINDER_FOOTER			= "Faites la combinaison " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " pour copier le lien de téléchargement dans votre presse-papier."
 L.UPDATEREMINDER_FOOTER_GENERIC = "Faites la combinaison " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " pour copier le lien dans votre presse-papier."
 L.UPDATEREMINDER_DISABLE        = "ALERTE: Compte tenu que votre version DBM est fortement périmée (%d révisions), DBM a été désactivé jusqu'à ce que vous le mettiez à jour. Ceci, pour éviter que des versions incompatibles de DBM ne cause de mauvaises éxpériences de jeu pour vous et les membres du raid."
 L.UPDATEREMINDER_HOTFIX         = "Votre version de DBM contient des timers et alertes incorrects sur ce boss. Ceci a été corrigé dans la dernière version (ou alpha si la prochaine version n'est pas encore disponible)."
 L.UPDATEREMINDER_HOTFIX_ALPHA	= "La version de DBM sur laquelle vous êtes a des problèmes connus sur ce combat qui sont corrigées dans une future version (ou au moins une version alpha)"
 L.UPDATEREMINDER_MAJORPATCH		= "ATTENTION: Du au fait que votre DBM n'est pas à jour, celui-ci a été désactivé, puisqu'il y a eu une mise à jour majeure du jeu. Ceci pour être sûr que du code incompatible ou trop vieux ne réduise l'expérience de jeu pour vous ou des membres de votre groupe. Téléchargez une nouvelle version sur deadlybossmods.com ou curse dès que possible."
-L.UPDATEREMINDER_TESTVERSION	= "ATTENTION: Vous utilisez une version de DBM qui n'est pas prévue pour jouer avec cette version du jeu. Téléchargez une version appropriée pour votre client de jeu sur deadlybossmods.com ou sur curse."
 L.VEM							= "ATTENTION: Vous utilisez et DBM et Voice Encounter Mods. DBM ne tournera pas dans cette configuration et ne sera donc pas chargé."
 L.OUTDATEDPROFILES				= "ATTENTION: DBM-Profiles n'est pas compatible avec cette version de DBM. Il faut qu'il soit désactivé pour que DBM puisse tourner sans soucis."
 L.OUTDATEDSPELLTIMERS			= "ATTENTION: DBM-SpellTimers casse " .. L.DBM .. "et doit être désactivé pour que " .. L.DBM .. " fonctionne correctement."
@@ -179,8 +178,8 @@ L.CLASSIC_ONLY					= "ATTENTION: Cette version de " .. L.DBM .. " est uniquement
 
 L.MOVABLE_BAR					= "Bougez-moi !"
 
---L.PIZZA_SYNC_INFO				= "|Hplayer:%1$s|h[%1$s]|h vous a envoyé un délai DBM: '%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[Annuler ce délais]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[Ignorer les délais de %1$s]|r|h"
-L.PIZZA_SYNC_INFO				= "|Hplayer:%1$s|h[%1$s]|h vous a envoyé un délai DBM"
+L.PIZZA_SYNC_INFO				= "|Hplayer:%1$s|h[%1$s]|h vous a envoyé un délai DBM: '%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[Annuler ce délais]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[Ignorer les délais de %1$s]|r|h"
+--L.PIZZA_SYNC_INFO				= "|Hplayer:%1$s|h[%1$s]|h vous a envoyé un délai DBM"
 L.PIZZA_CONFIRM_IGNORE			= "Voulez-vous réellement ignorer les délais DBM de %s durant cette session ?"
 L.PIZZA_ERROR_USAGE				= "Utilisation: /dbm [broadcast] timer <durée> <texte>"
 
@@ -593,8 +592,8 @@ L.INSTANCE_INFO_STATS_DENIED	= "A refusé la requête : %s"
 L.INSTANCE_INFO_STATS_AWAY		= "Absent: %s"
 L.INSTANCE_INFO_STATS_NO_RESPONSE	= "Sans une version récente de DBM: %s"
 L.INSTANCE_INFO_RESULTS			= "Résultats de l'analyse des IDs d'instance. Notez que les instances peuvent apparaître plusieurs fois si les joueurs de votre raid ont WoW dans différentes langues."
---L.INSTANCE_INFO_SHOW_RESULTS	= "Joueurs qui doivent encore répondre: %s\n|HDBM:showRaidIdResults|h|cff3588ff[Afficher les résultats maintenant]|r|h"
-L.INSTANCE_INFO_SHOW_RESULTS	= "Joueurs qui doivent encore répondre: %s"
+L.INSTANCE_INFO_SHOW_RESULTS	= "Joueurs qui doivent encore répondre: %s\n|HDBM:showRaidIdResults|h|cff3588ff[Afficher les résultats maintenant]|r|h"
+--L.INSTANCE_INFO_SHOW_RESULTS	= "Joueurs qui doivent encore répondre: %s"
 
 L.LAG_CHECKING              = "Vérification de la latence du raid..."
 L.LAG_HEADER                = L.DEADLY_BOSS_MODS .. " - Résultats sur la latence"
@@ -613,17 +612,6 @@ L.SILENTMODE_IS                     = "Mode silencieux est "
 
 L.LDB_LOAD_MODS						= "Charger les mods de boss"
 
-L.LDB_CAT_BFA						= "Battle for Azeroth"
-L.LDB_CAT_LEG						= "Legion"
-L.LDB_CAT_WOD						= "Warlords of Draenor"
-L.LDB_CAT_MOP						= "Mists of Pandaria"
-L.LDB_CAT_CATA						= "Cataclysm"
-L.LDB_CAT_WOTLK						= "Wrath of the Lich King"
-L.LDB_CAT_BC						= "Burning Crusade"
-L.LDB_CAT_CLASSIC 					= EXPANSION_NAME0
-L.LDB_CAT_OTHER						= "Autres mods de boss"
-
-L.LDB_CAT_GENERAL					= "Général"
 L.LDB_ENABLE_BOSS_MOD				= "Activer le mod de boss"
 
 L.WORLD_BUFFS.hordeOny		= "Peuple de la Horde, citoyens d’Orgrimmar, venez, rassemblez-vous et célébrez un héros de la Horde"

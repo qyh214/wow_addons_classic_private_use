@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(478, "DBM-Party-Classic", 19, 240)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(3674)
 mod:SetEncounterID(589)
 
@@ -29,12 +29,8 @@ function mod:OnCombatEnd()
 	end
 end
 
-do
-	local ChainedBolt = DBM:GetSpellInfo(6254)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 6254 then
-		if args.spellName == ChainedBolt and args:IsSrcTypeHostile() then
-			timerChainedBoltCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 6254 and args:IsSrcTypeHostile() then
+		timerChainedBoltCD:Start()
 	end
 end

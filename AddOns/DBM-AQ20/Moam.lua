@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Moam", "DBM-AQ20", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210402014659")
 mod:SetCreatureID(15340)
 mod:SetEncounterID(720)
 mod:SetModelID(15392)
@@ -25,21 +25,16 @@ function mod:OnCombatStart(delay)
 	timerEnergize:Start(-delay)
 end
 
-do
-	local Energize = DBM:GetSpellInfo(25685)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 25685 then
-		if args.spellName == Energize and args:IsDestTypeHostile() then
-			warnEnergize:Show()
-			timerEnergizeDur:Start()
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 25685 and args:IsDestTypeHostile() then
+		warnEnergize:Show()
+		timerEnergizeDur:Start()
 	end
+end
 
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 25685 then
-		if args.spellName == Energize and args:IsDestTypeHostile() then
-			timerEnergizeDur:Stop()
-			timerEnergize:Start()
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 25685 and args:IsDestTypeHostile() then
+		timerEnergizeDur:Stop()
+		timerEnergize:Start()
 	end
 end

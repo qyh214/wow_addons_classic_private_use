@@ -1,8 +1,7 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
---Lua functions
-local min, max, floor, format = min, max, floor, format
---WoW API / Variables
+local min, max, format = min, max, format
+
 local UIParent = UIParent
 local InCombatLockdown = InCombatLockdown
 local GetPhysicalScreenSize = GetPhysicalScreenSize
@@ -19,41 +18,43 @@ function E:IsEyefinity(width, height)
 		if width >= 4800 and width < 5760 and height == 900 then return 1600 end --UXGA & HD+
 
 		--Low resolution screen
-		if width >= 4320 and width < 4800 then return 1440 end	--WSXGA
-		if width >= 4080 and width < 4320 then return 1360 end	--WXGA
-		if width >= 3840 and width < 4080 then return 1224 end	--SXGA & SXGA (UVGA) & WXGA & HDTV
+		if width >= 4320 and width < 4800 then return 1440 end --WSXGA
+		if width >= 4080 and width < 4320 then return 1360 end --WXGA
+		if width >= 3840 and width < 4080 then return 1224 end --SXGA & SXGA (UVGA) & WXGA & HDTV
 	end
 end
 
-function E:UIScale(init)
-	local scale = E.global.general.UIScale
-	-- `init` will be the `event` if its triggered after combat
+function E:IsUltrawide(width, height)
+	if E.global.general.ultrawide and width >= 2560 then
+		--HQ Resolution
+		if width >= 3440 and (height == 1440 or height == 1600) then return 2560 end --WQHD, DQHD, DQHD+ & WQHD+
+
+		--Low resolution
+		if width >= 2560 and height == 1080 then return 1920 end --WFHD & DFHD
+	end
+end
+
+function E:UIScale(init) -- `init` will be the `event` if its triggered after combat
 	if init == true then -- E.OnInitialize
-		--Set variables for pixel scaling
-		local pixel, ratio = 1, 768 / E.screenheight
-		E.mult = (pixel / scale) - ((pixel - ratio) / scale)
-		E.Spacing = (E.PixelMode and 0) or E.mult
-		E.Border = ((not E.twoPixelsPlease) and E.PixelMode and E.mult) or E.mult*2
+		E.mult = (768 / E.screenheight) / E.global.general.UIScale
 	elseif InCombatLockdown() then
 		E:RegisterEventForObject('PLAYER_REGEN_ENABLED', E.UIScale, E.UIScale)
 	else -- E.Initialize
-		UIParent:SetScale(scale)
+		UIParent:SetScale(E.global.general.UIScale)
 
-		--Check if we are using `E.eyefinity`
 		local width, height = E.screenwidth, E.screenheight
 		E.eyefinity = E:IsEyefinity(width, height)
+		E.ultrawide = E:IsUltrawide(width, height)
 
-		--Resize E.UIParent if Eyefinity is on.
-		local testingEyefinity = false
-		if testingEyefinity then
-			--Eyefinity Test: Resize the E.UIParent to be smaller than it should be, all objects inside should relocate.
-			--Dragging moveable frames outside the box and reloading the UI ensures that they are saving position correctly.
+		local testing, newWidth = false, E.eyefinity or E.ultrawide
+		if testing then -- Resize E.UIParent if Eyefinity or UltraWide is on.
+			-- Eyefinity / UltraWide Test: Resize the E.UIParent to be smaller than it should be, all objects inside should relocate.
+			-- Dragging moveable frames outside the box and reloading the UI ensures that they are saving position correctly.
 			local uiWidth, uiHeight = UIParent:GetSize()
 			width, height = uiWidth-250, uiHeight-250
-		elseif E.eyefinity then
-			--Find a new width value of E.UIParent for screen #1.
+		elseif newWidth then -- Center E.UIParent
 			local uiHeight = UIParent:GetHeight()
-			width, height = E.eyefinity / (height / uiHeight), uiHeight
+			width, height = newWidth / (height / uiHeight), uiHeight
 		else
 			width, height = UIParent:GetSize()
 		end
@@ -77,13 +78,15 @@ function E:PixelScaleChanged(event)
 		E.resolution = format('%dx%d', E.screenwidth, E.screenheight)
 	end
 
-	E:UIScale(true) --Repopulate variables
-	E:UIScale() --Setup the scale
+	E:UIScale(true) -- Repopulate variables
+	E:UIScale() -- Setup the scale
 
-	E:Config_UpdateSize(true) --Reposition config
+	E:Config_UpdateSize(true) -- Reposition config
 end
 
-function E:Scale(x)
-	local mult = E.mult
-	return mult * floor(x / mult + 0.5)
+local trunc = function(s) return s >= 0 and s-s%01 or s-s%-1 end
+local round = function(s) return s >= 0 and s-s%-1 or s-s%01 end
+function E:Scale(n)
+	local m = E.mult
+	return (m == 1 or n == 0) and n or ((m < 1 and trunc(n/m) or round(n/m)) * m)
 end

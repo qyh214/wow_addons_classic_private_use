@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(420, "DBM-Party-Classic", 7, 231)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(7079)
 mod:SetEncounterID(378)
 
@@ -19,13 +19,9 @@ function mod:OnCombatStart(delay)
 	timerToxicVolleyCD:Start(1-delay)
 end
 
-do
-	local ToxicVolley = DBM:GetSpellInfo(21687)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 21687 then
-		if args.spellName == ToxicVolley then
-			warningToxicVolley:Show()
-			timerToxicVolleyCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 21687 then
+		warningToxicVolley:Show()
+		timerToxicVolleyCD:Start()
 	end
 end

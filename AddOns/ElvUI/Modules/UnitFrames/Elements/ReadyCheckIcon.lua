@@ -1,13 +1,10 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
-
---Lua functions
---WoW API / Variables
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
 function UF:Construct_ReadyCheckIcon(frame)
-	local tex = frame.RaisedElementParent.TextureParent:CreateTexture(nil, "OVERLAY", nil, 7)
+	local tex = frame.RaisedElementParent.TextureParent:CreateTexture(nil, 'OVERLAY', nil, 7)
 	tex:Size(12)
-	tex:Point("BOTTOM", frame.Health, "BOTTOM", 0, 2)
+	tex:Point('BOTTOM', frame.Health, 'BOTTOM', 0, 2)
 
 	return tex
 end
@@ -16,7 +13,7 @@ function UF:Configure_ReadyCheckIcon(frame)
 	local ReadyCheckIndicator = frame.ReadyCheckIndicator
 	local db = frame.db
 
-	if (db.readycheckIcon.enable) then
+	if db.readycheckIcon.enable then
 		if not frame:IsElementEnabled('ReadyCheckIndicator') then
 			frame:EnableElement('ReadyCheckIndicator')
 		end

@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, Private = ...
 
 local SharedMedia = LibStub("LibSharedMedia-3.0");
 
@@ -30,10 +31,16 @@ local function create(parent)
   region:SetHeight(2);
 
   -- Border region
-  local border = CreateFrame("frame", nil, region);
+  local border = CreateFrame("frame", nil, region, BackdropTemplateMixin and "BackdropTemplate")
   region.border = border;
 
   WeakAuras.regionPrototype.create(region);
+
+  local oldSetFrameLevel = region.SetFrameLevel
+  region.SetFrameLevel = function(self, level)
+    oldSetFrameLevel(self, level)
+    self.border:SetFrameLevel(level)
+  end
 
   return region;
 end
@@ -77,17 +84,20 @@ end
 
 -- Modify a given region/display
 local function modify(parent, region, data)
-  data.selfPoint = "BOTTOMLEFT";
+  if data.information.groupOffset then
+    data.selfPoint = "BOTTOMLEFT";
+  else
+    data.selfPoint = "CENTER";
+  end
   WeakAuras.regionPrototype.modify(parent, region, data);
   -- Localize
   local border = region.border;
 
   -- Scale
-  region:SetScale(data.scale and data.scale > 0 and data.scale or 1)
+  region:SetScale(data.scale and data.scale > 0 and data.scale <= 10 and data.scale or 1)
 
   -- Get overall bounding box
   local leftest, rightest, lowest, highest = 0, 0, 0, 0;
-  local minLevel
   for index, childId in ipairs(data.controlledChildren) do
     local childData = WeakAuras.GetData(childId);
     local childRegion = WeakAuras.GetRegion(childId)
@@ -97,10 +107,6 @@ local function modify(parent, region, data)
       rightest = math.max(rightest, trx);
       lowest = math.min(lowest, bly);
       highest = math.max(highest, try);
-      local frameLevel = childRegion and childRegion:GetFrameLevel()
-      if frameLevel then
-        minLevel = minLevel and math.min(minLevel, frameLevel) or frameLevel
-      end
     end
   end
   region.blx = leftest;
@@ -109,7 +115,7 @@ local function modify(parent, region, data)
   region.try = highest;
 
   -- Adjust frame-level sorting
-  WeakAuras.FixGroupChildrenOrderForGroup(data);
+  Private.FixGroupChildrenOrderForGroup(data);
 
   -- Control children (does not happen with "group")
   function region:UpdateBorder(childRegion)
@@ -149,9 +155,6 @@ local function modify(parent, region, data)
         border:ClearAllPoints();
         border:SetPoint("bottomleft", region, "bottomleft", leftest-data.borderOffset, lowest-data.borderOffset);
         border:SetPoint("topright",   region, "topright",   rightest+data.borderOffset, highest+data.borderOffset);
-        if minLevel then
-          border:SetFrameLevel(minLevel - 1)
-        end
         border:Show();
       else
         border:Hide();

@@ -1,13 +1,13 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+local LSM = E.Libs.LSM
 
 local _G = _G
---Lua functions
 local pairs = pairs
 local select = select
 local assert = assert
 local tinsert = tinsert
---WoW API / Variables
+local strsub = strsub
 local CreateFrame = CreateFrame
 local UnitClass = UnitClass
 local UnitExists = UnitExists
@@ -42,6 +42,10 @@ function UF:FrameGlow_ElementHook(frame, glow, which)
 		if which == 'targetGlow' then
 			UF:FrameGlow_CheckTarget(frame)
 		end
+
+		if which == 'focusGlow' then
+			UF:FrameGlow_CheckFocus(frame)
+		end
 	end)
 end
 
@@ -63,7 +67,7 @@ function UF:FrameGlow_ClassGlowPosition(frame, powerName, glow, offset, fromScri
 	-- check for Additional Power to hook scripts on
 	local useBonusPower, bonus
 	if powerName == 'ClassPower' then
-		local bonusName = (frame.AdditionalPower and 'AdditionalPower') or (frame.Stagger and 'Stagger') or (frame.Runes and 'Runes')
+		local bonusName = (frame.AdditionalPower and 'AdditionalPower')
 		bonus = bonusName and frame[bonusName]
 
 		if bonus then
@@ -84,12 +88,12 @@ function UF:FrameGlow_ClassGlowPosition(frame, powerName, glow, offset, fromScri
 	end
 
 	local portrait = (frame.USE_PORTRAIT and not frame.USE_PORTRAIT_OVERLAY) and (frame.Portrait and frame.Portrait.backdrop)
-	if (power and power.backdrop and power:IsVisible()) and ((power == frame.AlternativePower) or not (frame.CLASSBAR_DETACHED or frame.USE_MINI_CLASSBAR)) then
-		glow:Point('TOPLEFT', (frame.ORIENTATION == "LEFT" and portrait) or power.backdrop, -offset, offset)
-		glow:Point('TOPRIGHT', (frame.ORIENTATION == "RIGHT" and portrait) or power.backdrop, offset, offset)
+	if (power and power.backdrop and power:IsVisible()) and ((power == frame.AlternativePower and not frame.USE_MINI_CLASSBAR) or not (frame.CLASSBAR_DETACHED or frame.USE_MINI_CLASSBAR)) then
+		glow:SetPoint('TOPLEFT', (frame.ORIENTATION == 'LEFT' and portrait) or power.backdrop, -offset, offset)
+		glow:SetPoint('TOPRIGHT', (frame.ORIENTATION == 'RIGHT' and portrait) or power.backdrop, offset, offset)
 	elseif frame.Health and frame.Health.backdrop then
-		glow:Point('TOPLEFT', (frame.ORIENTATION == "LEFT" and portrait) or frame.Health.backdrop, -offset, offset)
-		glow:Point('TOPRIGHT', (frame.ORIENTATION == "RIGHT" and portrait) or frame.Health.backdrop, offset, offset)
+		glow:SetPoint('TOPLEFT', (frame.ORIENTATION == 'LEFT' and portrait) or frame.Health.backdrop, -offset, offset)
+		glow:SetPoint('TOPRIGHT', (frame.ORIENTATION == 'RIGHT' and portrait) or frame.Health.backdrop, offset, offset)
 	end
 end
 
@@ -99,62 +103,53 @@ function UF:FrameGlow_PositionGlow(frame, mainGlow, powerGlow)
 	local infoPanel = frame.InfoPanel
 	local classPower = frame.ClassPower
 	local altPower = frame.AlternativePower
-	local pvpSpec = frame.PVPSpecIcon
 	local power = frame.Power and frame.Power.backdrop
 	local health = frame.Health and frame.Health.backdrop
 	local portrait = (frame.USE_PORTRAIT and not frame.USE_PORTRAIT_OVERLAY) and (frame.Portrait and frame.Portrait.backdrop)
-	local offset = (E.PixelMode and 3) or 4 -- edgeSize is 3
+	local offset = (UF.thinBorders and 4) or 5 -- edgeSize is 3
 
 	mainGlow:ClearAllPoints()
-	mainGlow:Point('TOPLEFT', (frame.ORIENTATION == "LEFT" and portrait) or health, -offset, offset)
-	mainGlow:Point('TOPRIGHT', (frame.ORIENTATION == "RIGHT" and portrait) or health, offset, offset)
+	mainGlow:SetPoint('TOPLEFT', (frame.ORIENTATION == 'LEFT' and portrait) or health, -offset, offset)
+	mainGlow:SetPoint('TOPRIGHT', (frame.ORIENTATION == 'RIGHT' and portrait) or health, offset, offset)
 
 	if frame.USE_POWERBAR_OFFSET or frame.USE_MINI_POWERBAR then
-		mainGlow:Point('BOTTOMLEFT', health, -offset, -offset)
-		mainGlow:Point('BOTTOMRIGHT', health, offset, -offset)
+		mainGlow:SetPoint('BOTTOMLEFT', health, -offset, -offset)
+		mainGlow:SetPoint('BOTTOMRIGHT', health, offset, -offset)
 	else
 		--offset is set because its one pixel off for some reason
-		mainGlow:Point('BOTTOMLEFT', frame, -offset, -(E.PixelMode and offset or offset-1))
-		mainGlow:Point('BOTTOMRIGHT', frame, offset, -(E.PixelMode and offset or offset-1))
+		mainGlow:SetPoint('BOTTOMLEFT', frame, -offset, -(UF.thinBorders and offset or offset-1))
+		mainGlow:SetPoint('BOTTOMRIGHT', frame, offset, -(UF.thinBorders and offset or offset-1))
 	end
 
 	if powerGlow then
 		powerGlow:ClearAllPoints()
-		powerGlow:Point('TOPLEFT', power, -offset, offset)
-		powerGlow:Point('TOPRIGHT', power, offset, offset)
-		powerGlow:Point('BOTTOMLEFT', power, -offset, -offset)
-		powerGlow:Point('BOTTOMRIGHT', power, offset, -offset)
+		powerGlow:SetPoint('TOPLEFT', power, -offset, offset)
+		powerGlow:SetPoint('TOPRIGHT', power, offset, offset)
+		powerGlow:SetPoint('BOTTOMLEFT', power, -offset, -offset)
+		powerGlow:SetPoint('BOTTOMRIGHT', power, offset, -offset)
 	end
 
 	if classPower then
 		UF:FrameGlow_ClassGlowPosition(frame, 'ClassPower', mainGlow, offset)
-	elseif altPower and (frame.isForced or (frame.unit and frame.unit:find('boss%d'))) then
+	elseif altPower then
 		UF:FrameGlow_ClassGlowPosition(frame, 'AlternativePower', mainGlow, offset)
-	elseif pvpSpec and pvpSpec:IsShown() then
-		local shownPanel = (infoPanel and infoPanel:IsShown() and infoPanel.backdrop)
-		mainGlow:Point('TOPLEFT', pvpSpec.bg, -offset, offset)
-		mainGlow:Point('BOTTOMLEFT', shownPanel or pvpSpec.bg, -offset, -offset)
 	end
 end
 
-function UF:FrameGlow_CreateGlow(frame, mouse)
+function UF:FrameGlow_CreateGlow(frame, which)
 	-- Main Glow to wrap the health frame to it's best ability
-	local mainGlow = frame:CreateShadow(nil, true)
+	local mainGlow = frame:CreateShadow(4, true)
 	mainGlow:SetFrameStrata('BACKGROUND')
 	mainGlow:Hide()
 
 	-- Secondary Glow for power frame when using power offset or mini power
-	local powerGlow = frame:CreateShadow(nil, true)
+	local powerGlow = frame:CreateShadow(4, true)
 	powerGlow:SetFrameStrata('BACKGROUND')
 	powerGlow:Hide()
 
-	if mouse then
-		mainGlow:SetFrameLevel(4)
-		powerGlow:SetFrameLevel(4)
-	else
-		mainGlow:SetFrameLevel(3)
-		powerGlow:SetFrameLevel(3)
-	end
+	local level = (which == 'mouse' and 5) or (which == 'target' and 4) or 3
+	mainGlow:SetFrameLevel(level)
+	powerGlow:SetFrameLevel(level)
 
 	-- Eventing Frame
 	if not frame.FrameGlow then
@@ -163,6 +158,8 @@ function UF:FrameGlow_CreateGlow(frame, mouse)
 		frame.FrameGlow:SetScript('OnEvent', function(_, event)
 			if event == 'UPDATE_MOUSEOVER_UNIT' then
 				UF:FrameGlow_CheckMouseover(frame)
+			elseif event == 'PLAYER_FOCUS_CHANGED' then
+				UF:FrameGlow_CheckFocus(frame)
 			elseif event == 'PLAYER_TARGET_CHANGED' then
 				UF:FrameGlow_CheckTarget(frame)
 			end
@@ -260,27 +257,39 @@ function UF:FrameGlow_ConfigureGlow(frame, unit, dbTexture)
 	if frame.TargetGlow then
 		UF:FrameGlow_CheckTarget(frame, true)
 	end
+
+	if frame.FocusGlow then
+		UF:FrameGlow_CheckFocus(frame, true)
+	end
 end
 
-function UF:FrameGlow_CheckTarget(frame, setColor)
-	if not (frame and frame.TargetGlow and frame:IsVisible()) then return end
+function UF:FrameGlow_CheckUnit(frame, element, setting, color, glowEnabled, frameDisabled)
+	if not (element and frame:IsVisible()) then return end
 
 	local unit = frame.unit or (frame.isForced and 'player')
-	if E.db.unitframe.colors.frameGlow.targetGlow.enable and (unit and UnitIsUnit(unit, 'target')) and not (frame.db and frame.db.disableTargetGlow) then
-		if setColor then
-			UF:FrameGlow_SetGlowColor(frame.TargetGlow, unit, 'targetGlow')
+	if (glowEnabled and not frameDisabled) and unit and UnitIsUnit(unit, strsub(setting, 0, -5)) then
+		if color then
+			UF:FrameGlow_SetGlowColor(element, unit, setting)
 		end
-		if frame.TargetGlow.powerGlow then
+		if element.powerGlow then
 			if frame.USE_POWERBAR_OFFSET or frame.USE_MINI_POWERBAR then
-				frame.TargetGlow.powerGlow:Show()
-			elseif frame.TargetGlow.powerGlow:IsShown() then
-				frame.TargetGlow.powerGlow:Hide()
+				element.powerGlow:Show()
+			elseif element.powerGlow:IsShown() then
+				element.powerGlow:Hide()
 			end
 		end
-		frame.TargetGlow:Show()
+		element:Show()
 	else
-		UF:FrameGlow_HideGlow(frame.TargetGlow)
+		UF:FrameGlow_HideGlow(element)
 	end
+end
+
+function UF:FrameGlow_CheckTarget(frame, color)
+	UF:FrameGlow_CheckUnit(frame, frame.TargetGlow, 'targetGlow', color, E.db.unitframe.colors.frameGlow.targetGlow.enable, frame.db and frame.db.disableTargetGlow)
+end
+
+function UF:FrameGlow_CheckFocus(frame, color)
+	UF:FrameGlow_CheckUnit(frame, frame.FocusGlow, 'focusGlow', color, E.db.unitframe.colors.frameGlow.focusGlow.enable, frame.db and frame.db.disableFocusGlow)
 end
 
 function UF:FrameGlow_CheckMouseover(frame)
@@ -300,7 +309,7 @@ function UF:FrameGlow_CheckMouseover(frame)
 		if frame.FrameGlow and not frame.FrameGlow:IsShown() then
 			frame.FrameGlow:Show()
 		end
-		if (shouldShow == 'both' or shouldShow == 'frame') then
+		if shouldShow == 'both' or shouldShow == 'frame' then
 			if frame.MouseGlow.powerGlow then
 				if frame.USE_POWERBAR_OFFSET or frame.USE_MINI_POWERBAR then
 					frame.MouseGlow.powerGlow:Show()
@@ -310,7 +319,7 @@ function UF:FrameGlow_CheckMouseover(frame)
 			end
 			frame.MouseGlow:Show()
 
-			if (shouldShow == 'frame') and frame.FrameGlow.texture and frame.FrameGlow.texture:IsShown() then
+			if shouldShow == 'frame' and frame.FrameGlow.texture and frame.FrameGlow.texture:IsShown() then
 				frame.FrameGlow.texture:Hide()
 			end
 		end
@@ -325,14 +334,14 @@ end
 function UF:FrameGlow_PositionTexture(frame)
 	if frame.FrameGlow and frame.FrameGlow.texture then
 		frame.FrameGlow.texture:ClearAllPoints()
-		frame.FrameGlow.texture:Point('TOPLEFT', frame.Health, 'TOPLEFT')
-		frame.FrameGlow.texture:Point('BOTTOMRIGHT', frame.Health:GetStatusBarTexture(), 'BOTTOMRIGHT')
+		frame.FrameGlow.texture:SetPoint('TOPLEFT', frame.Health, 'TOPLEFT')
+		frame.FrameGlow.texture:SetPoint('BOTTOMRIGHT', frame.Health:GetStatusBarTexture(), 'BOTTOMRIGHT')
 	end
 end
 
 function UF:Configure_FrameGlow(frame)
 	if frame.FrameGlow and frame.FrameGlow.texture then
-		local dbTexture = UF.LSM:Fetch('statusbar', E.db.unitframe.colors.frameGlow.mouseoverGlow.texture)
+		local dbTexture = LSM:Fetch('statusbar', E.db.unitframe.colors.frameGlow.mouseoverGlow.texture)
 		frame.FrameGlow.texture:SetTexture(dbTexture)
 	end
 end
@@ -366,7 +375,7 @@ function UF:Construct_FrameGlow(frame, glow)
 end
 
 function UF:Construct_MouseGlow(frame)
-	local mainGlow = UF:FrameGlow_CreateGlow(frame, true)
+	local mainGlow = UF:FrameGlow_CreateGlow(frame, 'mouse')
 	UF:FrameGlow_ElementHook(frame, mainGlow, 'mainGlow')
 	UF:Construct_FrameGlow(frame, mainGlow)
 	frame.FrameGlow:RegisterEvent('UPDATE_MOUSEOVER_UNIT')
@@ -375,11 +384,19 @@ function UF:Construct_MouseGlow(frame)
 end
 
 function UF:Construct_TargetGlow(frame)
-	local targetGlow = UF:FrameGlow_CreateGlow(frame)
+	local targetGlow = UF:FrameGlow_CreateGlow(frame, 'target')
 	UF:FrameGlow_ElementHook(frame, targetGlow, 'targetGlow')
 	frame.FrameGlow:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 	return targetGlow
+end
+
+function UF:Construct_FocusGlow(frame)
+	local focusGlow = UF:FrameGlow_CreateGlow(frame, 'focus')
+	UF:FrameGlow_ElementHook(frame, focusGlow, 'focusGlow')
+	frame.FrameGlow:RegisterEvent('PLAYER_FOCUS_CHANGED')
+
+	return focusGlow
 end
 
 function UF:FrameGlow_CheckChildren(frame, dbTexture)
@@ -397,10 +414,15 @@ function UF:FrameGlow_CheckChildren(frame, dbTexture)
 end
 
 function UF:FrameGlow_UpdateFrames()
-	local dbTexture = UF.LSM:Fetch('statusbar', E.db.unitframe.colors.frameGlow.mouseoverGlow.texture)
+	local dbTexture = LSM:Fetch('statusbar', E.db.unitframe.colors.frameGlow.mouseoverGlow.texture)
 
 	-- focus, focustarget, pet, pettarget, player, target, targettarget, targettargettarget
 	for unit in pairs(self.units) do
+		UF:FrameGlow_ConfigureGlow(self[unit], unit, dbTexture)
+	end
+
+	-- arena{1-5}, boss{1-5}
+	for unit in pairs(self.groupunits) do
 		UF:FrameGlow_ConfigureGlow(self[unit], unit, dbTexture)
 	end
 

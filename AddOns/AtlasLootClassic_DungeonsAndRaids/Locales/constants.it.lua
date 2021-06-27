@@ -286,3 +286,6 @@ AL["Wolf Master Nandos"] = "Signore dei Lupi Nandos"
 AL["Wushoolay"] = "Wushoolay"
 AL["Zerillis"] = "Zerillis"
 AL["Zevrim Thornhoof"] = "Zevrim Zamparossa"
+
+if _G.AtlasLoot:GetGameVersion() < 2 then return end
+-- DungeonsAndRaidsTBC

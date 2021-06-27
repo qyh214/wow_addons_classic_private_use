@@ -1,12 +1,10 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local unpack, select = unpack, select
 local strfind = strfind
---WoW API / Variables
+
 local GetItemInfo = GetItemInfo
 local GetCraftNumReagents = GetCraftNumReagents
 local GetItemQualityColor = GetItemQualityColor
@@ -15,7 +13,8 @@ local GetCraftReagentInfo = GetCraftReagentInfo
 local GetCraftReagentItemLink = GetCraftReagentItemLink
 local hooksecurefunc = hooksecurefunc
 
-function S:SkinCraft()
+-- This is the Hunter Beast Training skin
+function S:SkinCraftFrame()
 	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.craft) then return end
 
 	local CraftFrame = _G.CraftFrame
@@ -178,4 +177,4 @@ function S:SkinCraft()
 	end)
 end
 
-S:AddCallbackForAddon('Blizzard_CraftUI', 'SkinCraft')
+S:AddCallbackForAddon('Blizzard_CraftUI', 'SkinCraftFrame')

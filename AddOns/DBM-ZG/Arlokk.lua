@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Arlokk", "DBM-ZG", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision$"):sub(12, -3))
+mod:SetRevision("20210403082144")
 mod:SetCreatureID(14515)
 mod:SetEncounterID(791)
 mod:RegisterCombat("combat")
@@ -18,31 +18,22 @@ local specWarnMark	= mod:NewSpecialWarningYou(24210, nil, nil, nil, 1, 2)
 
 local timerPain		= mod:NewTargetTimer(18, 24212, nil, "RemoveMagic|Healer", nil, 3, nil, DBM_CORE_L.MAGIC_ICON)
 
-function mod:OnCombatStart(delay)
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 24210 then
+		if args:IsPlayer() then
+			specWarnMark:Show()
+			specWarnMark:Play("targetyou")
+		else
+			warnMark:Show(args.destName)
+		end
+	elseif args.spellId == 24212 and args:IsDestTypePlayer() then
+		warnPain:Show(args.destName)
+		timerPain:Start(args.destName)
+	end
 end
 
-do
-	local MarkofArlokk, ShadowwordPain = DBM:GetSpellInfo(24210), DBM:GetSpellInfo(24212)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args:IsSpellID(24210) then
-		if args.spellName == MarkofArlokk then
-			if args:IsPlayer() then
-				specWarnMark:Show()
-				specWarnMark:Play("targetyou")
-			else
-				warnMark:Show(args.destName)
-			end
-		--elseif args:IsSpellID(24212) then
-		elseif args.spellName == ShadowwordPain and args:IsDestTypePlayer() then
-			warnPain:Show(args.destName)
-			timerPain:Start(args.destName)
-		end
-	end
-
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args:IsSpellID(24212) then
-		if args.spellName == ShadowwordPain and args:IsDestTypePlayer() then
-			timerPain:Stop(args.destName)
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 24212 and args:IsDestTypePlayer() then
+		timerPain:Stop(args.destName)
 	end
 end

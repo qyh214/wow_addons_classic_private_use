@@ -1,10 +1,9 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local max = math.max
 local format, strjoin = format, strjoin
---WoW API / Variables
+
 local UnitAttackPower = UnitAttackPower
 local UnitRangedAttackPower = UnitRangedAttackPower
 local ATTACK_POWER = ATTACK_POWER
@@ -14,7 +13,6 @@ local MELEE_ATTACK_POWER_TOOLTIP = MELEE_ATTACK_POWER_TOOLTIP
 local RANGED_ATTACK_POWER = RANGED_ATTACK_POWER
 local RANGED_ATTACK_POWER_TOOLTIP = RANGED_ATTACK_POWER_TOOLTIP
 local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
-local ATTACK_POWER_TOOLTIP = ATTACK_POWER_TOOLTIP
 
 local base, posBuff, negBuff, effective, Rbase, RposBuff, RnegBuff, Reffective, pwr
 local displayNumberString = ''
@@ -37,6 +35,7 @@ local function OnEvent(self)
 end
 
 local function OnEnter()
+	DT.tooltip:ClearLines()
 	if E.myclass == 'HUNTER' then
 		DT.tooltip:AddDoubleLine(RANGED_ATTACK_POWER, pwr, 1, 1, 1)
 
@@ -60,4 +59,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Attack Power', STAT_CATEGORY_ENHANCEMENTS, {'UNIT_STATS', 'UNIT_AURA', 'UNIT_ATTACK_POWER', 'UNIT_RANGED_ATTACK_POWER'}, OnEvent, nil, nil, OnEnter, nil, STAT_ATTACK_POWER)
+DT:RegisterDatatext('Attack Power', STAT_CATEGORY_ENHANCEMENTS, {'UNIT_STATS', 'UNIT_AURA', 'UNIT_ATTACK_POWER', 'UNIT_RANGED_ATTACK_POWER'}, OnEvent, nil, nil, OnEnter, nil, ATTACK_POWER_TOOLTIP)

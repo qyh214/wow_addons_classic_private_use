@@ -1,10 +1,12 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
+<Ui xmlns='http://www.blizzard.com/wow/ui/'>
+	<Script file='AlertFrame.lua'/>
 	<Script file='Blizzard.lua'/>
+	<Script file='CaptureBar.lua'/>
 	<Script file='ColorPicker.lua'/>
+	<Script file='Durability.lua'/>
+	<Script file='GM.lua'/>
 	<Script file='Kill.lua'/>
 	<Script file='QuestWatch.lua'/>
-	<Script file='GM.lua'/>
-	<Script file='Durability.lua'/>
-	<Script file='CaptureBar.lua'/>
-	<Script file='AlertFrame.lua'/>
+	<Script file='TimerTracker.lua'/>
+	<Script file='WidgetsUI.lua'/>
 </Ui>

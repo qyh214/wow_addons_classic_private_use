@@ -64,7 +64,7 @@ function _detalhes:ApplyBasicKeys()
 	--> load default profile keys
 		for key, value in pairs (_detalhes.default_profile) do 
 			if (type (value) == "table") then
-				local ctable = table_deepcopy (value)
+				local ctable = Details.CopyTable (value)
 				self [key] = ctable
 			else
 				self [key] = value
@@ -86,7 +86,7 @@ function _detalhes:LoadGlobalAndCharacterData()
 	
 		--> it exists?
 		if (not _detalhes_database) then
-			_detalhes_database = table_deepcopy (_detalhes.default_player_data)
+			_detalhes_database = Details.CopyTable (_detalhes.default_player_data)
 		end
 
 		--> load saved values
@@ -95,16 +95,19 @@ function _detalhes:LoadGlobalAndCharacterData()
 			--> check if key exists, e.g. a new key was added
 			if (_detalhes_database [key] == nil) then
 				if (type (value) == "table") then
-					_detalhes_database [key] = table_deepcopy (_detalhes.default_player_data [key])
+					_detalhes_database [key] = Details.CopyTable (_detalhes.default_player_data [key])
 				else
 					_detalhes_database [key] = value
 				end
 				
 			elseif (type (_detalhes_database [key]) == "table") then
-				for key2, value2 in pairs (_detalhes.default_player_data [key]) do 
+				if (type(_detalhes.default_player_data [key]) == "string") then
+					print("|cFFFFAA00Details!|r error 0x8538, report on discord", key, _detalhes_database [key], _detalhes.default_player_data [key])
+				end
+				for key2, value2 in pairs (_detalhes.default_player_data [key]) do
 					if (_detalhes_database [key] [key2] == nil) then
 						if (type (value2) == "table") then
-							_detalhes_database [key] [key2] = table_deepcopy (_detalhes.default_player_data [key] [key2])
+							_detalhes_database [key] [key2] = Details.CopyTable (_detalhes.default_player_data [key] [key2])
 						else
 							_detalhes_database [key] [key2] = value2
 						end
@@ -114,7 +117,7 @@ function _detalhes:LoadGlobalAndCharacterData()
 			
 			--> copy the key from saved table to details object
 			if (type (value) == "table") then
-				_detalhes [key] = table_deepcopy (_detalhes_database [key])
+				_detalhes [key] = Details.CopyTable (_detalhes_database [key])
 			else
 				_detalhes [key] = _detalhes_database [key]
 			end
@@ -123,7 +126,7 @@ function _detalhes:LoadGlobalAndCharacterData()
 	
 	--> check and build the default container for account database
 		if (not _detalhes_global) then
-			_detalhes_global = table_deepcopy (_detalhes.default_global_data)
+			_detalhes_global = Details.CopyTable (_detalhes.default_global_data)
 		end
 		
 		for key, value in pairs (_detalhes.default_global_data) do 
@@ -131,18 +134,31 @@ function _detalhes:LoadGlobalAndCharacterData()
 			--> check if key exists
 			if (_detalhes_global [key] == nil) then
 				if (type (value) == "table") then
-					_detalhes_global [key] = table_deepcopy (_detalhes.default_global_data [key])
+					_detalhes_global [key] = Details.CopyTable (_detalhes.default_global_data [key])
 				else
 					_detalhes_global [key] = value
 				end
 				
 			elseif (type (_detalhes_global [key]) == "table") then
-				for key2, value2 in pairs (_detalhes.default_global_data [key]) do 
-					if (_detalhes_global [key] [key2] == nil) then
-						if (type (value2) == "table") then
-							_detalhes_global [key] [key2] = table_deepcopy (_detalhes.default_global_data [key] [key2])
-						else
-							_detalhes_global [key] [key2] = value2
+
+				if (type(_detalhes.default_global_data [key]) == "string") then
+					C_Timer.After(5, function()
+						print("|cFFFFAA00Details!|r error 0x8547, report on discord", key, _detalhes_global [key], _detalhes.default_global_data [key])
+					end)
+				end
+
+				if (key == "always_use_profile_name") then
+					_detalhes_global ["always_use_profile_name"] = ""
+				end
+
+				if (type (_detalhes_global [key]) == "table") then
+					for key2, value2 in pairs (_detalhes.default_global_data [key]) do
+						if (_detalhes_global [key] [key2] == nil) then
+							if (type (value2) == "table") then
+								_detalhes_global [key] [key2] = Details.CopyTable (_detalhes.default_global_data [key] [key2])
+							else
+								_detalhes_global [key] [key2] = value2
+							end
 						end
 					end
 				end
@@ -150,7 +166,7 @@ function _detalhes:LoadGlobalAndCharacterData()
 			
 			--> copy the key from saved table to details object
 			if (type (value) == "table") then
-				_detalhes [key] = table_deepcopy (_detalhes_global [key])
+				_detalhes [key] = Details.CopyTable (_detalhes_global [key])
 			else
 				_detalhes [key] = _detalhes_global [key]
 			end
@@ -185,7 +201,7 @@ function _detalhes:LoadCombatTables()
 				-- pets
 				_detalhes.tabela_pets = _detalhes.container_pets:NovoContainer()
 				if (_detalhes_database.tabela_pets) then
-					_detalhes.tabela_pets.pets = table_deepcopy (_detalhes_database.tabela_pets)
+					_detalhes.tabela_pets.pets = Details.CopyTable (_detalhes_database.tabela_pets)
 				end
 				_detalhes:UpdateContainerCombatentes()
 				
@@ -219,6 +235,8 @@ function _detalhes:LoadCombatTables()
 						_detalhes.tabela_overall = _detalhes_database.tabela_overall
 						_detalhes:RestauraOverallMetaTables()
 					end
+				else
+					_detalhes.tabela_overall = _detalhes.combate:NovaTabela()
 				end
 				
 			--> re-build all indexes and metatables
@@ -263,7 +281,6 @@ function _detalhes:LoadConfig()
 
 	--> plugins data
 		_detalhes.plugin_database = _detalhes_database.plugin_database or {}
-		_detalhes_database.plugin_database = _detalhes.plugin_database
 
 	--> startup
 	
@@ -301,7 +318,7 @@ function _detalhes:LoadConfig()
 		--> buffs
 			_detalhes.savedbuffs = _detalhes_database.savedbuffs
 			_detalhes.Buffs:BuildTables()
-		
+			
 		--> initialize parser
 			_detalhes.capture_current = {}
 			for captureType, captureValue in pairs (_detalhes.capture_real) do 
@@ -310,7 +327,7 @@ function _detalhes:LoadConfig()
 			
 		--> row animations
 			_detalhes:SetUseAnimations()
-
+			
 		--> initialize spell cache
 			_detalhes:ClearSpellCache() 
 			
@@ -327,14 +344,19 @@ function _detalhes:LoadConfig()
 	
 		--> fix for old versions
 		if (type (_detalhes.always_use_profile) == "string") then
-			_detalhes.always_use_profile_name = _detalhes.always_use_profile
-			_detalhes.always_use_profile = true
+			_detalhes.always_use_profile = false
+			_detalhes.always_use_profile_name = ""
+		end
+
+		if (type (_detalhes.always_use_profile_name) ~= "string") then
+			_detalhes.always_use_profile = false
+			_detalhes.always_use_profile_name = ""
 		end
 		
 		--> check for "always use this profile"
 			if (_detalhes.always_use_profile and not _detalhes.always_use_profile_exception [unitname]) then
 				local profile_name = _detalhes.always_use_profile_name
-				if (profile_name and _detalhes:GetProfile (profile_name)) then
+				if (profile_name and profile_name ~= "" and _detalhes:GetProfile (profile_name)) then
 					_detalhes_database.active_profile = profile_name
 				end
 			end
@@ -343,7 +365,7 @@ function _detalhes:LoadConfig()
 		--	if (_detalhes.always_use_profile and type (_detalhes.always_use_profile) == "string") then
 		--		_detalhes_database.active_profile = _detalhes.always_use_profile
 		--	end
-	
+
 		--> character first run
 			if (_detalhes_database.active_profile == "") then
 				_detalhes.character_first_run = true
@@ -352,15 +374,18 @@ function _detalhes:LoadConfig()
 				_detalhes:GetProfile (current_profile_name, true)
 				_detalhes:SaveProfileSpecial()
 			end
-	
+
 		--> load profile and active instances
 			local current_profile_name = _detalhes:GetCurrentProfileName()
 		--> check if exists, if not, create one
 			local profile = _detalhes:GetProfile (current_profile_name, true)
-		
+
 		--> instances
 			_detalhes.tabela_instancias = _detalhes_database.tabela_instancias or {}
-			
+			--so if the instances are loaded, the taint happen
+			--if I break the tabela_instancias the addon won't taint
+			--if true then return end --if I return here, the addon taints
+
 			--> fix for version 1.21.0
 			if (#_detalhes.tabela_instancias > 0) then --> only happens once after the character logon
 				--if (current_profile_name:find (UnitName ("player"))) then
@@ -368,16 +393,16 @@ function _detalhes:LoadConfig()
 						local instance = _detalhes.tabela_instancias [index]
 						if (instance) then
 							saved_skin.__was_opened = instance.ativa
-							saved_skin.__pos = table_deepcopy (instance.posicao)
+							saved_skin.__pos = Details.CopyTable (instance.posicao)
 							saved_skin.__locked = instance.isLocked
-							saved_skin.__snap = table_deepcopy (instance.snap)
+							saved_skin.__snap = Details.CopyTable (instance.snap)
 							saved_skin.__snapH = instance.horizontalSnap
 							saved_skin.__snapV = instance.verticalSnap
-							
+
 							for key, value in pairs (instance) do
-								if (_detalhes.instance_defaults [key] ~= nil) then	
+								if (_detalhes.instance_defaults [key] ~= nil) then
 									if (type (value) == "table") then
-										saved_skin [key] = table_deepcopy (value)
+										saved_skin [key] = Details.CopyTable (value)
 									else
 										saved_skin [key] = value
 									end
@@ -385,39 +410,39 @@ function _detalhes:LoadConfig()
 							end
 						end
 					end
-					
+
 					for index, instance in _detalhes:ListInstances() do
 						_detalhes.local_instances_config [index] = {
-							pos = table_deepcopy (instance.posicao),
+							pos = Details.CopyTable (instance.posicao),
 							is_open = instance.ativa,
 							attribute = instance.atributo,
 							sub_attribute = instance.sub_atributo,
-							mode = instance.modo,
+							mode = instance.modo or 2,
+							modo = instance.modo or 2,
 							segment = instance.segmento,
-							snap = table_deepcopy (instance.snap),
+							snap = Details.CopyTable (instance.snap),
 							horizontalSnap = instance.horizontalSnap,
 							verticalSnap = instance.verticalSnap,
 							sub_atributo_last = instance.sub_atributo_last,
 							isLocked = instance.isLocked
 						}
-						
+
 						if (_detalhes.local_instances_config [index].isLocked == nil) then
 							_detalhes.local_instances_config [index].isLocked = false
 						end
 					end
 				--end
-				
+
 				_detalhes.tabela_instancias = {}
 			end
 			--_detalhes:ReativarInstancias()
-		
+
 		--> apply the profile
 			_detalhes:ApplyProfile (current_profile_name, true)
-			
+
 		--> custom
 			_detalhes.custom = _detalhes_global.custom
 			_detalhes.refresh:r_atributo_custom()
-			
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

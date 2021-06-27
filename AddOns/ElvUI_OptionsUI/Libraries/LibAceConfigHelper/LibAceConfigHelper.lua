@@ -1,9 +1,10 @@
 local LibStub = LibStub
-local MAJOR, MINOR = 'LibAceConfigHelper', 1
+local MAJOR, MINOR = 'LibAceConfigHelper', 5
 local ACH = LibStub:NewLibrary(MAJOR, MINOR)
 local LSM = LibStub('LibSharedMedia-3.0')
 
 if not ACH then return end
+local type, pairs = type, pairs
 
 function ACH:Color(name, desc, order, alpha, width, get, set, disabled, hidden)
 	return { type = 'color', name = name, desc = desc, order = order, hasAlpha = alpha, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
@@ -36,7 +37,7 @@ function ACH:Group(name, desc, order, childGroups, get, set, disabled, hidden, f
 end
 
 function ACH:Header(name, order, get, set, hidden)
-	return { type = 'header', name = name, order = order, get = get, set = set, hidden = hidden }
+	return { type = 'header', name = name or '', order = order, get = get, set = set, hidden = hidden }
 end
 
 function ACH:Input(name, desc, order, multiline, width, get, set, disabled, hidden, validate)
@@ -44,6 +45,8 @@ function ACH:Input(name, desc, order, multiline, width, get, set, disabled, hidd
 end
 
 function ACH:Select(name, desc, order, values, confirm, width, get, set, disabled, hidden)
+	values = values or {}
+
 	local optionTable = { type = 'select', name = name, desc = desc, order = order, values = values, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
 
 	if confirm then
@@ -62,6 +65,8 @@ function ACH:Select(name, desc, order, values, confirm, width, get, set, disable
 end
 
 function ACH:MultiSelect(name, desc, order, values, confirm, width, get, set, disabled, hidden)
+	values = values or {}
+
 	local optionTable = { type = 'multiselect', name = name, desc = desc, order = order, values = values, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
 
 	if confirm then
@@ -107,6 +112,8 @@ end
 -- isPercent (boolean) - represent e.g. 1.0 as 100%, etc. (default=false)
 
 function ACH:Range(name, desc, order, values, width, get, set, disabled, hidden)
+	values = values or {}
+
 	local optionTable = { type = 'range', name = name, desc = desc, order = order, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
 
 	for key, value in pairs(values) do
@@ -116,12 +123,12 @@ function ACH:Range(name, desc, order, values, width, get, set, disabled, hidden)
 	return optionTable
 end
 
-function ACH:Spacer(order, width)
-	return { name = ' ', type = 'description', order = order, width = width }
+function ACH:Spacer(order, width, hidden)
+	return { name = ' ', type = 'description', order = order, width = width, hidden = hidden }
 end
 
-local function SharedMediaSelect(type, name, desc, order, values, width, get, set, disabled, hidden)
-	return { type = 'select', dialogControl = type, name = name, desc = desc, order = order, values = values, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
+local function SharedMediaSelect(controlType, name, desc, order, values, width, get, set, disabled, hidden)
+	return { type = 'select', dialogControl = controlType, name = name, desc = desc, order = order, values = values, width = width, get = get, set = set, disabled = disabled, hidden = hidden }
 end
 
 function ACH:SharedMediaFont(name, desc, order, width, get, set, disabled, hidden)
@@ -142,4 +149,17 @@ end
 
 function ACH:SharedMediaBorder(name, desc, order, width, get, set, disabled, hidden)
 	return SharedMediaSelect('LSM30_Border', name, desc, order, function() return LSM:HashTable('border') end, width, get, set, disabled, hidden)
+end
+
+local FontFlagValues = {
+	NONE = 'None',
+	OUTLINE = 'Outline',
+	THICKOUTLINE = 'Thick',
+	MONOCHROME = 'Monochrome',
+	MONOCHROMEOUTLINE = 'Monochrome Outline',
+	MONOCHROMETHICKOUTLINE = 'Monochrome Thick',
+}
+
+function ACH:FontFlags(name, desc, order, width, get, set, disabled, hidden)
+	return { type = 'select', name = name, desc = desc, order = order, width = width, get = get, set = set, disabled = disabled, hidden = hidden, values = FontFlagValues }
 end

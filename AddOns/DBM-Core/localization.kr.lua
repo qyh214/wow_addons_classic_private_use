@@ -14,7 +14,7 @@ L.LOAD_GUI_COMBAT			= "전투중에는 GUI의 최초 로딩을 할 수 없습니
 L.BAD_LOAD					= L.DBM .. "이 전투로 인해 현재 인스턴스의 모드를 완전히 로딩하지 못했습니다. 전투가 종료된 후 가능한 빨리 /console reloadui 명령어를 입력해주세요."
 L.LOAD_MOD_VER_MISMATCH		= "DBM-Core가 로딩 조건과 맞지 않아 %s|1을;를; 로딩하지 못했습니다. 최신 버전을 설치하세요"
 L.LOAD_MOD_EXP_MISMATCH		= "아직 출시되지 않은 WoW 확장팩용으로 설계되었으므로 %s|1을;를; 로딩하지 못했습니다. 확장팩이 출시되면 해당 모드는 자동으로 작동합니다."
-L.LOAD_MOD_TOC_MISMATCH		= "%s|1은;는; WoW 클래식 용으로 제작된 것이 아니라서 로딩할 수 없습니다. 최신 버전용 모듈을 설치한 것 같습니다. 해당 모듈은 삭제하시고 월드 오브 워크래프트 클래식 용으로 제작된 애드온만 사용하세요"
+L.LOAD_MOD_TOC_MISMATCH		= "%s|1은;는; WoW 불타는 성전 클래식용으로 제작된 것이 아니라서 로딩할 수 없습니다. 최신 확장팩이나 클래식 시대버전 모듈을 설치한 것 같습니다. 해당 모듈은 삭제하시고 WoW 불타는 성전 클래식용으로 제작된 애드온만 사용하세요."
 L.LOAD_MOD_DISABLED			= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드가 로딩되지 않습니다."
 L.LOAD_MOD_DISABLED_PLURAL	= "%s|1이;가; 설치는 돼있지만 켜져있질 않습니다. 직접 켜기 전까진 모드들이 로딩되지 않습니다."
 
@@ -33,7 +33,7 @@ L.LOOT_SPEC_REMINDER			= "현재 전문화는 %s입니다. 현재 지정한 전�
 
 L.BIGWIGS_ICON_CONFLICT		= L.DBM .. "이 BigWigs와" .. L.DBM .. " 모두 공격대 징표 기능을 사용하고 있음을 감지했습니다. 충돌을 방지하기 위해 공대장이 두 애드온중 하나의 징표 설정을 비활성화해야 합니다."
 
-L.MOD_AVAILABLE				= "이 지역에서 %s|1을;를; 사용할 수 있습니다. Curse/Twitch 또는 WoWI에서 다운로드 받으실 수 있습니다."
+L.MOD_AVAILABLE				= "이 지역에서 %s|1을;를; 사용할 수 있습니다. Curse 또는 WoWI에서 다운로드 받으실 수 있습니다."
 
 L.COMBAT_STARTED				= "%s 전투 시작. 행운을 빕니다! :)";
 L.COMBAT_STARTED_IN_PROGRESS	= "%s 전투 진행 도중 참가했습니다. 행운을 빕니다! :)"
@@ -82,6 +82,7 @@ L.MPROFILE_DELETE_SELF_ERROR	= "사용중에는 모드를 삭제할 수 없습�
 L.MPROFILE_DELETE_S_ERROR	= "원본이 손상되었습니다. 설정이 삭제되지 않거나 일부만 삭제됩니다. 삭제에 실패했습니다."
 
 L.NOTE_SHARE_SUCCESS			= "%s|1이;가; %s에 대한 메모를 공유했습니다."
+L.NOTE_SHARE_LINK			= "메모를 확인하려면 여기를 클릭하세요"
 L.NOTE_SHARE_FAIL			= "%s|1이;가; %s에 대한 메모 공유를 시도했습니다. 하지만 해당 보스 스킬에 관련된 모드를 설치하지 않았거나 로딩하지 않은 상태입니다. 이 메모가 필요하다면 해당 모드를 로딩했는지 확인 후 공유를 다시 요청하세요."
 
 L.NOTEHEADER					= "%s에 대한 메모를 여기에 입력하세요. 캐릭터명을 >< 로 감싸면 직업 색상으로 표시됩니다. 여러번 알림이 필요한 경우 '/'로 메모를 구분해서 작성하세요."
@@ -146,22 +147,19 @@ L.VERSIONCHECK_HEADER		= "보스 모드 - 버전"
 L.VERSIONCHECK_ENTRY_NO_DBM	= "%s: 설치된 보스 모드 없음"
 L.VERSIONCHECK_FOOTER		= L.DBM .. "을 설치한 플레이어 %d명과 Bigwigs를 설치한 플레이어 %d명을 발견했습니다."
 L.VERSIONCHECK_OUTDATED		= "다음 %d명의 플레이어가 구버전 보스 모드를 사용중: %s"
-L.YOUR_VERSION_OUTDATED      = "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전이 사용 기한을 지났습니다. Curse/Twitch, WoWI 또는 GitHub 릴리즈 페이지에서 최신 버전을 받으세요."
+L.YOUR_VERSION_OUTDATED      = "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전이 사용 기한을 지났습니다. Curse, WoWI 또는 GitHub 릴리즈 페이지에서 최신 버전을 받으세요."
 L.VOICE_PACK_OUTDATED		= "선택한 " .. L.DBM .. " 음성팩에 일부 음성이 들어있지 않습니다. 몇가지 경고 음성이 기본 효과음으로 재생됩니다. 최신 음성팩을 다운로드 받거나 제작자에게 누락된 음성 파일 업데이트를 요청하시기 바랍니다"
 L.VOICE_MISSING				= "선택한 " .. L.DBM .. " 음성팩을 찾을 수 없습니다. 오류일 경우 음성팩이 제대로 설치되어 있고 애드온 목록에서 활성화되어 있는지 확인해 보시기 바랍니다."
 L.VOICE_DISABLED				= "현재 " .. L.DBM .. " 음성팩이 한 개 이상 설치되어 있지만 사용하고 있는게 없습니다. 음성팩을 사용하려면 '음성 경고' 항목에서 음성팩이 지정되어 있는지 확인하세요. 음성팩을 사용할 의사가 없으면 음성팩을 삭제하시면 이 메시지는 더이상 출력되지 않습니다"
 L.VOICE_COUNT_MISSING		= "초읽기 음성 %d번으로 설정된 음성/초읽기 팩을 찾을 수 없습니다. 기본 설정으로 초기화 되었습니다: %s"
 
-L.UPDATEREMINDER_HEADER			= "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전의 사용 기한이 지났습니다.\n Curse/Twitch, WoWI, GitHub 릴리즈 페이지 등에서 %s (%s) 버전을 다운로드 할 수 있습니다."
-L.UPDATEREMINDER_HEADER_ALPHA	= "사용중인 " .. L.DEADLY_BOSS_MODS .. " ALPHA 버전의 사용 기한이 지났습니다.\n 적어도 %s 테스트 버전 이상은 사용해야 합니다. ALPHA 버전을 선택한 " .. L.DBM .. " 이용자는 최신 ALPHA 버전을 실행하는걸 권장합니다. 아니면 최신 RELEASE 버전을 사용하는 것도 좋습니다. 오래된 ALPHA 버전은 개발용인 관계로 버전 검사 기능이 제한되어 있기 때문입니다."
+L.UPDATEREMINDER_HEADER			= "사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전의 사용 기한이 지났습니다.\n Curse, WoWI, GitHub 릴리즈 페이지 등에서 %s (%s) 버전을 다운로드 할 수 있습니다."
 L.UPDATEREMINDER_FOOTER			= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
 L.UPDATEREMINDER_FOOTER_GENERIC	= (IsMacClient() and "Cmd-C" or "Ctrl-C").. "를 누르면 주소를 복사할 수 있습니다."
 L.UPDATEREMINDER_DISABLE			= "경고: 지금 사용중인 " .. L.DEADLY_BOSS_MODS .. "가 지나치게 오래되어 강제로 비활성화되며 업데이트 전까진 사용할 수 없습니다. 이는 오래되고 호환되지 않는 모드가 당신과 파티/공대원의 플레이에 악영향을 미치지 않게 하기 위함입니다."
---L.UPDATEREMINDER_NODISABLE		= "경고: 설치한 " .. L.DEADLY_BOSS_MODS .. "가 사용 기한을 지났습니다. 업데이트 알림이 꺼져있거나 해서 특정 기한을 지나면 본 메시지가 등장하는 것이며 이 알림은 끌 수 없습니다. 반드시 업데이트 하시기 바랍니다."
 L.UPDATEREMINDER_HOTFIX			= "지금 사용하는 " .. L.DBM .. " 버전은 이 보스 전투에서 알려진 오류를 가지고 있습니다. 이 오류는 최신 버전으로 업데이트하면 수정됩니다."
 L.UPDATEREMINDER_HOTFIX_ALPHA	= "지금 사용하는 " .. L.DBM .. " 버전은 이 보스 전투에서 알려진 오류를 가지고 있습니다. 이 오류는 향후 출시될 버전 (또는 최신 ALPHA 버전)에서 수정되어있을 것입니다."
 L.UPDATEREMINDER_MAJORPATCH		= "경고: 대규모 패치로 인해 " .. L.DEADLY_BOSS_MODS .. " 버전이 사용 기한이 지나 업데이트하기 전까진 " .. L.DBM .. "이 비활성화됩니다. 이는 오래되고 호환되지 않는 코드로 인해 당신과 공격대원이 조악한 플레이 경험을 겪지 않게 하기 위함입니다. 당장 deadlybossmods.com이나 Curse에서 최신 버전을 다운로드 하시기 바랍니다."
-L.UPDATEREMINDER_TESTVERSION		= "경고: 현재 게임 버전과 맞지 않는 " .. L.DEADLY_BOSS_MODS .. " 버전을 사용중입니다. 게임 클라이언트에 맞는 버전을 deadlybossmods.com이나 Curse에서 다운로드 하시기 바랍니다."
 L.VEM							= "경고: " .. L.DEADLY_BOSS_MODS .. "와 Voice Encounter Mods를 함께 사용중입니다. 현재 설정으로는 DBM이 작동하지 않으며 로딩도 되지 않을 것입니다."
 L.OUTDATEDPROFILES				= "경고: DBM-Profiles가 이 버전의 " .. L.DBM .. "과 호환되지 않습니다. " .. L.DBM .. "이 읽기 전에 삭제해야 충돌을 방지할 수 있습니다."
 L.OUTDATEDSPELLTIMERS				= "경고: DBM-SpellTimers로 인해 " .. L.DBM .. "이 작동하지 않습니다. 반드시 비활성화 해야 " .. L.DBM .. "이 정상 작동합니다."
@@ -170,11 +168,12 @@ L.VICTORYSOUND						= "경고: DBM-VictorySound가 이 버전의 " .. L.DBM .. "
 L.DPMCORE						= "경고: Deadly PvP 모드는 더이상 개발되지 않으며 이 버전의 " .. L.DBM .. "과 호환되지 않습니다. 반드시 삭제해야 " .. L.DBM .. "이 정상 작동합니다."
 L.DBMLDB							= "경고: DBM-LDB는 이제 DBM-Core에 편입되었습니다. 같이 사용해도 문제가 생기는건 아니지만 가급적 애드온 폴더에서 'DBM-LDB' 폴더를 삭제하는걸 권장합니다"
 L.UPDATE_REQUIRES_RELAUNCH		= "경고: 지금 업데이트한 " .. L.DBM .. "은 게임 클라이언트를 완전히 재시작하기 전까진 정상 작동하지 않습니다. 이 업데이트엔 새 파일이 포함되어 있거나 UI 재시작으로는 로딩할 수 없는 .toc 파일의 변경 사항이 있습니다. 클라이언트 재시작 없이 사용할 경우 오류가 발생하거나 작동하지 않을 수 있습니다."
-L.OUT_OF_DATE_NAG				= "현재 사용중인 " .. L.DEADLY_BOSS_MODS .. " 버전이 오래되었습니다. 업데이트를 해야 이 전투의 중요한 알림이나 타이머 그리고 공격대원 모두가 보는 외침 등이 빠지지 않게 나옵니다."
-L.CLASSIC_ONLY					= "경고: 이 " .. L.DBM .. "은 월드 오브 워크래프트: 클래식 전용 버전입니다. 삭제하시고 최신 WoW 버전용 " .. L.DBM .. "을 설치하세요."
+L.OUT_OF_DATE_NAG				= "현재 사용중인 " .. L.DBM .. " 버전이 오래되었습니다. 이 전투에 대응하는 모듈은 새로운 기능을 탑재했거나 버그가 수정된 상태입니다. 향상된 레이드 경험을 누리고 싶다면 업데이트를 권장합니다."
+L.CLASSIC_ONLY					= "경고: 이 " .. L.DBM .. "은 WoW 불타는 성전 클래식 전용입니다. 삭제하시고 현재 이용중인 WoW 버전에 맞는 " .. L.DBM .. "을 설치하세요."
 L.MOVABLE_BAR				= "드래그 하세요!"
 
-L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h님이 당신에게 " .. L.DBM .. " 타이머를 전송했습니다"
+L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h님이 당신에게 " .. L.DBM .. " 타이머를 전송했습니다: '%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[타이머 취소]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[%1$s의 타이머 무시]|r|h"
+--L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h님이 당신에게 " .. L.DBM .. " 타이머를 전송했습니다"
 L.PIZZA_CONFIRM_IGNORE			= "정말 %s의 " .. L.DBM .. " 타이머를 차단하시겠습니까? 이 공격대에 있는 동안에만 적용됩니다."
 L.PIZZA_ERROR_USAGE				= "사용법: /dbm [broadcast] timer <시간> <텍스트>. <시간>은 1초 이상이어야 합니다."
 
@@ -248,6 +247,7 @@ L.TIMER_USAGE	= {
 }
 
 L.ERROR_NO_PERMISSION				= "이 명령어를 실행하기 위한 권한을 가지고 있지 않습니다."
+L.TIME_TOO_SHORT					= "풀링 타이머는 3초 이상으로 설정해야 합니다."
 
 --Common Locals
 L.NEXT							= "다음 %s"
@@ -491,7 +491,8 @@ L.AUTO_YELL_OPTION_TEXT.count		= "$spell:%s 대상일 때 말풍선으로 알리
 L.AUTO_YELL_OPTION_TEXT.fade		= "$spell:%s 지속시간이 끝나갈 때 말풍선으로 알리기 (주문 이름 및 초읽기 포함)"
 L.AUTO_YELL_OPTION_TEXT.shortfade	= "$spell:%s 지속시간이 끝나갈 때 말풍선으로 알리기 (초읽기 포함)"
 L.AUTO_YELL_OPTION_TEXT.iconfade		= "$spell:%s 지속시간이 끝나갈 때 말풍선으로 알리기 (초읽기 및 공격대 징표 포함)"
-L.AUTO_YELL_OPTION_TEXT.position	= "$spell:%s 대상일 때 말풍선으로 알리기 (위치 포함)"
+L.AUTO_YELL_OPTION_TEXT.position		= "$spell:%s 대상일 때 말풍선으로 알리기 (위치와 이름 포함)"
+L.AUTO_YELL_OPTION_TEXT.shortposition	= "$spell:%s 대상일 때 말풍선으로 알리기 (위치 포함)"
 L.AUTO_YELL_OPTION_TEXT.combo		= "$spell:%s|1과;와; 다른 디버프가 같이 걸렸을 때 말풍선으로 알리기 (사용자 지정 문자 포함)"
 L.AUTO_YELL_ANNOUNCE_TEXT.yell	= UnitName("player") .. "에게 %s"
 L.AUTO_YELL_ANNOUNCE_TEXT.count	= UnitName("player") .. "에게 %s (%%d)"
@@ -565,7 +566,8 @@ L.INSTANCE_INFO_STATS_DENIED		= "확인 요청 거부: %s"
 L.INSTANCE_INFO_STATS_AWAY		= "자리 비움: %s"
 L.INSTANCE_INFO_STATS_NO_RESPONSE	= "최근 버전 " .. L.DBM .. " 미설치: %s"
 L.INSTANCE_INFO_RESULTS			= "인스턴스 ID 검사가 끝났습니다. 다른 언어의 WoW 클라이언트를 사용 중인 공격대원이 있다면 같은 인스턴스가 여러개 보일 수 있습니다."
-L.INSTANCE_INFO_SHOW_RESULTS		= "응답 안한 플레이어: %s"
+L.INSTANCE_INFO_SHOW_RESULTS		= "응답 안한 플레이어: %s\n|HDBM:showRaidIdResults|h|cff3588ff[결과 보기]|r|h"
+--L.INSTANCE_INFO_SHOW_RESULTS		= "응답 안한 플레이어: %s"
 
 L.LAG_CHECKING				= "공격대의 지연시간 확인중..."
 L.LAG_HEADER					= L.DEADLY_BOSS_MODS .. " - 지연시간 확인 결과"
@@ -584,16 +586,6 @@ L.SILENTMODE_IS                     = "조용함 모드 "
 
 L.LDB_LOAD_MODS		= "보스 모드 로드"
 
-L.LDB_CAT_BFA			= "격전의 아제로스"
-L.LDB_CAT_LEG			= "군단"
-L.LDB_CAT_WOD			= "드레노어의 전쟁군주"
-L.LDB_CAT_MOP			= "판다리아의 안개"
-L.LDB_CAT_CATA		= "대격변"
-L.LDB_CAT_WOTLK		= "리치 왕의 분노"
-L.LDB_CAT_BC			= "불타는 성전"
-L.LDB_CAT_OTHER		= "그 외 보스 모드"
-
-L.LDB_CAT_GENERAL		= "일반"
 L.LDB_ENABLE_BOSS_MOD	= "보스 모드 사용"
 
 L.WORLD_BUFFS.hordeOny		= "호드의 백성들이여, 오그리마의 주민들이여, 모두 와서 호드의 영웅을 찬양하라."

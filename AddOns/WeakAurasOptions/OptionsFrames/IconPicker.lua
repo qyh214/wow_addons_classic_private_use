@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, OptionsPrivate = ...
 
 -- Lua APIs
 local pairs  = pairs
@@ -119,19 +120,19 @@ local function ConstructIconPicker(frame)
   iconLabel:SetPoint("RIGHT", input, "LEFT", -50, 0);
 
   function group.Pick(self, texturePath)
-    if(not self.groupIcon and self.data.controlledChildren) then
-      for index, childId in pairs(self.data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          childData[self.field] = texturePath;
-          WeakAuras.Add(childData);
-          WeakAuras.UpdateThumbnail(childData);
-        end
-      end
+    local valueToPath = OptionsPrivate.Private.ValueToPath
+    if self.groupIcon then
+      valueToPath(self.baseObject, self.paths[self.baseObject.id], texturePath)
+      WeakAuras.Add(self.baseObject)
+      WeakAuras.ClearAndUpdateOptions(self.baseObject.id)
+      WeakAuras.UpdateThumbnail(self.baseObject)
     else
-      self.data[self.field] = texturePath;
-      WeakAuras.Add(self.data);
-      WeakAuras.UpdateThumbnail(self.data);
+      for child in OptionsPrivate.Private.TraverseLeafsOrAura(self.baseObject) do
+        valueToPath(child, self.paths[child.id], texturePath)
+        WeakAuras.Add(child)
+        WeakAuras.ClearAndUpdateOptions(child.id)
+        WeakAuras.UpdateThumbnail(child);
+      end
     end
     local success = icon:SetTexture(texturePath) and texturePath;
     if(success) then
@@ -141,20 +142,22 @@ local function ConstructIconPicker(frame)
     end
   end
 
-  function group.Open(self, data, field, groupIcon)
-    self.data = data;
-    self.field = field;
+  function group.Open(self, baseObject, paths, groupIcon)
+    local valueFromPath = OptionsPrivate.Private.ValueFromPath
+    self.baseObject = baseObject
+    self.paths = paths
     self.groupIcon = groupIcon
-    if(not groupIcon and data.controlledChildren) then
+    if groupIcon then
+      local value = valueFromPath(self.baseObject, paths[self.baseObject.id])
+      self.givenPath = value
+    else
       self.givenPath = {};
-      for index, childId in pairs(data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          self.givenPath[childId] = childData[field];
+      for child in OptionsPrivate.Private.TraverseLeafsOrAura(baseObject) do
+        if(child) then
+          local value = valueFromPath(child, paths[child.id])
+          self.givenPath[child.id] = value or "";
         end
       end
-    else
-      self.givenPath = self.data[self.field];
     end
     -- group:Pick(self.givenPath);
     frame.window = "icon";
@@ -169,18 +172,23 @@ local function ConstructIconPicker(frame)
   end
 
   function group.CancelClose()
-    if(not group.groupIcon and group.data.controlledChildren) then
-      for index, childId in pairs(group.data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          childData[group.field] = group.givenPath[childId] or childData[group.field];
-          WeakAuras.Add(childData);
-          WeakAuras.UpdateThumbnail(childData);
+    local valueToPath = OptionsPrivate.Private.ValueToPath
+    if group.groupIcon then
+      valueToPath(group.baseObject, group.paths[group.baseObject.id], group.givenPath)
+      WeakAuras.Add(group.baseObject)
+      WeakAuras.ClearAndUpdateOptions(group.baseObject.id)
+      WeakAuras.UpdateThumbnail(group.baseObject)
+    else
+      for child in OptionsPrivate.Private.TraverseLeafsOrAura(group.baseObject) do
+        if (group.givenPath[child.id]) then
+          valueToPath(child, group.paths[child.id], group.givenPath[child.id])
+          WeakAuras.Add(child);
+          WeakAuras.ClearAndUpdateOptions(child.id)
+          WeakAuras.UpdateThumbnail(child);
         end
       end
-    else
-      group:Pick(group.givenPath);
     end
+
     group.Close();
   end
 
@@ -201,7 +209,7 @@ local function ConstructIconPicker(frame)
   return group
 end
 
-function WeakAuras.IconPicker(frame)
+function OptionsPrivate.IconPicker(frame)
   iconPicker = iconPicker or ConstructIconPicker(frame)
   return iconPicker
 end

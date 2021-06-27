@@ -17,7 +17,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	ArachnophobiaTimer	= "Arachnophobie",
 	Pull1				= "Rennt! Das bringt das Blut in Wallung!",
-	Pull2				= "Nur einmal kosten..." --needs to be verified (wowhead-captured translation)
+	Pull2				= "Nur einmal kosten..."
 })
 
 ----------------------------
@@ -40,7 +40,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull					= "Kniet nieder, Wurm!" --needs to be verified (wowhead-captured translation)
+	Pull					= "Kniet nieder, Wurm!"
 })
 
 ---------------
@@ -164,7 +164,7 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	yell1			= "Flickwerk spielen möchte!",
-	yell2			= "Kel’Thuzad macht Flickwerk zu seinem Abgesandten des Kriegs!"
+	yell2			= "Kel’thuzad macht Flickwerk zu seinem Abgesandten von Krieg!"
 })
 
 -----------------
@@ -217,10 +217,6 @@ L:SetWarningLocalization({
 	WarningChargeNotChanged	= "Polarität hat sich nicht geändert"
 })
 
-L:SetOptionCatLocalization({
-	Arrows	= "Pfeile"
-})
-
 ----------------------------
 --  Instructor Razuvious  --
 ----------------------------
@@ -251,7 +247,7 @@ L:SetWarningLocalization({
 L = DBM:GetModLocalization("Gothik")
 
 L:SetGeneralLocalization({
-	name = "Gothik der Ernter"
+	name = "Gothik der Seelenjäger"
 })
 
 L:SetOptionLocalization({
@@ -297,7 +293,6 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	WarningMarkSoon				= "Zeige Vorwarnung für Mal",
-	WarningMarkNow				= "Zeige Warnung für Mal",
 	SpecialWarningMarkOnPlayer	= "Spezialwarnung, wenn sich ein Mal mehr als 4-mal auf dir stapelt"
 })
 
@@ -306,7 +301,6 @@ L:SetTimerLocalization({
 
 L:SetWarningLocalization({
 	WarningMarkSoon				= "Mal %d in 3 Sekunden",
-	WarningMarkNow				= "Mal %d",
 	SpecialWarningMarkOnPlayer	= "%s: %s"
 })
 
@@ -370,7 +364,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Yell = "Lakaien, Diener, Soldaten der eisigen Finsternis! Folgt dem Ruf von Kel'Thuzad!"
+	Yell = "Diener, Jünger, Soldaten der eisigen Finsternis! Folgt dem Ruf von Kel'Thuzad!"
 })
 
 L:SetWarningLocalization({

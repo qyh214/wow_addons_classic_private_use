@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hamhock", "DBM-Party-Classic", 15)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(1717)
 
 mod:RegisterCombat("combat")
@@ -27,12 +27,8 @@ function mod:OnCombatEnd()
 	end
 end
 
-do
-	local BloodLust = DBM:GetSpellInfo(6742)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 6742 then
-		if args.spellName == BloodLust and args:IsDestTypeHostile() then
-			warningBloodlust:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 6742 and args:IsDestTypeHostile() then
+		warningBloodlust:Show(args.destName)
 	end
 end

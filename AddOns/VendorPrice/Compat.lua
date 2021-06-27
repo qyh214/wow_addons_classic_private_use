@@ -5,7 +5,7 @@ local function SetPrice(tt, count, item)
 end
 
 local function IsShown(frame)
-	return frame and frame:IsShown() and frame:IsMouseOver()
+	return frame and frame:IsVisible() and frame:IsMouseOver()
 end
 
 local Auctioneer = {
@@ -48,16 +48,21 @@ GameTooltip:HookScript("OnTooltipSetItem", function(tt)
 			count = hoverRowData and hoverRowData.count -- provided by AuctionFaster
 		end
 		SetPrice(tt, count)
+	elseif AtlasLoot and IsShown(_G["AtlasLoot_GUI-Frame"]) then
+		SetPrice(tt)
 	elseif Bagnon and IsShown(BagnonFramebank) then
 		local info = tt:GetOwner():GetParent().info
 		if info then -- /bagnon bank
 			SetPrice(tt, info.count)
 		end
 	else -- Chatter, Prat: check for active chat windows
-		for i = 1, FCF_GetNumActiveChatFrames() do
-			if _G["ChatFrame"..i]:IsMouseOver() then
-				SetPrice(tt)
-				break
+		local mouseFocus = GetMouseFocus()
+		if mouseFocus and mouseFocus:GetObjectType() == "FontString" then
+			for i = 1, FCF_GetNumActiveChatFrames() do
+				if _G["ChatFrame"..i]:IsMouseOver() then
+					SetPrice(tt)
+					break
+				end
 			end
 		end
 	end

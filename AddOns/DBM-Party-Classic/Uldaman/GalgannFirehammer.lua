@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(471, "DBM-Party-Classic", 18, 239)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(7291)
 mod:SetEncounterID(552)
 
@@ -22,25 +22,19 @@ function mod:OnCombatStart(delay)
 	timerFireNovaCD:Start(1-delay)
 end
 
-do
-	local FlameSpike, FlameLash, FireNova = DBM:GetSpellInfo(6725), DBM:GetSpellInfo(3356), DBM:GetSpellInfo(11969)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 6725 then
-		if args.spellName == FlameSpike then
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnFlameSpike:Show(args.sourceName)
-				specWarnFlameSpike:Play("kickcast")
-			end
-		--elseif args.spellId == 3356 then
-		elseif args.spellName == FlameLash then
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnFlameLash:Show(args.sourceName)
-				specWarnFlameLash:Play("kickcast")
-			end
-		--elseif args.spellId == 11969 then
-		elseif args.spellName == FireNova then
-			warningFireNova:Show()
-			timerFireNovaCD:Start()
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 6725 then
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnFlameSpike:Show(args.sourceName)
+			specWarnFlameSpike:Play("kickcast")
 		end
+	elseif args.spellId == 3356 then
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnFlameLash:Show(args.sourceName)
+			specWarnFlameLash:Play("kickcast")
+		end
+	elseif args.spellId == 11969 then
+		warningFireNova:Show()
+		timerFireNovaCD:Start()
 	end
 end

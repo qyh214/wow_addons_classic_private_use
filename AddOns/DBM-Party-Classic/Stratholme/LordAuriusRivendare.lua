@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(456, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(10440)--10440 Baron Rivendare, 45412 Lord Aurius Rivendare, 11197/mindless-skeleton
 mod:SetEncounterID(484)
 
@@ -21,14 +21,10 @@ function mod:OnCombatStart(delay)
 	timerRaiseDeadCD:Start(1-delay)
 end
 
-do
-	local RaiseDead = DBM:GetSpellInfo(17480)
-	function mod:SPELL_SUMMON(args)
-		--if args.spellId == 17480 and self:AntiSpam(5, 1) then
-		if args.spellName == RaiseDead and self:AntiSpam(5, 1) then
-			warningRaiseDead:Show()
-			timerDeathPactCD:Start()
-			timerRaiseDeadCD:Start()
-		end
+function mod:SPELL_SUMMON(args)
+	if args.spellId == 17480 and self:AntiSpam(5, 1) then
+		warningRaiseDead:Show()
+		timerDeathPactCD:Start()
+		timerRaiseDeadCD:Start()
 	end
 end

@@ -34,7 +34,7 @@ L.LOOT_SPEC_REMINDER			= "你目前的專精為:%s。而你目前的拾取選擇
 
 L.BIGWIGS_ICON_CONFLICT		= L.DBM .. "偵測到你同時開啟BigWigs和" .. L.DBM .. "的團隊圖示。請關閉其中之一的團隊圖示功能以免與產生衝突。"
 
-L.MOD_AVAILABLE				= "%s的DBM插件已經可供使用。你可以在Curse/Twitch或WoWI上找到。"
+L.MOD_AVAILABLE				= "%s的DBM插件已經可供使用。你可以在Curse或WoWI上找到。"
 
 L.COMBAT_STARTED				= "%s開戰。祝好運與盡興! :)"
 L.COMBAT_STARTED_IN_PROGRESS	= "與%s開戰已進行的戰鬥。祝好運與盡興! :)"
@@ -83,6 +83,7 @@ L.MPROFILE_DELETE_SELF_ERROR	= "不能刪除使用中的模組設定。"
 L.MPROFILE_DELETE_S_ERROR	= "配置檔來源已經損毀，設定不能被刪除或是部分刪除，刪除已失敗。"
 
 L.NOTE_SHARE_SUCCESS			= "%s已分享他的%s的註記"
+L.NOTE_SHARE_LINK				= "點擊這裡打開註記"
 L.NOTE_SHARE_FAIL			= "%s嘗試與你分享%s的註記。模組相關的技能沒有安裝或是載入。請確定你載入此模組並請求他們在分享一次。"
 
 L.NOTEHEADER					= "為%s輸入你的註記。在><插入腳色名稱可套用職業顏色。多個註記請使用'/'分開"
@@ -150,22 +151,19 @@ L.VERSIONCHECK_ENTRY_TWO		= "%s: %s (%s) & %s (%s)"--Two Boss mods
 L.VERSIONCHECK_ENTRY_NO_DBM	= "%s：尚未安裝任何團隊首領模組"
 L.VERSIONCHECK_FOOTER		= "找到有%d玩家正在使用DBM且有%d玩家正在使用Bigwigs"
 L.VERSIONCHECK_OUTDATED		= "下列有%d玩家正在使用過期的首領模組:%s"
-L.YOUR_VERSION_OUTDATED		= "你的 " .. L.DEADLY_BOSS_MODS .. " 已經過期。請透由Curse/Twitch，WoWI或從GitHub Releases頁面下載最新版本。"
+L.YOUR_VERSION_OUTDATED		= "你的 " .. L.DEADLY_BOSS_MODS .. " 已經過期。請透由Curse，WoWI或從GitHub Releases頁面下載最新版本。"
 L.VOICE_PACK_OUTDATED		= "你所選的" .. L.DBM .. "語音包可能缺少一些DBM支援的的語音。部分警告音效仍然會使用預設音效播放。請下載新版本的語音包或是聯絡語音包作者更新並加入缺少的語音。"
 L.VOICE_MISSING				= L.DBM .. "找不到你所選取的語音包。你的語音包選項已經被重置為'None'。請確定你的語音包已正確的安裝與啟用。"
 L.VOICE_DISABLED				= "你的語音包已安裝但是尚未啟用。如果你想使用語音包，請確定語言包已在語音警告中被選取，或是刪除不使用的語音包去隱藏此訊息。"
 L.VOICE_COUNT_MISSING		= "所選取的語音/倒數語音包%d找不到倒數語音。設定已被重置回預設值。"
 
-L.UPDATEREMINDER_HEADER			= "你的".. L.DEADLY_BOSS_MODS .. "已經過期。\n你可以在Curse/Twitch，WoWI或從GitHub Releases頁面下載到最新版本：%s(%s)"
-L.UPDATEREMINDER_HEADER_ALPHA	= "你的ALPHA版本" .. L.DEADLY_BOSS_MODS .. "已經過期。\n 你至少落後%d個測試版本。建議DBM使用者使用最新的ALPHA或最新的穩定版本。過期的alpha版本可能會有效能低落或未完成的功能。"
+L.UPDATEREMINDER_HEADER			= "你的".. L.DEADLY_BOSS_MODS .. "已經過期。\n你可以在Curse，WoWI或從GitHub Releases頁面下載到最新版本：%s(%s)"
 L.UPDATEREMINDER_FOOTER			= "按下" .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  "：複製下載網址到剪貼簿。"
 L.UPDATEREMINDER_FOOTER_GENERIC	= "按下" .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  "：複製網址到剪貼簿。"
 L.UPDATEREMINDER_DISABLE			= "警告：你的" .. L.DEADLY_BOSS_MODS .. "版本已過期並且已被強制禁用了而不能啟用除非更新至最新版本。這是為了確保過時或不相容的模組不會對你自己或團隊夥伴造成低落的遊戲體驗。"
---L.UPDATEREMINDER_NODISABLE		= "警告：你的" .. L.DEADLY_BOSS_MODS .. "版本已大幅過期。此訊息在過了某個門檻之後會不能被禁用，強烈建議更新。"
 L.UPDATEREMINDER_HOTFIX			= "你的" .. L.DBM .. "版本會在這首領戰鬥有不準確的計時器或警告。這問題已被修正在新版正式版"
 L.UPDATEREMINDER_HOTFIX_ALPHA	= "你的" .. L.DBM .. "版本會在這首領戰鬥有不準確的計時器或警告。這問題已被修正在新版正式版(或是更新到最新的alpha)"
 L.UPDATEREMINDER_MAJORPATCH		= "警告：你的" .. L.DEADLY_BOSS_MODS .. "已經過期，" .. L.DBM .. "已被禁用直到你更新至最新版，因為遊戲大改版。為了不讓舊的程式碼拖累遊戲體驗。請至deadlybossmods.com或是curse下載最新版本的" .. L.DBM .. "。"
-L.UPDATEREMINDER_TESTVERSION		= "警告：你使用的" .. L.DEADLY_BOSS_MODS .. "版本和遊戲版本不相容。請到deadlybossmods.com或是curse下載符合你遊戲客戶端的版本。"
 L.VEM									= "警告：你同時使用" .. L.DEADLY_BOSS_MODS .. "和VEM。" .. L.DBM .. "將停用而無法執行。"
 L.OUTDATEDPROFILES					= "警告：DBM-Profiles不相容此版本DBM。請移除避免衝突。"
 L.OUTDATEDSPELLTIMERS				= "警告：DBM-SpellTimers破壞了" .. L.DBM .. ".必須要移除" .. L.DBM .. "才能正常運作。"
@@ -179,8 +177,8 @@ L.CLASSIC_ONLY					= "警告: 此版本的" .. L.DBM .. "僅適用於經典版�
 
 L.MOVABLE_BAR				= "拖動我!"
 
---L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h向你發送了一個倒數計時：'%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[取消該計時]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[忽略來自%1$s的計時]|r|h"
-L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h向你發送了一個DBM計時器"
+L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h向你發送了一個倒數計時：'%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[取消該計時]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[忽略來自%1$s的計時]|r|h"
+--L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h向你發送了一個DBM計時器"
 L.PIZZA_CONFIRM_IGNORE			= "是否要在該次遊戲連結中忽略來自%s的計時？"
 L.PIZZA_ERROR_USAGE				= "命令：/dbm [broadcast] timer <時間（秒）> <文字>。<時間>必須大於1"
 
@@ -592,8 +590,8 @@ L.INSTANCE_INFO_STATS_DENIED		= "拒絕回傳數據:%s"
 L.INSTANCE_INFO_STATS_AWAY		= "離開:%s"
 L.INSTANCE_INFO_STATS_NO_RESPONSE	= "沒有安裝最新版本的DBM:%s"
 L.INSTANCE_INFO_RESULTS			= "副本ID掃描結果。注意如果團隊中有不同語言版本的魔獸客戶端，那麼同一副本可能會出現不止一次。"
---L.INSTANCE_INFO_SHOW_RESULTS		= "仍未回覆的玩家: %s\n|HDBM:showRaidIdResults|h|cff3588ff[查看結果]|r|h"
-L.INSTANCE_INFO_SHOW_RESULTS		= "仍未回覆的玩家: %s"
+L.INSTANCE_INFO_SHOW_RESULTS		= "仍未回覆的玩家: %s\n|HDBM:showRaidIdResults|h|cff3588ff[查看結果]|r|h"
+--L.INSTANCE_INFO_SHOW_RESULTS		= "仍未回覆的玩家: %s"
 
 L.LAG_CHECKING				= "檢測團隊成員的網路延遲中..."
 L.LAG_HEADER					= "Deadly Boss Mods - 網路延遲結果"
@@ -612,9 +610,6 @@ L.SILENTMODE_IS                     = "無聲模式是 "
 
 L.LDB_LOAD_MODS		= "載入首領模組"
 
-L.LDB_CAT_OTHER		= "其他首領"
-
-L.LDB_CAT_GENERAL		= "一般"
 L.LDB_ENABLE_BOSS_MOD	= "啟用首領模組"
 
 --Localizers, do not copy entire table, follow same guidelines as other tables, overwrite each entry with L.WORLD_BUFFS.hordeOny = "stuff" for example.

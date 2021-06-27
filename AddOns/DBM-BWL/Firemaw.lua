@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Firemaw", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403075439")
 mod:SetCreatureID(11983)
 mod:SetEncounterID(613)
 mod:SetModelID(6377)
@@ -25,30 +25,21 @@ function mod:OnCombatStart(delay)
 	timerWingBuffet:Start(30-delay)
 end
 
-do
-	local WingBuffet, ShadowFlame = DBM:GetSpellInfo(23339), DBM:GetSpellInfo(22539)
-	function mod:SPELL_CAST_START(args)--did not see ebon use any of these abilities
-		--if args.spellId == 23339 then
-		if args.spellName == WingBuffet then
-			warnWingBuffet:Show()
-			timerWingBuffet:Start()
-		--elseif args.spellId == 22539 then
-		elseif args.spellName == ShadowFlame then
-			warnShadowFlame:Show()
-			timerShadowFlameCD:Start()
-		end
+function mod:SPELL_CAST_START(args)--did not see ebon use any of these abilities
+	if args.spellId == 23339 then
+		warnWingBuffet:Show()
+		timerWingBuffet:Start()
+	elseif args.spellId == 22539 then
+		warnShadowFlame:Show()
+		timerShadowFlameCD:Start()
 	end
 end
 
-do
-	local FlameBuffet = DBM:GetSpellInfo(23341)
-	function mod:SPELL_AURA_APPLIED_DOSE(args)
-		--if args.spellId == 23341 then
-		if args.spellName == FlameBuffet and args:IsPlayer() then
-			local amount = args.amount or 1
-			if (amount >= 4) and (amount % 2 == 0) then--Starting at 4, every even amount warn stack
-				warnFlameBuffet:Show(amount)
-			end
+function mod:SPELL_AURA_APPLIED_DOSE(args)
+	if args.spellId == 23341 and args:IsPlayer() then
+		local amount = args.amount or 1
+		if (amount >= 4) and (amount % 2 == 0) then--Starting at 4, every even amount warn stack
+			warnFlameBuffet:Show(amount)
 		end
 	end
 end

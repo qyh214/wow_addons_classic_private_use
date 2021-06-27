@@ -7,14 +7,19 @@ end
 local L = WeakAuras.L
 
 -- WeakAuras/Templates
+	L[" Debuff"] = "(дебафф)"
+	L["<70% Mana"] = "(менее 70% маны)"
+	L[">70% Mana"] = "(более 70% маны)"
 	L["Abilities"] = "Способности"
-	L["Ability Charges"] = "Заряды способности"
+	L["Ability"] = "(способность)"
 	L["Add Triggers"] = "Добавить триггеры"
 	L["Always Active"] = "Всегда активный триггер"
 	L["Always Show"] = "Показывать всегда"
 	L["Always show the aura, highlight it if debuffed."] = "Всегда показывает индикацию; выделяет ее, если на цели есть дебафф."
 	L["Always show the aura, turns grey if on cooldown."] = "Всегда показывает индикацию; становится серой, если предмет восстанавливается."
 	L["Always show the aura, turns grey if the debuff not active."] = "Всегда показывает индикацию; становится серой, если на цели нет дебаффа."
+	--[[Translation missing --]]
+	L["Always shows highlights if enchant missing."] = "Always shows highlights if enchant missing."
 	L["Always shows the aura, grey if buff not active."] = "Всегда показывает индикацию; становится серой, если на цели нет баффа."
 	L["Always shows the aura, highlight it if buffed."] = "Всегда показывает индикацию; выделяет ее, если на цели есть бафф."
 	L["Always shows the aura, highlight when active, turns blue on insufficient resources."] = "Всегда показывает ауру, подсвечивать, когда активна, становится синим при нехватке ресурсов."
@@ -28,30 +33,43 @@ local L = WeakAuras.L
 	L["Always shows the aura, turns grey if the ability is not usable."] = "Всегда показывает ауру, становится серым, если способность нельзя использовать."
 	L["Always shows the aura, turns red when out of range, blue on insufficient resources."] = "Всегда показывает ауру, становится красным вне зоны действия, синим при недостаточных ресурсах."
 	L["Always shows the aura, turns red when out of range."] = "Всегда показывает индикацию; становится красной, если цель вне зоны действия."
+	--[[Translation missing --]]
+	L["Always shows the aura."] = "Always shows the aura."
 	L["Back"] = "Назад"
 	L["Basic Show On Cooldown"] = "Показать восстановление"
 	--[[Translation missing --]]
 	L["Basic Show On Ready"] = "Basic Show On Ready"
 	L["Bloodlust/Heroism"] = "Жажда крови / Героизм"
+	--[[Translation missing --]]
+	L["Bonded Buff"] = "Bonded Buff"
+	L["Buff"] = "(бафф)"
 	L["buff"] = "(бафф)"
+	L["Buff on Other"] = "(бафф цели)"
 	L["Buffs"] = "Баффы"
+	L["Build Up"] = "(накопление эффекта)"
 	L["Cancel"] = "Отмена"
-	L["Cast"] = "Применение заклинания (каст)"
+	L["Cast"] = "Применение заклинания"
 	L["Charge and Buff Tracking"] = "Отслеживание заряда и баффов"
 	L["Charge and Debuff Tracking"] = "Отслеживание зарядов и дебаффов"
 	L["Charge and Duration Tracking"] = "Отслеживание заряда и продолжительности"
 	L["Charge Tracking"] = "Отслеживание заряда"
+	L["Combustion Ready"] = "(готовность)"
+	L["Conduits"] = "Проводники"
+	L["Cooldown"] = "(восстановление)"
 	L["cooldown"] = "(восстановление)"
-	L["Cooldown"] = "Перезарядка"
 	L["Cooldown Tracking"] = "Отслеживание восстановления"
 	L["Create Auras"] = "Создать"
-	L["debuff"] = "дебафф"
+	L["Debuff"] = "(дебафф)"
+	L["debuff"] = "(дебафф)"
 	L["Debuffs"] = "Дебаффы"
-	L["Enchants"] = "Чары"
-	L["General"] = "Общие"
 	--[[Translation missing --]]
-	L["General Azerite Traits"] = "General Azerite Traits"
+	L["Empowered Buff"] = "Empowered Buff"
+	L["Fire"] = "(огонь)"
+	L["Frost"] = "(лед)"
+	L["General"] = "Общее"
 	L["Health"] = "Здоровье"
+	--[[Translation missing --]]
+	L["Highlight while action is queued."] = "Highlight while action is queued."
 	--[[Translation missing --]]
 	L["Highlight while active, red when out of range."] = "Highlight while active, red when out of range."
 	--[[Translation missing --]]
@@ -64,44 +82,41 @@ local L = WeakAuras.L
 	L["Highlight while spell is active."] = "Highlight while spell is active."
 	L["Hold CTRL to create multiple auras at once"] = "Удерживайте Ctrl для создания нескольких индикаций"
 	L["Keeps existing triggers intact"] = "Сохраняет существующие триггеры нетронутыми"
+	L["Legendaries"] = "Легендарные предметы"
+	L["Meteor Ready"] = "(готовность)"
+	L["Nature"] = "(силы природы)"
 	L["Next"] = "Далее"
-	--[[Translation missing --]]
-	L["On Procc Trinkets (Aura)"] = "On Procc Trinkets (Aura)"
-	--[[Translation missing --]]
-	L["On Use Trinkets (Aura)"] = "On Use Trinkets (Aura)"
-	L["On Use Trinkets (CD)"] = "Активир-е аксессуары (CD)"
 	L["Only show the aura if the target has the debuff."] = "Показывает индикацию, только когда на цели есть дебафф."
 	L["Only show the aura when the item is on cooldown."] = "Показывает индикацию, только когда предмет восстанавливается."
+	--[[Translation missing --]]
+	L["Only shows if the weapon is enchanted."] = "Only shows if the weapon is enchanted."
+	--[[Translation missing --]]
+	L["Only shows if the weapon is not enchanted."] = "Only shows if the weapon is not enchanted."
 	L["Only shows the aura if the target has the buff."] = "Показывает индикацию, только когда на цели есть бафф."
 	L["Only shows the aura when the ability is on cooldown."] = "Показывает индикацию, только когда способность восстанавливается."
 	--[[Translation missing --]]
 	L["Only shows the aura when the ability is ready to use."] = "Only shows the aura when the ability is ready to use."
+	L["Other cooldown"] = "(восстановление, остальные)"
 	L["Pet alive"] = "Питомец жив"
 	L["Pet Behavior"] = "Поведение питомца"
-	--[[Translation missing --]]
-	L["PvP Azerite Traits"] = "PvP Azerite Traits"
 	L["PvP Talents"] = "PvP таланты"
-	--[[Translation missing --]]
-	L["PVP Trinkets (Aura)"] = "PVP Trinkets (Aura)"
-	L["PVP Trinkets (CD)"] = "Аксессуары PvP (CD)"
 	L["Replace all existing triggers"] = "Заменяет все существующие триггеры"
 	L["Replace Triggers"] = "Заменить триггеры"
 	L["Resources"] = "Ресурсы"
-	L["Resources and Shapeshift Form"] = "Форма Друида и ресурсы"
+	L["Resources and Shapeshift Form"] = "Ресурсы и облики друида"
+	L["Rogue cooldown"] = "(восстановление, разбойник)"
 	L["Runes"] = "Руны"
-	L["Shapeshift Form"] = "Форма Друида"
+	L["Shapeshift Form"] = "Облик друида"
+	L["Show Always, Glow on Missing"] = "Показывать всегда, сверкать при отсутствии"
+	L["Show Charges and Check Usable"] = "Показать заряды и проверить доступность"
+	L["Show Charges with Proc Tracking"] = "Показать заряды с отслеживанием срабатывания"
+	L["Show Charges with Range Tracking"] = "Показать заряды с отслеживанием дистанции"
+	L["Show Charges with Usable Check"] = "Показать заряды с проверкой доступности"
 	--[[Translation missing --]]
-	L["Show Charges and Check Usable"] = "Show Charges and Check Usable"
-	--[[Translation missing --]]
-	L["Show Charges with Proc Tracking"] = "Show Charges with Proc Tracking"
-	--[[Translation missing --]]
-	L["Show Charges with Range Tracking"] = "Show Charges with Range Tracking"
-	--[[Translation missing --]]
-	L["Show Charges with Usable Check"] = "Show Charges with Usable Check"
+	L["Show Cooldown and Action Queued"] = "Show Cooldown and Action Queued"
 	L["Show Cooldown and Buff"] = "Показать восстановление и бафф"
 	L["Show Cooldown and Buff and Check for Target"] = "Показать восстановление, бафф и проверку зоны действия"
-	--[[Translation missing --]]
-	L["Show Cooldown and Buff and Check Usable"] = "Show Cooldown and Buff and Check Usable"
+	L["Show Cooldown and Buff and Check Usable"] = "Показать восстановление, бафф и проверку доступности"
 	L["Show Cooldown and Check for Target"] = "Показать восстановление и проверку зоны действия"
 	--[[Translation missing --]]
 	L["Show Cooldown and Check for Target & Proc Tracking"] = "Show Cooldown and Check for Target & Proc Tracking"
@@ -126,20 +141,22 @@ local L = WeakAuras.L
 	--[[Translation missing --]]
 	L["Show Cooldown and Totem Information"] = "Show Cooldown and Totem Information"
 	--[[Translation missing --]]
+	L["Show if Enchant Missing"] = "Show if Enchant Missing"
+	--[[Translation missing --]]
 	L["Show on Ready"] = "Show on Ready"
 	L["Show Only if Buffed"] = "Показать бафф"
 	L["Show Only if Debuffed"] = "Показать дебафф"
+	--[[Translation missing --]]
+	L["Show Only if Enchanted"] = "Show Only if Enchanted"
 	L["Show Only if on Cooldown"] = "Показать восстановление"
 	--[[Translation missing --]]
 	L["Show Totem and Charge Information"] = "Show Totem and Charge Information"
-	--[[Translation missing --]]
-	L["slow debuff"] = "slow debuff"
-	--[[Translation missing --]]
-	L["Specific Azerite Traits"] = "Specific Azerite Traits"
-	--[[Translation missing --]]
-	L["Stance"] = "Stance"
-	--[[Translation missing --]]
-	L["stun debuff"] = "stun debuff"
+	L["Slow"] = "(замедление)"
+	L["slow debuff"] = "(замедление)"
+	L["Stance"] = "Стойка"
+	L["stun debuff"] = "(оглушение)"
+	L["Stun Debuff"] = "(оглушение)"
+	L["Totem"] = "(тотем)"
 	--[[Translation missing --]]
 	L["Track the charge and proc, highlight while proc is active, turns red when out of range, blue on insufficient resources."] = "Track the charge and proc, highlight while proc is active, turns red when out of range, blue on insufficient resources."
 	--[[Translation missing --]]
@@ -150,4 +167,5 @@ local L = WeakAuras.L
 	L["Tracks the charge and the duration of spell, highlight while the spell is active, blue on insufficient resources."] = "Tracks the charge and the duration of spell, highlight while the spell is active, blue on insufficient resources."
 	L["Unknown Item"] = "Неизвестный предмет"
 	L["Unknown Spell"] = "Неизвестное заклинание"
+	L["Warrior cooldown"] = "(восстановление, воин)"
 

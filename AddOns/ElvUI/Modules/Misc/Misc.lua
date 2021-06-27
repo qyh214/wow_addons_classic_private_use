@@ -1,13 +1,12 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local M = E:GetModule('Misc')
 local Bags = E:GetModule('Bags')
 
---Lua functions
 local _G = _G
 local select = select
 local format = format
 local strmatch = strmatch
---WoW API / Variables
+
 local CreateFrame = CreateFrame
 local AcceptGroup = AcceptGroup
 local BNGetGameAccountInfoByGUID = BNGetGameAccountInfoByGUID
@@ -32,7 +31,6 @@ local RaidNotice_AddMessage = RaidNotice_AddMessage
 local RepairAllItems = RepairAllItems
 local SendChatMessage = SendChatMessage
 local StaticPopup_Hide = StaticPopup_Hide
-local StaticPopupSpecial_Hide = StaticPopupSpecial_Hide
 local UninviteUnit = UninviteUnit
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
@@ -46,14 +44,12 @@ local GetNumFactions = GetNumFactions
 local GetFactionInfo = GetFactionInfo
 local SetWatchedFactionIndex = SetWatchedFactionIndex
 local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
-
-local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local LE_GAME_ERR_NOT_ENOUGH_MONEY = LE_GAME_ERR_NOT_ENOUGH_MONEY
 local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS
-local UNKNOWN = UNKNOWN
 local BOOST_THANKSFORPLAYING_SMALLER = SOUNDKIT.UI_70_BOOST_THANKSFORPLAYING_SMALLER
 local INTERRUPT_MSG = INTERRUPTED.." %s's [%s]!"
+local UNKNOWN = UNKNOWN
 
 function M:ErrorFrameToggle(event)
 	if not E.db.general.hideErrorFrame then return end
@@ -188,7 +184,7 @@ function M:AutoInvite(event, _, _, _, _, _, _, inviterGUID)
 	if event == "PARTY_INVITE_REQUEST" then
 		if BNGetGameAccountInfoByGUID(inviterGUID) or IsCharacterFriend(inviterGUID) or IsGuildMember(inviterGUID) then
 			AcceptGroup()
-			StaticPopupDialogs["PARTY_INVITE"].inviteAccepted = 1
+			_G.StaticPopupDialogs.PARTY_INVITE.inviteAccepted = 1
 			StaticPopup_Hide("PARTY_INVITE")
 		end
 	end
@@ -270,7 +266,6 @@ function M:Initialize()
 	self:LoadLootRoll()
 	self:LoadChatBubbles()
 	self:LoadLoot()
-	--self:ToggleItemLevelInfo(true)
 	self:RegisterEvent('MERCHANT_SHOW')
 	self:RegisterEvent('RESURRECT_REQUEST')
 	self:RegisterEvent('PLAYER_REGEN_DISABLED', 'ErrorFrameToggle')
@@ -285,14 +280,6 @@ function M:Initialize()
 	self:RegisterEvent('COMBAT_TEXT_UPDATE')
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
 	self:RegisterEvent('QUEST_COMPLETE')
-
---[[
-	if IsAddOnLoaded("Blizzard_InspectUI") then
-		M:SetupInspectPageInfo()
-	else
-		self:RegisterEvent("ADDON_LOADED")
-	end
-]]
 end
 
 E:RegisterModule(M:GetName())

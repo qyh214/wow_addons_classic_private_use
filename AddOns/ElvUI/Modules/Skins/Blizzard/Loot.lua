@@ -2,18 +2,19 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local S = E:GetModule('Skins')
 local LBG = E.Libs.ButtonGlow
 
---Cache global variables
---Lua functions
 local _G = _G
 local unpack, select = unpack, select
---WoW API / Variables
-local hooksecurefunc = hooksecurefunc
+
+local GetItemInfo = GetItemInfo
 local GetLootSlotInfo = GetLootSlotInfo
+local hooksecurefunc = hooksecurefunc
+local IsFishingLoot = IsFishingLoot
 local UnitIsDead = UnitIsDead
 local UnitIsFriend = UnitIsFriend
 local UnitName = UnitName
-local IsFishingLoot = IsFishingLoot
+
 local C_LootHistory_GetNumItems = C_LootHistory.GetNumItems
+local C_LootHistory_GetItem = C_LootHistory.GetItem
 local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
 local LOOT, ITEMS = LOOT, ITEMS
 
@@ -31,6 +32,16 @@ local function UpdateLoots()
 			frame:CreateBackdrop()
 			frame.backdrop:SetOutside(frame.Icon)
 			frame.Icon:SetParent(frame.backdrop)
+
+			local _, itemLink = C_LootHistory_GetItem(frame.itemIdx)
+			local _, _, itemRarity = GetItemInfo(itemLink)
+
+			if (itemRarity) then
+				local color = ITEM_QUALITY_COLORS[itemRarity]
+				if (color) then
+					frame.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+				end
+			end
 
 			frame.isSkinned = true
 		end
@@ -119,7 +130,6 @@ function S:LootFrame()
 	for i=1, _G.LOOTFRAME_NUMBUTTONS do
 		local button = _G['LootButton'..i]
 		_G['LootButton'..i..'NameFrame']:Hide()
-		--_G['LootButton'..i..'IconQuestTexture']:SetParent(E.HiddenFrame)
 		S:HandleItemButton(button, true)
 
 		button.IconBorder:SetTexture()

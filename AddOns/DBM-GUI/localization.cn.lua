@@ -2,7 +2,7 @@
 -- yleaf(yaroot@gmail.com)
 -- sunlcy@NGA
 -- Mini Dragon(projecteurs@gmail.com)
--- Last update: 2020/09/01
+-- Last update: 2020/09/08
 
 if GetLocale() ~= "zhCN" then return end
 if not DBM_GUI_L then DBM_GUI_L = {} end
@@ -13,7 +13,7 @@ L.MainFrame 				= "Deadly Boss Mods"
 
 L.TranslationByPrefix		= "翻译: "
 L.TranslationBy 			= "Mini_Dragon(Brilla@金色平原) 枫聖@阿什坎迪 原翻译：Diablohu & yleaf & sunlcy"
-L.Website					= "拜访我们的Discord |cFF73C2FBhttps://discord.gg/DF5mffk|r. 在Twitter上关注 @deadlybossmods 或 @MysticalOS"
+L.Website					= "拜访我们的Discord |cFF73C2FBhttps://discord.gg/deadlybossmods|r. 在Twitter上关注 @deadlybossmods 或 @MysticalOS"
 L.WebsiteButton				= "网页"
 
 L.OTabBosses	            = "模块"--Deprecated and will be deleted once tabs no longer use this
@@ -23,15 +23,6 @@ L.OTabPlugins	            = "核心插件"
 L.OTabOptions	            = "选项"
 L.OTabAbout		            = "关于"
 
-L.TabCategory_Options	 	= "综合设置"
-L.TabCategory_BFA	 		= "争霸艾泽拉斯"
-L.TabCategory_LEG	 		= "军团再临"
-L.TabCategory_WOD	 		= "德拉诺之王"
-L.TabCategory_MOP	 		= "熊猫人之谜"
-L.TabCategory_CATA	 		= "大地的裂变"
-L.TabCategory_WOTLK 		= "巫妖王之怒"
-L.TabCategory_BC 			= "燃烧的远征"
-L.TabCategory_CLASSIC		= "经典"
 L.TabCategory_OTHER    		= "其它"
 
 L.BossModLoaded 			= "%s 状态"
@@ -39,13 +30,13 @@ L.BossModLoad_now 			= [[该模块尚未启动。
 当你进入相应副本时其会自动加载。
 你也可以点击开启模块按钮手动启动该模块。]]
 
-L.PosX						= 'X 坐标'
-L.PosY						= 'Y 坐标'
+L.PosX						= "X 坐标"
+L.PosY						= "Y 坐标"
 
-L.MoveMe 					= '移动我'
-L.Button_OK 				= '确定'
-L.Button_Cancel 			= '取消'
-L.Button_LoadMod 			= '加载模块'
+L.MoveMe 					= "移动我"
+L.Button_OK 				= "确定"
+L.Button_Cancel 			= "取消"
+L.Button_LoadMod 			= "加载模块"
 L.Mod_Enabled				= "开启模块"
 L.Mod_Reset					= "恢复默认设置"
 L.Reset 					= "重置"
@@ -63,14 +54,20 @@ L.Statistic_Kills			= "击杀:"
 L.Statistic_Wipes			= "失败:"
 L.Statistic_Incompletes		= "未完成:"
 L.Statistic_BestKill		= "最好成绩:"
-L.Statistic_BestRank		= "最高评级:"
+L.Statistic_BestRank		= "最佳排名:"
 
--- Tab: General Core Options
+-- Tab: General Options
+L.TabCategory_Options	 	= "常规设置"
+L.Area_BasicSetup			= "初始 DBM 设置提示"
+L.Area_ModulesForYou		= "哪些 DBM 模块适合您？"
+L.Area_ProfilesSetup		= "DBM 配置文件指南"
+-- Panel: Core & GUI
+L.Core_GUI 					= "DBM核心设置"
 L.General 					= "DBM核心综合设置"
 L.EnableMiniMapIcon			= "显示小地图按钮"
 L.UseSoundChannel			= "设置DBM使用的声道"
-L.UseMasterChannel			= "主声道。"
-L.UseDialogChannel			= "对话声道。"
+L.UseMasterChannel			= "主声道"
+L.UseDialogChannel			= "对话声道"
 L.UseSFXChannel				= "音效声道"
 L.Latency_Text				= "设定团队之间DBM最高延迟阈值：%d"
 
@@ -90,7 +87,64 @@ L.Button_ResetWindowSize	= "重置窗口大小"
 L.Editbox_WindowWidth		= "宽度"
 L.Editbox_WindowHeight		= "高度"
 
--- Tab: Raidwarning
+-- Panel: Extra Features
+L.Panel_ExtraFeatures		= "其他功能"
+
+L.Area_SoundAlerts			= "语音/闪烁警报选项"
+L.LFDEnhance				= "当发起角色检查或随机团队/战场就绪时，在主声道播放准备音效(即使关闭了音效而且很大声！)并闪烁图标"
+L.WorldBossNearAlert		= "当世界附近的Boss进入战斗时播放准备音效(覆盖单独BOSS设置)并闪烁图标"
+L.RLReadyCheckSound			= "在主声道/对话声道播放检查准备音效并闪烁图标"
+L.AFKHealthWarning			= "当你在挂机/暂离受到伤害时播放音效并闪烁图标(你会死)"
+--
+L.TimerGeneral 				= "计时器选项"
+L.SKT_Enabled				= "总是显示最速胜利计时条(覆盖单独BOSS设置)"
+L.ShowRespawn				= "Boss战斗未完成时显示Boss刷新计时条"
+L.ShowQueuePop				= "显示PVP战场确认计时条"
+--
+L.Area_AutoLogging			= "自动战斗日志选项"
+L.AutologBosses				= "自动采用官方格式记录日志。"
+L.AdvancedAutologBosses		= "自动采用 Transcriptor 记录日志"
+L.RecordOnlyBosses			= "只记录团队BOSS数据 (不记录其他数据，使用 /dbm pull 可提前记录并使得记录更准确，如提前偷药水或是召唤大军。)"
+L.LogOnlyNonTrivial			= "只记录团队Boss，而不记录随机团队/5人本/场景战役。"
+--
+--L.Area_3rdParty				= "第三方插件选项"
+--L.ShowBBOnCombatStart		= "战斗开始时使用Big Brother的buff检测"
+--L.BigBrotherAnnounceToRaid	= "报告Big Brother的检测结果给团队"
+L.Area_Invite				= "组队邀请选项"
+L.AutoAcceptFriendInvite	= "自动接受来自好友列表里的好友的组队邀请"
+L.AutoAcceptGuildInvite		= "自动接受同公会成员的组队邀请"
+L.Area_Advanced				= "高级选项"
+L.FakeBW					= "当检查Bigwig时，假装DBM就是Bigwig"
+L.AITimer					= "DBM为没遇见过的战斗使用人工智能自动产生计时器(在初期的Beta或PTR的Boss测试非常有帮助)。此功能不会对多目标技能生效。"
+
+-- Panel: Profiles
+L.Panel_Profile				= "配置文件"
+L.Area_CreateProfile		= "创建DBM核心配置"
+L.EnterProfileName			= "输入配置文件名称"
+L.CreateProfile				= "创建带有默认设置的配置文件"
+L.Area_ApplyProfile			= "选择一个已有的DBM核心配置文件并应用它"
+L.SelectProfileToApply		= "选择一个配置文件并应用"
+L.Area_CopyProfile			= "复制一个配置文件"
+L.SelectProfileToCopy		= "选择一个配置文件并复制"
+L.Area_DeleteProfile		= "删除一个已有的DBM核心配置文件"
+L.SelectProfileToDelete		= "选择一个配置文件并删除"
+L.Area_DualProfile			= "Boss模块配置文件选项"
+L.DualProfile				= "为Boss的每个专精开启不同的配置选项(Boss的配置在boss模块里)。默认状态下，当你切换专精时，DBM会重置选项到默认状态，选中本选项后，每个专精都有对应的配置文件，切换专精不会丢失上一个专精的配置。"
+
+L.Area_ModProfile			= "复制/删除一个角色/专精选项"
+L.ModAllReset				= "重置所有Boss模块选项"
+L.ModAllStatReset			= "重置所有Boss模块状态"
+L.SelectModProfileCopy		= "复制所有选项："
+L.SelectModProfileCopySound	= "只复制声音选项："
+L.SelectModProfileCopyNote	= "只复制自定义注记："
+L.SelectModProfileDelete	= "删除 Boss 模块设置："
+
+-- Tab: Alerts
+L.TabCategory_Alerts	 	= "警报"
+L.Area_SpecAnnounceConfig	= "特殊警报提示和声音指南"
+L.Area_SpecAnnounceNotes	= "特殊警报自定义指南"
+L.Area_VoicePackInfo		= "所有 DBM 语音包信息"
+-- Panel: Raidwarning
 L.Tab_RaidWarning 			= "团队警报"
 L.RaidWarning_Header		= "团队警报设置"
 L.RaidWarnColors 			= "团队警报颜色"
@@ -106,20 +160,16 @@ L.WarningIconLeft 			= "左侧显示图标"
 L.WarningIconRight 			= "右侧显示图标"
 L.WarningIconChat 			= "在聊天窗口中显示图标"
 L.WarningAlphabetical		= "按字母顺序排序"
-L.Warn_FontType				= "选择字体"
-L.Warn_FontStyle			= "选择样式"
-L.Warn_FontShadow			= "阴影"
-L.Warn_FontSize				= "字体大小: %d"
 L.Warn_Duration				= "警告持续时间: %0.1f 秒"
 L.None						= "无"
-L.Random					= "Random"
+L.Random					= "随机"
 L.Outline					= "描边"
 L.ThickOutline				= "加粗描边"
 L.MonochromeOutline			= "单色描边"
 L.MonochromeThickOutline	= "单色加粗描边"
 L.RaidWarnSound				= "发出团队警报时播放声音"
 
--- Tab: Spec Warn Frame
+-- Panel: Spec Warn Frame
 L.Panel_SpecWarnFrame		= "特殊团队警报"
 L.Area_SpecWarn				= "特殊警报设置"
 L.SpecWarn_ClassColor		= "为特殊警报启用分职业着色"
@@ -128,17 +178,12 @@ L.SWarnNameInNote			= "使用自定义注记的特殊警报请选择 类型5"
 L.SpecialWarningIcon		= "特殊警报使用技能图标"
 L.ShortTextSpellname		= "使用较短的技能名称 (当可行时)"
 L.SpecWarn_FlashFrameRepeat	= "重复 %d 次 (如果开启的话)"
-L.SpecWarn_Font				= "特殊警报字体"
-L.SpecWarn_FontSize			= "字体大小: %d"
-L.SpecWarn_FontColor		= "字体颜色"
-L.SpecWarn_FontType			= "选择字体"
 L.SpecWarn_Flash			= "屏幕闪烁"
 L.SpecWarn_FlashRepeat		= "重复闪烁"
 L.SpecWarn_FlashColor		= "闪烁颜色 %d"
 L.SpecWarn_FlashDur			= "闪烁持续时间: %0.1f"
 L.SpecWarn_FlashAlpha		= "闪烁透明度: %0.1f"
 L.SpecWarn_DemoButton		= "测试警报"
-L.SpecWarn_MoveMe			= "设置位置"
 L.SpecWarn_ResetMe			= "重置"
 L.SpecialWarnSoundOption	= "设置默认声音"
 L.SpecialWarnHeader1		= "类型 1: 设置影响您或您的操作的普通优先级警报选项"
@@ -147,7 +192,7 @@ L.SpecialWarnHeader3		= "类型 3: 设置高优先级警报的选项"
 L.SpecialWarnHeader4		= "类型 4: 设置“高优先级”选项会避免特殊警报"
 L.SpecialWarnHeader5		= "类型 5: 设置警报选项，并包含玩家姓名"
 
--- Tab: Generalwarnings
+-- Panel: Generalwarnings
 L.Tab_GeneralMessages 		= "综合信息"
 L.CoreMessages				= "核心信息设置"
 L.ShowPizzaMessage 			= "在聊天窗口中显示计时条广播信息"
@@ -157,26 +202,62 @@ L.ShowReminders				= "显示建议消息，缺少的模块和需要修补程序�
 L.CombatMessages			= "战斗信息设置"
 L.ShowEngageMessage 		= "在聊天窗口中显示开战信息"
 L.ShowDefeatMessage 		= "在聊天窗口中显示击杀信息"
-L.ShowGuildMessages 		= "在聊天窗口中显示公会开战，击杀，灭团信息"
+L.ShowGuildMessages 		= "在聊天窗口中显示公会开战/击杀/灭团信息"
 
 L.Area_ChatAlerts			= "其他警报选项"
 L.WorldBossAlert			= "当世界Boss进入战斗后发送警报，这个信息可能是你的朋友或者同公会成员发送的。 (由于跨服，位面等因素，可能不准确)"
 L.WorldBuffAlert			= "当世界增益BUFF激活后发送警报，这个信息可能是你的朋友或者同公会成员发送的。 (由于跨服，位面等因素，可能不准确)"
 
-L.Area_BugAlerts			= "错误报告警报选项"
-L.BadTimerAlert				= "当DBM检测到计时器错误且至少有2秒不正确时显示聊天消息"
-L.BadIDAlert				= "当DBM检测到使用中的无效技能或日志ID时显示聊天消息"
+L.Area_BugAlerts			= "错误报告选项"
+L.BadTimerAlert				= "在聊天窗口中显示DBM检测到计时器错误且至少有1秒不正确的信息"
+L.BadIDAlert				= "在聊天窗口中显示DBM检测到使用中的无效技能或日志ID的信息"
 
--- Tab: Barsetup
-L.BarSetup					= "计时条设置"
+-- Panel: Spoken Alerts Frame
+L.Panel_SpokenAlerts		= "语音警报"
+L.Area_VoiceSelection		= "语音选择"
+L.CountdownVoice			= "设置第一倒计时语音"
+L.CountdownVoice2			= "设置第二倒计时语音"
+L.CountdownVoice3			= "设置第三倒计时语音"
+L.VoicePackChoice			= "设置语音报警的语音包(快躲开！)"
+L.Area_CountdownOptions		= "倒计时选项"
+L.Area_VoicePackOptions		= "语音包选项(第三方语音包)"
+L.SpecWarn_NoSoundsWVoice	= "当技能存在语音包语音时，屏蔽播放特殊警报声（当心，毁灭）"
+L.SWFNever					= "从不"
+L.SWFDefaultOnly			= "当特殊警报使用默认声音时(允许自定义语音包播放)"
+L.SWFAll					= "当特殊警报使用任何默认声音时"
+L.SpecWarn_AlwaysVoice		= "总是播放所有语音警报(覆盖Boss特定的选项,建议指挥使用)"
+--TODO, maybe add URLS right to GUI panel on where to acquire 3rd party voice packs?
+L.Area_GetVEM				= "获取夏一可语音包(普通话最新)"
+L.VEMDownload				= "|cFF73C2FBhttps://curseforge.com/wow/addons/dbm-voicepack-yike|r"
+L.Area_BrowseOtherVP		= "获取其他语音包"
+L.BrowseOtherVPs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+voice|r"
+L.Area_BrowseOtherCT		= "获取其他倒计时语音包"
+L.BrowseOtherCTs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+count+pack|r"
+
+-- Tab: Event Sounds
+L.Panel_EventSounds			= "事件音效"
+L.Area_SoundSelection		= "音效选择(使用鼠标滚轮滚动选择)"
+L.EventVictorySound			= "设置战斗胜利音效"
+L.EventWipeSound			= "设置灭团音效"
+L.EventEngageSound			= "设置开战音效"
+L.EventDungeonMusic			= "设置在副本内播放的音乐"
+L.EventEngageMusic			= "设置战斗过程中的音乐"
+L.Area_EventSoundsExtras	= "事件音效选项"
+L.EventMusicCombined		= "允许在副本内播放在音乐选项中的全部音效(需要/reload 才能加载)"
+L.Area_EventSoundsFilters	= "事件音效过滤条件"
+
+-- Tab: Timers
+L.TabCategory_Timers		= "计时条"
+L.Area_ColorBytype			= "计时条分类着色指南"
+-- Panel: Color by Type
+L.Panel_ColorByType	 		= "计时条分类着色"
+L.AreaTitle_BarColors		= "计时条颜色"
 L.BarTexture				= "计时条材质"
 L.BarStyle					= "计时条样式"
 L.BarDBM					= "DBM(有动画)"
 L.BarSimple					= "简易(没动画)"
 L.BarStartColor				= "初始颜色"
 L.BarEndColor 				= "结束颜色"
-L.Bar_Font					= "计时条字体"
-L.Bar_FontSize				= "字体大小: %d"
 L.Bar_Height				= "计时条高度: %d"
 L.Slider_BarOffSetX 		= "X 偏移: %d"
 L.Slider_BarOffSetY 		= "Y 偏移: %d"
@@ -215,8 +296,9 @@ L.CVoiceOne					= "倒数 1"
 L.CVoiceTwo					= "倒数 2"
 L.CVoiceThree				= "倒数 3"
 
--- Tab: Timers
-L.AreaTitle_BarColors		= "按类型分类着色"
+-- Panel: Timers
+L.Panel_Appearance	 		= "计时条设置"
+L.Panel_Behavior	 		= "计时条特性"
 L.AreaTitle_BarSetup		= "计时条综合设置"
 L.AreaTitle_Behavior		= "计时条特性设置"
 L.AreaTitle_BarSetupSmall 	= "小型计时条设置"
@@ -228,7 +310,7 @@ L.ExpandUpwards				= "快消失的计时条在上"
 L.FillUpBars				= "填充计时条"
 L.ClickThrough				= "禁用鼠标点击事件（允许你点击计时条后面的目标）"
 L.Bar_Decimal				= "%d 秒以内显示小数点"
-L.Bar_Alpha					= "计时条透明度: %0.1f"
+L.Bar_Alpha					= "透明度: %0.1f"
 L.Bar_EnlargeTime			= "在 %d 秒后计时条变大"
 L.BarSpark					= "计时条闪光"
 L.BarFlash					= "快走完时闪动"
@@ -237,46 +319,16 @@ L.BarColorByType			= "按类着色"
 L.NoBarFade					= "使用开始/结束颜色作为长/短计时条颜色，而不是颜色渐变"
 L.BarInlineIcons			= "显示条内图标"
 L.ShortTimerText			= "使用更短的计时条文字 (当可行时)"
-L.StripTimerText			= "分离 CD/下一次 计时条" --
+L.StripTimerText			= "分离 CD/下一次 计时条"
 L.KeepBar					= "保持计时条显示直到技能被释放"
 L.KeepBar2					= "(当被模组支持时)"
 L.FadeBar					= "隐藏超出技能范围的计时条"
 
--- Tab: Spoken Alerts Frame
-L.Panel_SpokenAlerts		= "语音警报"
-L.Area_VoiceSelection		= "语音选择"
-L.CountdownVoice			= "设置第一倒计时语音"
-L.CountdownVoice2			= "设置第二倒计时语音"
-L.CountdownVoice3			= "设置第三倒计时语音"
-L.VoicePackChoice			= "设置语音报警的语音包(快躲开！)"
-L.Area_CountdownOptions		= "倒计时选项"
-L.Area_VoicePackOptions		= "语音包选项(第三方语音包)"
-L.SpecWarn_NoSoundsWVoice	= "当技能存在语音包语音时，屏蔽播放特殊警报声（当心，毁灭）"
-L.SWFNever					= "从不"
-L.SWFDefaultOnly			= "当特殊警报使用默认声音时(允许自定义语音包播放)"
-L.SWFAll					= "当特殊警报使用任何默认声音时"
-L.SpecWarn_AlwaysVoice		= "总是播放所有语音警报(覆盖Boss特定的选项,建议指挥使用)"
---TODO, maybe add URLS right to GUI panel on where to acquire 3rd party voice packs?
-L.Area_GetVEM				= "获取夏一可语音包(普通话最新)"
-L.VEMDownload				= "|cFF73C2FBhttps://curseforge.com/wow/addons/dbm-voicepack-yike|r"
-L.Area_BrowseOtherVP		= "获取其他语音包"
-L.BrowseOtherVPs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+voice|r"
-L.Area_BrowseOtherCT		= "获取其他倒计时语音包"
-L.BrowseOtherCTs			= "|cFF73C2FBhttps://curseforge.com/wow/addons/search?search=dbm+count+pack|r"
-
--- Tab: Event Sounds
-L.Panel_EventSounds			= "事件音效"
-L.Area_SoundSelection		= "音效选择(使用鼠标滚轮滚动选择)"
-L.EventVictorySound			= "设置战斗胜利音效"
-L.EventWipeSound			= "设置灭团音效"
-L.EventEngageSound			= "设置开战音效"
-L.EventDungeonMusic			= "设置在副本内播放的音乐"
-L.EventEngageMusic			= "设置战斗过程中的音乐"
-L.Area_EventSoundsExtras	= "事件音效选项"
-L.EventMusicCombined		= "允许在副本内播放在音乐选项中的全部音效(需要/reload 才能加载)"
-L.Area_EventSoundsFilters	= "事件音效过滤条件"
-
--- Tab: Global Filter
+-- Tab: Global Disables & Filters
+L.TabCategory_Filters	 	= "禁用及过滤选项"
+L.Area_DBMFiltersSetup		= "DBM 信息过滤指南"
+L.Area_BlizzFiltersSetup	= "暴雪信息过滤指南"
+-- Panel: DBM Features
 L.Panel_SpamFilter			= "DBM 全局过滤选项"
 L.Area_SpamFilter_Anounces	= "警报过滤选项"
 L.SpamBlockNoShowAnnounce	= "不显示警报或播放警报音效"
@@ -303,7 +355,6 @@ L.Area_Restore				= "DBM战斗结束重置设置（在模块完成后，DBM 是�
 L.SpamBlockNoIconRestore	= "当战斗结束后不保存团队标记状态并重置"
 L.SpamBlockNoRangeRestore	= "当Boss模块隐藏距离窗体时不重置窗体位置"
 
--- Tab: Spam Filter
 L.Area_SpamFilter			= "信息过滤选项"
 L.DontShowFarWarnings		= "不为过远的事件显示计时条/警报"
 L.StripServerName			= "警报和计时器中不显示服务器名"
@@ -326,6 +377,7 @@ L.DontShowPTText			= "不显示开怪和倒计时文字"
 L.DontPlayPTCountdown		= "不播放开怪倒计时语音"
 L.PT_Threshold				= "不显示高于 %d 秒的倒计时动画"
 
+-- Panel: Blizzard Features
 L.Panel_HideBlizzard		= "隐藏游戏自带内容"
 L.Area_HideBlizzard			= "隐藏游戏自带提示选项"
 L.HideBossEmoteFrame		= "Boss战斗中隐藏Boss表情框体"
@@ -340,67 +392,40 @@ L.Always					= "总是跳过"
 L.CombatOnly				= "在战斗中隐藏 (任何)"
 L.RaidCombat				= "在战斗中隐藏 (boss 战隐藏)"
 
--- Tab: Privacy
+-- Panel: Privacy
 L.Tab_Privacy 				= "密语设置"
 L.Area_WhisperMessages		= "密语信息设置"
 L.AutoRespond 				= "在战斗中自动回复私聊"
 L.WhisperStats 				= "在回复的私聊中包含击杀或灭团次数统计信息"
 L.DisableStatusWhisper 		= "屏蔽全团成员的密语(需要团长权限)。只对普通/英雄/神话团队和挑战/神话五人小队有效。"
-
 L.Area_SyncMessages			= "信息同步设置"
 L.EnableWBSharing 			= "当世界增益BUFF的激活或者世界BOSS刷新/击杀；分享给在同服务器的战网好友。 （此信息将始终与您的公会分享）"
 L.DisableGuildStatus 		= "屏蔽通报团队进度信息到公会(需要团长权限)"
 
--- Tab: Extra Features
-L.Panel_ExtraFeatures		= "其他功能"
-L.Area_SoundAlerts			= "语音/闪烁警报选项"
-L.LFDEnhance				= "当发起角色检查或随机团队/战场就绪时，在主声道播放准备音效(即使关闭了音效而且很大声！)并闪烁图标"
-L.WorldBossNearAlert		= "当世界附近的Boss进入战斗时播放准备音效(覆盖单独BOSS设置)并闪烁图标"
-L.RLReadyCheckSound			= "在主声道/对话声道播放检查准备音效并闪烁图标。"
-L.AFKHealthWarning			= "当你在挂机/暂离而受到伤害时播放音效并闪烁图标(你会死)"
---
-L.TimerGeneral 				= "计时器选项"
-L.SKT_Enabled				= "总是显示最速胜利计时条(覆盖单独BOSS设置)"
-L.ShowRespawn				= "Boss战斗未完成时显示Boss刷新计时条"
-L.ShowQueuePop				= "显示随机小队/团队查找器确认计时条"
---
-L.Area_AutoLogging			= "自动战斗日志选项"
-L.AutologBosses				= "自动采用官方格式记录日志。"
-L.AdvancedAutologBosses		= "自动采用 Transcriptor 记录日志"
-L.RecordOnlyBosses			= "只记录团队BOSS数据 (不记录其他数据，使用 /dbm pull 可提前记录并使得记录更准确，如提前偷药水或是召唤大军。)"
-L.LogOnlyNonTrivial			= "只记录团队Boss，而不记录随机团队，5人本，场景战役。"
---
---L.Area_3rdParty				= "第三方插件选项"
---L.ShowBBOnCombatStart		= "战斗开始时使用Big Brother的buff检测"
---L.BigBrotherAnnounceToRaid	= "报告Big Brother的检测结果给团队"
-L.Area_Invite				= "组队邀请选项"
-L.AutoAcceptFriendInvite	= "自动接受来自好友列表里的好友的组队邀请"
-L.AutoAcceptGuildInvite		= "自动接受同公会成员的组队邀请"
-L.Area_Advanced				= "高级选项"
-L.FakeBW					= "当检查Bigwig时，假装DBM就是Bigwig"
-L.AITimer					= "DBM为没遇见过的战斗使用人工智能自动产生计时器(在初期的Beta或PTR的Boss测试非常有帮助)。此功能不会对多目标技能生效。"
+-- Tab: Frames & Integrations
+L.TabCategory_Frames		= "框体及其它"
+L.Area_NamelateInfo			= "DBM 姓名板光环信息"
+-- Panel: InfoFrame
+L.Panel_InfoFrame			= "信息框"
 
--- Tab: Profiles
-L.Panel_Profile				= "配置文件"
-L.Area_CreateProfile		= "创建DBM核心配置"
-L.EnterProfileName			= "输入配置文件名称"
-L.CreateProfile				= "创建带有默认设置的配置文件"
-L.Area_ApplyProfile			= "选择一个已有的DBM核心配置文件并应用它"
-L.SelectProfileToApply		= "选择一个配置文件并应用"
-L.Area_CopyProfile			= "复制一个配置文件"
-L.SelectProfileToCopy		= "选择一个配置文件并复制"
-L.Area_DeleteProfile		= "删除一个已有的DBM核心配置文件"
-L.SelectProfileToDelete		= "选择一个配置文件并删除"
-L.Area_DualProfile			= "Boss模块配置文件选项"
-L.DualProfile				= "为Boss的每个专精开启不同的配置选项(Boss的配置在boss模块里)。默认状态下，当你切换专精时，DBM会重置选项到默认状态，选中本选项后，每个专精都有对应的配置文件，切换专精不会丢失上一个专精的配置。"
+-- Panel: Range
+L.Panel_Range				= "距离框"
 
-L.Area_ModProfile			= "复制/删除一个角色/专精选项"
-L.ModAllReset				= "重置所有Boss模块选项"
-L.ModAllStatReset			= "重置所有Boss模块状态"
-L.SelectModProfileCopy		= "复制所有选项："
-L.SelectModProfileCopySound	= "只复制声音选项："
-L.SelectModProfileCopyNote	= "只复制自定义注记："
-L.SelectModProfileDelete	= "删除 Boss 模块设置："
+-- Panel: Nameplate
+L.Panel_Nameplates			= "姓名板"
+L.UseNameplateHandoff		= "将姓名板上显示技能图标移交给支持的插件（KuiNameplates，Threat Plates，Plater），而不是DBM处理。 推荐使用此选项，因为能通过姓名板插件完成更高级的功能和配置。"
+L.Area_NPStyle				= "样式(注意：仅能使用DBM配置支持的样式。)"
+L.NPAuraSize				= "技能图标大小(比例): %d"
 
 -- Misc
+L.Area_General				= "一般"
+L.Area_Position				= "位置"
+L.Area_Style				= "样式"
+
+L.FontSize					= "字体大小: %d"
+L.FontStyle					= "字体样式"
+L.FontColor					= "字体颜色"
+L.FontShadow				= "字体阴影"
+L.FontType					= "选择字体"
+
 L.FontHeight	= 16

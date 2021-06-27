@@ -1,7 +1,6 @@
 local _, ns = ...
 local oUF = ns.oUF
 
---Lua functions
 local _G = _G
 local GetTime = GetTime
 local UnitPower = UnitPower
@@ -19,14 +18,14 @@ local myClass = select(2, UnitClass('player'))
 local Mp5Delay = 5
 local Mp5DelayWillEnd = nil
 local Mp5IgnoredSpells = {
-	[11689] = true, -- life tap 6
-	[11688] = true, -- life tap 5
-	[11687] = true, -- life tap 4
-	[1456] = true, -- life tap 3
-	[1455] = true, -- life tap 2
-	[1454] = true, -- life tap 1
-	[18182] = true, -- improved life tap 1
-	[18183] = true, -- improved life tap 2
+	[18182] = true, -- Improved Life Tap 1
+	[18183] = true, -- Improved Life Tap 2
+	[1454] = true, -- Life Tap 1
+	[1455] = true, -- Life Tap 2
+	[1456] = true, -- Life Tap 3
+	[11687] = true, -- Life Tap 4
+	[11688] = true, -- Life Tap 5
+	[11689] = true, -- Life Tap 6
 }
 
 -- Sets tick time to the last possible time based on the last tick

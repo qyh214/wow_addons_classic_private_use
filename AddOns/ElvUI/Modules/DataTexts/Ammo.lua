@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...))
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 if E.myclass ~= 'HUNTER' and E.myclass ~= 'ROGUE' and E.myclass ~= 'WARLOCK' and E.myclass ~= 'WARRIOR' then return end
 
 local DT = E:GetModule('DataTexts')
@@ -92,6 +92,7 @@ end
 
 local itemCount = {}
 local function OnEnter()
+	DT.tooltip:ClearLines()
 	if E.myclass == 'HUNTER' or E.myclass == 'ROGUE' or E.myclass == 'WARRIOR' then
 		wipe(itemCount)
 		DT.tooltip:AddLine(INVTYPE_AMMO)

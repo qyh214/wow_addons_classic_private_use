@@ -1,11 +1,11 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local D = E:GetModule('Distributor')
 local NP = E:GetModule('NamePlates')
 local LibCompress = E.Libs.Compress
 local LibBase64 = E.Libs.Base64
 
 local _G = _G
-local tonumber, type, gsub, pcall, loadstring = tonumber, type, gsub, pcall, loadstring
+local tonumber, type, gsub, pairs, pcall, loadstring = tonumber, type, gsub, pairs, pcall, loadstring
 local len, format, split, find = strlen, format, strsplit, strfind
 
 local CreateFrame = CreateFrame
@@ -244,11 +244,11 @@ local blacklistedKeys = {
 	profile = {
 		gridSize = true,
 		general = {
-			numberPrefixStyle = true,
+			numberPrefixStyle = true
 		},
 		chat = {
-			hideVoiceButtons = true,
-		},
+			hideVoiceButtons = true
+		}
 	},
 	private = {},
 	global = {
@@ -259,15 +259,20 @@ local blacklistedKeys = {
 			locale = true,
 			version = true,
 			eyefinity = true,
-			disableTutorialButtons = true,
+			ultrawide = true,
 			showMissingTalentAlert = true,
 			allowDistributor = true
 		},
 		chat = {
-			classColorMentionExcludedNames = true,
+			classColorMentionExcludedNames = true
 		},
 		datatexts = {
-			newPanelInfo = true
+			newPanelInfo = true,
+			settings = {
+				Currencies = {
+					tooltipData = true
+				}
+			}
 		},
 		nameplate = {
 			effectiveHealth = true,
@@ -276,27 +281,27 @@ local blacklistedKeys = {
 			effectiveHealthSpeed = true,
 			effectivePowerSpeed = true,
 			effectiveAuraSpeed = true,
-			filters = true,
+			filters = true
 		},
 		unitframe = {
 			aurafilters = true,
-			buffwatch = true,
+			aurawatch = true,
 			effectiveHealth = true,
 			effectivePower = true,
 			effectiveAura = true,
 			effectiveHealthSpeed = true,
 			effectivePowerSpeed = true,
-			effectiveAuraSpeed = true,
-			spellRangeCheck = true,
-		},
+			effectiveAuraSpeed = true
+		}
 	},
 }
 
 --Keys that auto or user generated tables.
 D.GeneratedKeys = {
 	profile = {
+		convertPages = true,
 		movers = true,
-		v11NamePlateReset = true,
+		actionbar = {},
 		nameplates = { -- this is supposed to have an 's' because yeah, oh well
 			filters = true
 		},
@@ -314,11 +319,10 @@ D.GeneratedKeys = {
 	global = {
 		datatexts = {
 			customPanels = true,
-			customCurrencies = true
 		},
 		unitframe = {
 			aurafilters = true,
-			buffwatch = true,
+			aurawatch = true
 		},
 		nameplate = {
 			filters = true
@@ -330,6 +334,10 @@ do
 	local units = D.GeneratedKeys.profile.unitframe.units
 	for unit in pairs(P.unitframe.units) do
 		units[unit] = {customTexts = true}
+	end
+
+	for i = 1, 10 do
+		D.GeneratedKeys.profile.actionbar['bar'..i] = { paging = true }
 	end
 end
 
@@ -365,8 +373,8 @@ local function GetProfileData(profileType)
 		profileData.unitframe = {}
 		profileData.unitframe.aurafilters = {}
 		profileData.unitframe.aurafilters = E:CopyTable(profileData.unitframe.aurafilters, ElvDB.global.unitframe.aurafilters)
-		profileData.unitframe.buffwatch = {}
-		profileData.unitframe.buffwatch = E:CopyTable(profileData.unitframe.buffwatch, ElvDB.global.unitframe.buffwatch)
+		profileData.unitframe.aurawatch = {}
+		profileData.unitframe.aurawatch = E:CopyTable(profileData.unitframe.aurawatch, ElvDB.global.unitframe.aurawatch)
 		profileData = E:RemoveTableDuplicates(profileData, G, D.GeneratedKeys.global)
 		profileKey = 'filters'
 	elseif profileType == 'styleFilters' then

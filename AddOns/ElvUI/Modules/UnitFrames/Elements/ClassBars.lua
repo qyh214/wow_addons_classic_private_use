@@ -1,111 +1,142 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
---Lua functions
-local select, unpack = select, unpack
-local strfind, strsub, gsub = strfind, strsub, gsub
-local floor, max = floor, max
---WoW API / Variables
+local max = max
+local ipairs = ipairs
+local unpack = unpack
 local CreateFrame = CreateFrame
 local MAX_COMBO_POINTS = MAX_COMBO_POINTS
 -- GLOBALS: ElvUF_Player
 
 local _, ns = ...
 local ElvUF = ns.oUF
-assert(ElvUF, "ElvUI was unable to locate oUF.")
+assert(ElvUF, 'ElvUI was unable to locate oUF.')
 
-function UF:Configure_ClassBar(frame, cur)
+function UF:PostVisibility_ClassBars(frame)
+	if not (frame and frame.db) then return end
+
+	UF:Configure_ClassBar(frame)
+	UF:Configure_Power(frame)
+	UF:Configure_InfoPanel(frame)
+end
+
+function UF:ClassPower_UpdateColor(powerType)
+	local color, r, g, b = UF.db.colors.classResources[E.myclass] or UF.db.colors.power[powerType]
+	if color then
+		r, g, b = color.r, color.g, color.b
+	else
+		color = ElvUF.colors.power[powerType]
+		r, g, b = unpack(color)
+	end
+
+	local custom_backdrop = UF.db.colors.customclasspowerbackdrop and UF.db.colors.classpower_backdrop
+
+	for i, bar in ipairs(self) do
+		local classCombo = (powerType == 'COMBO_POINTS' and UF.db.colors.classResources.comboPoints[i])
+		if classCombo then r, g, b = classCombo.r, classCombo.g, classCombo.b end
+
+		bar:SetStatusBarColor(r, g, b)
+
+		if bar.bg then
+			if custom_backdrop then
+				bar.bg:SetVertexColor(custom_backdrop.r, custom_backdrop.g, custom_backdrop.b)
+			else
+				bar.bg:SetVertexColor(r * .35, g * .35, b * .35)
+			end
+		end
+	end
+end
+
+function UF:Configure_ClassBar(frame)
+	local db = frame.db
+	if not db then return end
+
 	local bars = frame[frame.ClassBar]
 	if not bars then return end
 
-	local db = frame.db
 	bars.Holder = frame.ClassBarHolder
 	bars.origParent = frame
 
+	local MAX_CLASS_BAR = frame.MAX_CLASS_BAR
+
 	--Fix height in case it is lower than the theme allows, or in case it's higher than 30px when not detached
-	if (not self.thinBorders and not E.PixelMode) and frame.CLASSBAR_HEIGHT > 0 and frame.CLASSBAR_HEIGHT < 7 then --A height of 7 means 6px for borders and just 1px for the actual power statusbar
+	if not UF.thinBorders and (frame.CLASSBAR_HEIGHT > 0 and frame.CLASSBAR_HEIGHT < 7) then --A height of 7 means 6px for borders and just 1px for the actual power statusbar
 		frame.CLASSBAR_HEIGHT = 7
 		if db.classbar then db.classbar.height = 7 end
-		UF.ToggleResourceBar(bars) --Trigger update to health if needed
-	elseif (self.thinBorders or E.PixelMode) and frame.CLASSBAR_HEIGHT > 0 and frame.CLASSBAR_HEIGHT < 3 then --A height of 3 means 2px for borders and just 1px for the actual power statusbar
+	elseif UF.thinBorders and (frame.CLASSBAR_HEIGHT > 0 and frame.CLASSBAR_HEIGHT < 3) then --A height of 3 means 2px for borders and just 1px for the actual power statusbar
 		frame.CLASSBAR_HEIGHT = 3
 		if db.classbar then db.classbar.height = 3 end
-		UF.ToggleResourceBar(bars)  --Trigger update to health if needed
-	elseif (not frame.CLASSBAR_DETACHED and frame.CLASSBAR_HEIGHT > 30) then
+	elseif not frame.CLASSBAR_DETACHED and frame.CLASSBAR_HEIGHT > 30 then
 		frame.CLASSBAR_HEIGHT = 10
 		if db.classbar then db.classbar.height = 10 end
-		--Override visibility if Classbar is Additional Power in order to fix a bug when Auto Hide is enabled, height is higher than 30 and it goes from detached to not detached
-		local overrideVisibility = frame.ClassBar == "AdditionalPower"
-		UF.ToggleResourceBar(bars, overrideVisibility)  --Trigger update to health if needed
 	end
 
+	-- keep after classbar height update
+	UF.ToggleResourceBar(bars)
+
 	--We don't want to modify the original frame.CLASSBAR_WIDTH value, as it bugs out when the classbar gains more buttons
-	local CLASSBAR_WIDTH = frame.CLASSBAR_WIDTH
+	local CLASSBAR_WIDTH = E:Scale(frame.CLASSBAR_WIDTH)
+	local SPACING = E:Scale((UF.BORDER + UF.SPACING)*2)
 
 	local color = E.db.unitframe.colors.borderColor
-	if not bars.backdrop.ignoreBorderColors then
+	if not bars.backdrop.forcedBorderColors then
 		bars.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
 	end
 
 	if frame.USE_MINI_CLASSBAR and not frame.CLASSBAR_DETACHED then
-		if frame.MAX_CLASS_BAR == 1 or frame.ClassBar == "AdditionalPower" then
+		if MAX_CLASS_BAR == 1 or frame.ClassBar == 'AdditionalPower' or frame.ClassBar == 'AlternativePower' then
 			CLASSBAR_WIDTH = CLASSBAR_WIDTH * 2/3
 		else
-			CLASSBAR_WIDTH = CLASSBAR_WIDTH * (frame.MAX_CLASS_BAR - 1) / frame.MAX_CLASS_BAR
+			CLASSBAR_WIDTH = CLASSBAR_WIDTH * (MAX_CLASS_BAR - 1) / MAX_CLASS_BAR
 		end
 	elseif frame.CLASSBAR_DETACHED then --Detached
-		CLASSBAR_WIDTH = db.classbar.detachedWidth - ((frame.BORDER + frame.SPACING)*2)
+		CLASSBAR_WIDTH = db.classbar.detachedWidth
 	end
 
-	bars:Width(CLASSBAR_WIDTH)
-	bars:Height(frame.CLASSBAR_HEIGHT - ((frame.BORDER + frame.SPACING)*2))
+	bars:Width(CLASSBAR_WIDTH - SPACING)
+	bars:Height(frame.CLASSBAR_HEIGHT - SPACING)
 
-	if (frame.ClassBar == 'ClassPower' or frame.ClassBar == 'Totems') then
-		--This fixes issue with ComboPoints showing as active when they are not.
-		if frame.ClassBar == "ClassPower" and not cur then
-			cur = 0
-		end
+	if frame.ClassBar == 'ClassPower' then
 
-		local maxClassBarButtons = UF.classMaxResourceBar[E.myclass] or MAX_COMBO_POINTS
+		local maxClassBarButtons = max(UF.classMaxResourceBar[E.myclass] or 0, MAX_COMBO_POINTS)
 		for i = 1, maxClassBarButtons do
-			if frame.ClassBar == 'ClassPower' then
-				bars[i]:Hide()
-			end
-
 			bars[i].backdrop:Hide()
 
-			if i <= frame.MAX_CLASS_BAR then
-				bars[i].backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+			if i <= MAX_CLASS_BAR then
+				if not bars[i].backdrop.forcedBorderColors then
+					bars[i].backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+				end
 
 				bars[i]:Height(bars:GetHeight())
-				if frame.MAX_CLASS_BAR == 1 then
+				if MAX_CLASS_BAR == 1 then
 					bars[i]:Width(CLASSBAR_WIDTH)
 				elseif frame.USE_MINI_CLASSBAR then
 					if frame.CLASSBAR_DETACHED and db.classbar.orientation == 'VERTICAL' then
 						bars[i]:Width(CLASSBAR_WIDTH)
 					else
-						bars[i]:Width((CLASSBAR_WIDTH - ((5 + (frame.BORDER*2 + frame.SPACING*2))*(frame.MAX_CLASS_BAR - 1)))/frame.MAX_CLASS_BAR) --Width accounts for 5px spacing between each button, excluding borders
+						bars[i]:Width((CLASSBAR_WIDTH - ((5 + (UF.BORDER*2 + UF.SPACING*2))*(MAX_CLASS_BAR - 1)))/MAX_CLASS_BAR) --Width accounts for 5px spacing between each button, excluding borders
 					end
-				elseif i ~= frame.MAX_CLASS_BAR then
-					bars[i]:Width((CLASSBAR_WIDTH - ((frame.MAX_CLASS_BAR-1)*(frame.BORDER-frame.SPACING))) / frame.MAX_CLASS_BAR) --classbar width minus total width of dividers between each button, divided by number of buttons
+				elseif i ~= MAX_CLASS_BAR then
+					bars[i]:Width((CLASSBAR_WIDTH - ((MAX_CLASS_BAR-1)*(UF.BORDER*2-UF.SPACING))) / MAX_CLASS_BAR) --classbar width minus total width of dividers between each button, divided by number of buttons
 				end
 
 				bars[i]:GetStatusBarTexture():SetHorizTile(false)
 				bars[i]:ClearAllPoints()
+
 				if i == 1 then
-					bars[i]:Point("LEFT", bars)
+					bars[i]:Point('LEFT', bars)
 				else
 					if frame.USE_MINI_CLASSBAR then
 						if frame.CLASSBAR_DETACHED and db.classbar.orientation == 'VERTICAL' then
-							bars[i]:Point("BOTTOM", bars[i-1], "TOP", 0, (db.classbar.spacing + frame.BORDER*2 + frame.SPACING*2))
+							bars[i]:Point('BOTTOM', bars[i-1], 'TOP', 0, (db.classbar.spacing + UF.BORDER*2 + UF.SPACING*2))
 						else
-							bars[i]:Point("LEFT", bars[i-1], "RIGHT", (db.classbar.spacing + frame.BORDER*2 + frame.SPACING*2), 0) --5px spacing between borders of each button(replaced with Detached Spacing option)
+							bars[i]:Point('LEFT', bars[i-1], 'RIGHT', (db.classbar.spacing + UF.BORDER*2 + UF.SPACING*2), 0) --5px spacing between borders of each button(replaced with Detached Spacing option)
 						end
-					elseif i == frame.MAX_CLASS_BAR then
-						bars[i]:Point("LEFT", bars[i-1], "RIGHT", frame.BORDER-frame.SPACING, 0)
-						bars[i]:Point("RIGHT", bars)
+					elseif i == MAX_CLASS_BAR then
+						bars[i]:Point('LEFT', bars[i-1], 'RIGHT', UF.BORDER-UF.SPACING, 0)
+						bars[i]:Point('RIGHT', bars)
 					else
-						bars[i]:Point("LEFT", bars[i-1], "RIGHT", frame.BORDER-frame.SPACING, 0)
+						bars[i]:Point('LEFT', bars[i-1], 'RIGHT', UF.BORDER-UF.SPACING, 0)
 					end
 				end
 
@@ -115,37 +146,19 @@ function UF:Configure_ClassBar(frame, cur)
 					bars[i].backdrop:Show()
 				end
 
-				if frame.ClassBar == "ClassPower" then
-					local r1, g1, b1 = unpack(ElvUF.colors.ComboPoints[1])
-					local r2, g2, b2 = unpack(ElvUF.colors.ComboPoints[2])
-					local r3, g3, b3 = unpack(ElvUF.colors.ComboPoints[3])
-					local maxComboPoints = ((frame.MAX_CLASS_BAR == 10 and 10) or (frame.MAX_CLASS_BAR > 5 and 6 or 5))
-
-					bars[i]:SetStatusBarColor(ElvUF:ColorGradient(i, maxComboPoints, r1, g1, b1, r2, g2, b2, r3, g3, b3))
-				elseif frame.ClassBar == "Totems" then
-					bars[1]:SetStatusBarColor(.58, .23, .10)
-					bars[2]:SetStatusBarColor(.23, .45, .13)
-					bars[3]:SetStatusBarColor(.19, .48, .60)
-					bars[4]:SetStatusBarColor(.42, .18, .74)
-				end
-
 				if frame.CLASSBAR_DETACHED and db.classbar.verticalOrientation then
-					bars[i]:SetOrientation("VERTICAL")
+					bars[i]:SetOrientation('VERTICAL')
 				else
-					bars[i]:SetOrientation("HORIZONTAL")
+					bars[i]:SetOrientation('HORIZONTAL')
 				end
 
 				--Fix missing backdrop colors on Combo Points when using Spaced style
-				if frame.ClassBar == "ClassPower" or frame.ClassBar == 'Totems' then
+				if frame.ClassBar == 'ClassPower' then
 					if frame.USE_MINI_CLASSBAR then
 						bars[i].bg:SetParent(bars[i].backdrop)
 					else
 						bars[i].bg:SetParent(bars)
 					end
-				end
-
-				if cur and cur >= i then
-					bars[i]:Show()
 				end
 			end
 		end
@@ -155,67 +168,63 @@ function UF:Configure_ClassBar(frame, cur)
 		else
 			bars.backdrop:Hide()
 		end
-	elseif (frame.ClassBar == "AdditionalPower") then
+	elseif frame.ClassBar == 'AdditionalPower' or frame.ClassBar == 'AlternativePower' then
 		if frame.CLASSBAR_DETACHED and db.classbar.verticalOrientation then
-			bars:SetOrientation("VERTICAL")
+			bars:SetOrientation('VERTICAL')
 		else
-			bars:SetOrientation("HORIZONTAL")
+			bars:SetOrientation('HORIZONTAL')
 		end
 	end
 
 	if frame.USE_MINI_CLASSBAR and not frame.CLASSBAR_DETACHED then
 		bars:ClearAllPoints()
-		bars:Point("CENTER", frame.Health.backdrop, "TOP", 0, 0)
+		bars:Point('CENTER', frame.Health.backdrop, 'TOP', 0, 0)
 
 		bars:SetFrameLevel(50) --RaisedElementParent uses 100, we want it lower than this
 
 		if bars.Holder and bars.Holder.mover then
-			bars.Holder.mover:SetScale(0.0001)
-			bars.Holder.mover:SetAlpha(0)
+			E:DisableMover(bars.Holder.mover:GetName())
 		end
 	elseif frame.CLASSBAR_DETACHED then
 		bars.Holder:Size(db.classbar.detachedWidth, db.classbar.height)
 
+		bars:ClearAllPoints()
+		bars:Point('BOTTOMLEFT', bars.Holder, 'BOTTOMLEFT', UF.BORDER + UF.SPACING, UF.BORDER + UF.SPACING)
+
 		if not bars.Holder.mover then
-			bars:ClearAllPoints()
-			bars:Point("BOTTOMLEFT", bars.Holder, "BOTTOMLEFT", frame.BORDER + frame.SPACING, frame.BORDER + frame.SPACING)
-			E:CreateMover(bars.Holder, 'ClassBarMover', L["Classbar"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,player,classbar')
+			E:CreateMover(bars.Holder, 'ClassBarMover', L["Classbar"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,player,classbar')
 		else
-			bars:ClearAllPoints()
-			bars:Point("BOTTOMLEFT", bars.Holder, "BOTTOMLEFT", frame.BORDER + frame.SPACING, frame.BORDER + frame.SPACING)
-			bars.Holder.mover:SetScale(1)
-			bars.Holder.mover:SetAlpha(1)
+			E:EnableMover(bars.Holder.mover:GetName())
 		end
 
 		if not db.classbar.strataAndLevel.useCustomStrata then
-			bars:SetFrameStrata("LOW")
+			bars:SetFrameStrata('LOW')
 		else
 			bars:SetFrameStrata(db.classbar.strataAndLevel.frameStrata)
 		end
 
 		if not db.classbar.strataAndLevel.useCustomLevel then
-			bars:SetFrameLevel(frame:GetFrameLevel() + 5)
+			bars:SetFrameLevel(frame.Health:GetFrameLevel() + 10) --Health uses 10, Power uses (Health + 5) when attached
 		else
 			bars:SetFrameLevel(db.classbar.strataAndLevel.frameLevel)
 		end
 	else
 		bars:ClearAllPoints()
-		if frame.ORIENTATION == "RIGHT" then
-			bars:Point("BOTTOMRIGHT", frame.Health.backdrop, "TOPRIGHT", -frame.BORDER, frame.SPACING*3)
+		if frame.ORIENTATION == 'RIGHT' then
+			bars:Point('BOTTOMRIGHT', frame.Health.backdrop, 'TOPRIGHT', -UF.BORDER, UF.SPACING*3)
 		else
-			bars:Point("BOTTOMLEFT", frame.Health.backdrop, "TOPLEFT", frame.BORDER, frame.SPACING*3)
+			bars:Point('BOTTOMLEFT', frame.Health.backdrop, 'TOPLEFT', UF.BORDER, UF.SPACING*3)
 		end
 
-		bars:SetFrameStrata("LOW")
-		bars:SetFrameLevel(frame:GetFrameLevel() + 5)
+		bars:SetFrameStrata('LOW')
+		bars:SetFrameLevel(frame.Health:GetFrameLevel() + 10) --Health uses 10, Power uses (Health + 5) when attached
 
 		if bars.Holder and bars.Holder.mover then
-			bars.Holder.mover:SetScale(0.0001)
-			bars.Holder.mover:SetAlpha(0)
+			E:DisableMover(bars.Holder.mover:GetName())
 		end
 	end
 
-	if frame.CLASSBAR_DETACHED and db.classbar.parent == "UIPARENT" then
+	if frame.CLASSBAR_DETACHED and db.classbar.parent == 'UIPARENT' then
 		E.FrameLocks[bars] = true
 		bars:SetParent(E.UIParent)
 	else
@@ -224,87 +233,94 @@ function UF:Configure_ClassBar(frame, cur)
 	end
 
 	if frame.USE_CLASSBAR then
-		if frame.ClassPower and not frame:IsElementEnabled("ClassPower") then
-			frame:EnableElement("ClassPower")
+		if frame.ClassPower and not frame:IsElementEnabled('ClassPower') then
+			frame:EnableElement('ClassPower')
 		end
-		if frame.AdditionalPower and not frame:IsElementEnabled("AdditionalPower") then
-			frame:EnableElement("AdditionalPower")
+		if frame.AdditionalPower and not frame:IsElementEnabled('AdditionalPower') then
+			frame:EnableElement('AdditionalPower')
 		end
-		if frame.Totems and not frame:IsElementEnabled("Totems") then
-			frame:EnableElement("Totems")
+		if frame.AlternativePower and not frame:IsElementEnabled('AlternativePower') then
+			frame:EnableElement('AlternativePower')
 		end
 	else
-		if frame.ClassPower and frame:IsElementEnabled("ClassPower") then
-			frame:DisableElement("ClassPower")
+		if frame.ClassPower and frame:IsElementEnabled('ClassPower') then
+			frame:DisableElement('ClassPower')
 		end
-		if frame.AdditionalPower and frame:IsElementEnabled("AdditionalPower") then
-			frame:DisableElement("AdditionalPower")
+		if frame.AdditionalPower and frame:IsElementEnabled('AdditionalPower') then
+			frame:DisableElement('AdditionalPower')
 		end
-		if frame.Totems and frame:IsElementEnabled("Totems") then
-			frame:DisableElement("Totems")
+		if frame.AlternativePower and frame:IsElementEnabled('AlternativePower') then
+			frame:DisableElement('AlternativePower')
 		end
 	end
 end
 
-local function ToggleResourceBar(bars, overrideVisibility)
+local function ToggleResourceBar(bars)
 	local frame = bars.origParent or bars:GetParent()
+
 	local db = frame.db
 	if not db then return end
 
-	frame.CLASSBAR_SHOWN = (not not overrideVisibility) or frame[frame.ClassBar]:IsShown()
+	frame.CLASSBAR_SHOWN = frame[frame.ClassBar]:IsShown()
 
 	if bars.text then bars.text:SetAlpha(frame.CLASSBAR_SHOWN and 1 or 0) end
 
-	local height = (db.classbar and db.classbar.height) or (frame.AlternativePower and db.power.height)
-	frame.CLASSBAR_HEIGHT = (frame.USE_CLASSBAR and (frame.CLASSBAR_SHOWN and height) or 0)
-	frame.CLASSBAR_YOFFSET = (not frame.USE_CLASSBAR or not frame.CLASSBAR_SHOWN or frame.CLASSBAR_DETACHED) and 0 or (frame.USE_MINI_CLASSBAR and ((frame.SPACING+(frame.CLASSBAR_HEIGHT/2))) or (frame.CLASSBAR_HEIGHT - (frame.BORDER-frame.SPACING)))
+	frame.CLASSBAR_HEIGHT = frame.USE_CLASSBAR and ((db.classbar and db.classbar.height) or (frame.AlternativePower and db.power.height)) or 0
+	frame.CLASSBAR_YOFFSET = (not frame.USE_CLASSBAR or not frame.CLASSBAR_SHOWN or frame.CLASSBAR_DETACHED) and 0 or (frame.USE_MINI_CLASSBAR and ((UF.SPACING+(frame.CLASSBAR_HEIGHT/2))) or (frame.CLASSBAR_HEIGHT - (UF.BORDER-UF.SPACING)))
 
 	UF:Configure_CustomTexts(frame)
+	UF:Configure_HealthBar(frame)
+	UF:Configure_Portrait(frame)
 
-	if not frame.CLASSBAR_DETACHED then --Only update when necessary
-		UF:Configure_HealthBar(frame)
-		UF:Configure_Portrait(frame)
+	-- keep this after the configure_healtbar, we need the one updated before we match the healpred size to -1
+	if frame.HealthPrediction then
+		UF:Configure_HealComm(frame)
 	end
 end
 UF.ToggleResourceBar = ToggleResourceBar --Make available to combobar
 
 -------------------------------------------------------------
--- MONK, PALADIN, WARLOCK, MAGE, and COMBOS
+-- PALADIN, WARLOCK, MAGE, and COMBOS
 -------------------------------------------------------------
 function UF:Construct_ClassBar(frame)
-	local bars = CreateFrame("Frame", '$parent_ClassBar', frame)
-	bars:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+	local bars = CreateFrame('Frame', '$parent_ClassBar', frame, 'BackdropTemplate')
+	bars:CreateBackdrop(nil, nil, nil, nil, true)
 	bars:Hide()
 
 	local maxBars = max(UF.classMaxResourceBar[E.myclass] or 0, MAX_COMBO_POINTS)
 	for i = 1, maxBars do
-		bars[i] = CreateFrame("StatusBar", frame:GetName().."ClassIconButton"..i, bars)
+		bars[i] = CreateFrame('StatusBar', frame:GetName()..'ClassIconButton'..i, bars)
 		bars[i]:SetStatusBarTexture(E.media.blankTex) --Dummy really, this needs to be set so we can change the color
 		bars[i]:GetStatusBarTexture():SetHorizTile(false)
 		UF.statusbars[bars[i]] = true
 
-		bars[i]:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+		bars[i]:CreateBackdrop(nil, nil, nil, nil, true)
 		bars[i].backdrop:SetParent(bars)
 
-		bars[i].bg = bars:CreateTexture(nil, 'BACKGROUND')
+		bars[i].bg = bars:CreateTexture(nil, 'BORDER')
 		bars[i].bg:SetAllPoints(bars[i])
 		bars[i].bg:SetTexture(E.media.blankTex)
 	end
 
+	bars.PostVisibility = UF.PostVisibilityClassBar
 	bars.PostUpdate = UF.UpdateClassBar
-	bars.UpdateColor = E.noop --We handle colors on our own in Configure_ClassBar
+	bars.UpdateColor = UF.ClassPower_UpdateColor
 	bars.UpdateTexture = E.noop --We don't use textures but statusbars, so prevent errors
 
-	bars:SetScript("OnShow", ToggleResourceBar)
-	bars:SetScript("OnHide", ToggleResourceBar)
+	bars:SetScript('OnShow', ToggleResourceBar)
+	bars:SetScript('OnHide', ToggleResourceBar)
 
 	return bars
 end
 
-function UF:UpdateClassBar(current, maxBars, hasMaxChanged)
+function UF:PostVisibilityClassBar()
+	UF:PostVisibility_ClassBars(self.origParent or self:GetParent())
+end
+
+function UF:UpdateClassBar(current, maxBars, hasMaxChanged, powerType)
 	local frame = self.origParent or self:GetParent()
 	local db = frame.db
-	if not db then return; end
+	if not db then return end
 
 	local isShown = self:IsShown()
 	local stateChanged
@@ -328,20 +344,16 @@ function UF:UpdateClassBar(current, maxBars, hasMaxChanged)
 		UF:Configure_ClassBar(frame, current)
 	end
 
-	local custom_backdrop = UF.db.colors.customclasspowerbackdrop and UF.db.colors.classpower_backdrop
-	for i=1, #self do
-		if custom_backdrop then
-			self[i].bg:SetVertexColor(custom_backdrop.r, custom_backdrop.g, custom_backdrop.b)
-		else
-			local r, g, b = self[i]:GetStatusBarColor()
-			self[i].bg:SetVertexColor(r * .35, g * .35, b * .35)
-		end
-
+	for i, bar in ipairs(self) do
 		if maxBars and (i <= maxBars) then
-			self[i].bg:Show()
+			bar.bg:Show()
 		else
-			self[i].bg:Hide()
+			bar.bg:Hide()
 		end
+	end
+
+	if powerType == 'COMBO_POINTS' and E.myclass == 'ROGUE' then
+		UF.ClassPower_UpdateColor(self, powerType)
 	end
 end
 
@@ -349,12 +361,13 @@ end
 -- ALTERNATIVE MANA BAR
 -------------------------------------------------------------
 function UF:Construct_AdditionalPowerBar(frame)
-	local additionalPower = CreateFrame('StatusBar', "AdditionalPowerBar", frame)
-	additionalPower:SetFrameLevel(additionalPower:GetFrameLevel() + 1)
+	local additionalPower = CreateFrame('StatusBar', '$parent_AdditionalPowerBar', frame)
 	additionalPower.colorPower = true
+	additionalPower.frequentUpdates = true
 	additionalPower.PostUpdate = UF.PostUpdateAdditionalPower
-	additionalPower.PostUpdateVisibility = UF.PostVisibilityAdditionalPower
-	additionalPower:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+	additionalPower.PostUpdateColor = UF.PostColorAdditionalPower
+	additionalPower.PostVisibility = UF.PostVisibilityAdditionalPower
+	additionalPower:CreateBackdrop(nil, nil, nil, nil, true)
 	additionalPower:SetStatusBarTexture(E.media.blankTex)
 	UF.statusbars[additionalPower] = true
 
@@ -365,92 +378,42 @@ function UF:Construct_AdditionalPowerBar(frame)
 	additionalPower.text = additionalPower.RaisedElementParent:CreateFontString(nil, 'OVERLAY')
 	UF:Configure_FontString(additionalPower.text)
 
-	additionalPower.bg = additionalPower:CreateTexture(nil, "BORDER")
+	additionalPower.bg = additionalPower:CreateTexture(nil, 'BORDER')
 	additionalPower.bg:SetAllPoints(additionalPower)
 	additionalPower.bg:SetTexture(E.media.blankTex)
 	additionalPower.bg.multiplier = 0.35
 
-	additionalPower:SetScript("OnShow", ToggleResourceBar)
-	additionalPower:SetScript("OnHide", ToggleResourceBar)
+	additionalPower:SetScript('OnShow', ToggleResourceBar)
+	additionalPower:SetScript('OnHide', ToggleResourceBar)
 
 	return additionalPower
 end
 
-function UF:PostUpdateAdditionalPower(_, MIN, MAX, event)
+function UF:PostColorAdditionalPower()
 	local frame = self.origParent or self:GetParent()
-	local db = frame.db
-
-	if frame.USE_CLASSBAR and ((MIN ~= MAX or (not db.classbar.autoHide)) and (event ~= "ElementDisable")) then
+	if frame.USE_CLASSBAR then
 		local custom_backdrop = UF.db.colors.customclasspowerbackdrop and UF.db.colors.classpower_backdrop
 		if custom_backdrop then
 			self.bg:SetVertexColor(custom_backdrop.r, custom_backdrop.g, custom_backdrop.b)
 		end
+	end
+end
 
+function UF:PostUpdateAdditionalPower(CUR, MAX, event)
+	local frame = self.origParent or self:GetParent()
+	local db = frame.db
+
+	if frame.USE_CLASSBAR and event ~= 'ElementDisable' and (CUR ~= MAX or not db.classbar.autoHide) then
 		self:Show()
-	else --Bar disabled
+	else
 		self:Hide()
 	end
 end
 
-function UF:PostVisibilityAdditionalPower(enabled, stateChanged)
+function UF:PostVisibilityAdditionalPower(enabled)
 	local frame = self.origParent or self:GetParent()
 
-	if enabled then
-		frame.ClassBar = 'AdditionalPower'
-	else
-		frame.ClassBar = 'ClassPower'
-	end
+	frame.ClassBar = (enabled and 'AdditionalPower') or 'ClassPower'
 
-	if stateChanged then
-		ToggleResourceBar(frame[frame.ClassBar])
-		UF:Configure_ClassBar(frame)
-		UF:Configure_HealthBar(frame)
-		UF:Configure_Power(frame)
-		UF:Configure_InfoPanel(frame)
-	end
+	UF:PostVisibility_ClassBars(frame)
 end
-
------------------------------------------------------------
--- Totems
------------------------------------------------------------
-local TotemColors = {
-	[1] = {.58,.23,.10},
-	[2] = {.23,.45,.13},
-	[3] = {.19,.48,.60},
-	[4] = {.42,.18,.74},
-}
-
-function UF:Construct_Totems(frame)
-	local totems = CreateFrame("Frame", nil, frame)
-	totems:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
-	totems.Destroy = {}
-
-	for i = 1, 4 do
-		local r, g, b = unpack(TotemColors[i])
-
-		totems[i] = CreateFrame("StatusBar", frame:GetName().."Totem"..i, totems)
-		totems[i]:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
-		totems[i].backdrop:SetParent(totems)
-
-		totems[i]:SetStatusBarTexture(E.media.blankTex)
-		totems[i]:SetStatusBarColor(r, g, b)
-
-		UF.statusbars[totems[i]] = true
-
-		totems[i]:SetMinMaxValues(0, 1)
-		totems[i]:SetValue(0)
-
-		totems[i].bg = totems[i]:CreateTexture(nil, "BORDER")
-		totems[i].bg:SetAllPoints(totems[i])
-		totems[i].bg:SetTexture(E['media'].blankTex)
-		totems[i].bg.multiplier = 0.3
-
-		totems[i].bg:SetVertexColor(r * .3, g * .3, b * .3)
-	end
-
-	frame.MAX_CLASS_BAR = 4
-	frame.ClassBar = 'Totems'
-
-	return totems
-end
-

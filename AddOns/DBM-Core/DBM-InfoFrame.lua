@@ -13,6 +13,20 @@ local error, tostring, type, pairs, ipairs, select, tonumber, tsort, twipe, mflo
 local NORMAL_FONT_COLOR, SPELL_FAILED_OUT_OF_RANGE = NORMAL_FONT_COLOR, SPELL_FAILED_OUT_OF_RANGE
 local RAID_CLASS_COLORS = _G["CUSTOM_CLASS_COLORS"] or RAID_CLASS_COLORS-- for Phanx' Class Colors
 
+--Hard code STANDARD_TEXT_FONT since skinning mods like to taint it (or worse, set it to nil, wtf?)
+local standardFont
+if LOCALE_koKR then
+	standardFont = "Fonts\\2002.TTF"
+elseif LOCALE_zhCN then
+	standardFont = "Fonts\\ARKai_T.ttf"
+elseif LOCALE_zhTW then
+	standardFont = "Fonts\\blei00d.TTF"
+elseif LOCALE_ruRU then
+	standardFont = "Fonts\\FRIZQT___CYR.TTF"
+else
+	standardFont = "Fonts\\FRIZQT__.TTF"
+end
+
 --------------
 --  Locals  --
 --------------
@@ -148,6 +162,13 @@ do
 				info.arg1 = 20
 				info.checked = (DBM.Options.InfoFrameLines == 20)
 				UIDropDownMenu_AddButton(info, 2)
+
+				info = UIDropDownMenu_CreateInfo()
+				info.text = L.INFOFRAME_LINES_TO:format(40)
+				info.func = setLines
+				info.arg1 = 40
+				info.checked = (DBM.Options.InfoFrameLines == 40)
+				UIDropDownMenu_AddButton(info, 2)
 			elseif menu == "cols" then
 				info = UIDropDownMenu_CreateInfo()
 				info.text = L.INFOFRAME_LINESDEFAULT
@@ -190,6 +211,13 @@ do
 				info.arg1 = 5
 				info.checked = (DBM.Options.InfoFrameCols == 5)
 				UIDropDownMenu_AddButton(info, 2)
+
+				info = UIDropDownMenu_CreateInfo()
+				info.text = L.INFOFRAME_COLS_TO:format(6)
+				info.func = setCols
+				info.arg1 = 6
+				info.checked = (DBM.Options.InfoFrameCols == 6)
+				UIDropDownMenu_AddButton(info, 2)
 			end
 		end
 	end
@@ -199,14 +227,19 @@ end
 --  Create the frame  --
 ------------------------
 function createFrame()
-	frame = CreateFrame("Frame", "DBMInfoFrame", UIParent)
+	frame = CreateFrame("Frame", "DBMInfoFrame", UIParent, DBM:IsShadowlands() and "BackdropTemplate")
 	frame:Hide()
 	frame:SetFrameStrata("DIALOG")
-	frame:SetBackdrop({
+	frame.backdropInfo = {
 		bgFile		= "Interface\\DialogFrame\\UI-DialogBox-Background", -- 131071
 		tile		= true,
 		tileSize	= 16
-	})
+	}
+	if not DBM:IsShadowlands() then
+		frame:SetBackdrop(frame.backdropInfo)
+	else
+		frame:ApplyBackdrop()
+	end
 	frame:SetPoint(DBM.Options.InfoFramePoint, UIParent, DBM.Options.InfoFramePoint, DBM.Options.InfoFrameX, DBM.Options.InfoFrameY)
 	frame:SetSize(10, 10)
 	frame:SetClampedToScreen(true)
@@ -378,23 +411,29 @@ local function updateEnemyPower()
 	local specificUnit = value[3]
 	if powerType then -- Only do power type defined
 		if specificUnit then
-			local currentPower, maxPower = UnitPower(specificUnit, powerType), UnitPowerMax(specificUnit, powerType)
-			if maxPower and maxPower > 0 then
-				local percent = currentPower / maxPower * 100
-				if percent >= threshold then
-					lines[UnitName(specificUnit)] = mfloor(percent) .. "%"
+			local usedUnit = UnitExists(specificUnit) or DBM:GetUnitIdFromGUID(specificUnit)--unitID already passed or GUID we convert into unitID
+			if UnitExists(usedUnit) then--Double check I know. Has to be kinda hacky for TBC
+				local currentPower, maxPower = UnitPower(usedUnit, powerType), UnitPowerMax(usedUnit, powerType)
+				if maxPower and maxPower > 0 then
+					local percent = currentPower / maxPower * 100
+					if percent >= threshold then
+						lines[UnitName(usedUnit)] = mfloor(percent) .. "%"
+					end
 				end
 			end
 		else
 			if specificUnit then
-				local currentPower, maxPower = UnitPower(specificUnit), UnitPowerMax(specificUnit)
-				if maxPower and maxPower > 0 then
-					local percent = currentPower / maxPower * 100
-					if percent >= threshold then
-						lines[UnitName(specificUnit)] = mfloor(percent) .. "%"
+				local usedUnit = UnitExists(specificUnit) or DBM:GetUnitIdFromGUID(specificUnit)--unitID already passed or GUID we convert into unitID
+				if UnitExists(usedUnit) then--Double check I know. Has to be kinda hacky for TBC
+					local currentPower, maxPower = UnitPower(usedUnit), UnitPowerMax(usedUnit)
+					if maxPower and maxPower > 0 then
+						local percent = currentPower / maxPower * 100
+						if percent >= threshold then
+							lines[UnitName(usedUnit)] = mfloor(percent) .. "%"
+						end
 					end
 				end
-			else
+			else--useless in TBC, don't use frames with no specified unit
 				for i = 1, 5 do
 					local uId = "boss" .. i
 					local currentPower, maxPower = UnitPower(uId), UnitPowerMax(uId)
@@ -436,25 +475,26 @@ local function updateEnemyAbsorb()
 	local totalAbsorb = value[2]
 	local specificUnit = value[3]
 	if specificUnit then
-		if UnitExists(specificUnit) then
+		local usedUnit = UnitExists(specificUnit) or DBM:GetUnitIdFromGUID(specificUnit)--unitID already passed or GUID we convert into unitID
+		if UnitExists(usedUnit) then--Double check I know. Has to be kinda hacky for TBC
 			local absorbAmount
 			if spellInput then -- Get specific spell absorb
-				absorbAmount = select(16, DBM:UnitBuff(specificUnit, spellInput)) or select(16, DBM:UnitDebuff(specificUnit, spellInput))
+				absorbAmount = select(16, DBM:UnitBuff(usedUnit, spellInput)) or select(16, DBM:UnitDebuff(usedUnit, spellInput))
 			else -- Get all of them
-				absorbAmount = UnitGetTotalAbsorbs(specificUnit)
+				absorbAmount = UnitGetTotalAbsorbs(usedUnit)
 			end
 			if absorbAmount and absorbAmount > 0 then
 				local text
 				if totalAbsorb then
 					text = absorbAmount / totalAbsorb * 100
-					lines[UnitName(specificUnit)] = mfloor(text) .. "%"
+					lines[UnitName(usedUnit)] = mfloor(text) .. "%"
 				else
 					text = absorbAmount
-					lines[UnitName(specificUnit)] = mfloor(text)
+					lines[UnitName(usedUnit)] = mfloor(text)
 				end
 			end
 		end
-	else
+	else--Effectively useless for TBC, without a GUID can't use this frame in TBC
 		for i = 1, 5 do
 			local uId = "boss" .. i
 			if UnitExists(uId) then
@@ -842,42 +882,45 @@ local function onUpdate(frame, table)
 		local icon = icons[extraName or leftText] and icons[extraName or leftText] .. leftText
 		if friendlyEvents[currentEvent] then
 			local unitId = DBM:GetRaidUnitId(DBM:GetUnitFullName(extraName or leftText)) or "player"--Prevent nil logical error
-			if unitId and select(4, UnitPosition(unitId)) == currentMapId then
-				local _, class = UnitClass(unitId)
-				if class then
-					color = RAID_CLASS_COLORS[class]
-					if DBM.Options.StripServerName then -- StripServerName option is checked here, even though it's checked in GetShortServerName function, because we have to apply custom 3rd column hack reconstruction
-						local shortName = DBM:GetShortServerName(extraName or leftText)
-						if extraName then -- 3 column hack is present, we need to reconstruct leftText with shortened name
-							leftText = extra.."*"..shortName
-						else -- LeftText is name, just replace it with shortname
-							leftText = shortName
-						end
-					end
-				end
-				linesShown = linesShown + 1
-				if unitId and UnitIsUnit(unitId, "player") then -- It's player.
-					if currentEvent == "health" or currentEvent == "playerpower" or currentEvent == "playerabsorb" or currentEvent == "playerbuff" or currentEvent == "playergooddebuff" or currentEvent == "playerbaddebuff" or currentEvent == "playerdebuffremaining" or currentEvent == "playerdebuffstacks" or currentEvent == "playerbuffremaining" or currentEvent == "playertargets" or currentEvent == "playeraggro" then--Red
-						infoFrame:SetLine(linesShown, icon or leftText, rightText, 255, 0, 0, 255, 255, 255)
-					else -- Green
-						infoFrame:SetLine(linesShown, icon or leftText, rightText, 0, 255, 0, 255, 255, 255)
-					end
-				else -- It's not player, do nothing special with it. Ordinary class colored text.
-					if currentEvent == "playerdebuffremaining" or currentEvent == "playerbuffremaining" then
-						local numberValue = tonumber(rightText)
-						if numberValue < 6 then
-							infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 0, 0)--Red
-						elseif numberValue < 11 then
-							infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 127.5, 0)--Orange
-						else
-							if numberValue == 9000 then -- Out of range players
-								infoFrame:SetLine(linesShown, icon or leftText, SPELL_FAILED_OUT_OF_RANGE, color.r, color.g, color.b, 255, 0, 0)--Red
-							else
-								infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 255, 255)--White
+			if unitId then
+				local _, _, _, mapId = UnitPosition(unitId)
+				if mapId == currentMapId then
+					local _, class = UnitClass(unitId)
+					if class then
+						color = RAID_CLASS_COLORS[class]
+						if DBM.Options.StripServerName then -- StripServerName option is checked here, even though it's checked in GetShortServerName function, because we have to apply custom 3rd column hack reconstruction
+							local shortName = DBM:GetShortServerName(extraName or leftText)
+							if extraName then -- 3 column hack is present, we need to reconstruct leftText with shortened name
+								leftText = extra.."*"..shortName
+							else -- LeftText is name, just replace it with shortname
+								leftText = shortName
 							end
 						end
-					else
-						infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 255, 255)
+					end
+					linesShown = linesShown + 1
+					if unitId and UnitIsUnit(unitId, "player") then -- It's player.
+						if currentEvent == "health" or currentEvent == "playerpower" or currentEvent == "playerabsorb" or currentEvent == "playerbuff" or currentEvent == "playergooddebuff" or currentEvent == "playerbaddebuff" or currentEvent == "playerdebuffremaining" or currentEvent == "playerdebuffstacks" or currentEvent == "playerbuffremaining" or currentEvent == "playertargets" or currentEvent == "playeraggro" then--Red
+							infoFrame:SetLine(linesShown, icon or leftText, rightText, 255, 0, 0, 255, 255, 255)
+						else -- Green
+							infoFrame:SetLine(linesShown, icon or leftText, rightText, 0, 255, 0, 255, 255, 255)
+						end
+					else -- It's not player, do nothing special with it. Ordinary class colored text.
+						if currentEvent == "playerdebuffremaining" or currentEvent == "playerbuffremaining" then
+							local numberValue = tonumber(rightText)
+							if numberValue < 6 then
+								infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 0, 0)--Red
+							elseif numberValue < 11 then
+								infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 127.5, 0)--Orange
+							else
+								if numberValue == 9000 then -- Out of range players
+									infoFrame:SetLine(linesShown, icon or leftText, SPELL_FAILED_OUT_OF_RANGE, color.r, color.g, color.b, 255, 0, 0)--Red
+								else
+									infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 255, 255)--White
+								end
+							end
+						else
+							infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, 255, 255, 255)
+						end
 					end
 				end
 			end
@@ -914,8 +957,10 @@ local function onUpdate(frame, table)
 			infoFrame:SetLine(linesShown, icon or leftText, rightText, color.r, color.g, color.b, color2.r, color2.g, color2.b)
 		end
 	end
-	local maxWidth1, maxWidth2 = {}, {}
-	local linesPerRow = mmin(maxLines, mfloor(linesShown / maxCols + 0.99))
+	local maxWidth1, maxWidth2, linesPerRow = {}, {}, 5
+	if linesShown > 5 then
+		linesPerRow = mmin(maxLines, mfloor(linesShown / maxCols + 0.99))
+	end
 	local shouldUpdate = prevLines ~= linesShown
 	for i = 1, linesShown do
 		if shouldUpdate then
@@ -928,23 +973,30 @@ local function onUpdate(frame, table)
 		maxWidth1[m] = mmax(maxWidth1[m] or 0, frame.lines[i * 2 - 1]:GetStringWidth())
 		maxWidth2[m] = mmax(maxWidth2[m] or 0, frame.lines[i * 2]:GetStringWidth())
 	end
+	local size = DBM.Options.InfoFrameFontSize
 	local width = 0
 	for i, _ in pairs(maxWidth1) do
 		local maxWid, maxWid2 = maxWidth1[i], maxWidth2[i]
-		width = width + maxWid + maxWid2 + 18
+		width = width + maxWid + maxWid2 + size + (size / 2)
 		for ii = 1, linesPerRow do
 			local m = ((i - 1) * linesPerRow * 2) + (ii * 2)
 			if not frame.lines[m] then
 				break
 			end
-			frame.lines[m - 1]:SetSize(maxWid, 12)
-			frame.lines[m]:SetSize(maxWid2, 12)
+			frame.lines[m - 1]:SetSize(maxWid, size)
+			frame.lines[m]:SetSize(maxWid2, size)
 		end
 	end
 	if width == 0 then
 		width = 105
 	end
-	frame:SetSize(width, (linesPerRow * 12) + 12)
+	local height = size
+	if linesShown > linesPerRow then
+		height = height + (linesPerRow * size)
+	else
+		height = height + (mmin(linesShown, maxLines) * size)
+	end
+	frame:SetSize(width, height)
 	frame:Show()
 	prevLines = linesShown
 end
@@ -1072,20 +1124,34 @@ function infoFrame:ClearLines()
 end
 
 function infoFrame:AlignLine(lineNum, linesPerRow)
+	local size = DBM.Options.InfoFrameFontSize
 	local line = frame.lines[lineNum]
 	line:SetJustifyH(lineNum % 2 == 0 and "RIGHT" or "LEFT")
 	if lineNum == 1 then -- 1st entry left
-		line:SetPoint("TOPLEFT", frame, "TOPLEFT", 6, -6)
+		line:SetPoint("TOPLEFT", frame, "TOPLEFT", size / 2, -(size / 2))
 	elseif lineNum == 2 then -- 1st entry right
-		line:SetPoint("TOPLEFT", frame.lines[1], "TOPRIGHT", 6, 0)
+		line:SetPoint("TOPLEFT", frame.lines[1], "TOPRIGHT", size / 2, 0)
 	else
 		if lineNum % linesPerRow == 1 then -- Column 2-x, 1st entry left
-			line:SetPoint("TOPLEFT", frame.lines[lineNum - linesPerRow + 1], "TOPRIGHT", 12, 0)
+			line:SetPoint("TOPLEFT", frame.lines[lineNum - linesPerRow + 1], "TOPRIGHT", size, 0)
 		elseif lineNum % 2 == 0 then -- Column 2-x, Right entry
-			line:SetPoint("TOPLEFT", frame.lines[lineNum - 1], "TOPRIGHT", 6, 0)
+			line:SetPoint("TOPLEFT", frame.lines[lineNum - 1], "TOPRIGHT", size / 2, 0)
 		else -- Column 2-x, Left entry
-			line:SetPoint("TOPLEFT", frame.lines[lineNum - 2], "LEFT", 0, -6)
+			line:SetPoint("TOPLEFT", frame.lines[lineNum - 2], "LEFT", 0, -(size / 2))
 		end
+	end
+end
+
+function infoFrame:UpdateStyle()
+	if not frame then
+		createFrame()
+	end
+	prevLines = 0
+	local font = DBM.Options.InfoFrameFont == "standardFont" and standardFont or DBM.Options.InfoFrameFont
+	local size = DBM.Options.InfoFrameFontSize
+	local style = DBM.Options.InfoFrameFontStyle == "none" and nil or DBM.Options.InfoFrameFontStyle
+	for i = 1, #frame.lines do
+		frame.lines[i]:SetFont(font, size, style)
 	end
 end
 
@@ -1095,8 +1161,14 @@ function infoFrame:SetLine(lineNum, leftText, rightText, colorR, colorG, colorB,
 	end
 	lineNum = lineNum * 2 - 1
 	if not frame.lines[lineNum] then
+		local font = DBM.Options.InfoFrameFont == "standardFont" and standardFont or DBM.Options.InfoFrameFont
+		local size = DBM.Options.InfoFrameFontSize
+		local style = DBM.Options.InfoFrameFontStyle == "none" and nil or DBM.Options.InfoFrameFontStyle
 		frame.lines[lineNum] = frame:CreateFontString("Line" .. lineNum, "OVERLAY", "GameFontNormal")
+		frame.lines[lineNum]:SetFont(font, size, style)
 		frame.lines[lineNum + 1] = frame:CreateFontString("Line" .. lineNum + 1, "OVERLAY", "GameFontNormal")
+		frame.lines[lineNum + 1]:SetFont(font, size, style)
+		frame.lines[lineNum + 1]:SetJustifyH("RIGHT")
 	end
 	frame.lines[lineNum]:SetText(leftText)
 	frame.lines[lineNum]:SetTextColor(colorR or 255, colorG or 255, colorB or 255)
@@ -1126,10 +1198,16 @@ end
 
 function infoFrame:SetLines(lines)
 	modLines = lines
+	if DBM.Options.InfoFrameLines == 0 then
+		maxLines = lines
+	end
 end
 
 function infoFrame:SetColumns(columns)
 	modCols = columns
+	if DBM.Options.InfoFrameCols == 0 then
+		maxCols = columns
+	end
 end
 
 function infoFrame:IsShown()

@@ -1,19 +1,17 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+local LSM = E.Libs.LSM
 
---Lua functions
 local unpack = unpack
---WoW API / Variables
 local CreateFrame = CreateFrame
 
 function UF:Construct_RaidDebuffs(frame)
-	local debuff = CreateFrame('Frame', nil, frame.RaisedElementParent)
-	debuff:SetTemplate(nil, nil, nil, UF.thinBorders, true)
+	local debuff = CreateFrame('Frame', nil, frame.RaisedElementParent, 'BackdropTemplate')
+	debuff:SetTemplate(nil, nil, nil, nil, true)
 	debuff:SetFrameLevel(frame.RaisedElementParent:GetFrameLevel() + 20) --Make them appear above regular buffs or debuffs
 
-	local offset = UF.thinBorders and E.mult or E.Border
 	debuff.icon = debuff:CreateTexture(nil, 'OVERLAY')
-	debuff.icon:SetInside(debuff, offset, offset)
+	debuff.icon:SetInside(debuff, UF.BORDER, UF.BORDER)
 
 	debuff.count = debuff:CreateFontString(nil, 'OVERLAY')
 	debuff.count:FontTemplate(nil, 10, 'OUTLINE')
@@ -41,10 +39,10 @@ function UF:Configure_RaidDebuffs(frame)
 		debuff.onlyMatchSpellID = db.onlyMatchSpellID
 		debuff.forceShow = frame.forceShowAuras
 		debuff.icon:SetTexCoord(unpack(E.TexCoords))
-		debuff:Point('BOTTOM', frame, 'BOTTOM', db.xOffset, db.yOffset + frame.SPACING)
+		debuff:Point('BOTTOM', frame, 'BOTTOM', db.xOffset, db.yOffset + UF.SPACING)
 		debuff:Size(db.size)
 
-		local font = UF.LSM:Fetch("font", db.font)
+		local font = LSM:Fetch('font', db.font)
 		local stackColor = db.stack.color
 		debuff.count:FontTemplate(font, db.fontSize, db.fontOutline)
 		debuff.count:ClearAllPoints()

@@ -115,6 +115,7 @@ AtlasLoot:AddInitFunc(HookInit)
 local PLAYER_GUID_REGISTER = {
 	["Player-4463-003F795C"] = format(GOLD, "AtlasLoot Author"),
 	["Player-4466-015209F9"] = format(GOLD, "AtlasLoot Author"),
+	["Player-4455-0309734D"] = format(GOLD, "AtlasLoot Author"),
 	["Player-4455-00D28DDC"] = format(SILVER, "AtlasLoot Friend"),
 	["Player-4463-00A5D43D"] = format(SILVER, "AtlasLoot Friend"),
 	["Player-4476-0054EED9"] = format(COPPER, "aka god of shadow"),
@@ -124,6 +125,9 @@ local PLAYER_GUID_REGISTER = {
 	--holz
 	["Player-4463-00784DB2"] = format("|T132800:0|t "..COLOR, "AtlasLoot Friend"),
 	["Player-4749-01CB4830"] = format("|T132800:0|t "..COLOR, "AtlasLoot Friend"),
+	-- oob
+	["Player-4749-020C714C"] = format("|T135349:0|t "..COLOR, "AtlasLoot Friend"), --mage
+	["Player-4749-020BE873"] = format("|T135349:0|t "..COLOR, "AtlasLoot Friend"), --war
 	--
 	["Player-4463-00C0F307"] = format("|T135349:0|t "..COLOR, "AtlasLoot Friend"),
 }

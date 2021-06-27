@@ -1,9 +1,10 @@
 local mod	= DBM:NewMod("Ysondre", "DBM-Azeroth")
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210611232013")
 mod:SetCreatureID(14887)--121912 TW ID, 14887 classic ID
 --mod:SetModelID(17887)
+mod:EnableWBEngageSync()--Enable syncing engage in outdoors
 
 mod:RegisterCombat("combat_yell", L.Pull)
 
@@ -42,31 +43,25 @@ function mod:SPELL_CAST_START(args)
 end
 --]]
 
-do
-	local SleepingFog, NoxiousBreath = DBM:GetSpellInfo(24814), DBM:GetSpellInfo(24818)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 24814 or args.spellId == 24813 then
-		if args.spellName == SleepingFog then
-			specWarnSleepingFog:Show()
-			specWarnSleepingFog:Play("watchstep")
-			timerSleepingFogCD:Start()
-		--elseif args.spellId == 24818 and self:AntiSpam(3, 1) then
-		--elseif args.spellName == NoxiousBreath and self:AntiSpam(3, 1) then
-			--timerNoxiousBreathCD
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	--if args.spellId == 24814 or args.spellId == 24813 then
+	if args.spellId == 24814 then
+		specWarnSleepingFog:Show()
+		specWarnSleepingFog:Play("watchstep")
+		timerSleepingFogCD:Start()
+	--elseif args.spellId == 24818 and self:AntiSpam(3, 1) then
+		--timerNoxiousBreathCD
 	end
-
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 24818 then
-		if args.spellName == NoxiousBreath then
-			if self:IsTanking(nil, nil, args.destName, nil, args.sourceGUID) then--Basically, HAS to be bosses current target
-				local amount = args.amount or 1
-				warnNoxiousBreath:Show(args.destName, amount)
-			end
-		end
-	end
-	mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 end
+
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 24818 then
+		if self:IsTanking(nil, nil, args.destName, nil, args.sourceGUID) then--Basically, HAS to be bosses current target
+			warnNoxiousBreath:Show(args.destName, args.amount or 1)
+		end
+	end
+end
+mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
 --Probably won't work in classic, unit_spellcast events disabled there for all but "player"
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, spellId)

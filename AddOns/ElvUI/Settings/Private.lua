@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------------------------------
 -- Locked Settings, These settings are stored for your character only regardless of profile options.
 ------------------------------------------------------------------------------------------------------
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 V.general = {
 	loot = true,
@@ -19,15 +19,16 @@ V.general = {
 	replaceNameFont = true,
 	replaceCombatFont = true,
 	replaceBlizzFonts = true,
+	unifiedBlizzFonts = false,
+	totemBar = true,
 	minimap = {
 		enable = true,
-		hideCalendar = true,
 		hideTracking = false,
 	},
-	worldMap = true,
 	classColorMentionsSpeech = true,
 	raidUtility = true,
 	voiceOverlay = true,
+	worldMap = true,
 }
 
 V.bags = {
@@ -47,7 +48,7 @@ V.auras = {
 	masque = {
 		buffs = false,
 		debuffs = false,
-	},
+	}
 }
 
 V.chat = {
@@ -60,53 +61,55 @@ V.skins = {
 	parchmentRemoverEnable = false,
 	blizzard = {
 		enable = true,
-		bags = true,
-		inspect = true,
-		binding = true,
-		guild = true,
-		tradeskill = true,
-		raid = true,
-		talent = true,
+
+		addonManager = true,
+		arena = true,
+		arenaRegistrar = true,
 		auctionhouse = true,
-		macro = true,
-		debug = true,
-		trainer = true,
-		loot = true,
-		lootRoll = true,
-		alertframes = true,
-		bgscore = true,
-		merchant = true,
-		mail = true,
-		help = true,
-		trade = true,
-		gossip = true,
-		worldmap = true,
-		taxi = true,
-		timemanger = true,
-		tooltip = true,
-		quest = true,
-		questtimers = true,
-		petition = true,
-		dressingroom = true,
-		friends = true,
-		spellbook = true,
-		character = true,
-		craft = true,
-		misc = true,
-		tabard = true,
-		guildregistrar = true,
-		timemanager = true,
-		stable = true,
+		bags = true,
 		battlefield = true,
 		bgmap = true,
-		addonManager = true,
+		bgscore = true,
+		binding = true,
+		blizzardOptions = true,
+		channels = true,
+		character = true,
+		communities = true,
+		craft = true,
+		debug = true,
+		dressingroom = true,
+		eventLog = true,
+		friends = true,
+		gossip = true,
+		guild = true,
+		guildcontrol = true,
+		guildregistrar = true,
+		help = true,
+		inspect = true,
+		loot = true,
+		macro = true,
+		mail = true,
+		merchant = true,
 		mirrorTimers = true,
-		tutorial = true,
-		BlizzardOptions = true,
-		Channels = true,
-		Communities = true,
-		GMChat = true,
-	},
+		misc = true,
+		petition = true,
+		quest = true,
+		questChoice = true,
+		raid = true,
+		socket = true,
+		spellbook = true,
+		stable = true,
+		tabard = true,
+		talent = true,
+		taxi = true,
+		timemanager = true,
+		tooltip = true,
+		trade = true,
+		tradeskill = true,
+		trainer = true,
+		tutorials = true,
+		worldmap = true,
+	}
 }
 
 V.tooltip = {
@@ -118,9 +121,11 @@ V.unitframe = {
 	disabledBlizzardFrames = {
 		player = true,
 		target = true,
+		focus = true,
+		arena = true,
 		party = true,
 		raid = true,
-	},
+	}
 }
 
 V.actionbar = {
@@ -130,5 +135,5 @@ V.actionbar = {
 		actionbars = false,
 		petBar = false,
 		stanceBar = false,
-	},
+	}
 }

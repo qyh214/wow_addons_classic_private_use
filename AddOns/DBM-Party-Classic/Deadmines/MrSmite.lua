@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("MrSmite", "DBM-Party-Classic", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(646)
 --mod:SetEncounterID(1144)
 
@@ -17,29 +17,16 @@ local warningNimbleReflexes	= mod:NewTargetNoFilterAnnounce(6264, 2)
 
 local timerSmiteStomp		= mod:NewBuffFadesTimer(10, 6432, nil, nil, nil, 2)
 
---function mod:OnCombatStart(delay)
-
---end
-
-do
-	local Stomp = DBM:GetSpellInfo(6432)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 6432 then
-		if args.spellName == Stomp then
-			timerSmiteStomp:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 6432 then
+		timerSmiteStomp:Start()
 	end
 end
 
-do
-	local Slam, Nimble = DBM:GetSpellInfo(6435), DBM:GetSpellInfo(6264)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 6435 then
-		if args.spellName == Slam then
-			warningSmiteSlam:Show(args.destName)
-		--elseif args.spellId == 6264 then
-		elseif args.spellName == Nimble then
-			warningNimbleReflexes:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 6435 then
+		warningSmiteSlam:Show(args.destName)
+	elseif args.spellId == 6264 then
+		warningNimbleReflexes:Show(args.destName)
 	end
 end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Gehennas", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210613212942")
 mod:SetCreatureID(12259)--, 11661
 mod:SetEncounterID(665)
 mod:SetModelID(13030)
@@ -27,7 +27,7 @@ local timerFist		= mod:NewBuffActiveTimer(4, 20277, nil, false, 2, 3)
 
 function mod:OnCombatStart(delay)
 	timerCurse:Start(6-delay)
-	if self:IsDifficulty("event40") or not self:IsTrivial(75) then--Only want to warn if it's a threat
+	if self:IsEvent() or not self:IsTrivial() then
 		self:RegisterShortTermEvents(
 			"SPELL_PERIODIC_DAMAGE 19717",
 			"SPELL_PERIODIC_MISSED 19717"
@@ -39,39 +39,26 @@ function mod:OnCombatEnd()
 	self:UnregisterShortTermEvents()
 end
 
-do
-	local Curse, RainofFire = DBM:GetSpellInfo(19716), DBM:GetSpellInfo(19717)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 19716 then
-		if args.spellName == Curse and args:IsSrcTypeHostile() then
-			warnCurse:Show()
-			timerCurse:Start()
-		--elseif args.spellId == 19717 then
-		elseif args.spellName == RainofFire and args:IsSrcTypeHostile() then
-			warnRainFire:Show()
-			timerRoF:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 19716 and args:IsSrcTypeHostile() then
+		warnCurse:Show()
+		timerCurse:Start()
+	elseif args.spellId == 19717 and args:IsSrcTypeHostile() then
+		warnRainFire:Show()
+		timerRoF:Start()
 	end
 end
 
-do
-	local Fist = DBM:GetSpellInfo(20277)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 20277 and args:IsDestTypePlayer() then
-		if args.spellName == Fist and args:IsDestTypePlayer() then
-			warnFist:CombinedShow(0.3, args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 20277 and args:IsDestTypePlayer() then
+		warnFist:CombinedShow(0.3, args.destName)
 	end
 end
 
-do
-	local RainofFire = DBM:GetSpellInfo(19717)
-	function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, destName, _, _, spellId, spellName)
-		--if spellId == 19717 and destGUID == UnitGUID("player") and self:AntiSpam() then
-		if spellName == RainofFire and destGUID == UnitGUID("player") and self:AntiSpam() then
-			specWarnGTFO:Show(spellName)
-			specWarnGTFO:Play("watchfeet")
-		end
+function mod:SPELL_PERIODIC_DAMAGE(_, _, _, _, destGUID, destName, _, _, spellId, spellName)
+	if spellId == 19717 and destGUID == UnitGUID("player") and self:AntiSpam() then
+		specWarnGTFO:Show(spellName)
+		specWarnGTFO:Play("watchfeet")
 	end
-	mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE
 end
+mod.SPELL_PERIODIC_MISSED = mod.SPELL_PERIODIC_DAMAGE

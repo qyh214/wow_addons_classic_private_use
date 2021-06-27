@@ -1,5 +1,5 @@
-﻿## Interface: 11305
-## X-Min-Interface: 11302
+## Interface: 20501
+## X-Min-Interface: 20501
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Blackwing Lair|r
 ## Title-deDE:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Pechschwingenhort|r
 ## Title-esES:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Guarida de Alanegra|r
@@ -17,10 +17,11 @@
 ## X-DBM-Mod: 1
 ## X-DBM-Mod-Type: RAID
 ## X-DBM-Mod-Category: Classic
-## X-DBM-Mod-Has-Single-Format: 1
+## X-DBM-StatTypes: normal
 ## X-DBM-Mod-MapID: 469
-## X-DBM-Mod-Sort: 12
+## X-DBM-Mod-Sort: 1105
 ## X-DBM-Mod-MinCoreRevision: 12473
+## X-DBM-Mod-MinExpansion: 0
 localization.en.lua
 localization.de.lua
 localization.es.lua

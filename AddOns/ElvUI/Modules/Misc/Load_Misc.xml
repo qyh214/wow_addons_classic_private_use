@@ -1,11 +1,12 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file='Misc.lua'/>
-	<Script file='DebugTools.lua'/>
+<Ui xmlns='http://www.blizzard.com/wow/ui/'>
+	<Script file='AFK.lua'/>
 	<Script file='ChatBubbles.lua'/>
-	<Script file='RaidMarker.lua'/>
+	<Script file='DebugTools.lua'/>
+	<Script file='InfoItemLevel.lua'/>
 	<Script file='Loot.lua'/>
 	<Script file='LootRoll.lua'/>
-	<!--Script file='InfoItemLevel.lua'/-->
+	<Script file='Misc.lua'/>
+	<Script file='RaidMarker.lua'/>
 	<Script file='RaidUtility.lua'/>
-	<Script file='AFK.lua'/>
+	<Script file='TotemBar.lua'/>
 </Ui>

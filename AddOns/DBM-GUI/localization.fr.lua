@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "frFR" then return end
+if GetLocale() ~= "frFR" then return end
 if not DBM_GUI_L then DBM_GUI_L = {} end
 local L = DBM_GUI_L
 
@@ -17,13 +17,13 @@ L.BossModLoad_now 			= [[Ce boss mod n'est pas chargé.
 Il le sera une fois que vous serez dans l'instance.
 Vous pouvez aussi cliquer sur le bouton pour le charger manuellement.]]
 
-L.PosX						= 'Position en X'
-L.PosY						= 'Position en Y'
+L.PosX						= "Position en X"
+L.PosY						= "Position en Y"
 
-L.MoveMe 					= 'Déplacez-moi'
-L.Button_OK 				= 'OK'
-L.Button_Cancel 			= 'Annuler'
-L.Button_LoadMod 			= 'Charger l\'AddOn'
+L.MoveMe 					= "Déplacez-moi"
+L.Button_OK 				= "OK"
+L.Button_Cancel 			= "Annuler"
+L.Button_LoadMod 			= "Charger l\'AddOn"
 L.Mod_Enabled				= "Activer ce module"
 L.Mod_Reset					= "Charger les options par défaut"
 L.Reset 					= "Réinit."
@@ -78,10 +78,6 @@ L.WarningIconLeft 			= "Afficher l'icône du côté gauche"
 L.WarningIconRight 			= "Afficher l'icône du côté droit"
 L.WarningIconChat 			= "Afficher les icônes dans la fenêtre de chat"
 L.WarningAlphabetical		= "Arranger les noms de manière alphabétique"
-L.Warn_FontType				= "Choisir une police"
-L.Warn_FontStyle			= "Contours de la police"
-L.Warn_FontShadow			= "Ombre"
-L.Warn_FontSize				= "Taille de la police: %d"
 L.Warn_Duration				= "Durée de l'alerte: %0.1f sec"
 L.None						= "Aucun"
 L.Outline					= "Simple"
@@ -117,8 +113,6 @@ L.BarDBM					= "DBM (animations)"
 L.BarSimple					= "Simple (pas d'animation)"
 L.BarStartColor				= "Couleur de départ"
 L.BarEndColor 				= "Couleur de fin"
-L.Bar_Font					= "Police pour les barres"
-L.Bar_FontSize				= "Taille de cette police: %d"
 L.Bar_Height				= "Hauteur de la barre: %d"
 L.Slider_BarOffSetX 		= "Décalage en X: %d"
 L.Slider_BarOffSetY 		= "Décalage en Y: %d"
@@ -163,16 +157,11 @@ L.SpecWarn_ClassColor		= "Utiliser des couleurs selon les classes pour les alert
 L.ShowSWarningsInChat 		= "Afficher les alertes spéciales dans la fenêtre de discussion"
 L.SWarnNameInNote			= "Utiliser les options SW5 si une note personnalisée contient votre nom"
 L.SpecWarn_FlashFrameRepeat	= "Répéter %d fois (si activé)" --was missing
-L.SpecWarn_Font				= "Police de texte des alertes spéciales"
-L.SpecWarn_FontSize			= "Taille de la police: %d"
-L.SpecWarn_FontColor		= "Couleur du texte"
-L.SpecWarn_FontType			= "Choisissez la police"
 L.SpecWarn_FlashRepeat		= "Répéter Flash" --was missing
 L.SpecWarn_FlashColor		= "Couleur du flash"
 L.SpecWarn_FlashDur			= "Durée du flash: %0.1f"
 L.SpecWarn_FlashAlpha		= "Taux alpha du flash: %0.1f"
 L.SpecWarn_DemoButton		= "Aff. un exemple"
-L.SpecWarn_MoveMe			= "Définir la position"
 L.SpecWarn_ResetMe			= "Réinit. les valeurs"
 
 -- Tab: Spoken Alerts Frame
@@ -298,4 +287,10 @@ L.SelectModProfileCopyNote	= "Copier uniquement les réglages des notes depuis"
 L.SelectModProfileDelete	= "Supprimer les réglages pour"
 
 -- Misc
+L.FontType					= "Choisir une police"
+L.FontStyle					= "Contours de la police"
+L.FontColor					= "Couleur du texte"
+L.FontShadow				= "Ombre"
+L.FontSize					= "Taille de la police: %d"
+
 L.FontHeight	= 16

@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2010-2019, Hendrik "nevcairiel" Leppkes <h.leppkes@gmail.com>
+Copyright (c) 2010-2020, Hendrik "nevcairiel" Leppkes <h.leppkes@gmail.com>
 
 All rights reserved.
 
@@ -26,38 +26,28 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
 
+]]
 local MAJOR_VERSION = "LibActionButton-1.0-ElvUI"
-local MINOR_VERSION = 20 -- the real minor version is 76
+local MINOR_VERSION = 25 -- the real minor version is 80
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
 if not lib then return end
 
+-- Lua functions
 local type, error, tostring, tonumber, assert, select = type, error, tostring, tonumber, assert, select
 local setmetatable, wipe, unpack, pairs, next = setmetatable, wipe, unpack, pairs, next
 local str_match, format, tinsert, tremove = string.match, format, tinsert, tremove
 
--- GLOBALS: ATTACK_BUTTON_FLASH_TIME, C_ToyBox, ClearCursor, COOLDOWN_TYPE_LOSS_OF_CONTROL, COOLDOWN_TYPE_NORMAL
--- GLOBALS: CooldownFrame_Set, CreateFrame, FindSpellBookSlotBySpellID, FlyoutHasSpell, GameTooltip, GameTooltip_SetDefaultAnchor
--- GLOBALS: GetActionCharges, GetActionCooldown, GetActionCount, GetActionInfo, GetActionLossOfControlCooldown, GetActionText
--- GLOBALS: GetActionTexture, GetBindingKey, GetBindingText, GetCursorInfo, GetCVar, GetCVarBool, GetItemCooldown, GetItemCount
--- GLOBALS: GetItemIcon, GetLastZoneAbilitySpellTexture, GetMacroInfo, GetMacroSpell, GetModifiedClick, GetMouseFocus, GetSpellCharges
--- GLOBALS: GetSpellCooldown, GetSpellCount, GetSpellInfo, GetSpellTexture, HasAction, HasZoneAbility, InCombatLockdown, IsActionInRange
--- GLOBALS: IsAltKeyDown, IsAttackAction, IsAttackSpell, IsAutoRepeatAction, IsAutoRepeatSpell, IsConsumableAction, IsConsumableItem
--- GLOBALS: IsConsumableSpell, IsControlKeyDown, IsCurrentAction, IsCurrentItem, IsCurrentSpell, IsEquippedAction, IsEquippedItem
--- GLOBALS: IsItemAction, IsItemInRange, IsShiftKeyDown, IsSpellInRange, IsSpellOverlayed, IsStackableAction, IsUsableAction, IsUsableItem
--- GLOBALS: IsUsableSpell, LibStub, PickupAction, PickupCompanion, PickupEquipmentSet, PickupItem, PickupMacro, PickupPetAction, PickupSpell
--- GLOBALS: RANGE_INDICATOR, SetBinding, SetBindingClick, SetClampedTextureRotation, SpellFlyout, TOOLTIP_UPDATE_TIME, UIParent, ZoneAbilityFrame
--- GLOBALS: GetOnBarHighlightMark
+local Classic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+local Retail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local TBC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC
 
 local KeyBound = LibStub("LibKeyBound-1.0", true)
 local CBH = LibStub("CallbackHandler-1.0")
 local LBG = LibStub("LibButtonGlow-1.0", true)
 local Masque = LibStub("Masque", true)
-
-local WoWClassic = select(4, GetBuildInfo()) < 20000
 
 lib.eventFrame = lib.eventFrame or CreateFrame("Frame")
 lib.eventFrame:UnregisterAllEvents()
@@ -111,8 +101,8 @@ local type_meta_map = {
 
 local ButtonRegistry, ActiveButtons, ActionButtons, NonActionButtons = lib.buttonRegistry, lib.activeButtons, lib.actionButtons, lib.nonActionButtons
 
-local Update, UpdateButtonState, UpdateUsable, UpdateCount, UpdateCooldown, UpdateTooltip, UpdateNewAction, ClearNewActionHighlight
-local StartFlash, StopFlash, UpdateFlash, UpdateHotkeys, UpdateRangeTimer
+local Update, UpdateButtonState, UpdateUsable, UpdateCount, UpdateCooldown, UpdateTooltip, UpdateNewAction, UpdateSpellHighlight, ClearNewActionHighlight
+local StartFlash, StopFlash, UpdateFlash, UpdateHotkeys, UpdateRangeTimer, UpdateOverlayGlow
 local UpdateFlyout, ShowGrid, HideGrid, UpdateGrid, SetupSecureSnippets, WrapOnClick
 local ShowOverlayGlow, HideOverlayGlow
 local EndChargeCooldown
@@ -149,6 +139,7 @@ local DefaultConfig = {
 	disableCountDownNumbers = false,
 	useDrawBling = true,
 	useDrawSwipeOnCharges = true,
+	handleOverlay = true,
 }
 
 --- Create a new action button.
@@ -170,6 +161,8 @@ function lib:CreateButton(id, name, header, config)
 	local button = setmetatable(CreateFrame("CheckButton", name, header, "SecureActionButtonTemplate, ActionButtonTemplate"), Generic_MT)
 	button:RegisterForDrag("LeftButton", "RightButton")
 	button:RegisterForClicks("AnyUp")
+	button.cooldown:SetFrameStrata(button:GetFrameStrata())
+	button.cooldown:SetFrameLevel(button:GetFrameLevel() + 1)
 
 	-- Frame Scripts
 	button:SetScript("OnEnter", Generic.OnEnter)
@@ -195,6 +188,7 @@ function lib:CreateButton(id, name, header, config)
 	-- adjust hotkey style for better readability
 	button.HotKey:SetFont(button.HotKey:GetFont(), 13, "OUTLINE")
 	button.HotKey:SetVertexColor(0.75, 0.75, 0.75)
+	button.HotKey:SetPoint("TOPLEFT", button, "TOPLEFT", -2, -4)
 
 	-- adjust count/stack size
 	button.Count:SetFont(button.Count:GetFont(), 16, "OUTLINE")
@@ -333,44 +327,41 @@ function SetupSecureSnippets(button)
 
 	button:SetScript("OnDragStart", nil)
 	-- Wrapped OnDragStart(self, button, kind, value, ...)
-	button.header:WrapScript(button, "OnDragStart", [[
-		return self:RunAttribute("OnDragStart")
-	]])
+	SecureHandlerWrapScript(button, "OnDragStart", button.header,
+		[[return self:RunAttribute("OnDragStart")]]
+	)
 	-- Wrap twice, because the post-script is not run when the pre-script causes a pickup (doh)
 	-- we also need some phony message, or it won't work =/
-	button.header:WrapScript(button, "OnDragStart", [[
-		return "message", "update"
-	]], [[
-		self:RunAttribute("UpdateState", self:GetAttribute("state"))
-	]])
+	SecureHandlerWrapScript(button, "OnDragStart", button.header,
+		[[return "message", "update"]],
+		[[self:RunAttribute("UpdateState", self:GetAttribute("state"))]]
+	)
 
 	button:SetScript("OnReceiveDrag", nil)
 	-- Wrapped OnReceiveDrag(self, button, kind, value, ...)
-	button.header:WrapScript(button, "OnReceiveDrag", [[
-		return self:RunAttribute("OnReceiveDrag", kind, value, ...)
-	]])
+	SecureHandlerWrapScript(button, "OnReceiveDrag", button.header,
+		[[return self:RunAttribute("OnReceiveDrag", kind, value, ...)]]
+	)
 	-- Wrap twice, because the post-script is not run when the pre-script causes a pickup (doh)
 	-- we also need some phony message, or it won't work =/
-	button.header:WrapScript(button, "OnReceiveDrag", [[
-		return "message", "update"
-	]], [[
-		self:RunAttribute("UpdateState", self:GetAttribute("state"))
-	]])
+	SecureHandlerWrapScript(button, "OnReceiveDrag", button.header,
+		[[return "message", "update"]],
+		[[self:RunAttribute("UpdateState", self:GetAttribute("state"))]]
+	)
 end
 
 function WrapOnClick(button)
 	-- Wrap OnClick, to catch changes to actions that are applied with a click on the button.
-	button.header:WrapScript(button, "OnClick", [[
-		if self:GetAttribute("type") == "action" then
-			local type, action = GetActionInfo(self:GetAttribute("action"))
-			return nil, format("%s|%s", tostring(type), tostring(action))
-		end
-	]], [[
-		local type, action = GetActionInfo(self:GetAttribute("action"))
-		if message ~= format("%s|%s", tostring(type), tostring(action)) then
-			self:RunAttribute("UpdateState", self:GetAttribute("state"))
-		end
-	]])
+	SecureHandlerWrapScript(button, "OnClick", button.header,
+		[[if self:GetAttribute("type") == "action" then
+				local type, action = GetActionInfo(self:GetAttribute("action"))
+				return nil, format("%s|%s", tostring(type), tostring(action))
+			end]],
+		[[local type, action = GetActionInfo(self:GetAttribute("action"))
+			if message ~= format("%s|%s", tostring(type), tostring(action)) then
+				self:RunAttribute("UpdateState", self:GetAttribute("state"))
+			end]]
+		)
 end
 
 -----------------------------------------------------------
@@ -501,7 +492,7 @@ function Generic:AddToMasque(group)
 	if type(group) ~= "table" or type(group.AddButton) ~= "function" then
 		error("LibActionButton-1.0:AddToMasque: You need to supply a proper group to use!", 2)
 	end
-	group:AddButton(self)
+	group:AddButton(self, nil, "Action")
 	self.MasqueSkinned = true
 end
 
@@ -624,7 +615,7 @@ function Generic:PostClick()
 		local kind, data, subtype, extra = GetCursorInfo()
 		self.header:SetFrameRef("updateButton", self)
 		self.header:Execute(format([[
-			local frame = self:GetFrameRef("updateButton")
+			local frame = self:GetAttribute("frameref-updateButton")
 			control:RunFor(frame, frame:GetAttribute("OnReceiveDrag"), %s, %s, %s, %s)
 			control:RunFor(frame, frame:GetAttribute("UpdateState"), %s)
 		]], formatHelper(kind), formatHelper(data), formatHelper(subtype), formatHelper(extra), formatHelper(self:GetAttribute("state"))))
@@ -695,15 +686,12 @@ function InitializeEventHandler()
 	lib.eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_SHOWGRID")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_HIDEGRID")
-	--lib.eventFrame:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-	--lib.eventFrame:RegisterEvent("UPDATE_BONUS_ACTIONBAR")
+	lib.eventFrame:RegisterEvent("PET_BAR_SHOWGRID")
+	lib.eventFrame:RegisterEvent("PET_BAR_HIDEGRID")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
 	lib.eventFrame:RegisterEvent("UPDATE_BINDINGS")
-	lib.eventFrame:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
+	lib.eventFrame:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
 	lib.eventFrame:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
-	if not WoWClassic then
-		lib.eventFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
-	end
 
 	lib.eventFrame:RegisterEvent("ACTIONBAR_UPDATE_STATE")
 	lib.eventFrame:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
@@ -722,7 +710,9 @@ function InitializeEventHandler()
 	lib.eventFrame:RegisterEvent("PET_STABLE_SHOW")
 	lib.eventFrame:RegisterEvent("SPELL_UPDATE_CHARGES")
 	lib.eventFrame:RegisterEvent("SPELL_UPDATE_ICON")
-	if not WoWClassic then
+
+	if Retail then
+		lib.eventFrame:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
 		lib.eventFrame:RegisterEvent("ARCHAEOLOGY_CLOSED")
 		lib.eventFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
 		lib.eventFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
@@ -757,10 +747,8 @@ function OnEvent(frame, event, arg1, ...)
 				Update(button)
 			end
 		end
-	elseif event == "PLAYER_ENTERING_WORLD" or event == "UPDATE_SHAPESHIFT_FORM" or event == "UPDATE_VEHICLE_ACTIONBAR" then
+	elseif event == "PLAYER_ENTERING_WORLD" or event == "UPDATE_SHAPESHIFT_FORMS" or event == "UPDATE_VEHICLE_ACTIONBAR" then
 		ForAllButtons(Update)
-	elseif event == "ACTIONBAR_PAGE_CHANGED" or event == "UPDATE_BONUS_ACTIONBAR" then
-		-- TODO: Are these even needed?
 	elseif event == "ACTIONBAR_SHOWGRID" or event == "PET_BAR_SHOWGRID" then
 		ShowGrid(event)
 	elseif event == "ACTIONBAR_HIDEGRID" or event == "PET_BAR_HIDEGRID" then
@@ -994,6 +982,7 @@ function UpdateRange(self, force) -- Sezz: moved from OnUpdate
 				hotkey:SetVertexColor(unpack(self.config.colors.usable))
 			end
 		end
+		lib.callbacks:Fire("OnUpdateRange", self)
 	end
 end
 
@@ -1066,13 +1055,13 @@ end
 --- button management
 
 function Generic:UpdateAction(force)
-	local type, action = self:GetAction()
-	if force or (type ~= self._state_type) or (action ~= self._state_action) then
+	local action_type, action = self:GetAction()
+	if force or (action_type ~= self._state_type) or (action ~= self._state_action) then
 		-- type changed, update the metatable
-		if force or (self._state_type ~= type) then
-			local meta = type_meta_map[type] or type_meta_map.empty
+		if force or (self._state_type ~= action_type) then
+			local meta = type_meta_map[action_type] or type_meta_map.empty
 			setmetatable(self, meta)
-			self._state_type = type
+			self._state_type = action_type
 		end
 		self._state_action = action
 		Update(self)
@@ -1106,6 +1095,10 @@ function Update(self, fromUpdateConfig)
 		if self.chargeCooldown then
 			EndChargeCooldown(self.chargeCooldown)
 		end
+
+		if self.LevelLinkLockIcon then
+			self.LevelLinkLockIcon:SetShown(false)
+		end
 	end
 
 	-- Add a green border if button is an equipped item
@@ -1126,9 +1119,12 @@ function Update(self, fromUpdateConfig)
 	-- Update icon and hotkey
 	local texture = self:GetTexture()
 
+	-- Cooldown desaturate can control saturation, we don't want to override it here
+	local allowSaturation = not self.saturationLocked and self.LevelLinkLockIcon and not self.LevelLinkLockIcon:IsShown()
+
 	-- Zone ability button handling
 	self.zoneAbilityDisabled = false
-	if not self.saturationLocked then
+	if allowSaturation then
 		self.icon:SetDesaturated(false)
 	end
 	if self._state_type == "action" then
@@ -1139,7 +1135,8 @@ function Update(self, fromUpdateConfig)
 			if name == abilityName then
 				texture = GetLastZoneAbilitySpellTexture()
 				self.zoneAbilityDisabled = true
-				if not self.saturationLocked then
+
+				if allowSaturation then
 					self.icon:SetDesaturated(true)
 				end
 			end
@@ -1151,7 +1148,6 @@ function Update(self, fromUpdateConfig)
 		self.icon:Show()
 		self.rangeTimer = - 1
 		self:SetNormalTexture("Interface\\Buttons\\UI-Quickslot2")
-
 		if not self.LBFSkinned and not self.MasqueSkinned then
 			self.NormalTexture:SetTexCoord(0, 0, 0, 0)
 		end
@@ -1174,9 +1170,13 @@ function Update(self, fromUpdateConfig)
 
 	UpdateFlyout(self)
 
+	--UpdateOverlayGlow(self)
+
 	UpdateNewAction(self)
 
 	UpdateButtonState(self)
+
+	UpdateSpellHighlight(self)
 
 	if GameTooltip_GetOwnerForbidden() == self then
 		UpdateTooltip(self)
@@ -1188,7 +1188,7 @@ function Update(self, fromUpdateConfig)
 		if onStateChanged then
 			self.header:SetFrameRef("updateButton", self)
 			self.header:Execute(([[
-				local frame = self:GetFrameRef("updateButton")
+				local frame = self:GetAttribute("frameref-updateButton")
 				control:RunFor(frame, frame:GetAttribute("OnStateChanged"), %s, %s, %s)
 			]]):format(formatHelper(self:GetAttribute("state")), formatHelper(self._state_type), formatHelper(self._state_action)))
 		end
@@ -1210,25 +1210,37 @@ function UpdateButtonState(self)
 end
 
 function UpdateUsable(self)
+	local isLevelLinkLocked
+	if Retail and self._state_type == "action" then
+		isLevelLinkLocked = C_LevelLink.IsActionLocked(self._state_action)
+		if not self.icon:IsDesaturated() then
+			self.icon:SetDesaturated(isLevelLinkLocked)
+		end
+
+		if self.LevelLinkLockIcon then
+			self.LevelLinkLockIcon:SetShown(isLevelLinkLocked)
+		end
+	end
+
 	if self.config.useColoring then
-		if self.config.outOfRangeColoring == "button" and self.outOfRange then
+		if isLevelLinkLocked then
+			self.icon:SetVertexColor(unpack(self.config.colors.notUsable))
+		elseif self.config.outOfRangeColoring == "button" and self.outOfRange then
 			self.icon:SetVertexColor(unpack(self.config.colors.range))
 		else
 			local isUsable, notEnoughMana = self:IsUsable()
 			if isUsable then
 				self.icon:SetVertexColor(unpack(self.config.colors.usable))
-				--self.NormalTexture:SetVertexColor(1.0, 1.0, 1.0)
 			elseif notEnoughMana then
 				self.icon:SetVertexColor(unpack(self.config.colors.mana))
-				--self.NormalTexture:SetVertexColor(0.5, 0.5, 1.0)
 			else
 				self.icon:SetVertexColor(unpack(self.config.colors.notUsable))
-				--self.NormalTexture:SetVertexColor(1.0, 1.0, 1.0)
 			end
 		end
 	else
 		self.icon:SetVertexColor(unpack(self.config.colors.usable))
 	end
+
 	lib.callbacks:Fire("OnButtonUsable", self)
 end
 
@@ -1276,7 +1288,8 @@ local function StartChargeCooldown(parent, chargeStart, chargeDuration, chargeMo
 		end
 		cooldown:SetParent(parent)
 		cooldown:SetAllPoints(parent)
-		cooldown:SetFrameStrata("TOOLTIP")
+		cooldown:SetFrameStrata(parent:GetFrameStrata())
+		cooldown:SetFrameLevel(parent:GetFrameLevel() + 1)
 		cooldown:Show()
 		parent.chargeCooldown = cooldown
 		cooldown.parent = parent
@@ -1331,7 +1344,7 @@ function UpdateCooldown(self)
 			self.cooldown.currentCooldownType = COOLDOWN_TYPE_NORMAL
 		end
 
-		if charges and maxCharges and charges > 0 and charges < maxCharges then
+		if charges and maxCharges and maxCharges > 1 and charges < maxCharges then
 			StartChargeCooldown(self, chargeStart, chargeDuration, chargeModRate)
 
 			self.chargeCooldown:SetDrawSwipe(duration <= 0 and self.config.useDrawSwipeOnCharges)
@@ -1367,6 +1380,7 @@ end
 function UpdateTooltip(self)
 	if GameTooltip:IsForbidden() then return end
 	if (GetCVar("UberTooltips") == "1") then
+		GameTooltip:ClearAllPoints();
 		GameTooltip_SetDefaultAnchor(GameTooltip, self);
 	else
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -1382,11 +1396,9 @@ function UpdateHotkeys(self)
 	local key = self:GetHotkey()
 	if not key or key == "" or self.config.hideElements.hotkey then
 		self.HotKey:SetText(RANGE_INDICATOR)
-		self.HotKey:SetPoint("TOPLEFT", self, "TOPLEFT", 1, - 2)
 		self.HotKey:Hide()
 	else
 		self.HotKey:SetText(key)
-		self.HotKey:SetPoint("TOPLEFT", self, "TOPLEFT", - 2, - 2)
 		self.HotKey:Show()
 	end
 
@@ -1396,7 +1408,7 @@ function UpdateHotkeys(self)
 end
 
 function ShowOverlayGlow(self)
-	if LBG then
+	if LBG and self.config.handleOverlay then
 		LBG.ShowOverlayGlow(self)
 	end
 end
@@ -1406,6 +1418,15 @@ function HideOverlayGlow(self)
 		LBG.HideOverlayGlow(self)
 	end
 end
+
+--[[function UpdateOverlayGlow(self)
+	local spellId = self.config.handleOverlay and self:GetSpellId()
+	if spellId and IsSpellOverlayed(spellId) then
+		ShowOverlayGlow(self)
+	else
+		HideOverlayGlow(self)
+	end
+end]]
 
 function ClearNewActionHighlight(action, preventIdenticalActionsFromClearing, value)
 	lib.ACTION_HIGHLIGHT_MARKS[action] = value
@@ -1445,26 +1466,6 @@ hooksecurefunc("ClearNewActionHighlight", function(action, preventIdenticalActio
 	ClearNewActionHighlight(action, preventIdenticalActionsFromClearing, nil)
 end)
 
-local function UpdateSpellHighlight(self, shown)
-	if ( shown ) then
-		self.SpellHighlightTexture:Show();
-		self.SpellHighlightAnim:Play();
-	else
-		self.SpellHighlightTexture:Hide();
-		self.SpellHighlightAnim:Stop();
-	end
-end
-
-hooksecurefunc("SharedActionButton_RefreshSpellHighlight", function(self)
-	if ( self.SpellHighlightTexture and self.SpellHighlightAnim ) then
-		for button in next, ButtonRegistry do
-			if button._state_type == "action" then
-				UpdateSpellHighlight(button, GetOnBarHighlightMark(button._state_action))
-			end
-		end
-	end
-end)
-
 function UpdateNewAction(self)
 	-- special handling for "New Action" markers
 	if self.NewActionTexture then
@@ -1473,6 +1474,54 @@ function UpdateNewAction(self)
 		else
 			self.NewActionTexture:Hide()
 		end
+	end
+end
+
+hooksecurefunc("UpdateOnBarHighlightMarksBySpell", function(spellID)
+	lib.ON_BAR_HIGHLIGHT_MARK_TYPE = "spell"
+	lib.ON_BAR_HIGHLIGHT_MARK_ID = tonumber(spellID)
+
+	for button in next, ButtonRegistry do
+		UpdateSpellHighlight(button)
+	end
+end)
+
+hooksecurefunc("UpdateOnBarHighlightMarksByFlyout", function(flyoutID)
+	lib.ON_BAR_HIGHLIGHT_MARK_TYPE = "flyout"
+	lib.ON_BAR_HIGHLIGHT_MARK_ID = tonumber(flyoutID)
+
+	for button in next, ButtonRegistry do
+		UpdateSpellHighlight(button)
+	end
+end)
+
+hooksecurefunc("ClearOnBarHighlightMarks", function()
+	lib.ON_BAR_HIGHLIGHT_MARK_TYPE = nil
+
+	for button in next, ButtonRegistry do
+		UpdateSpellHighlight(button)
+	end
+end)
+
+function UpdateSpellHighlight(self)
+	local shown = false
+
+	local highlightType, id = lib.ON_BAR_HIGHLIGHT_MARK_TYPE, lib.ON_BAR_HIGHLIGHT_MARK_ID
+	if highlightType == "spell" and self:GetSpellId() == id then
+		shown = true
+	elseif highlightType == "flyout" and self._state_type == "action" then
+		local actionType, actionId = GetActionInfo(self._state_action)
+		if actionType == "flyout" and actionId == id then
+			shown = true
+		end
+	end
+
+	if shown then
+		self.SpellHighlightTexture:Show()
+		self.SpellHighlightAnim:Play()
+	else
+		self.SpellHighlightTexture:Hide()
+		self.SpellHighlightAnim:Stop()
 	end
 end
 
@@ -1589,7 +1638,7 @@ end
 Action.GetLossOfControlCooldown = function(self) return GetActionLossOfControlCooldown(self._state_action) end
 
 -- Classic overrides for item count breakage
-if WoWClassic then
+if Classic or TBC then
 	-- if the library is present, simply use it to override action counts
 	local LibClassicSpellActionCount = LibStub("LibClassicSpellActionCount-1.0", true)
 	if LibClassicSpellActionCount then
@@ -1598,6 +1647,9 @@ if WoWClassic then
 		-- if we don't have the library, only show count for items, like the default UI
 		Action.IsConsumableOrStackable = function(self) return IsItemAction(self._state_action) and (IsConsumableAction(self._state_action) or IsStackableAction(self._state_action)) end
 	end
+
+	-- disable loss of control cooldown on classic
+	-- Action.GetLossOfControlCooldown = function(self) return 0,0 end
 end
 
 -----------------------------------------------------------
@@ -1617,6 +1669,7 @@ Spell.IsConsumableOrStackable = function(self) return IsConsumableSpell(self._st
 Spell.IsUnitInRange           = function(self, unit) return IsSpellInRange(FindSpellBookSlotBySpellID(self._state_action), "spell", unit) end -- needs spell book id as of 4.0.1.13066
 Spell.SetTooltip              = function(self) return GameTooltip:SetSpellByID(self._state_action) end
 Spell.GetSpellId              = function(self) return self._state_action end
+Spell.GetLossOfControlCooldown = function(self) return GetSpellLossOfControlCooldown(self._state_action) end
 
 -----------------------------------------------------------
 --- Item Button
@@ -1697,7 +1750,7 @@ Custom.GetSpellId              = function(self) return nil end
 Custom.RunCustom               = function(self, unit, button) return self._state_action.func(self, unit, button) end
 
 --- WoW Classic overrides
-if WoWClassic then
+if Classic then
 	UpdateOverlayGlow = function() end
 end
 
@@ -1717,6 +1770,7 @@ if oldversion and next(lib.buttonRegistry) then
 				button.overlay:Hide()
 				ActionButton_HideOverlayGlow(button)
 				button.overlay = nil
+				UpdateOverlayGlow(button)
 			end
 		end
 	end

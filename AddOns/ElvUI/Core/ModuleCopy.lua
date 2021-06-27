@@ -1,7 +1,6 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local MC = E:GetModule('ModuleCopy')
 
---Lua functions
 local pairs, next, type = pairs, next, type
 local format, error = format, error
 -- GLOBALS: ElvDB
@@ -102,8 +101,8 @@ function MC:CreateMoversConfigGroup()
 			order = 1,
 			type = 'toggle',
 			name = data.mover.textString,
-			get = function(info) return E.global.profileCopy.movers[moverName] end,
-			set = function(info, value) E.global.profileCopy.movers[moverName] = value; end
+			get = function() return E.global.profileCopy.movers[moverName] end,
+			set = function(_, value) E.global.profileCopy.movers[moverName] = value; end
 		}
 	end
 	for moverName, data in pairs(E.DisabledMovers) do
@@ -112,8 +111,8 @@ function MC:CreateMoversConfigGroup()
 			order = 1,
 			type = 'toggle',
 			name = data.mover.textString,
-			get = function(info) return E.global.profileCopy.movers[moverName] end,
-			set = function(info, value) E.global.profileCopy.movers[moverName] = value; end
+			get = function() return E.global.profileCopy.movers[moverName] end,
+			set = function(_, value) E.global.profileCopy.movers[moverName] = value; end
 		}
 	end
 	return config
@@ -159,10 +158,10 @@ end
 		}
 	* For example:
 		G.profileCopy.auras = {
-			['general'] = true,
-			['buffs'] = true,
-			['debuffs'] = true,
-			['cooldown'] = true,
+			general = true,
+			buffs = true,
+			debuffs = true,
+			cooldown = true,
 		}
 	* 'general' key can refer to a similar named subtable or all non-table variables inside your group
 	* If you leave the table as G.profileCopy[YourOptionGroupName] = {}, this will result in no valid copy template error.

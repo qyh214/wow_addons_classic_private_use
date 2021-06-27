@@ -1,16 +1,10 @@
 # WIM
 
-## [3.8.14](https://github.com/sylvanaar/wow-instant-messenger/tree/3.8.14) (2020-08-05)
-[Full Changelog](https://github.com/sylvanaar/wow-instant-messenger/compare/3.8.13...3.8.14) 
+## [3.9.1](https://github.com/sylvanaar/wow-instant-messenger/tree/3.9.1) (2021-05-15)
+[Full Changelog](https://github.com/sylvanaar/wow-instant-messenger/compare/3.9.0...3.9.1) 
 
-- Fix #22 - add missing localization strings.  
-- Merge pull request #21 from anon1231823/patch-6  
-    Update ptBR.lua  
-- Merge pull request #23 from anon1231823/patch-7  
-    Update frFR.lua  
-- Update frFR.lua  
-- Update ptBR.lua  
-- Update ptBR.lua  
-- Update ptBR.lua  
-- Update ptBR.lua  
-- Update ptBR.lua  
+- Update .travis.yml  
+    Update building  
+- update toc for packager changes  
+- Bump Classic TOC  
+- Fix new TBC lua error  

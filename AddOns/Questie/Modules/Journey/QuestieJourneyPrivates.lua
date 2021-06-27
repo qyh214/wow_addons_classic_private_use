@@ -8,9 +8,11 @@ local _QuestieJourney = QuestieJourney.private
 local QuestieSearchResults = QuestieLoader:ImportModule("QuestieSearchResults")
 ---@type QuestieDB
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB")
+---@type l10n
+local l10n = QuestieLoader:ImportModule("l10n")
 
 _QuestieJourney.containerCache = nil
-_QuestieJourney.treeChache = nil
+_QuestieJourney.treeCache = nil
 
 
 function _QuestieJourney:ShowJourneyTooltip()
@@ -46,20 +48,20 @@ function _QuestieJourney:CreateObjectiveText(desc)
 
     if desc then
         if type(desc) == "table" then
-            for i, v in ipairs(desc) do
+            for _, v in ipairs(desc) do
                 objText = objText .. v .. "\n"
             end
         else
             objText = objText .. tostring(desc) .. "\n"
         end
     else
-        objText = Questie:Colorize(QuestieLocale:GetUIString('JOURNEY_AUTO_QUEST'), 'yellow')
+        objText = Questie:Colorize(l10n('This quest is an automatic completion quest and does not contain an objective.'), 'yellow')
     end
 
     return objText
 end
 
-function _QuestieJourney:JourneySelectTabGroup(container, event, group)
+function _QuestieJourney:HandleTabChange(container, group)
     if not _QuestieJourney.containerCache then
         _QuestieJourney.containerCache = container
     end
@@ -84,7 +86,7 @@ end
 
 function _QuestieJourney:GetLevelDifficultyRanges(questLevel, questMinLevel)
 
-    local red, orange, yellow, green, gray = 0,0,0,0,0
+    local red, orange, yellow, green, gray
 
     -- Calculate Base Values
     red = questMinLevel

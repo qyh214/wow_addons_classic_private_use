@@ -5,6 +5,7 @@ if not AL then return end
 -- These localization strings are translated on Curseforge: https://www.curseforge.com/wow/addons/atlaslootclassic/localization
 -- Collections
 AL["%s Sets"] = "Conjuntos de %s"
+AL["'%s' Vendor"] = "'%s' Vendedor"
 AL["Abyssal Dukes"] = "Duques abisales"
 AL["Abyssal Lords"] = "Lords abisales"
 AL["Abyssal Templars"] = "Templarios abisales"
@@ -16,6 +17,10 @@ AL["Box of Chocolates"] = "Caja de bombones"
 AL["Brightly Colored Egg"] = "Huevo de colores vivos"
 AL["Childrens Week"] = "Semana de los Niños"
 AL["Crimson Templar"] = "Templario Carmesí"
+--[[Translation missing --]]
+--[[ AL["Drops"] = "Drops"--]] 
+AL["Dungeon Set %s"] = "Conjunto de Mazmorra %s"
+AL["Dungeon Sets"] = "Conjuntos de Mazmorra"
 AL["Earthen Templar"] = "Templario terráneo"
 AL["Elemental Invasions"] = "Invasión elemental"
 AL["Equip"] = "Armadura"
@@ -51,7 +56,6 @@ AL["Revanchion"] = "Revanchion"
 AL["Scarlet Monastery - Graveyard"] = "Monasterio Escarlata - Cementerio"
 AL["Scorn"] = "Desdén"
 AL["Scourge Invasion"] = "Invasión de la Plaga"
-AL["Sets"] = "Conjuntos"
 AL["Silithus Abyssal"] = "Abisal Silithus"
 AL["Smokywood Pastures"] = "Pastos de Bosquehumeante"
 AL["Smokywood Pastures Special Gift"] = "Obsequio especial de Pastos de Bosquehumeante"

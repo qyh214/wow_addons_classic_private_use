@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Shazzrah", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210403080347")
 mod:SetCreatureID(12264)
 mod:SetEncounterID(667)
 mod:SetModelID(13032)
@@ -36,46 +36,34 @@ function mod:OnCombatStart(delay)
 	timerGateCD:Start(30-delay)--30-31
 end
 
-do
-	local magicDeadenMagic = DBM:GetSpellInfo(19714)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 19714 and not args:IsDestTypePlayer() then
-		if args.spellName == magicDeadenMagic and args:IsDestTypeHostile() then
-			if self.Options.SpecWarn19714dispel then
-				specWarnDeadenMagic:Show(args.destName)
-				specWarnDeadenMagic:Play("dispelboss")
-			else
-				warnDeadenMagic:Show(args.destName)
-			end
-			timerDeadenMagic:Start()
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 19714 and not args:IsDestTypePlayer() then
+		if self.Options.SpecWarn19714dispel then
+			specWarnDeadenMagic:Show(args.destName)
+			specWarnDeadenMagic:Play("dispelboss")
+		else
+			warnDeadenMagic:Show(args.destName)
 		end
-	end
-
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 19714 then
-		if args.spellName == magicDeadenMagic then
-			timerDeadenMagic:Stop()
-		end
+		timerDeadenMagic:Start()
 	end
 end
 
-do
-	local Curse, Counterspell, Gate = DBM:GetSpellInfo(19713), DBM:GetSpellInfo(19715), DBM:GetSpellInfo(23138)
-	function mod:SPELL_CAST_SUCCESS(args)
-		local spellName = args.spellName
-		--if args.spellId == 19713 then
-		if spellName == Curse then
-			warnCurse:Show()
-			timerCurseCD:Start()
-		--elseif args.spellId == 19715 then
-		elseif spellName == Counterspell and args:IsSrcTypeHostile() then
-			warnCntrSpell:Show()
-			timerCounterSpellCD:Start()
-		--elseif args.spellId == 23138 then
-		elseif spellName == Gate then
-			specWarnGate:Show(args.sourceName)
-			specWarnGate:Play("tauntboss")
-			timerGateCD:Start()
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 19714 then
+		timerDeadenMagic:Stop()
+	end
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 19713 then
+		warnCurse:Show()
+		timerCurseCD:Start()
+	elseif args.spellId == 19715 then
+		warnCntrSpell:Show()
+		timerCounterSpellCD:Start()
+	elseif args.spellId == 23138 then
+		specWarnGate:Show(args.sourceName)
+		specWarnGate:Play("tauntboss")
+		timerGateCD:Start()
 	end
 end

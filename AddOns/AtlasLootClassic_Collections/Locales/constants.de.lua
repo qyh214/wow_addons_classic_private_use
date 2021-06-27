@@ -5,6 +5,7 @@ if not AL then return end
 -- These localization strings are translated on Curseforge: https://www.curseforge.com/wow/addons/atlaslootclassic/localization
 -- Collections
 AL["%s Sets"] = "%s Sets"
+AL["'%s' Vendor"] = "'%s' Händler"
 AL["Abyssal Dukes"] = "Abyssische Fürsten"
 AL["Abyssal Lords"] = "Abyssische Lords"
 AL["Abyssal Templars"] = "Abyssische Templer"
@@ -51,7 +52,6 @@ AL["Revanchion"] = "Revanchion"
 AL["Scarlet Monastery - Graveyard"] = "Scharlachrotes Kloster - Friedhof"
 AL["Scorn"] = "Der Verächter"
 AL["Scourge Invasion"] = "Invasion der Geißel"
-AL["Sets"] = "SEts"
 AL["Silithus Abyssal"] = "Silithus Abyssischer Rat"
 AL["Smokywood Pastures"] = "Kokelwälder"
 AL["Smokywood Pastures Special Gift"] = "Kokelwälder Spezialgeschenk"

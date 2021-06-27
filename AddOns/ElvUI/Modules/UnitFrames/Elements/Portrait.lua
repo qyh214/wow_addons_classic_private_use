@@ -1,19 +1,18 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
 local rad = rad
-local unpack = unpack
-local select = select
 local UnitClass = UnitClass
 local CreateFrame = CreateFrame
+local unpack, select = unpack, select
 local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
-local classIcon = 'Interface\\WorldStateFrame\\Icons-Classes'
+local classIcon = [[Interface\WorldStateFrame\Icons-Classes]]
 
 function UF:Construct_Portrait(frame, type)
 	local portrait
 
 	if type == 'texture' then
-		local backdrop = CreateFrame('Frame', nil, frame)
+		local backdrop = CreateFrame('Frame', nil, frame, 'BackdropTemplate')
 		portrait = frame:CreateTexture(nil, 'OVERLAY')
 		portrait:SetTexCoord(0.15, 0.85, 0.15, 0.85)
 		backdrop:SetOutside(portrait)
@@ -21,8 +20,8 @@ function UF:Construct_Portrait(frame, type)
 		backdrop:SetTemplate()
 		portrait.backdrop = backdrop
 	else
-		portrait = CreateFrame("PlayerModel", nil, frame)
-		portrait:CreateBackdrop(nil, nil, nil, self.thinBorders, true)
+		portrait = CreateFrame('PlayerModel', nil, frame)
+		portrait:CreateBackdrop(nil, nil, nil, nil, true)
 	end
 
 	portrait.PostUpdate = self.PortraitUpdate
@@ -74,35 +73,35 @@ function UF:Configure_Portrait(frame)
 			else
 				local healthTex = frame.Health:GetStatusBarTexture()
 				if db.health.reverseFill then
-					portrait:Point("TOPLEFT", healthTex, "TOPLEFT")
-					portrait:Point("BOTTOMLEFT", healthTex, "BOTTOMLEFT")
-					portrait:Point("BOTTOMRIGHT", frame.Health, "BOTTOMRIGHT")
+					portrait:Point('TOPLEFT', healthTex, 'TOPLEFT')
+					portrait:Point('BOTTOMLEFT', healthTex, 'BOTTOMLEFT')
+					portrait:Point('BOTTOMRIGHT', frame.Health, 'BOTTOMRIGHT')
 				else
-					portrait:Point("TOPLEFT", frame.Health, "TOPLEFT")
-					portrait:Point("BOTTOMRIGHT", healthTex, "BOTTOMRIGHT")
-					portrait:Point("BOTTOMLEFT", healthTex, "BOTTOMLEFT")
+					portrait:Point('TOPLEFT', frame.Health, 'TOPLEFT')
+					portrait:Point('BOTTOMRIGHT', healthTex, 'BOTTOMRIGHT')
+					portrait:Point('BOTTOMLEFT', healthTex, 'BOTTOMLEFT')
 				end
 			end
 		else
 			portrait:SetAlpha(1)
 			portrait.backdrop:Show()
-			portrait:SetInside(portrait.backdrop, frame.BORDER)
+			portrait:SetInside(portrait.backdrop, UF.BORDER)
 
-			if frame.ORIENTATION == "LEFT" then
-				portrait.backdrop:Point("TOPLEFT", frame, "TOPLEFT", frame.SPACING, frame.USE_MINI_CLASSBAR and -(frame.CLASSBAR_YOFFSET+frame.SPACING) or -frame.SPACING)
+			if frame.ORIENTATION == 'LEFT' then
+				portrait.backdrop:Point('TOPLEFT', frame, 'TOPLEFT', UF.SPACING, frame.USE_MINI_CLASSBAR and -(frame.CLASSBAR_YOFFSET+UF.SPACING) or -UF.SPACING)
 
 				if frame.USE_MINI_POWERBAR or frame.USE_POWERBAR_OFFSET or not frame.USE_POWERBAR or frame.USE_INSET_POWERBAR or frame.POWERBAR_DETACHED then
-					portrait.backdrop:Point("BOTTOMRIGHT", frame.Health.backdrop, "BOTTOMLEFT", frame.BORDER - frame.SPACING*3, 0)
+					portrait.backdrop:Point('BOTTOMRIGHT', frame.Health.backdrop, 'BOTTOMLEFT', UF.BORDER - UF.SPACING*3, 0)
 				else
-					portrait.backdrop:Point("BOTTOMRIGHT", frame.Power.backdrop, "BOTTOMLEFT", frame.BORDER - frame.SPACING*3, 0)
+					portrait.backdrop:Point('BOTTOMRIGHT', frame.Power.backdrop, 'BOTTOMLEFT', UF.BORDER - UF.SPACING*3, 0)
 				end
-			elseif frame.ORIENTATION == "RIGHT" then
-				portrait.backdrop:Point("TOPRIGHT", frame, "TOPRIGHT", -frame.SPACING, frame.USE_MINI_CLASSBAR and -(frame.CLASSBAR_YOFFSET+frame.SPACING) or -frame.SPACING)
+			elseif frame.ORIENTATION == 'RIGHT' then
+				portrait.backdrop:Point('TOPRIGHT', frame, 'TOPRIGHT', -UF.SPACING, frame.USE_MINI_CLASSBAR and -(frame.CLASSBAR_YOFFSET+UF.SPACING) or -UF.SPACING)
 
 				if frame.USE_MINI_POWERBAR or frame.USE_POWERBAR_OFFSET or not frame.USE_POWERBAR or frame.USE_INSET_POWERBAR or frame.POWERBAR_DETACHED then
-					portrait.backdrop:Point("BOTTOMLEFT", frame.Health.backdrop, "BOTTOMRIGHT", -frame.BORDER + frame.SPACING*3, 0)
+					portrait.backdrop:Point('BOTTOMLEFT', frame.Health.backdrop, 'BOTTOMRIGHT', -UF.BORDER + UF.SPACING*3, 0)
 				else
-					portrait.backdrop:Point("BOTTOMLEFT", frame.Power.backdrop, "BOTTOMRIGHT", -frame.BORDER + frame.SPACING*3, 0)
+					portrait.backdrop:Point('BOTTOMLEFT', frame.Power.backdrop, 'BOTTOMRIGHT', -UF.BORDER + UF.SPACING*3, 0)
 				end
 			end
 		end

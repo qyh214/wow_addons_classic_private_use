@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("EdwinVanCleef", "DBM-Party-Classic", 5)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(639)
 --mod:SetEncounterID(1144)
 
@@ -21,23 +21,15 @@ function mod:OnCombatStart(delay)
 	timerTrashD:Start(1-delay)
 end
 
-do
-	local VanCleefAllies = DBM:GetSpellInfo(5200)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 5200 and self:AntiSpam(3, 1) then
-		if args.spellName == VanCleefAllies and self:AntiSpam(3, 1) then
-			warningAllies:Show()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 5200 and self:AntiSpam(3, 1) then
+		warningAllies:Show()
 	end
 end
 
-do
-	local Thrash = DBM:GetSpellInfo(3391)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 3391 then
-		if args.spellName == Thrash and args:IsDestTypeHostile() then
-			warningThrash:Show()
-			timerTrashD:Start()
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 3391 and args:IsDestTypeHostile() then
+		warningThrash:Show()
+		timerTrashD:Start()
 	end
 end

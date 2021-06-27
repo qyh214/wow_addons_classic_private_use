@@ -67,7 +67,7 @@ function QuestieOptionsDefaults:Load()
             hookTracking = true,
             trackerHeaderEnabled = true,
             trackerHeaderAutoMove = false,
-            stickyDurabilityFrame = true,
+            stickyDurabilityFrame = false,
             hideTrackerInCombat = false,
             trackerFadeMinMaxButtons = true,
             trackerFadeQuestItemButtons = false,
@@ -97,11 +97,10 @@ function QuestieOptionsDefaults:Load()
 
         },
         char = {
-            minLevelFilter = GetQuestGreenRange(), -- Raised the default to allow more quests to be shown
+            minLevelFilter = (GetQuestGreenRange or UnitQuestTrivialLevelRange)("player"), -- Raised the default to allow more quests to be shown
             maxLevelFilter = 7,
             complete = {},
             hidden = {},
-            enableMinimalisticIcons = false,
             enabled = true,
             lowlevel = false,
             manualMinLevelOffset = false,
@@ -120,6 +119,7 @@ function QuestieOptionsDefaults:Load()
             showRaidQuests = true,
             showPvPQuests = true,
             showAQWarEffortQuests = false,
+            showQuestsInNpcTooltip = true
         },
         profile = {minimap = {hide = false}}
     }

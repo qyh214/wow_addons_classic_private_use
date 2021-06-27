@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local AFK = E:GetModule('AFK')
 local CH = E:GetModule('Chat')
 
@@ -14,7 +14,6 @@ local ChatHistory_GetAccessID = ChatHistory_GetAccessID
 local CloseAllWindows = CloseAllWindows
 local CreateFrame = CreateFrame
 local GetBattlefieldStatus = GetBattlefieldStatus
-local GetColoredName = GetColoredName
 local GetGuildInfo = GetGuildInfo
 local GetScreenHeight = GetScreenHeight
 local GetScreenWidth = GetScreenWidth
@@ -27,6 +26,7 @@ local MoveViewLeftStop = MoveViewLeftStop
 local RemoveExtraSpaces = RemoveExtraSpaces
 local Screenshot = Screenshot
 local SetCVar = SetCVar
+local UnitCastingInfo = UnitCastingInfo
 local UnitIsAFK = UnitIsAFK
 local CinematicFrame = CinematicFrame
 local MovieFrame = MovieFrame
@@ -99,7 +99,7 @@ function AFK:SetAFK(status)
 end
 
 function AFK:OnEvent(event, ...)
-	if event == 'PLAYER_REGEN_DISABLED' or event == 'UPDATE_BATTLEFIELD_STATUS' then
+	if event == 'PLAYER_REGEN_DISABLED' or event == 'LFG_PROPOSAL_SHOW' or event == 'UPDATE_BATTLEFIELD_STATUS' then
 		if event ~= 'UPDATE_BATTLEFIELD_STATUS' or (GetBattlefieldStatus(...) == 'confirm') then
 			AFK:SetAFK(false)
 		end
@@ -117,7 +117,7 @@ function AFK:OnEvent(event, ...)
 
 	if not E.db.general.afk or (InCombatLockdown() or CinematicFrame:IsShown() or MovieFrame:IsShown()) then return end
 
-	if CastingInfo('player') then --Don't activate afk if player is crafting stuff, check back in 30 seconds
+	if UnitCastingInfo('player') then --Don't activate afk if player is crafting stuff, check back in 30 seconds
 		AFK:ScheduleTimer('OnEvent', 30)
 		return
 	end
@@ -129,11 +129,13 @@ function AFK:Toggle()
 	if E.db.general.afk then
 		AFK:RegisterEvent('PLAYER_FLAGS_CHANGED', 'OnEvent')
 		AFK:RegisterEvent('PLAYER_REGEN_DISABLED', 'OnEvent')
+		AFK:RegisterEvent('LFG_PROPOSAL_SHOW', 'OnEvent')
 		AFK:RegisterEvent('UPDATE_BATTLEFIELD_STATUS', 'OnEvent')
 		SetCVar('autoClearAFK', '1')
 	else
 		AFK:UnregisterEvent('PLAYER_FLAGS_CHANGED')
 		AFK:UnregisterEvent('PLAYER_REGEN_DISABLED')
+		AFK:UnregisterEvent('LFG_PROPOSAL_SHOW')
 		AFK:UnregisterEvent('UPDATE_BATTLEFIELD_STATUS')
 	end
 end
@@ -212,13 +214,13 @@ local function Chat_OnEvent(self, event, arg1, arg2, arg3, arg4, arg5, arg6, arg
 	end
 
 	local accessID = ChatHistory_GetAccessID(chatGroup, chatTarget)
-	local typeID = ChatHistory_GetAccessID(type, chatTarget, arg12 == "" and arg13 or arg12)
+	local typeID = ChatHistory_GetAccessID(type, chatTarget, arg12 == '' and arg13 or arg12)
 	if CH.db.shortChannels then
 		body = body:gsub('|Hchannel:(.-)|h%[(.-)%]|h', CH.ShortChannel)
 		body = body:gsub('^(.-|h) '..L["whispers"], '%1')
 		body = body:gsub('<'..AFKstr..'>', '[|cffFF0000'..L["AFK"]..'|r] ')
 		body = body:gsub('<'..DNDstr..'>', '[|cffE7E716'..L["DND"]..'|r] ')
-		body = body:gsub('%[BN_CONVERSATION:', '%['.."")
+		body = body:gsub('%[BN_CONVERSATION:', '%['..'')
 	end
 
 	self:AddMessage(body, info.r, info.g, info.b, info.id, false, accessID, typeID)
@@ -263,7 +265,7 @@ function AFK:Initialize()
 	AFK.AFKMode.chat:SetScript('OnMouseWheel', Chat_OnMouseWheel)
 	AFK.AFKMode.chat:SetScript('OnEvent', Chat_OnEvent)
 
-	AFK.AFKMode.bottom = CreateFrame('Frame', nil, AFK.AFKMode)
+	AFK.AFKMode.bottom = CreateFrame('Frame', nil, AFK.AFKMode, 'BackdropTemplate')
 	AFK.AFKMode.bottom:SetFrameLevel(0)
 	AFK.AFKMode.bottom:SetTemplate('Transparent')
 	AFK.AFKMode.bottom:Point('BOTTOM', AFK.AFKMode, 'BOTTOM', 0, -E.Border)
@@ -281,6 +283,9 @@ function AFK:Initialize()
 	AFK.AFKMode.bottom.LogoBottom:SetTexture(E.Media.Textures.LogoBottom)
 
 	local factionGroup, size, offsetX, offsetY, nameOffsetX, nameOffsetY = E.myfaction, 140, -20, -16, -10, -28
+	if factionGroup == 'Neutral' then
+		factionGroup, size, offsetX, offsetY, nameOffsetX, nameOffsetY = 'Panda', 90, 15, 10, 20, -5
+	end
 
 	AFK.AFKMode.bottom.faction = AFK.AFKMode.bottom:CreateTexture(nil, 'OVERLAY')
 	AFK.AFKMode.bottom.faction:Point('BOTTOMLEFT', AFK.AFKMode.bottom, 'BOTTOMLEFT', offsetX, offsetY)

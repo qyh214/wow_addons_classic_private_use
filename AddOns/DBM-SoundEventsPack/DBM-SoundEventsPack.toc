@@ -1,0 +1,16 @@
+## Interface: 20501
+## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Sound Events Pack|r
+## DefaultState: enabled
+## RequiredDeps: DBM-Core
+## Author: MysticalOS, Pardua, Cigawoot
+## Version: 1.6.10
+## X-DBM-VictoryPack: 1
+## X-DBM-VictoryPack-GlobalName: DBMVPSoundEventsPack
+## X-DBM-DefeatPack: 1
+## X-DBM-DefeatPack-GlobalName: DBMDPSoundEventsPack
+## X-DBM-MusicPack: 1
+## X-DBM-MusicPack-GlobalName: DBMMPSoundEventsPack
+## X-Curse-Project-ID: 289311
+## X-Wago-ID: qv63WD6b
+
+LoadList.lua

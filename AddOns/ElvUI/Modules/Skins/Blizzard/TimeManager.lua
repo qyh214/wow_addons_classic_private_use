@@ -1,11 +1,8 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Lua functions
 local _G = _G
-local unpack = unpack
-local select = select
---WoW API / Variables
+local unpack, select = unpack, select
 local hooksecurefunc = hooksecurefunc
 
 function S:Blizzard_TimeManager()
@@ -14,7 +11,7 @@ function S:Blizzard_TimeManager()
 	local TimeManagerFrame = _G.TimeManagerFrame
 	S:HandleFrame(TimeManagerFrame, true)
 	TimeManagerFrame:Size(185, 240)
-	TimeManagerFrame:Point('TOPRIGHT', -1, -210)
+	TimeManagerFrame:Point('TOPRIGHT', -1, -186)
 
 	select(7, TimeManagerFrame:GetRegions()):Point('TOP', 0, -5)
 

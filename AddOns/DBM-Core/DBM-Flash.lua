@@ -1,4 +1,4 @@
-﻿---------------
+---------------
 --  Globals  --
 ---------------
 DBM.Flash = {}
@@ -7,46 +7,43 @@ DBM.Flash = {}
 --  Locals  --
 --------------
 local flashFrame = DBM.Flash
-local frame, r, g, b, t, a, duration
-local elapsed, totalRepeat = 0, 0
+local frame, duration, elapsed, totalRepeat
 
 --------------------
 --  Create Frame  --
 --------------------
-frame = CreateFrame("Frame", "DBMFlash", UIParent)
+frame = CreateFrame("Frame", "DBMFlash", UIParent, DBM:IsShadowlands() and "BackdropTemplate")
 frame:Hide()
 frame:SetBackdrop({
 	bgFile	= "Interface\\Tooltips\\UI-Tooltip-Background" -- 137056
 })
 frame:SetAllPoints(UIParent)
 frame:SetFrameStrata("BACKGROUND")
+frame:Hide()
 
 ------------------------
 --  OnUpdate Handler  --
 ------------------------
-do
-	frame:SetScript("OnUpdate", function(self, e)
-		elapsed = elapsed + e
-		if elapsed >= t then
+frame:SetScript("OnUpdate", function(self, e)
+	elapsed = elapsed + e
+	if elapsed >= duration then
+		if totalRepeat == 0 then
 			self:Hide()
-			self:SetAlpha(0)
-			if totalRepeat >= 1 then
-				flashFrame:Show(r, g, b, t, a, totalRepeat - 1)
-			end
 			return
 		end
-		self:SetAlpha(-(elapsed / (duration / 2) - 1) ^ 2 + 1)
-	end)
-	frame:Hide()
-end
+		elapsed = 0
+		totalRepeat = totalRepeat - 1
+		self:SetAlpha(0)
+		return
+	end
+	self:SetAlpha(-(elapsed / (duration / 2) - 1) ^ 2 + 1)
+end)
 
 function flashFrame:Show(red, green, blue, dur, alpha, repeatFlash)
-	r, g, b, t, a = red or 1, green or 0, blue or 0, dur or 0.4, alpha or 0.3
-	duration = dur
+	duration = dur or 0.4
 	elapsed = 0
 	totalRepeat = repeatFlash or 0
-	frame:SetAlpha(0)
-	frame:SetBackdropColor(r, g, b, a)
+	frame:SetBackdropColor(red or 1, green or 0, blue or 0, alpha or 0.3)
 	frame:Show()
 end
 

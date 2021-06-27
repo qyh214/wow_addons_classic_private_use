@@ -1,10 +1,9 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local strjoin = strjoin
 local format = format
---WoW API / Variables
+
 local GetBagName = GetBagName
 local GetContainerNumFreeSlots = GetContainerNumFreeSlots
 local GetContainerNumSlots = GetContainerNumSlots
@@ -17,9 +16,9 @@ local GetInventoryItemTexture = GetInventoryItemTexture
 local displayString, lastPanel = ''
 
 local BAG_TYPES = {
-	[0x0001]  = 'Quiver',
-	[0x0002]  = 'Ammo Pouch',
-	[0x0004]  = 'Soul Bag',
+	[0x0001] = 'Quiver',
+	[0x0002] = 'Ammo Pouch',
+	[0x0004] = 'Soul Bag',
 }
 
 local function OnEvent(self)
@@ -51,6 +50,8 @@ local function OnClick()
 end
 
 local function OnEnter()
+	DT.tooltip:ClearLines()
+
 	for i = 0, NUM_BAG_SLOTS do
 		local bagName = GetBagName(i)
 		if bagName then

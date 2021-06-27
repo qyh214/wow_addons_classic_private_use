@@ -22,9 +22,7 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> constants
 
-	local CONST_REALM_SYNC_ENABLED = false
-
-	local CONST_DETAILS_PREFIX = "DTLS"
+	DETAILS_PREFIX_NETWORK = "DTLS"
 
 	local CONST_HIGHFIVE_REQUEST = "HI"
 	local CONST_HIGHFIVE_DATA = "HF"
@@ -42,14 +40,15 @@
 	local CONST_CLOUD_DATARQ = "CD"
 	local CONST_CLOUD_DATARC = "CE"
 	local CONST_CLOUD_EQUALIZE = "EQ"
-	local CONST_CLOUD_UNEQUALIZED = "NQ"
 	
 	local CONST_CLOUD_SHAREDATA = "SD"
+	
 	local CONST_PVP_ENEMY = "PP"
+	
 	local CONST_ROGUE_SR = "SR" --soul rip from akaari's soul (LEGION ONLY)
 
-	local CONST_ASK_TALENTS = "AT"
-	local CONST_ANSWER_TALENTS = "AWT"
+	DETAILS_PREFIX_COACH = "CO" --coach feature
+	DETAILS_PREFIX_TBC_DATA = "BC" --tbc data
 	
 	_detalhes.network.ids = {
 		["HIGHFIVE_REQUEST"] = CONST_HIGHFIVE_REQUEST,
@@ -61,14 +60,20 @@
 		["CLOUD_DATARQ"] = CONST_CLOUD_DATARQ,
 		["CLOUD_DATARC"] = CONST_CLOUD_DATARC,
 		["CLOUD_EQUALIZE"] = CONST_CLOUD_EQUALIZE,
-		["CLOUD_UNEQUALIZED"] = CONST_CLOUD_UNEQUALIZED,
+		
 		["WIPE_CALL"] = CONST_WIPE_CALL,
+		
 		["GUILD_SYNC"] = CONST_GUILD_SYNC,
+		
 		["PVP_ENEMY"] = CONST_PVP_ENEMY,
+		
 		["MISSDATA_ROGUE_SOULRIP"] = CONST_ROGUE_SR, --soul rip from akaari's soul (LEGION ONLY)
+		
 		["CLOUD_SHAREDATA"] = CONST_CLOUD_SHAREDATA,
-		["ASK_TALENTS"] = CONST_ASK_TALENTS,
-		["ANSWER_TALENTS"] = CONST_ANSWER_TALENTS,
+
+		["COACH_FEATURE"] = DETAILS_PREFIX_COACH, --ask the raid leader is the coach is enbaled
+
+		["TBC_DATA"] = DETAILS_PREFIX_TBC_DATA, --get basic information about the player
 	}
 	
 	local plugins_registred = {}
@@ -85,9 +90,13 @@
 		if (not IsInGroup() and not IsInRaid()) then
 			return
 		end
-
-		if (DetailsFramework.IsClassicWow()) then
-			return Details:SendPlayerClassicInformation()
+		
+		if (DetailsFramework.IsTimewalkWoW()) then
+			if (DetailsFramework.IsTBCWow()) then
+				--detect my spec
+				
+			end
+			return
 		end
 		
 		--> check the player level
@@ -147,9 +156,9 @@
 		
 		_detalhes.LastPlayerInfoSync = GetTime()
 	end
-
+	
 	function _detalhes.network.ItemLevel_Received (player, realm, core_version, serial, itemlevel, talents, spec)
-		_detalhes:ClassicSpecFromNetwork (player, realm, core_version, serial, itemlevel, talents, spec)
+		_detalhes:IlvlFromNetwork (player, realm, core_version, serial, itemlevel, talents, spec)
 	end
 
 --high five
@@ -163,23 +172,6 @@
 		end
 	end
 	
---classic talents
-	function _detalhes.network.ReceivedTalentsQuery (player, realm, core_version, playerSerial)
-		Details.ask_talents_cooldown = Details.ask_Talents_cooldown or 0
-		if (Details.ask_talents_cooldown > time()) then
-			return
-		end
-		Details.ask_talents_cooldown = time() + 5
-
-		local targetName = Ambiguate (player .. "-" .. realm, "none")
-		Details:SendPlayerClassicInformation (targetName)
-	end
-
-	function _detalhes.network.ReceivedTalentsInformation (player, realm, core_version, serial, itemlevel, talents, spec)
-		_detalhes:ClassicSpecFromNetwork (player, realm, core_version, serial, itemlevel, talents, spec)
-	end
-
---details version	
 	function _detalhes.network.Update_VersionReceived (player, realm, core_version, build_number)
 		if (_detalhes.debug) then
 			_detalhes:Msg ("(debug) received version alert ", build_number)
@@ -190,12 +182,7 @@
 		if (not _detalhes.build_counter or not _detalhes.lastUpdateWarning or not build_number) then
 			return
 		end
-		
-		--retail sending version, just ignore
-		if (build_number > 6000) then
-			return
-		end
-
+	
 		if (build_number > _detalhes.build_counter) then
 			if (time() > _detalhes.lastUpdateWarning + 72000) then
 				local lower_instance = _detalhes:GetLowerInstanceNumber()
@@ -212,6 +199,9 @@
 	end
 	
 	function _detalhes.network.Cloud_Request (player, realm, core_version, ...)
+		--deprecated | need to remove
+		if (true) then return end
+		
 		if (_detalhes.debug) then
 			_detalhes:Msg ("(debug)", player, _detalhes.host_of, _detalhes:CaptureIsAllEnabled(), core_version == _detalhes.realversion)
 		end
@@ -224,12 +214,15 @@
 				if (_detalhes.debug) then
 					_detalhes:Msg ("(debug) sent 'okey' answer for a cloud parser request.")
 				end
-				_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (_detalhes.network.ids.CLOUD_FOUND, _UnitName ("player"), _GetRealmName(), _detalhes.realversion), "WHISPER", player)
+				_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (_detalhes.network.ids.CLOUD_FOUND, _UnitName ("player"), _GetRealmName(), _detalhes.realversion), "WHISPER", player)
 			end
 		end
 	end
 	
 	function _detalhes.network.Cloud_Found (player, realm, core_version, ...)
+		--deprecated | need to remove
+		if (true) then return end
+
 		if (_detalhes.host_by) then
 			return
 		end
@@ -248,6 +241,9 @@
 	end
 	
 	function _detalhes.network.Cloud_DataRequest (player, realm, core_version, ...)
+		--deprecated | need to remove
+		if (true) then return end
+
 		if (not _detalhes.host_of) then
 			return
 		end
@@ -283,12 +279,15 @@
 				_detalhes:Msg ("(debug) requesting data from the cloud.")
 			end
 			
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_CLOUD_DATARC, atributo, atributo_name, export), "WHISPER", _detalhes.host_of)
+			_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_CLOUD_DATARC, atributo, atributo_name, export), "WHISPER", _detalhes.host_of)
 			_table_wipe (temp)
 		end
 	end
 	
 	function _detalhes.network.Cloud_DataReceived	(player, realm, core_version, ...)
+		--deprecated | need to remove
+		if (true) then return end
+
 		local atributo, atributo_name, data = player, realm, core_version
 		
 		local container = _detalhes.tabela_vigente [atributo]
@@ -304,9 +303,7 @@
 			local actor = container:PegarCombatente (nil, name)
 			
 			if (not actor) then
-				local zoneName, zoneType = GetInstanceInfo()
-
-				if (IsInRaid() and zoneType == "raid") then
+				if (IsInRaid()) then
 					for i = 1, GetNumGroupMembers() do 
 						if (name:find ("-")) then --> other realm
 							local nname, server = _UnitName ("raid"..i)
@@ -325,8 +322,7 @@
 						end
 
 					end
-
-				elseif (IsInGroup() and zoneType == "party") then
+				elseif (IsInGroup()) then
 					for i = 1, GetNumGroupMembers()-1 do
 						if (name:find ("-")) then --> other realm
 							local nname, server = _UnitName ("party"..i)
@@ -358,21 +354,10 @@
 		end
 	end
 	
-	function _detalhes.network.Cloud_UnEqualized (player, realm, core_version, data)
-		if (core_version ~= _detalhes.realversion) then
-			return
-		end
-
-		_detalhes.last_combat_unequalized = _detalhes.last_combat_unequalized or {}
-		local uTable = _detalhes.last_combat_unequalized
-
-		for playerName, unEqualizedDamage in pairs (data) do
-			uTable [playerName] = uTable [playerName] or {}
-			uTable [playerName] [unEqualizedDamage] = (uTable [playerName] [unEqualizedDamage] or 0) + 1
-		end
-	end
-
 	function _detalhes.network.Cloud_Equalize (player, realm, core_version, data)
+		--deprecated | need to remove
+		if (true) then return end
+
 		if (not _detalhes.in_combat) then
 			if (core_version ~= _detalhes.realversion) then
 				return
@@ -382,7 +367,7 @@
 	end
 	
 	function _detalhes.network.Wipe_Call (player, realm, core_version, ...)
-		local chr_name = Ambiguate (player .. "-" .. realm, "none")
+		local chr_name = Ambiguate(player, "none")
 		if (UnitIsGroupLeader (chr_name)) then
 			if (UnitIsInMyGuild (chr_name)) then
 				_detalhes:CallWipe()
@@ -403,13 +388,110 @@
 		
 	end
 	
+
+	function _detalhes.network.TBCData(player, realm, coreVersion, data)
+		if (not IsInRaid() and not IsInGroup()) then
+			return
+		end
+
+		local LibDeflate = _G.LibStub:GetLibrary("LibDeflate")
+		local dataCompressed = LibDeflate:DecodeForWoWAddonChannel(data)
+		local dataSerialized = LibDeflate:DecompressDeflate(dataCompressed)
+		local dataTable = {Details:Deserialize(dataSerialized)}
+		tremove(dataTable, 1)
+		local dataTable = dataTable[1]
+
+		local playerRole = dataTable[1]
+		local spec = dataTable[2]
+		local itemLevel = dataTable[3]
+		local talents = dataTable[4]
+		local guid = dataTable[5]
+
+		--[=[
+		print("Details! Received TBC Comm Data:")
+		print("From:", player)
+		print("spec:", spec)
+		print("role:", playerRole)
+		print("item level:", itemLevel)
+		print("guid:", guid)
+		--]=]
+
+		_detalhes.cached_talents[guid] = talents
+		if (spec and spec ~= 0)  then
+			_detalhes.cached_specs[guid] = spec
+		end
+		_detalhes.cached_roles[guid] = playerRole
+		_detalhes.item_level_pool[guid] = {
+			name = player,
+			ilvl = itemLevel,
+			time = time()
+		}
+	end
+
+	--"CIEA" Coach Is Enabled Ask (client > server)
+	--"CIER" Coach Is Enabled Response (server > client)
+	--"CCS" Coach Combat Start (client > server)
+	function _detalhes.network.Coach(player, realm, core_version, msgType, data)
+		if (not IsInRaid()) then
+			return
+		end
+
+		if (_detalhes.debug) then
+			print("Details Coach Received Comm", player, realm, core_version, msgType, data)
+		end
+
+		local sourcePlayer = Ambiguate(player, "none")
+		
+		local playerName = UnitName("player")
+		if (playerName == sourcePlayer) then
+			if (_detalhes.debug) then
+				print("Details Coach Received Comm | RETURN | playerName == sourcePlayer", playerName , sourcePlayer)
+			end
+			return
+		end
+
+		if (msgType == "CIEA") then --Is Coach Enabled Ask (regular player asked to raid leader)
+			Details.Coach.Server.CoachIsEnabled_Answer(sourcePlayer)
+
+		elseif (msgType == "CIER") then --Coach Is Enabled Response (regular player received a raid leader response)
+			local isEnabled = data
+			Details.Coach.Client.CoachIsEnabled_Response(isEnabled, sourcePlayer)
+
+		elseif (msgType == "CCS") then --Coach Combat Start (raid assistant told the raid leader a combat started)
+			Details.Coach.Server.CombatStarted()
+
+		elseif (msgType == "CCE") then --Coach Combat End (raid assistant told the raid leader a combat ended)
+			Details.Coach.Server.CombatEnded()
+
+		elseif (msgType == "CS") then --Coach Start (raid leader notifying other members of the group)
+			if (_detalhes.debug) then
+				print("Details Coach received 'CE' a new coach is active, coach name:", sourcePlayer)
+			end
+			Details.Coach.Client.EnableCoach(sourcePlayer)
+
+		elseif (msgType == "CE") then --Coach End (raid leader notifying other members of the group)
+			Details.Coach.Client.CoachEnd()
+
+		elseif (msgType == "CDT") then --Coach Data (a player in the raid sent to raid leader combat data)
+			if (Details.Coach.Server.IsEnabled()) then
+				--update the current combat with new information
+				Details.packFunctions.DeployPackedCombatData(data)
+			end
+
+		elseif (msgType == "CDD") then --Coach Death (a player in the raid sent to raid leader his death log)
+			if (Details.Coach.Server.IsEnabled()) then
+				Details.Coach.Server.AddPlayerDeath(sourcePlayer, data)
+			end
+		end
+	end
+
 	--guild sync R = someone pressed the sync button
 	--guild sync L = list of fights IDs
 	--guild sync G = requested a list of encounters
 	--guild sync A = received missing encounters, add them
 	
 	function _detalhes.network.GuildSync (player, realm, core_version, type, data)
-		local chr_name = Ambiguate (player .. "-" .. realm, "none")
+		local chr_name = Ambiguate(player, "none")
 		
 		if (UnitName ("player") == chr_name) then
 			return
@@ -434,7 +516,7 @@
 			if (IDs and IDs [1]) then
 				local from = UnitName ("player")
 				local realm = GetRealmName()
-				_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "L", IDs), "WHISPER", chr_name)
+				_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "L", IDs), "WHISPER", chr_name)
 			end
 			
 			_detalhes.LastGuildSyncDataTime1 = GetTime() + 60
@@ -446,7 +528,7 @@
 			if (MissingIDs and MissingIDs [1]) then
 				local from = UnitName ("player")
 				local realm = GetRealmName()
-				_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "G", MissingIDs), "WHISPER", chr_name)
+				_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "G", MissingIDs), "WHISPER", chr_name)
 			end
 			return true
 			
@@ -465,7 +547,8 @@
 					
 					local from = UnitName ("player")
 					local realm = GetRealmName()
-					_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "A", data), "WHISPER", task.Target)
+					--todo: need to check if the target is still online
+					_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_GUILD_SYNC, from, realm, _detalhes.realversion, "A", data), "WHISPER", task.Target)
 					
 					if (_detalhes.debug) then
 						_detalhes:Msg ("(debug) [RoS-EncounterSync] send-task sending data #" .. task.TickID .. ".")
@@ -526,7 +609,6 @@
 		[CONST_CLOUD_DATARQ] = _detalhes.network.Cloud_DataRequest,
 		[CONST_CLOUD_DATARC] = _detalhes.network.Cloud_DataReceived,
 		[CONST_CLOUD_EQUALIZE] = _detalhes.network.Cloud_Equalize,
-		[CONST_CLOUD_UNEQUALIZED] = _detalhes.network.Cloud_UnEqualized,
 		[CONST_WIPE_CALL] = _detalhes.network.Wipe_Call,
 		
 		[CONST_GUILD_SYNC] = _detalhes.network.GuildSync,
@@ -535,17 +617,17 @@
 		
 		[CONST_PVP_ENEMY] = _detalhes.network.ReceivedEnemyPlayer,
 
-		[CONST_ASK_TALENTS] = _detalhes.network.ReceivedTalentsQuery,
-		[CONST_ANSWER_TALENTS] = _detalhes.network.ReceivedTalentsInformation,
-		
+		[DETAILS_PREFIX_COACH] = _detalhes.network.Coach, --coach feature
+		[DETAILS_PREFIX_TBC_DATA] = _detalhes.network.TBCData
 	}
 	
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> register comm
 
-	function _detalhes:CommReceived (_, data, _, source)
+	function _detalhes:CommReceived (commPrefix, data, channel, source)
 	
 		local prefix, player, realm, dversion, arg6, arg7, arg8, arg9 =  _select (2, _detalhes:Deserialize (data))
+		player = source
 		
 		if (_detalhes.debug) then
 			_detalhes:Msg ("(debug) network received:", prefix, "length:", string.len (data))
@@ -635,51 +717,32 @@
 	end
 	--]]
 
-	function _detalhes:SendPluginCommMessage (prefix, channel, ...)
-	
-		if (not _detalhes:IsConnected()) then
-			return false
-		end
-	
-		if (not channel) then
-			channel = "Details"
-		end
-		
+	function _detalhes:SendPluginCommMessage(prefix, channel, ...)
 		if (channel == "RAID") then
-			if (IsInGroup (LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
+			if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
 				_detalhes:SendCommMessage (prefix, _detalhes:Serialize (self.__version, ...), "INSTANCE_CHAT")
 			else
 				_detalhes:SendCommMessage (prefix, _detalhes:Serialize (self.__version, ...), "RAID")
 			end
 			
 		elseif (channel == "PARTY") then
-			if (IsInGroup (LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
-				_detalhes:SendCommMessage (prefix, _detalhes:Serialize (self.__version, ...), "INSTANCE_CHAT")
+			if (IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance()) then
+				_detalhes:SendCommMessage(prefix, _detalhes:Serialize (self.__version, ...), "INSTANCE_CHAT")
 			else
-				_detalhes:SendCommMessage (prefix, _detalhes:Serialize (self.__version, ...), "PARTY")
-			end
-		
-		elseif (channel == "Details") then
-			local id = _detalhes:GetChannelId (channel)
-			if (id) then
-				if (not _detalhes.listener:IsEventRegistered ("CHAT_MSG_CHANNEL")) then
-					_detalhes.listener:RegisterEvent ("CHAT_MSG_CHANNEL")
-				end
-				SendChatMessage (prefix .. "_" .. _detalhes:Serialize (self.__version, ...), "CHANNEL", nil, id)
+				_detalhes:SendCommMessage(prefix, _detalhes:Serialize (self.__version, ...), "PARTY")
 			end
 		else
-			_detalhes:SendCommMessage (prefix, _detalhes:Serialize (self.__version, ...), channel)
+			_detalhes:SendCommMessage(prefix, _detalhes:Serialize (self.__version, ...), channel)
 		end
 		
 		return true
 	end
 	
-	
 	--> send as
-	function _detalhes:SendRaidDataAs (type, player, realm, ...)
+	function _detalhes:SendRaidDataAs(type, player, realm, ...)
 		if (not realm) then
 			--> check if realm is already inside player name
-			for _name, _realm in _string_gmatch (player, "(%w+)-(%w+)") do
+			for _name, _realm in _string_gmatch(player, "(%w+)-(%w+)") do
 				if (_realm) then
 					player = _name
 					realm = _realm
@@ -690,26 +753,24 @@
 			--> doesn't have realm at all, so we assume the actor is in same realm as player
 			realm = _GetRealmName()
 		end
-		_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, player, realm, _detalhes.realversion, ...), "RAID")
+		_detalhes:SendCommMessage(DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, player, realm, _detalhes.realversion, ...), "RAID")
 	end
 	
-	function _detalhes:SendHomeRaidData (type, ...)
-		if (IsInRaid (LE_PARTY_CATEGORY_HOME) and IsInInstance()) then
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "RAID")
+	function _detalhes:SendHomeRaidData(type, ...)
+		if (IsInRaid(LE_PARTY_CATEGORY_HOME) and IsInInstance()) then
+			_detalhes:SendCommMessage(DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName("player"), _GetRealmName(), _detalhes.realversion, ...), "RAID")
 		end
 	end
 	
 	function _detalhes:SendRaidData (type, ...)
-	
 		local isInInstanceGroup = IsInRaid (LE_PARTY_CATEGORY_INSTANCE)
-	
 		if (isInInstanceGroup) then
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "INSTANCE_CHAT")
+			_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName("player"), _GetRealmName(), _detalhes.realversion, ...), "INSTANCE_CHAT")
 			if (_detalhes.debug) then
 				_detalhes:Msg ("(debug) sent comm to INSTANCE raid group")
 			end
 		else
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "RAID")
+			_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName("player"), _GetRealmName(), _detalhes.realversion, ...), "RAID")
 			if (_detalhes.debug) then
 				_detalhes:Msg ("(debug) sent comm to LOCAL raid group")
 			end
@@ -717,21 +778,18 @@
 	end
 	
 	function _detalhes:SendPartyData (type, ...)
-		
 		local isInInstanceGroup = IsInGroup (LE_PARTY_CATEGORY_INSTANCE)
-		
 		if (isInInstanceGroup) then
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "INSTANCE_CHAT")
+			_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "INSTANCE_CHAT")
 			if (_detalhes.debug) then
 				_detalhes:Msg ("(debug) sent comm to INSTANCE party group")
 			end
 		else
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "PARTY")
+			_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "PARTY")
 			if (_detalhes.debug) then
 				_detalhes:Msg ("(debug) sent comm to LOCAL party group")
 			end
 		end
-		
 	end
 	
 	function _detalhes:SendRaidOrPartyData (type, ...)
@@ -744,10 +802,8 @@
 	
 	function _detalhes:SendGuildData (type, ...)
 		if not IsInGuild() then return end --> fix from Tim@WoWInterface
-		_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "GUILD")
+		_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (type, _UnitName ("player"), _GetRealmName(), _detalhes.realversion, ...), "GUILD")
 	end
-	
-
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> cloud
@@ -772,16 +828,16 @@
 			if (instancia.ativa) then
 				local atributo = instancia.atributo
 				if (atributo == 1 and not _detalhes:CaptureGet ("damage")) then
-					_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
+					_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
 					break
 				elseif (atributo == 2 and (not _detalhes:CaptureGet ("heal") or _detalhes:CaptureGet ("aura"))) then
-					_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
+					_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
 					break
 				elseif (atributo == 3 and not _detalhes:CaptureGet ("energy")) then
-					_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
+					_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
 					break
 				elseif (atributo == 4 and not _detalhes:CaptureGet ("miscdata")) then
-					_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
+					_detalhes:SendCommMessage (DETAILS_PREFIX_NETWORK, _detalhes:Serialize (CONST_CLOUD_DATARQ, atributo, instancia.sub_atributo), "WHISPER", _detalhes.host_by)
 					break
 				end
 			end
@@ -801,175 +857,4 @@
 		if (send_to_guild) then
 			_detalhes:SendGuildData (_detalhes.network.ids.VERSION_CHECK, _detalhes.build_counter)
 		end
-	end
-	
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---> sharer
-
-	local city_zones = {
-		["ShattrathCity"] = true,
-		["Dalaran"] = true,
-		
-		["AshranHordeFactionHub"] = true,
-		["AshranAllianceFactionHub"] = true,
-		
-		["Orgrimmar"] = true,
-		["Undercity"] = true,
-		["ThunderBluff"] = true,
-		["SilvermoonCity"] = true,
-		
-		["StormwindCity"] = true,
-		["Darnassus"] = true,
-		["Ironforge"] = true,
-		["TheExodar"] = true,
-		
-		["garrisonffhorde_tier1"] = true,
-		["garrisonffhorde_tier2"] = true,
-		["garrisonffhorde_tier3"] = true,
-		
-		["garrisonsmvalliance_tier1"] = true,
-		["garrisonsmvalliance_tier2"] = true,
-		["garrisonsmvalliance_tier3"] = true,
-		["garrisonsmvalliance_tier4"] = true,
-	}
-	
-	local sub_zones = {
-		["ShrineofTwoMoons"] = true,
-		["ShrineofSevenStars"] = true,
-	}
-
-	function _detalhes:IsInCity()
-		if (SetMapToCurrentZone and SetMapToCurrentZone()) then
-			local mapID = C_Map.GetBestMapForUnit ("player")
-			if (not mapID) then
-				--print ("Details! exeption handled: zone has no map")
-				return
-			end
-			local mapFileName, _, _, _, microDungeonMapName = C_Map.GetMapInfo (mapID)
-			
-			if (city_zones [mapFileName]) then
-				return true
-			elseif (microDungeonMapName and type (microDungeonMapName) == "string" and sub_zones [microDungeonMapName]) then
-				return true
-			end
-		end
-	end
-
-	--> entrar no canal ap�s logar no servidor
-	function _detalhes:EnterChatChannel()
-		if (not _detalhes.realm_sync or not CONST_REALM_SYNC_ENABLED) then
-			return
-		end
-		
-		if (not _detalhes:IsInCity()) then
-			return
-		end
-		
-		if (_detalhes.schedule_chat_leave) then
-			_detalhes:CancelTimer (_detalhes.schedule_chat_leave)
-			_detalhes.schedule_chat_leave = nil
-		end
-		_detalhes.schedule_chat_enter = nil
-	
-		local realm = GetRealmName()
-		realm = realm or ""
-	
-		--> room name
-		local room_name = "Details"
-
-		_detalhes.listener:RegisterEvent ("CHAT_MSG_CHANNEL")
-		
-		--> already in?
-		for room_index = 1, 10 do
-			local _, name = GetChannelName (room_index)
-			if (name == room_name) then
-				_detalhes.is_connected = true
-				return --> already in the room
-			end
-		end
-		
-		--> enter
-		JoinChannelByName (room_name)
-		_detalhes.is_connected = true
-		
-		_detalhes:SendEvent ("REALM_CHANNEL_ENTER")
-	end
-	
-	function _detalhes:LeaveChatChannel()
-		if (not _detalhes.realm_sync or not CONST_REALM_SYNC_ENABLED) then
-			return
-		end
-	
-		if (_detalhes.schedule_chat_enter) then
-			_detalhes:CancelTimer (_detalhes.schedule_chat_enter)
-			_detalhes.schedule_chat_enter  = nil
-		end
-		_detalhes.schedule_chat_leave = nil
-	
-		local realm = GetRealmName()
-		realm = realm or ""
-		
-		--> room name
-		local room_name = "Details"
-		local is_in = false
-		
-		--> already in?
-		for room_index = 1, 10 do
-			local _, name = GetChannelName (room_index)
-			if (name == room_name) then
-				is_in = true
-			end
-		end
-		
-		if (is_in) then
-			LeaveChannelByName (room_name)
-		end
-		
-		_detalhes.is_connected = false
-		
-		_detalhes.listener:UnregisterEvent ("CHAT_MSG_CHANNEL")
-		
-		_detalhes:SendEvent ("REALM_CHANNEL_LEAVE")
-	end
-	
-	function _detalhes:DoZoneCheck()
-		local in_city = _detalhes:IsInCity()
-		if (not in_city) then
-			if (_detalhes.schedule_chat_enter) then
-				_detalhes:CancelTimer (_detalhes.schedule_chat_enter)
-			end
-			if (not _detalhes.schedule_chat_leave) then
-				_detalhes.schedule_chat_leave = _detalhes:ScheduleTimer ("LeaveChatChannel", 5)
-			end
-		else
-			if (in_city) then
-			
-				local _, name = GetChannelName (2)
-				if (name) then
-					if (_detalhes.schedule_chat_leave) then
-						_detalhes:CancelTimer (_detalhes.schedule_chat_leave)
-					end
-					if (not _detalhes.schedule_chat_enter) then
-						_detalhes.schedule_chat_enter = _detalhes:ScheduleTimer ("EnterChatChannel", 5)
-					end
-				end
-			end
-		end
-	end
-	
-	function _detalhes:CheckChatOnZoneChange()
-		if (not _detalhes.realm_sync or not CONST_REALM_SYNC_ENABLED) then
-			return
-		end
-		_detalhes:ScheduleTimer ("DoZoneCheck", 2)
-	end
-	
-	function _detalhes:IsConnected()
-		if (not _detalhes.is_connected) then
-			local id = _detalhes:GetChannelId ("Details")
-			if (id) then
-				_detalhes.is_connected = true
-			end
-		end
-		return _detalhes.is_connected
 	end

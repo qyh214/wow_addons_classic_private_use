@@ -1,15 +1,13 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+
 local _, ns = ...
 local ElvUF = ns.oUF
-assert(ElvUF, "ElvUI was unable to locate oUF.")
+assert(ElvUF, 'ElvUI was unable to locate oUF.')
 
---Lua functions
 local _G = _G
-local max = math.max
---WoW API / Variables
+local max = max
 local CreateFrame = CreateFrame
-local IsAddOnLoaded = IsAddOnLoaded
 local InCombatLockdown = InCombatLockdown
 local RegisterAttributeDriver = RegisterAttributeDriver
 
@@ -23,25 +21,24 @@ function UF:Construct_AssistFrames()
 
 	self.Health = UF:Construct_HealthBar(self, true)
 	self.Name = UF:Construct_NameText(self)
-
-	self.Cutaway = UF:Construct_Cutaway(self)
-	self.Fader = UF:Construct_Fader()
-	self.MouseGlow = UF:Construct_MouseGlow(self)
-	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
-	self.TargetGlow = UF:Construct_TargetGlow(self)
 	self.ThreatIndicator = UF:Construct_Threat(self)
+	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
+	self.MouseGlow = UF:Construct_MouseGlow(self)
+	self.TargetGlow = UF:Construct_TargetGlow(self)
+	self.FocusGlow = UF:Construct_FocusGlow(self)
+	self.Fader = UF:Construct_Fader()
+	self.Cutaway = UF:Construct_Cutaway(self)
 
 	if not self.isChild then
 		self.Buffs = UF:Construct_Buffs(self)
 		self.Debuffs = UF:Construct_Debuffs(self)
 		self.AuraWatch = UF:Construct_AuraWatch(self)
 		self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
-		self.HealthPrediction = UF:Construct_HealComm(self)
 		self.AuraHighlight = UF:Construct_AuraHighlight(self)
 
-		self.unitframeType = "assist"
+		self.unitframeType = 'assist'
 	else
-		self.unitframeType = "assisttarget"
+		self.unitframeType = 'assisttarget'
 	end
 
 	self.originalParent = self:GetParent()
@@ -86,14 +83,6 @@ function UF:Update_AssistFrames(frame, db)
 
 	do
 		frame.ORIENTATION = db.orientation --allow this value to change when unitframes position changes on screen?
-		if(UF.thinBorders) then
-			frame.SPACING = 0
-			frame.BORDER = E.mult
-		else
-			frame.BORDER = E.Border
-			frame.SPACING = E.Spacing
-		end
-
 		frame.SHADOW_SPACING = 3
 		frame.UNIT_WIDTH = db.width
 		frame.UNIT_HEIGHT = db.height
@@ -131,21 +120,19 @@ function UF:Update_AssistFrames(frame, db)
 		frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 	end
 
-	--Health
 	UF:Configure_HealthBar(frame)
-	UF:UpdateNameSettings(frame)
-
 	UF:Configure_Threat(frame)
+	UF:UpdateNameSettings(frame)
 	UF:Configure_Fader(frame)
 	UF:Configure_RaidIcon(frame)
 	UF:Configure_Cutaway(frame)
 
 	if not frame.isChild then
-		if not IsAddOnLoaded("Clique") then
+		if not E:IsAddOnEnabled('Clique') then
 			if db.middleClickFocus then
-				frame:SetAttribute("type3", "focus")
-			elseif frame:GetAttribute("type3") == "focus" then
-				frame:SetAttribute("type3", nil)
+				frame:SetAttribute('type3', 'focus')
+			elseif frame:GetAttribute('type3') == 'focus' then
+				frame:SetAttribute('type3', nil)
 			end
 		end
 
@@ -154,11 +141,9 @@ function UF:Update_AssistFrames(frame, db)
 		UF:Configure_RaidDebuffs(frame)
 		UF:Configure_AuraHighlight(frame)
 		UF:Configure_AuraWatch(frame)
-		UF:Configure_RaidDebuffs(frame)
-		UF:Configure_HealComm(frame)
 	end
 
-	frame:UpdateAllElements("ElvUI_UpdateAllElements")
+	frame:UpdateAllElements('ElvUI_UpdateAllElements')
 end
 
 UF.headerstoload.assist = {'MAINASSIST', 'ELVUI_UNITTARGET'}

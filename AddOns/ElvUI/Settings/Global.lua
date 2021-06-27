@@ -3,9 +3,9 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 --Global Settings
 G.general = {
 	UIScale = 0.64,
-	version = 1.31,
 	locale = E:GetLocale(),
 	eyefinity = false,
+	ultrawide = false,
 	smallerWorldMap = true,
 	allowDistributor = false,
 	smallerWorldMapScale = 0.9,
@@ -14,17 +14,16 @@ G.general = {
 	fadeMapDuration = 0.2,
 	WorldMapCoordinates = {
 		enable = true,
-		position = "BOTTOMLEFT",
+		position = 'BOTTOMLEFT',
 		xOffset = 0,
 		yOffset = 0
 	},
 	AceGUI = {
-		width = 960,
-		height = 730
+		width = 970,
+		height = 755
 	},
-	disableTutorialButtons = true,
 	showMissingTalentAlert = false,
-	commandBarSetting = "ENABLED_RESIZEPARENT"
+	commandBarSetting = 'ENABLED_RESIZEPARENT'
 }
 
 G.classtimer = {}
@@ -47,7 +46,7 @@ G.datatexts = {
 		CallToArms = { Label = '', NoLabel = false },
 		Crit = { Label = '', NoLabel = false, decimalLength = 1 },
 		Currencies = { goldFormat = 'BLIZZARD', goldCoins = true, displayedCurrency = 'BACKPACK', displayStyle = 'ICON', tooltipData = {} },
-		Durability = { Label = '', NoLabel = false, percThreshold = 30 },
+		Durability = { percThreshold = 30 },
 		Experience = { textFormat = 'CUR' },
 		Friends = {
 			Label = '', NoLabel = false,
@@ -69,7 +68,7 @@ G.datatexts = {
 		},
 		Gold = { goldFormat = 'BLIZZARD', goldCoins = true },
 		Guild = { Label = '', NoLabel = false },
-		QuickJoin = { Label = '', NoLabel = false },
+		Hit = { Label = '', NoLabel = false, decimalLength = 1 },
 		Bags = { textFormat = 'USED_TOTAL' },
 		Reputation = { textFormat = 'CUR' },
 		Speed = { Label = '', NoLabel = false, decimalLength = 1 },
@@ -91,7 +90,7 @@ G.datatexts = {
 		panelTransparency = false,
 		mouseover = false,
 		border = true,
-		visibility = '[petbattle] hide;show',
+		visibility = 'show',
 		tooltipAnchor = 'ANCHOR_TOPLEFT',
 		tooltipXOffset = -17,
 		tooltipYOffset = 4,
@@ -111,11 +110,34 @@ G.nameplate = {
 	effectiveHealthSpeed = 0.3,
 	effectivePowerSpeed = 0.3,
 	effectiveAuraSpeed = 0.3,
+	widgetMap = {
+		[149805] = 1940, -- Farseer Ori
+		[149804] = 1613, -- Hunter Akana
+		[149803] = 1966, -- Bladesman Inowari
+		[149904] = 1621, -- Neri Sharpfin
+		[149902] = 1622, -- Poen Gillbrack
+		[149906] = 1920, -- Vim Brineheart
+
+		[154304] = 1940, -- Farseer Ori
+		[150202] = 1613, -- Hunter Akana
+		[154297] = 1966, -- Bladesman Inowari
+		[151300] = 1621, -- Neri Sharpfin
+		[151310] = 1622, -- Poen Gillbrack
+		[151309] = 1920, -- Vim Brineheart
+
+		[163541] = 2342, -- Voidtouched Egg
+		[163592] = 2342, -- Yu'gaz
+		[163593] = 2342, -- Bitey McStabface
+		[163595] = 2342, -- Reginald
+		[163596] = 2342, -- Picco
+		[163648] = 2342, -- Bitey McStabface
+		[163651] = 2342, -- Yu'gaz
+	}
 }
 
 G.unitframe = {
 	aurafilters = {},
-	buffwatch = {},
+	aurawatch = {},
 	effectiveHealth = false,
 	effectivePower = false,
 	effectiveAura = false,
@@ -123,14 +145,14 @@ G.unitframe = {
 	effectivePowerSpeed = 0.3,
 	effectiveAuraSpeed = 0.3,
 	raidDebuffIndicator = {
-		instanceFilter = "RaidDebuffs",
-		otherFilter = "CCDebuffs"
-	},
+		instanceFilter = 'RaidDebuffs',
+		otherFilter = 'CCDebuffs'
+	}
 }
 
 G.profileCopy = {
 	--Specific values
-	selected = "Default",
+	selected = 'Default',
 	movers = {},
 	--Modules
 	actionbar = {
@@ -218,8 +240,11 @@ G.profileCopy = {
 			target = true,
 			targettarget = true,
 			targettargettarget = true,
+			focus = true,
+			focustarget = true,
 			pet = true,
 			pettarget = true,
+			arena = true,
 			party = true,
 			raid = true,
 			raid40 = true,

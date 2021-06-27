@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(448, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(10811)
 mod:SetEncounterID(477)
 
@@ -24,30 +24,21 @@ function mod:OnCombatStart(delay)
 	timerFireNovaCD:Start(1-delay)
 end
 
-do
-	local FireNova = DBM:GetSpellInfo(17366)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 17366 then
-		if args.spellName == FireNova and args:IsSrcTypeHostile() then
-			warningFireNova:Show()
-			timerFireNovaCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 17366 and args:IsSrcTypeHostile() then
+		warningFireNova:Show()
+		timerFireNovaCD:Start()
 	end
 end
 
-do
-	local BurningWinds = DBM:GetSpellInfo(17293)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 17293 then
-		if args.spellName == BurningWinds then
-			timerBurningWindsCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 17293 then
+		timerBurningWindsCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 17293 then
-		if args.spellName == BurningWinds then
-			warningBurningWinds:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 17293 then
+		warningBurningWinds:Show(args.destName)
 	end
 end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(457, "DBM-Party-Classic", 17, 237)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(8443)
 mod:SetEncounterID(492)
 
@@ -23,25 +23,18 @@ function mod:OnCombatStart(delay)
 	timerCauseInsanityCD:Start(1-delay)
 end
 
-do
-	local CurseofTongues, CauseInsanity = DBM:GetSpellInfo(12889), DBM:GetSpellInfo(12888)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 12889 then
-		if args.spellName == CurseofTongues then
-			timerCurseofTonguesCD:Start()
-		--elseif args.spellId == 12888 then
-		elseif args.spellName == CauseInsanity then
-			timerCauseInsanityCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 12889 then
+		timerCurseofTonguesCD:Start()
+	elseif args.spellId == 12888 then
+		timerCauseInsanityCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 12889 then
-		if args.spellName == CurseofTongues then
-			warningCurseofTongues:Show(args.destName)
-		--elseif args.spellId == 12888 then
-		elseif args.spellName == CauseInsanity then
-			warningCauseInsanity:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 12889 then
+		warningCurseofTongues:Show(args.destName)
+	elseif args.spellId == 12888 then
+		warningCauseInsanity:Show(args.destName)
 	end
 end

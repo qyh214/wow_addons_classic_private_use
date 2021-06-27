@@ -1,4 +1,4 @@
-if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
+if GetLocale() ~= "esES" then return end
 local L
 
 -----------------
@@ -105,7 +105,10 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	Pull				= "¡Muere, intruso!"
+	Pull				= "¡Muere, intruso!",
+	AddsYell			= "¡Levantaos, soldados míos! ¡Levantaos y luchad una vez más!",
+	Adds				= "invoca a guerreros esqueletos!",
+	AddsTwo				= "alza más esqueletos!"
 })
 
 ----------------------
@@ -222,10 +225,6 @@ L:SetWarningLocalization({
 	WarningChargeNotChanged	= "Tu polaridad no ha cambiado"
 })
 
-L:SetOptionCatLocalization({
-	Arrows	= "Flechas"
-})
-
 --------------------------
 -- Instructor Razuvious --
 --------------------------
@@ -302,7 +301,6 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	WarningMarkSoon				= "Mostrar aviso previo para las marcas",
-	WarningMarkNow				= "Mostrar aviso para las marcas",
 	SpecialWarningMarkOnPlayer	= "Mostrar aviso especial cuando estés afectado por más de cuatro marcas"
 })
 
@@ -311,7 +309,6 @@ L:SetTimerLocalization({
 
 L:SetWarningLocalization({
 	WarningMarkSoon				= "Marca %d en 3 s",
-	WarningMarkNow				= "Marca %d",
 	SpecialWarningMarkOnPlayer	= "%s: %s"
 })
 

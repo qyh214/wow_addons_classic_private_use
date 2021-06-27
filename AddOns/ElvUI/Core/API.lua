@@ -1,22 +1,31 @@
 ------------------------------------------------------------------------
 -- Collection of functions that can be used in multiple places
 ------------------------------------------------------------------------
-local E, L, V, P, G = unpack(select(2, ...))
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 local _G = _G
-local wipe, date = wipe, date
-local format, type, ipairs, pairs, strlen = format, type, ipairs, pairs, strlen
+local wipe, date, max = wipe, date, max
+local format, select, type, ipairs, pairs = format, select, type, ipairs, pairs
 local strmatch, strfind, tonumber, tostring = strmatch, strfind, tonumber, tostring
+local strlen, CreateFrame = strlen, CreateFrame
 local GetAddOnEnableState = GetAddOnEnableState
 local GetCVar, SetCVar = GetCVar, SetCVar
 local GetCVarBool = GetCVarBool
 local GetFunctionCPUUsage = GetFunctionCPUUsage
 local GetInstanceInfo = GetInstanceInfo
+local GetNumGroupMembers = GetNumGroupMembers
 local InCombatLockdown = InCombatLockdown
 local IsAddOnLoaded = IsAddOnLoaded
+local IsInRaid = IsInRaid
 local RequestBattlefieldScoreData = RequestBattlefieldScoreData
 local UIParentLoadAddOn = UIParentLoadAddOn
+local UnitInParty = UnitInParty
+local UnitInRaid = UnitInRaid
+local UnitIsUnit = UnitIsUnit
 local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
+local FACTION_ALLIANCE = FACTION_ALLIANCE
+local FACTION_HORDE = FACTION_HORDE
+local PLAYER_FACTION_GROUP = PLAYER_FACTION_GROUP
 -- GLOBALS: ElvDB
 
 function E:ClassColor(class, usePriestColor)
@@ -31,11 +40,23 @@ function E:ClassColor(class, usePriestColor)
 		color.colorStr = 'ff'..color.colorStr
 	end
 
-	if (usePriestColor and class == 'PRIEST') and tonumber(color.colorStr, 16) > tonumber(E.PriestColors.colorStr, 16) then
+	if usePriestColor and class == 'PRIEST' and tonumber(color.colorStr, 16) > tonumber(E.PriestColors.colorStr, 16) then
 		return E.PriestColors
 	else
 		return color
 	end
+end
+
+function E:InverseClassColor(class, usePriestColor, forceCap)
+	local color = E:CopyTable({}, E:ClassColor(class, usePriestColor))
+	local capColor = color == E.PriestColors or forceCap
+
+	color.r = capColor and max(1-color.r,0.35) or (1-color.r)
+	color.g = capColor and max(1-color.g,0.35) or (1-color.g)
+	color.b = capColor and max(1-color.b,0.35) or (1-color.b)
+	color.colorStr = E:RGBToHex(color.r, color.g, color.b, 'ff')
+
+	return color
 end
 
 do -- other non-english locales require this
@@ -125,23 +146,8 @@ do
 			return
 		end
 
-		E.UIParent:SetHeight(E.UIParent.origHeight - (_G.OrderHallCommandBar:GetHeight() + E.Border))
-
 		if f == SetModifiedHeight then
 			E:UnregisterEventForObject('PLAYER_REGEN_ENABLED', SetModifiedHeight, SetModifiedHeight)
-		end
-	end
-
-	--This function handles disabling of OrderHall Bar or resizing of ElvUIParent if needed
-	function E:HandleCommandBar()
-		if E.global.general.commandBarSetting == 'DISABLED' then
-			_G.OrderHallCommandBar:UnregisterAllEvents()
-			_G.OrderHallCommandBar:SetScript('OnShow', _G.OrderHallCommandBar.Hide)
-			_G.OrderHallCommandBar:Hide()
-			_G.UIParent:UnregisterEvent('UNIT_AURA') --Only used for OrderHall Bar
-		elseif E.global.general.commandBarSetting == 'ENABLED_RESIZEPARENT' then
-			_G.OrderHallCommandBar:HookScript('OnShow', SetModifiedHeight)
-			_G.OrderHallCommandBar:HookScript('OnHide', SetOriginalHeight)
 		end
 	end
 end
@@ -150,11 +156,11 @@ do
 	local Masque = E.Libs.Masque
 	local MasqueGroupState = {}
 	local MasqueGroupToTableElement = {
-		['ActionBars'] = {'actionbar', 'actionbars'},
-		['Pet Bar'] = {'actionbar', 'petBar'},
-		['Stance Bar'] = {'actionbar', 'stanceBar'},
-		['Buffs'] = {'auras', 'buffs'},
-		['Debuffs'] = {'auras', 'debuffs'},
+		['ActionBars']	= {'actionbar', 'actionbars'},
+		['Pet Bar']		= {'actionbar', 'petBar'},
+		['Stance Bar']	= {'actionbar', 'stanceBar'},
+		['Buffs']		= {'auras', 'buffs'},
+		['Debuffs']		= {'auras', 'debuffs'},
 	}
 
 	function E:MasqueCallback(Group, _, _, _, _, Disabled)
@@ -230,7 +236,7 @@ do
 		if module == 'all' then
 			for moduName, modu in pairs(self.modules) do
 				for funcName, func in pairs(modu) do
-					if (funcName ~= 'GetModule') and (type(func) == 'function') then
+					if funcName ~= 'GetModule' and type(func) == 'function' then
 						CPU_USAGE[moduName..':'..funcName] = GetFunctionCPUUsage(func, true)
 					end
 				end
@@ -282,7 +288,8 @@ function E:RequestBGInfo()
 	RequestBattlefieldScoreData()
 end
 
-function E:PLAYER_ENTERING_WORLD(_, initLogin)
+function E:PLAYER_ENTERING_WORLD(_, initLogin, isReload)
+
 	if initLogin or not ElvDB.LuaErrorDisabledAddOns then
 		ElvDB.LuaErrorDisabledAddOns = {}
 	end
@@ -347,6 +354,24 @@ function E:PLAYER_REGEN_DISABLED()
 
 	if err then
 		self:Print(ERR_NOT_IN_COMBAT)
+	end
+end
+
+function E:GetGroupUnit(unit)
+	if UnitIsUnit(unit, 'player') then return end
+	if strfind(unit, 'party') or strfind(unit, 'raid') then
+		return unit
+	end
+
+	-- returns the unit as raid# or party# when grouped
+	if UnitInParty(unit) or UnitInRaid(unit) then
+		local isInRaid = IsInRaid()
+		for i = 1, GetNumGroupMembers() do
+			local groupUnit = (isInRaid and 'raid' or 'party')..i
+			if UnitIsUnit(unit, groupUnit) then
+				return groupUnit
+			end
+		end
 	end
 end
 

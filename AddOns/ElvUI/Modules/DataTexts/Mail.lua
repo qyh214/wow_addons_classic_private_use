@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
 local pairs = pairs
@@ -16,6 +16,8 @@ local function OnEvent(self)
 end
 
 local function OnEnter()
+	DT.tooltip:ClearLines()
+
 	local senders = { GetLatestThreeSenders() }
 	if #senders > 0 then
 		DT.tooltip:AddLine(HasNewMail() and HAVE_MAIL_FROM or MAIL_LABEL, 1, 1, 1)

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Bazzalan", "DBM-Party-Classic", 9)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(11519)
 --mod:SetEncounterID(1445)
 
@@ -20,19 +20,14 @@ function mod:OnCombatStart(delay)
 	timerDeadlyPoisonCD:Start(1-delay)
 end
 
-do
-	local DeadlyPoison = DBM:GetSpellInfo(744)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 744 then
-		if args.spellName == DeadlyPoison and args:IsSrcTypeHostile() then
-			timerDeadlyPoisonCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 744 and args:IsSrcTypeHostile() then
+		timerDeadlyPoisonCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 744 and self:CheckDispelFilter() then
-		if args.spellName == DeadlyPoison and args:IsDestTypePlayer() and self:CheckDispelFilter() then
-			warningDeadlyPoison:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 744 and args:IsDestTypePlayer() and self:CheckDispelFilter() then
+		warningDeadlyPoison:Show(args.destName)
 	end
 end

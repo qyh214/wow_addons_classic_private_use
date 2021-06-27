@@ -1,4 +1,4 @@
-local E, _, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, _, V, P, G = unpack(ElvUI) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local C, L = unpack(select(2, ...))
 local DT = E:GetModule('DataTexts')
 local Layout = E:GetModule('Layout')
@@ -346,7 +346,7 @@ local function CreateDTOptions(name, data)
 				type = 'input',
 				name = L['Label'],
 				get = function(info) return settings[info[#info]] and gsub(settings[info[#info]], '\124', '\124\124') end,
-				set = function(info, value) settings[info[#info]] = gsub(value, '\124\124+', '\124') end,
+				set = function(info, value) settings[info[#info]] = gsub(value, '\124\124+', '\124') DT:ForceUpdate_DataText(name) end,
 			}
 		elseif key == 'NoLabel' then
 			optionTable.args.NoLabel = {
@@ -578,7 +578,7 @@ E.Options.args.datatexts = {
 								end
 
 								PanelGroup_Create(name)
-								DT:BuildPanelFrame(name, E.global.datatexts.customPanels[name])
+								DT:BuildPanelFrame(name)
 								DT:PanelLayoutOptions()
 
 								E.Libs.AceConfigDialog:SelectGroup('ElvUI', 'datatexts', 'panels', name)

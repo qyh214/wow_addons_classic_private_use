@@ -17,7 +17,7 @@ local MYSLOT_ALLOW_VER = {MYSLOT_VER}
 
 -- local MYSLOT_IS_DEBUG = true
 local MYSLOT_LINE_SEP = IsWindowsClient() and "\r\n" or "\n"
-local MYSLOT_MAX_ACTIONBAR = 120
+local MYSLOT_MAX_ACTIONBAR = 132
 
 -- {{{ SLOT TYPE
 local MYSLOT_SPELL = _MySlot.Slot.SlotType.SPELL
@@ -118,7 +118,8 @@ function MySlot:GetActionInfo(slotId)
     -- { slotId, slotType and high 16 ,high 8 , low 8, }
     local slotType, index = GetActionInfo(slotId)
     if MySlot.SLOT_TYPE[slotType] == MYSLOT_EQUIPMENTSET then
-        for i = 1, C_EquipmentSet.GetNumEquipmentSets() do
+        -- i starts from 0 https://github.com/tg123/myslot/issues/10 weird blz
+        for i = 0, C_EquipmentSet.GetNumEquipmentSets() do
             if C_EquipmentSet.GetEquipmentSetInfo(i) == index then
                 index = i
                 break
@@ -352,6 +353,12 @@ function MySlot:Import(text, opt)
     return msg
 end
 
+local function UnifyCRLF(text)
+    text = string.gsub(text, "\r", "")
+    text = string.gsub(text, "\n", MYSLOT_LINE_SEP)
+    return text
+end
+
 -- {{{ FindOrCreateMacro
 function MySlot:FindOrCreateMacro(macroInfo)
     if not macroInfo then
@@ -364,6 +371,7 @@ function MySlot:FindOrCreateMacro(macroInfo)
         
         local name, _, body = GetMacroInfo(i)
         if name then
+            body = UnifyCRLF(body)
             localMacro[ name .. "_" .. body ] = i
             localMacro[ body ] = i
         end
@@ -374,8 +382,9 @@ function MySlot:FindOrCreateMacro(macroInfo)
     local name = macroInfo["name"]
     local icon = macroInfo["icon"]
     local body = macroInfo["body"]
+    body = UnifyCRLF(body)
 
-    local localIndex = localMacro[ name .. "_" .. body ] or localMacro[ body ]
+    local localIndex = localMacro[ name .. "_" .. body] or localMacro[ body ]
 
     if localIndex then
         return localIndex
@@ -440,15 +449,6 @@ function MySlot:RecoverData(msg, opt)
             end
         end
     end
-
-    -- removed in 6.0 
-    -- for _, companionsType in pairs({"CRITTER"}) do
-    --     for i =1,GetNumCompanions(companionsType) do
-    --         local _,_,spellId = GetCompanionInfo( companionsType, i)
-    --         spells[MYSLOT_SPELL .. "_" .. spellId] = {i, companionsType, "companions"}
-    --     end
-    -- end
-
 
     -- for _, p in pairs({GetProfessions()}) do
     --     local _, _, _, _, numSpells, spelloffset = GetProfessionInfo(p)
@@ -623,7 +623,7 @@ function MySlot:RecoverData(msg, opt)
             end
 
         end
-        AttemptToSaveBindings(GetCurrentBindingSet())
+        SaveBindings(GetCurrentBindingSet())
     end
 
     MySlot:Print(L["All slots were restored"])
@@ -649,6 +649,6 @@ function MySlot:Clear(what)
                 end
             end
         end
-        AttemptToSaveBindings(GetCurrentBindingSet())
+        SaveBindings(GetCurrentBindingSet())
     end
 end

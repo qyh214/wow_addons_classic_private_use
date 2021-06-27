@@ -1,88 +1,162 @@
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> global name declaration
 		
-		--remove the underline from the global namespace
-		_ = nil 
+		_ = nil
 		_detalhes = LibStub("AceAddon-3.0"):NewAddon("_detalhes", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0", "NickTag-1.0")
 		
-		_detalhes.build_counter = 212
-		_detalhes.alpha_build_counter = 212 --if this is higher than the regular counter, use it instead
-		_detalhes.game_version = "v1.13.5"
-		_detalhes.userversion = "v1.13.5." .. _detalhes.build_counter
-		_detalhes.realversion = 142 --core version, this is used to check API version for scripts and plugins (see alias below)
+		local version, build, date, tocversion = GetBuildInfo()
+
+		_detalhes.build_counter = 8516
+		_detalhes.alpha_build_counter = 8516 --if this is higher than the regular counter, use it instead
+		_detalhes.bcc_counter = 22
+		_detalhes.dont_open_news = true
+		_detalhes.game_version = version
+		_detalhes.userversion = version .. _detalhes.build_counter
+		_detalhes.realversion = 145 --core version, this is used to check API version for scripts and plugins (see alias below)
 		_detalhes.APIVersion = _detalhes.realversion --core version
 		_detalhes.version = _detalhes.userversion .. " (core " .. _detalhes.realversion .. ")" --simple stirng to show to players
 		
-		--core version when a new version of wow is released
 		_detalhes.BFACORE = 131 --core version on BFA launch
-		_detalhes.CLASSICCORE = 140 --core version on BFA launch
-		_detalhes.SYNCCORE = 141 --core version to sync data due to blizzard cleu range
+		_detalhes.SHADOWLANDSCORE = 143 --core version on Shadowlands launch
 		
 		Details = _detalhes
 		
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> initialization stuff
+local _
 
-do 
-
+do
 	local _detalhes = _G._detalhes
 
 	_detalhes.resize_debug = {}
 
-	local Loc = LibStub ("AceLocale-3.0"):GetLocale ( "Details" )
---[[
-|cFFFFFF00v1.13.5.212.142 (|cFFFFCC00July 30th, 2020|r|cFFFFFF00)|r:\n\n
-|cFFFFFF00-|r Tiny Threat threat updates should few more frequent due to changes on the internal clock.\n\n
-|cFFFFFF00-|r \n\n
---]]
+	local Loc = _G.LibStub("AceLocale-3.0"):GetLocale( "Details" )
 
-	Loc ["STRING_VERSION_LOG"] = "|cFFFFFF00v1.13.5.212.142 (|cFFFFCC00July 30th, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Tiny Threat threat updates should few more frequent due to changes on the internal clock.\n\n|cFFFFFF00v1.13.5.211.142 (|cFFFFCC00July 12th, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed Tiny Thread bug where the player always shown bar had no value with animations on.\n\n|cFFFFFF00-|r Added Tiny Thread 'Always Show Me' option, default enabled.\n\n|cFFFFFF00-|r Tiny Thread now show the target of target threat to you when your target is friendly.\n\n|cFFFFFF00-|r Fixed an issue with Auto Hide where for some users it would hide out of combat.\n\n|cFFFFFF00-|r As on Retail, the bug with the title bar icons showing again randomly is fixed.\n\n|cFFFFFF00v1.13.5.210.142 (|cFFFFCC00July 11th, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed Tiny Thread bugs like not saving data at logout.\n\n|cFFFFFF00v1.13.5.207.142 (|cFFFFCC00July 8th, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Abandoned threat libraries, Tiny Threat now get threat value from Blizzard API.\n\n|cFFFFFF00-|r /tt or /tinythreat to open the Tiny Threat options.\n\n|cFFFFFF00v1.13.4.206.142 (|cFFFFCC00June 27rd, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Auto Hide options has been reworked, now there's options to select multiple options.\n\n|cFFFFFF00v1.13.4.204.142 (|cFFFFCC00June 16rd, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Tiny Threat options can now be accessed with /tt or /tinythreat.\n\n|cFFFFFF00v1.13.4.202.142 (|cFFFFCC00May 23rd, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added the option to Hide on Battlegrounds at Window: Automation > Auto Hide.\n\n|cFFFFFF00v1.13.4.199.142 (|cFFFFCC00April 15th, 2020|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed some issues while in battleground.\n\n|cFFFFFF00-|r Fixed a bug with damage taken from spell.\n\n|cFFFFFF00-|r More fixes on Tiny Threat plugin.\n\n|cFFFFFF00v1.13.2.184.141 (|cFFFFCC00November 28th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Sync tests is now available using '/details sync', use it during raids where distance > 50.\n\n|cFFFFFF00v1.13.2.180.140 (|cFFFFCC00November 17th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Details! Streamer plugin has been ported to classic, need lots of tests.\n\n|cFFFFFF00-|r Framework updates and more small bugs fix.\n\n|cFFFFFF00v1.13.2.176.140 (|cFFFFCC00October 19th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Total revamp on '/details users'.\n\n|cFFFFFF00-|r Fixed defenses and misses on Player Details Window.\n\n|cFFFFFF00v1.13.2.158.140 (|cFFFFCC00September 20th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed player detail window showing a blank page after selecting another player when in the comparison tab.\n\n|cFFFFFF00-|r Added information about the Eternal Palace raid, this brings better boss icons, background textures and other things (by GyroJoe).\n\n|cFFFFFF00v8.2.0.7167.140 (|cFFFFCC00July 24th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed overkill amount (by nullKomplex).\n\n|cFFFFFF00v8.2.0.7166.140 (|cFFFFCC00July 18th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added new potions, food and flasks. (by nullKomplex).\n\n|cFFFFFF00v8.2.0.7165.140 (|cFFFFCC00July 14th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r More 8.2 bug fixes.\n\n|cFFFFFF00v8.2.0.7152.140 (|cFFFFCC00July 7th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed some issues with classes showing some wrong icons (by nullKomplex).\n\n|cFFFFFF00v8.2.0.7150.140 (|cFFFFCC00July 2nd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added click through options.\n\n|cFFFFFF00-|r More 8.2 fixes.\n\n|cFFFFFF00v8.1.5.7129.140 (|cFFFFCC00May 2nd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Energy redesign: track only the energy generated below the maximum energy amount.\nEnergy generated above the maximum energy now counts as energy 'overflow', this info is in the tooltip.\n\n|cFFFFFF00v8.1.5.7102.139 (|cFFFFCC00April 23rd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added API Details.SegmentPhases() and Details.UnitDamageByPhase() see '/details api' for the full API.\n\n|cFFFFFF00-|r Minor fixes for the mythic version of 'The Restless Cabal' encounter.\n\n|cFFFFFF00v8.1.5.7099.139 (|cFFFFCC00April 16rd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Damage and Healing API is ready to be used by scripters, use '/details api' for more information.\n\n|cFFFFFF00v8.1.5.7084.138 (|cFFFFCC00April 9rd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Replacing the old API with the new, see /details api.\n\n|cFFFFFF00v8.1.5.7053.138 (|cFFFFCC00April 3rd, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed the 'Event Tracker' not showing all cooldowns and crowdcontrol.\n\n|cFFFFFF00-|r Added new gradient wallpapers.\n\n|cFFFFFF00v8.1.5.7042.138 (|cFFFFCC00March 23th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added the first batch of functions call for Details API 2.0.\n\n|cFFFFFF00v8.1.0.6923.136 (|cFFFFCC00March 06th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed Vamguard plugin not showing debuffs on tanks.\n\n|cFFFFFF00-|r Attempt to fix some plugins loading after details! start and failing to install.\n\n|cFFFFFF00-|r Fixed a bug within Atal'Dazar dungeon where in some cases adds damage where considered friendly fire.\n\n|cFFFFFF00v8.1.0.6902.135 (|cFFFFCC00February 19th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed some window gliches with lock, snap and resize buttons.\n\n|cFFFFFF00-|r Fixed issue with the window unlocking after a /reload.\n\n|cFFFFFF00v8.1.0.6861.135 (|cFFFFCC00January 20th, 2019|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed rogue spec icons.\n\n|cFFFFFF00-|r Some visuals improvements.\n\n|cFFFFFF00-|r Added some buttons below the release death recap window, only show in raid after a boss.\n\n|cFFFFFF00v8.1.0.6702.135 (|cFFFFCC00December 31th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Streamers/Youtubers the Event Tracker tool has been fixed for 8.1, enjoy!\n\n|cFFFFFF00v8.0.1.6692.135 (|cFFFFCC00December 11th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed East Asian myriads showing a giganting non formated number in the total bar DPS.\n\n|cFFFFFF00-|r Added a reset nickname button in the right side of the nickname field.\n\n|cFFFFFF00-|r Framework and NickTag library updates.\n\n|cFFFFFF00v8.0.1.6691.135 (|cFFFFCC00November 23th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Experimental: added deaths to overall data during a mythic dungeon run.\n\n|cFFFFFF00-|r Report window revamp: removed report history.\n\n|cFFFFFF00-|r Fixed report tooltip not closing on report button click.\n\n|cFFFFFF00-|r Fixed copy/paste report window.\n\n|cFFFFFF00-|r Time Line (plugin) added enemy cast time line.\n\n|cFFFFFF00v8.0.1.6678.135 (|cFFFFCC00November 07th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r New Feature: import and export profiles.\n\n|cFFFFFF00-|r Major improvements on bar text scripts.\n\n|cFFFFFF00-|r Improved import and export custom skins.\n\n|cFFFFFF00-|r Fixed shaman's sundering spell not showing in crowd control.\n\n|cFFFFFF00-|r Fixed sharing guild statistics.\n\n|cFFFFFF00-|r More spells added to spell consolidation: Whirlwind, Fracture, Mutilate.\n\n|cFFFFFF00-|r Monk Mistweaver Blackout Kick now has a indicator when it comes from passive 'Teachings of the Monastery'.\n\n|cFFFFFF00-|r Added slash command '/details debugwindow' for cases when the window isn't shown or are anchored in the wrong place.\n\n|cFFFFFF00-|r Exposed spell ignore table, you can now add spells to be ignored using Details.SpellsToIgnore [spellID] = true.\n\n|cFFFFFF00v8.0.1.6599.135 (|cFFFFCC00October 19th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed damage on low level training dummies where it was showing 1 damage for each ability.\n\n|cFFFFFF00-|r Added a line in the tooltip shown when hovering over the spec icon to show non-formated DPS, example: '12.0K' DPS shows '11,985.8'.\n\n|cFFFFFF00-|r Developers: command /run Details:DumpTable() should now show the correct table names with quotation marks if string.\n\n|cFFFFFF00v8.0.1.6553.135 (|cFFFFCC00October 06th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added a 'Macros' section in the options panel.\n\n|cFFFFFF00-|r Updated to BFA 'Potion Used' and 'Health Potion and Stone' custom displays.\n\n|cFFFFFF00-|r Backfire damage from Light of the Martyr now shows on death logs as friendly fire.\n\n|cFFFFFF00-|r Deprecated rules for friendly fire has been removed, this might fix some random issues with mind controlled players in the Lord Stormsong encounter in the Shrine of the Storm dungeon.\n\n|cFFFFFF00-|r Fixed DBM/BigWigs aura creation from the Spell List panel.\n\n|cFFFFFF00-|r Chart scripts now receives the envTable, use local envTable = ... .\n\n|cFFFFFF00-|r Polymorth (Black Cat) and Between the Eyes got added to Crowd Control list.\n\n|cFFFFFF00-|r Fixed Timeline plugin not showing the cooldown panel.\n\n|cFFFFFF00-|r Overall data setting won't reset on every logout.\n\n|cFFFFFF00-|r Slash command '/details merge' won't flag the merged combat as a trash segment anymore.\n\n|cFFFFFF00-|r Added function to use on macros to open the Player Details Window: /script Details:OpenPlayerDetails(1).\n\n|cFFFFFF00-|r Done more improvements on the Death Recap window.\n\n|cFFFFFF00v8.0.1.6449.134 (|cFFFFCC00September 11th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Details! is ready for Uldir mythic raiding!.\n\n|cFFFFFF00-|r Several improvements on Encounter Details plugin.\n\n|cFFFFFF00-|r Details! Scroll Damage for training in dummies is now ready for more tests, access it |cFFFFFF00/details scrolldamage|r.\n\n|cFFFFFF00-|r Damage and Healing tooltips now show a statusbar indicating the percent done by the ability.\n\n|cFFFFFF00-|r Added a scale slider  to the options panel.\n\n|cFFFFFF00-|r Added monk's Quaking Palm to crowd control spells.\n\n|cFFFFFF00-|r Fixed an issue with Plater integration.\n\n|cFFFFFF00-|r Fixed tooltips not hiding when the cursor leaves the spell icon in the Damage Taken by Spell.\n\n|cFFFFFF00-|r Framework: fixed an issue with tooltips and menus where the division line wasn't hiding properly.\n\n|cFFFFFF00-|r Framework: fixed some buttons not showing its text in the options panel.\n\n|cFFFFFF00v8.0.1.6272.134 (|cFFFFCC00August 28th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed Dynamic Overall Data custom display.\n\n|cFFFFFF00-|r Fixed friendly fire on some dungeon fights with mind control.\n\n|cFFFFFF00-|r Raid Check plugin fully revamped, now shows talents, spec and role.\n\n|cFFFFFF00-|r Updated flask and food list for BFA.\n\n|cFFFFFF00-|r Added NpcID listing at the Spell List window.\n\n|cFFFFFF00-|r Fixed an issue with Alliance or Horde icons showing at random in player bars.\n\n|cFFFFFF00-|r Small revamp in the Death Recap window.\n\n|cFFFFFF00-|r Fixed new segment creation when the option to use only one segment while in a battleground is disabled.\n\n|cFFFFFF00-|r Fixed east asian number format on several strings.\n\n|cFFFFFF00-|r 'Smart Score' option renamed to 'Unique Segment' under the PvP options for battlegrounds.\n\n|cFFFFFF00v8.0.1.6120.132 (|cFFFFCC00August 07th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Death Knight: Epidemic, Scourge Strike and Howling Blast now has a better description on the spell name.\n\n|cFFFFFF00-|r Fixed snap button showing when 'Hide Resize Buttons' are enabled.\n\n|cFFFFFF00-|r Fixed title bar icons not hiding when 'Auto Hide Buttons' is enabled.\n\n|cFFFFFF00-|r Several improvements to overall data, it should be more consistent now.\n\n|cFFFFFF00-|r Details! now passes to identify the tank role of the player even when out of a party or raid.\n\n|cFFFFFF00-|r Debug helper /run Details:DumpTable(table) now correctly shows the key name when it isn't a string.\n\n|cFFFFFF00-|r Improvements done on the Bookmark config frame accessed by the options panel > display section.\n\n|cFFFFFF00-|r New slash command: '/details spells'.\n\n|cFFFFFF00-|r Statistics for Legion has been closed! You can access statistics from the orange gear > statistics.\n\n|cFFFFFF00v8.0.1.6027.132 (|cFFFFCC00July 28th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added size offset options for the chat tab embed feature.\n\n|cFFFFFF00-|r Revamp on the editor for the custom line text.\n\n|cFFFFFF00v8.0.1.5985.131 (|cFFFFCC00July 17th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added 'Auto Run Code' module.\n\n|cFFFFFF00-|r Added 'Plater Nameplates' integration.\n\n|cFFFFFF00-|r Weakauras integration with the Create Aura panel got great improvements.\n\n|cFFFFFF00-|r Many options has been renamed or moved from groups for better organization .\n\n|cFFFFFF00-|r Several skins got some revamp for 2018.\n\n|cFFFFFF00-|r Default settings for Arenas and Battlegrounds got changes and the experience should be more smooth now.\n\n|cFFFFFF00v7.3.5.5559.130 (|cFFFFCC00April 13th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added slash commands: /details 'softtoggle' 'softshow' 'softhide'. Use them to manipulate the window visibility while using auto hide.\n\n|cFFFFFF00-|r Mythic dungeon graphic window won't show up if the user leaves the dungeon before completing it.\n\n|cFFFFFF00v7.3.5.5529.130 (|cFFFFCC00April 06th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added minimize button on the mythic dungeon run chart.\n\n|cFFFFFF00-|r Added API calls: Details:ResetSegmentOverallData() and Details:ResetSegmentData().\n\n|cFFFFFF00v7.3.5.5499.130 (|cFFFFCC00Mar 30th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added outline option for the right text.\n\n|cFFFFFF00v7.3.5.5469.130 (|cFFFFCC00Mar 23th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed a few things on the mythic dungeon chart.\n\n|cFFFFFF00v7.3.5.5424.129 (|cFFFFCC00Mar 10th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added macro support to open plugins. Example:\n /run Details:OpenPlugin ('Time Line')\n\n|cFFFFFF00v7.3.5.5351.129 (|cFFFFCC00Feb 26rd, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added a damage chart for mythic dungeon runs, it shows at the of the run. You may disable it at the Streamer Settings.\n\n|cFFFFFF00v7.3.5.5231.128 (|cFFFFCC00Feb 02nd, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed an issue with wasted shield absorbs where the wasted amount was subtracting the total healing done.\n\n|cFFFFFF00v7.3.5.5221.128 (|cFFFFCC00Jan 26th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Warlock mana from Life Tap won't show up any more under mana regen, this makes easy to see Soul Shard gain.\n\n|cFFFFFF00v7.3.2.5183.128 (|cFFFFCC00Jan 12th, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r The new bar animation is now applied to all users by default.\n\n|cFFFFFF00-|r Fixed an issue with the threat plugin where sometimes it was triggering errors.\n\n|cFFFFFF00v7.3.2.5175.128 (|cFFFFCC00Jan 03rd, 2018|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r ElvUI skins should have now a more good looking scrollbar.\n\n|cFFFFFF00-|r When starting to edit a custom display, the code window now clear the code from the previous display.\n\n|cFFFFFF00v7.3.2.5154.128 (|cFFFFCC00Dec 22th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r API and Create Aura windows are now attached to the new plugin window.\n\n|cFFFFFF00v7.3.2.5101.128 (|cFFFFCC00Dec 15th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Moving the custom display window to the new plugins window.\n\n|cFFFFFF00-|r Major layout changes on the Encounter Details plugin window.\n\n|cFFFFFF00v7.3.2.4919.128 (|cFFFFCC00Dec 08th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed an issue with the statistics sharing among guild members.\n\n|cFFFFFF00-|r Fixed an issue with Argus encounter where two segments were created.\n\n|cFFFFFF00-|r Fixed aura type images on the Create Aura Panel.\n\n|cFFFFFF00-|r Create Aura Panel can now be closed with Right Click.\n\n|cFFFFFF00-|r Framework updated to r60, plugins should be more stable now.\n\n|cFFFFFF00v7.3.0.4830.126 (|cFFFFFF00v7.3.2.4836.126 (|cFFFFCC00Nov 21th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Removed some tutorial windows popups.\n\n|cFFFFCC00Oct 21th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed opening windows when streamer settings > no alerts is enabled.\n\n|cFFFFFF00v7.3.0.4823.126 (|cFFFFCC00Oct 09th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added new options section: Streamer Settings, focused on adjustments for streamers and youtubers.\n\n|cFFFFFF00-|r Animations now always run at the same speed regardless the framerate.\n\n|cFFFFFF00-|r Click-To-Open menus now close the menu if the menu is already open.\n\n|cFFFFFF00v7.3.0.4723.126 (|cFFFFCC00Set 22th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed overall dungeon segments being added to overall data.\n\n|cFFFFFF00v7.3.0.4705.126 (|cFFFFCC00Set 19th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Fixed damage taken tooltip for Brewmaster Monk where sometimes the tooltip didn't open.\n\n|cFFFFFF00-|r Fixed overall data on mythic dungeon not adding trash segments even with the option enabled on the options panel.\n\n|cFFFFFF00-|r Fixed the guild selection dropdown reseting everytime the Guild Rank window is opened.\n\n|cFFFFFF00v7.3.0.4677.126 (|cFFFFCC00Set 10th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r During mythic dungeons, the trash segments will be merged into a new segment at the end of the boss encounter (instead of merging on the fly while cleaning up).\n\n|cFFFFFF00v7.3.0.4615.125 (|cFFFFCC00Set 09th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Setting up the dungeon stuff as opt-in for early adopters while we continue to make improvements on the system.\n\n|cFFFFFF00v7.3.0.4586.125 (|cFFFFCC00Set 08th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Formating mythic+ dungeon segments, each segment should count the boss trash + boss fight.\n\n|cFFFFFF00-|r At the end of the mythic+ dungeon, it should create a new segment adding up all segments described above.\n\n|cFFFFFF00v7.3.0.4499.124 (|cFFFFCC00Set 05th, 2017|r|cFFFFFF00)|r:\n\n|cFFFFFF00-|r Added an option to always show all players when using the standard mode. Option under PvP/PvE bracket on the options panel.\n\n|cFFFFFF00-|r Added a setting to exclude healing done lines from the death log below a certain healing amount. This options is also under PvP/PvE bracket.\n\n|cFFFFFF00-|r Fixed the guild selection on the ranking panel."
+	local news = {
+		{"v9.0.5.8502.144", "May 21th, 2021"},
+		"Added options to change the color of each team during an arena match.",
+		"Fixed One Segment Battleground.",
+		"Fixed an error with Howl of Terror on Demo Warlocks.",
+
+		{"v9.0.5.8501.144", "May 17th, 2021"},
+		"Complete overhaul and rerritten on Fade In and Out animations, this should fix all bugs related to animations not being consistent.",
+		"Complete overhaul on the broadcaster tool for arenas 'Current DPS'. It shows now a bar indicating the dps of both teams.",
+		"Yellow arena team now has purple color.",
+		"Several updates on the combat log engine and bug fixes.",
+
+		{"v9.0.5.8357.144", "March 15th, 2021"},
+		"Max amount of segments raised to 40, was 30.",
+		"Added a 'Sanguine Heal' actor to show how much the void zone healed enemies, shown on Everything mode.",
+		"Death events are now ignore after the necrolord triggers Forgeborne Reveries.",
+		"Mythic dungeon settings are reset after importing a profile.",
+		"Scripts now support Inline text feature.",
+		"Fixed a rare bug when exporting a profile would result into a bug.",
+		"Fixed an issue with Spirit Shell overhealing.",
+		"Fixed a rare bug on dispel toooltips giving errors.",
+		"Fixed a bug on exporting scripts.",
+		"Fixed an error given when an a battleground opponent die.",
+		"Fixed an issue where sometimes entering an arena cause errors.",
+		"Fixed some issues with pet detection.",
+
+		{"v9.0.2.8246.144", "February 17th, 2021"},
+		"Added healing done to Coach feature (in testing).",
+		"Ignore Forgeborne Reveries healing done (Necrolords ability).",
+		"Arena enemy deaths now are shown in the Deaths display.",
+		"Guild statistics data has been wiped, this system had a major improvement overall.",
+		"Fixed 'Clear Overall Data' on Logout which wasn't clearing.",
+		
+		{"v9.0.2.8192.144", "January 27th, 2021"},
+		"If you get issues with nicknames, disable any weakaura which modifies this feature.",
+		"Advanced Death Logs plugin got some fixes and should work properly.",
+		"Added the word 'Overall' at the end of the title bar text when the segment is overall.",
+		"Added covenant and durability into the Raid Check plugin.",
+		"Added API Window:SetTitleBarText(text) and Window:GetTitleBarText().",
+		"Fixed some issues where Details! printed 'combat start time not found.'",
+		"Fixed damage per Phase.",
+		"Fixed resizing window with no background error.",
+		"Fixed 'Always Show player' on ascending sort direction.",
+		"Added more foods into the Ready Check plugin.",
+		"Fixed some issues with the coach fearure.",
+		
+		{"v9.0.2.8154.144", "January 14th, 2021"},
+		"Added total damage bars into the player list in the Breakdown window.",
+		"Added 'Square' or 'Roll' mode to Details! Streamer plugin, to change the statusbar mode to Squares, visit the options panel for the plugin.",
+		"Added Binding Shot to crowd control (Hunter)",
+		"Merged all whirlwind damage (Warrior).",
+		"Fixed errors on the 1-10 tutorial levels while playing Demon Hunters.",
+		"Fixed some cases of DeathLog not showing healing",
+		"Fixed windows making a group after '/details toggle', while the option to not make groups enabled.",
+		"Fixed some issues with the custom display 'Potion Used' and 'Health Potion & Stone'.",
+		"Fixed the breakdown window where using the comparisson tab sometimes made the frame to overlap with the aura tab.",
+
+		{"v9.0.2.8001.144", "December 19th, 2020"},
+		"Added Details! Coach as a new experimental feature, you may want to test using /details coach",
+		"Coach feature allows the raid leader to stay outside the raid while seeing in real time player deaths and damage information.",
+		"Fixed issues with some raid encounters in Castle Nathria.",
+		"Druid Kyrian Spirits ability now has some rules to credit the druid for damage and heal.",
+		"Several small bug fixes has been done.",
+
+		{"v9.0.1.8001.144", "November 30rd, 2020"},
+		"Added back the report to bnet friend.",
+		"@Flamanis: fixed issues on custom displays.",
+
+		{"v9.0.1.7950.144", "November 3rd, 2020"},
+		"Added the baseline for the Coach feature, for testing use '/details coach', all users in the raid must have details! up to date.",
+		"Added container_spells:GetOrCreateSpell(id, shouldCreate, token).",
+		"Added Details:GetRaidLeader(), return the RL name.",
+		"Fixed Tiny Threat not showing threat.",
+		"Fixed annoucement interrupt enable toggle checkbox was reseting on logon.",
+
+		{"v9.0.1.7938.142", "October 29th, 2020"},
+		"Added option to select the icon buttons in the title bar.",
+
+		{"v9.0.1.7739.142", "August 18th, 2020"},
+		"More development on the new plugin Cast Timeline.",
+		"More development on Details! Scroll Damage.",
+		"Added options to opt-out show pets on solo play.",
+		"Added back Profiles and Plugins into the options panel.",
+		"Many framework fixes from retail ported to shadowlands.",
+		{"v9.0.1.7721.142", "August 14th, 2020"},
+		"Encounter time in the title bar got new code and might work now for some people that had issues with it.",
+		"Fixed an error with the Welcome Window showing errors.",
+		"Statusbar got fixed, it should now show it's widgets normally.",
+		"Alignment for the title bar text also got fixed.",
+		{"v9.0.1.7707.142", "August 11th, 2020"},
+		"While in The Concil of Blood, Details! now deletes the damage done to alive bosses when one of them dies. This condition can be turned off with /run Details.exp90temp.delete_damage_TCOB = false",
+		"Many Important Npcs like Jaina and Thrall shows as group members of your group.",
+		"More progress on the options panel overhaul.",
+		"General bug fixes.",
+		{"v9.0.1.7590.142", "July 31th, 2020"},
+		"New options panel in progress",
+		"Added options for the 'Inline' right texts in the window",
+		"General round of fixes",
+		{"v9.0.1.7544.142", "July 25th, 2020"},
+		"Changed texts alignment to be parallel.",
+		"Changed icons to white color.",
+		"Added player list on the Player Breakdown Window.",
+		"Added a new plugin: 'Cast Timeline' available at the Player Breakdown Window.",
+		"Added macro '/Details me' to open your Breakdown Window.",
+	}
+	
+	local newsString = "|cFFF1F1F1"
+
+	for i = 1, #news do
+		local line = news[i]
+		if (type(line) == "table")  then
+			local version = line[1]
+			local date = line[2]
+			newsString = newsString .. "|cFFFFFF00" .. version .. " (|cFFFF8800" .. date .. "|r):|r\n\n"
+		else
+			newsString = newsString .. "|cFFFFFF00-|r " .. line .. "\n\n"
+		end
+	end
+
+	Loc["STRING_VERSION_LOG"] = newsString
 
 	Loc ["STRING_DETAILS1"] = "|cffffaeaeDetails!:|r "
 
-	function _IS_CLASSIC()
-		return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-	end
-	
-	local _, _, defaultSpellIcon = GetSpellInfo (6603)
-	
-	--Translit (discord)
-	local AllSpellNames = {}
-	local GSI = GetSpellInfo
-	for i = 1, 30000 do
-		local name, _, icon = GSI(i)
-		if name and icon and icon ~= 136235 and not AllSpellNames [name] then
-			AllSpellNames[name] = icon
-		end
-	end
-
-	function Details.GetSpellInfoC (spell)
-		local spellName, _, spellIcon
-
-		if (spell == 0) then
-			spellName = ATTACK or "It's Blizzard Fault!"
-			spellIcon = [[Interface\ICONS\INV_Sword_04]]
-
-		elseif (spell == "!Melee" or spell == 1) then
-			spellName = ATTACK or "It's Blizzard Fault!"
-			spellIcon = [[Interface\ICONS\INV_Sword_04]]
-
-		elseif (spell == "!Autoshot" or spell == 2) then
-			spellName = Loc ["STRING_AUTOSHOT"]
-			spellIcon = [[Interface\ICONS\INV_Weapon_Bow_07]]
-
-		else
-			spellName, _, spellIcon = GetSpellInfo (spell)
-		end
-		
-		if (not spellName) then
-			return spell, _, AllSpellNames [spell] or defaultSpellIcon
-		end
-		
-		return spellName, _, AllSpellNames [spell] or spellIcon
-	end
-	
 	--> startup
+		_detalhes.max_windowline_columns = 11
 		_detalhes.initializing = true
 		_detalhes.enabled = true
 		_detalhes.__index = _detalhes
@@ -91,6 +165,9 @@ do
 		_detalhes.debug_chr = false
 		_detalhes.opened_windows = 0
 		_detalhes.last_combat_time = 0
+
+		--store functions to create options frame
+		Details.optionsSection = {}
 		
 	--> containers
 		--> armazenas as fun��es do parser - All parse functions 
@@ -108,86 +185,12 @@ do
 				{Name = "Change What the Window Shows", Desc = "Make a window show different data. SetDisplay uses (segment, displayGroup, displayID), the menu from the sword icon is in order (damage = group 1, overheal is: displayGroup 2 displayID 3.", MacroText = "/script Details:GetWindow(1):SetDisplay( DETAILS_SEGMENTID_CURRENT, 4, 5 )"},
 				{Name = "Toggle Window Height to Max Size", Desc = "Make a window be 450 pixel height, pressing the macro again toggle back to the original size. The number '1' if the window number. Hold a click in any window to show their number.", MacroText = "/script Details:GetWindow(1):ToggleMaxSize()"},
 			--	/script Details:OpenPlugin ('Advanced Death Logs'); local a = Details_DeathGraphsModeEnduranceButton and Details_DeathGraphsModeEnduranceButton.MyObject:Click()
-
 				{Name = "Report What is Shown In the Window", Desc = "Report the current data shown in the window, the number 1 is the window number, replace it to report another window.", MacroText = "/script Details:FastReportWindow(1)"},
-			
 			}
 			
-		--> quais raides devem ser guardadas no hist�rico
-			_detalhes.InstancesToStoreData = { --> mapIDs
-				[2070] = true, --Battle for Dazaralor (BFA) GetInstanceInfo
-				[1148] = true, --Uldir (BFA) uiMapID
-				[1861] = true, --Uldir (BFA) from GetInstanceInfo
-				[2164] = true, --Eternal Palace
-			}
-			
-			--must fail in map and encounter id to not store data
-			_detalhes.EncountersToStoreData = { --> encounterIDs
-				--CLEU
-				[2144] = 1, --Taloc - Taloc
-				[2141] = 2, --MOTHER - MOTHER
-				[2128] = 3, --Fetid Devourer - Fetid Devourer
-				[2136] = 4, --Zek'voz - Zek'voz, Herald of N'zoth
-				[2134] = 5, --Vectis - Vectis
-				[2145] = 6, --Zul - Zul, Reborn
-				[2135] = 7, --Mythrax the Unraveler - Mythrax the Unraveler
-				[2122] = 8, --G'huun - G'huun
-				
-				[2265] = 1, --Champion of the Light
-				[2263] = 2, --Grong, the Jungle Lord
-				[2266] = 3, --Jadefire Masters
-				[2271] = 4, --Opulence
-				[2268] = 5, --Conclave of the Chosen
-				[2272] = 6, --King Rastakhan
-				[2276] = 7, --High Tinker Mekkatorque
-				[2280] = 8, --Stormwall Blockade
-				[2281] = 9, --Lady Jaina Proudmoore
-				
-				[2269] = 1, --The Restless Cabal
-				[2273] = 2, --Uu'nat, Harbinger of the Void
-				
-				[2298] = 1, --Abyssal Commander Sivara
-				[2289] = 2, --Blackwater Behemoth
-				[2305] = 3, --Radiance of Azshara
-				[2304] = 4, --Lady Ashvane
-				[2303] = 5, --Orgozoa
-				[2311] = 6, --The Queen's Court
-				[2293] = 7, --Za'qul, Harbinger of Ny'alotha
-				[2299] = 8, --Queen Azshara
-				
-				--EJID
-				[2168] = 1, --Taloc
-				[2167] = 2, --MOTHER
-				[2146] = 3, --Fetid Devourer
-				[2169] = 4, --Zek'voz, Herald of N'zoth
-				[2166] = 5, --Vectis
-				[2195] = 6, --Zul, Reborn
-				[2194] = 7, --Mythrax the Unraveler
-				[2147] = 8, --G'huun
-				
-				[2333] = 1, --Champion of the Light
-				[2325] = 2, --Grong, the Jungle Lord
-				[2341] = 3, --Jadefire Masters
-				[2342] = 4, --Opulence
-				[2330] = 5, --Conclave of the Chosen
-				[2335] = 6, --King Rastakhan
-				[2334] = 7, --High Tinker Mekkatorque
-				[2337] = 8, --Stormwall Blockade
-				[2343] = 9, --Lady Jaina Proudmoore
-				
-				[2328] = 1, --The Restless Cabal
-				[2332] = 2, --Uu'nat, Harbinger of the Void
-				
-				[2352] = 1, --Abyssal Commander Sivara
-				[2347] = 2, --Blackwater Behemoth
-				[2353] = 3, --Radiance of Azshara
-				[2354] = 4, --Lady Ashvane
-				[2351] = 5, --Orgozoa
-				[2359] = 6, --The Queen's Court
-				[2349] = 7, --Za'qul, Harbinger of Ny'alotha
-				[2361] = 8, --Queen Azshara
-				
-			
+		--> current instances of the exp (need to maintain)
+			_detalhes.InstancesToStoreData = { --mapId
+				[2296] = true, --castle narnia
 			}
 			
 		--> armazena os escudos - Shields information for absorbs
@@ -241,6 +244,8 @@ do
 			_detalhes.encounter_table = {}
 			_detalhes.encounter_counter = {}
 			_detalhes.encounter_dungeons = {}
+		--> unitId dos inimigos dentro de uma arena
+			_detalhes.arena_enemies = {}
 		--> reliable char data sources
 		--> actors that are using details! and sent character data, we don't need query inspect on these actors
 			_detalhes.trusted_characters = {}
@@ -329,13 +334,12 @@ do
 			
 		--> armazena instancias inativas
 			_detalhes.unused_instances = {}
-			--_detalhes.default_skin_to_use = "Minimalistic"
 			_detalhes.default_skin_to_use = "Minimalistic"
 			_detalhes.instance_title_text_timer = {}
 		--> player detail skin
 			_detalhes.playerdetailwindow_skins = {}
-		
-		_detalhes.BitfieldSwapDebuffsIDs = {265646, 272407, 269691, 273401, 269131, 260900, 260926, 284995, 292826}
+
+		_detalhes.BitfieldSwapDebuffsIDs = {265646, 272407, 269691, 273401, 269131, 260900, 260926, 284995, 292826, 311367, 310567, 308996, 307832, 327414, 337253}
 		
 		--> auto run code
 		_detalhes.RunCodeTypes = {
@@ -475,28 +479,35 @@ do
 			--> plugins container
 				_detalhes.StatusBar = {}
 			--> maintain plugin menu
-				_detalhes.StatusBar.Menu = {} 
+				_detalhes.StatusBar.Menu = {}
 			--> plugins object
-				_detalhes.StatusBar.Plugins = {} 
+				_detalhes.StatusBar.Plugins = {}
 			--> name to plugin object
-				_detalhes.StatusBar.NameTable = {} 
+				_detalhes.StatusBar.NameTable = {}
 
 	--> constants
-		--[[global]] DETAILS_HEALTH_POTION_LIST = {
-			[250870] = true, --Coastal Healing Potion
-			[250872] = true, --Coastal Rejuvenation Potion
-			[6262] = true, --Warlock's Healthstone
-		}
-		--[[global]] DETAILS_HEALTH_POTION_ID = 250870
-		--[[global]] DETAILS_REJU_POTION_ID = 250872
-		--[[global]] DETAILS_MANA_POTION_ID = 250871
-		--[[global]] DETAILS_FOCUS_POTION_ID = 252753
+		--[[global]] DETAILS_HEALTH_POTION_ID = 307192
+		--[[global]] DETAILS_REJU_POTION_ID = 307194
+		--[[global]] DETAILS_MANA_POTION_ID = 307193
+		--[[global]] DETAILS_FOCUS_POTION_ID = 307161
+		--[[global]] DETAILS_HEALTHSTONE_ID = 6262
 		
-		--[[global]] DETAILS_INT_POTION_ID = 279151
-		--[[global]] DETAILS_AGI_POTION_ID = 279152
-		--[[global]] DETAILS_STR_POTION_ID = 279153
-		--[[global]] DETAILS_STAMINA_POTION_ID = 279154
+		--[[global]] DETAILS_INT_POTION_ID = 307162
+		--[[global]] DETAILS_AGI_POTION_ID = 307159
+		--[[global]] DETAILS_STR_POTION_ID = 307164
+		--[[global]] DETAILS_STAMINA_POTION_ID = 307163
+
+		--[[global]] DETAILS_HEALTH_POTION_LIST = {
+			[DETAILS_HEALTH_POTION_ID] = true, --Healing Potion
+			[DETAILS_HEALTHSTONE_ID] = true, --Warlock's Healthstone
+			[DETAILS_REJU_POTION_ID] = true, --Rejuvenation Potion
+			[DETAILS_MANA_POTION_ID] = true, --Mana Potion
+			[323436] = true --Phial of Serenity (from Kyrians)
+		}
 	
+		--[[global]] DETAILS_MODE_GROUP = 2
+		--[[global]] DETAILS_MODE_ALL = 3
+
 		_detalhes._detalhes_props = {
 			DATA_TYPE_START = 1,	--> Something on start
 			DATA_TYPE_END = 2,	--> Something on end
@@ -601,7 +612,7 @@ do
 		
 		_detalhes.icones = {
 			--> report window
-			report = { 
+			report = {
 					up = "Interface\\FriendsFrame\\UI-Toast-FriendOnlineIcon",
 					down = "Interface\\ItemAnimations\\MINIMAP\\TRACKING\\Profession",
 					disabled = "Interface\\ItemAnimations\\MINIMAP\\TRACKING\\Profession",
@@ -611,6 +622,13 @@ do
 	
 		_detalhes.missTypes = {"ABSORB", "BLOCK", "DEFLECT", "DODGE", "EVADE", "IMMUNE", "MISS", "PARRY", "REFLECT", "RESIST"} --> do not localize-me
 
+
+	function Details.SendHighFive()
+		Details.users = {{UnitName("player"), GetRealmName(), (Details.userversion or "") .. " (" .. Details.APIVersion .. ")"}}
+		Details.sent_highfive = GetTime()
+		Details:SendRaidData (Details.network.ids.HIGHFIVE_REQUEST)
+	end
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> frames
 	
@@ -618,8 +636,8 @@ do
 	local _UIParent = UIParent --api locals
 	
 	--> Info Window
-		_detalhes.janela_info = _CreateFrame ("Frame", "DetailsPlayerDetailsWindow", _UIParent)
-		_detalhes.PlayerDetailsWindow = _detalhes.janela_info
+		_detalhes.playerDetailWindow = _CreateFrame ("Frame", "DetailsPlayerDetailsWindow", _UIParent, "BackdropTemplate")
+		_detalhes.PlayerDetailsWindow = _detalhes.playerDetailWindow
 		
 	--> Event Frame
 		_detalhes.listener = _CreateFrame ("Frame", nil, _UIParent)
@@ -651,6 +669,43 @@ do
 	end
 
 
+------------------------------------------------------------------------------------------
+-->  welcome panel
+	function _detalhes:CreateWelcomePanel (name, parent, width, height, make_movable)
+		local f = CreateFrame ("frame", name, parent or UIParent, "BackdropTemplate")
+		
+		--f:SetBackdrop ({bgFile = [[Interface\AddOns\Details\images\background]], tile = true, tileSize = 128, insets = {left=3, right=3, top=3, bottom=3}, edgeFile = [[Interface\AddOns\Details\images\border_welcome]], edgeSize = 16})
+		f:SetBackdrop ({bgFile = [[Interface\AddOns\Details\images\background]], tile = true, tileSize = 128, insets = {left=0, right=0, top=0, bottom=0}, edgeFile = [[Interface\Buttons\WHITE8X8]], edgeSize = 1})
+		f:SetBackdropColor (1, 1, 1, 0.75)
+		f:SetBackdropBorderColor (0, 0, 0, 1)
+
+		f:SetSize(width or 1, height or 1)
+		
+		if (make_movable) then
+			f:SetScript ("OnMouseDown", function(self, button)
+				if (self.isMoving) then
+					return
+				end
+				if (button == "RightButton") then
+					self:Hide()
+				else
+					self:StartMoving() 
+					self.isMoving = true
+				end
+			end)
+			f:SetScript ("OnMouseUp", function(self, button) 
+				if (self.isMoving and button == "LeftButton") then
+					self:StopMovingOrSizing()
+					self.isMoving = nil
+				end
+			end)
+			f:SetToplevel (true)
+			f:SetMovable (true)
+		end
+		
+		return f
+	end
+
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --> functions
 	
@@ -670,6 +725,8 @@ do
 		SharedMedia:Register ("statusbar", "WorldState Score", [[Interface\WorldStateFrame\WORLDSTATEFINALSCORE-HIGHLIGHT]])
 		SharedMedia:Register ("statusbar", "DGround", [[Interface\AddOns\Details\images\bar_background]])
 		SharedMedia:Register ("statusbar", "Details Flat", [[Interface\AddOns\Details\images\bar_background]])
+		SharedMedia:Register ("statusbar", "Splitbar", [[Interface\AddOns\Details\images\bar_textures\split_bar]])
+		SharedMedia:Register ("statusbar", "Details2020", [[Interface\AddOns\Details\images\bar_textures\texture2020]])
 		
 		--window bg and bar border
 		SharedMedia:Register ("background", "Details Ground", [[Interface\AddOns\Details\images\background]])
@@ -689,25 +746,33 @@ do
 		SharedMedia:Register ("sound", "d_gun2", [[Interface\Addons\Details\sounds\sound_gun3.ogg]])
 		SharedMedia:Register ("sound", "d_jedi1", [[Interface\Addons\Details\sounds\sound_jedi1.ogg]])
 		SharedMedia:Register ("sound", "d_whip1", [[Interface\Addons\Details\sounds\sound_whip1.ogg]])
+
+		SharedMedia:Register ("sound", "Details Threat Warning Volume 1", [[Interface\Addons\Details\sounds\threat_warning_1.ogg]])
+		SharedMedia:Register ("sound", "Details Threat Warning Volume 2", [[Interface\Addons\Details\sounds\threat_warning_2.ogg]])
+		SharedMedia:Register ("sound", "Details Threat Warning Volume 3", [[Interface\Addons\Details\sounds\threat_warning_3.ogg]])
+		SharedMedia:Register ("sound", "Details Threat Warning Volume 4", [[Interface\Addons\Details\sounds\threat_warning_4.ogg]])
+
+		
+
 	
-	--> global 'vardump' for dump table contents over chat panel
-		function vardump (t)
+	--> dump table contents over chat panel
+		function Details.VarDump(t)
 			if (type (t) ~= "table") then
 				return
 			end
-			for a,b in pairs (t) do 
+			for a,b in pairs (t) do
 				print (a,b)
 			end
 		end
-		
-	--> global 'table_deepcopy' copies a full table	
-		function table_deepcopy (orig)
+
+	--> copies a full table
+		function Details.CopyTable(orig)
 			local orig_type = type(orig)
 			local copy
 			if orig_type == 'table' then
 				copy = {}
 				for orig_key, orig_value in next, orig, nil do
-					copy [table_deepcopy (orig_key)] = table_deepcopy (orig_value)
+					copy [Details.CopyTable (orig_key)] = Details.CopyTable (orig_value)
 				end
 			else
 				copy = orig

@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, OptionsPrivate = ...
 
 -- Lua APIs
 local pairs, rad = pairs, rad
@@ -14,13 +15,62 @@ local L = WeakAuras.L
 
 local modelPicker
 
+local function GetAll(baseObject, path, property, default)
+  local valueFromPath = OptionsPrivate.Private.ValueFromPath
+  if not property then
+    return default
+  end
+
+  local result = default
+  local first = true
+  for child in OptionsPrivate.Private.TraverseLeafsOrAura(baseObject) do
+    local childObject = valueFromPath(child, path)
+    if childObject and childObject[property] then
+      if first then
+        result = childObject[property]
+        first = false
+      else
+        if result ~= childObject[property] then
+          return default
+        end
+      end
+    end
+  end
+  return result
+end
+
 local function ConstructModelPicker(frame)
+  local function RecurseSetFilter(tree, filter)
+    for k, v in ipairs(tree) do
+      if v.children == nil and v.text then
+        v.visible = not filter or filter == "" or v.text:find(filter, 1, true) ~= nil
+      else
+        RecurseSetFilter(v.children, filter)
+      end
+    end
+  end
+
   local group = AceGUI:Create("InlineGroup");
   group.frame:SetParent(frame);
   group.frame:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -17, 87);
-  group.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 17, -10);
+  group.frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 17, -15);
   group.frame:Hide();
   group:SetLayout("flow");
+
+  local filterInput = CreateFrame("editbox", "WeakAurasFilterInput", group.frame, "SearchBoxTemplate")
+  filterInput:SetScript("OnTextChanged", function(self)
+    SearchBoxTemplate_OnTextChanged(self)
+    local filterText = filterInput:GetText()
+    RecurseSetFilter(group.modelTree.tree, filterText)
+    group.modelTree.filter = filterText ~= nil and filterText ~= ""
+    group.modelTree:RefreshTree()
+  end)
+  filterInput:SetHeight(15)
+  filterInput:SetPoint("TOP", group.frame, "TOP", 0, 1)
+  filterInput:SetPoint("LEFT", group.frame, "LEFT", 7, 0)
+  filterInput:SetWidth(200)
+  filterInput:SetFont(STANDARD_TEXT_FONT, 10)
+  group.frame.filterInput = filterInput
 
   -- Old X Y Z controls
   local modelPickerZ = AceGUI:Create("Slider");
@@ -45,6 +95,14 @@ local function ConstructModelPicker(frame)
   modelPickerY.frame:SetParent(group.frame);
   modelPickerY:SetCallback("OnValueChanged", function()
     group:Pick(nil, nil, nil, nil, modelPickerY:GetValue());
+  end);
+
+  local modelPickerRotation = AceGUI:Create("Slider");
+  modelPickerRotation:SetSliderValues(0, 360, 0.05);
+  modelPickerRotation:SetLabel(L["Rotation"]);
+  modelPickerRotation.frame:SetParent(group.frame);
+  modelPickerRotation:SetCallback("OnValueChanged", function()
+    group:Pick(nil, nil, nil, nil, nil, modelPickerRotation:GetValue());
   end);
 
   -- New TX TY TZ, RX, RY, RZ, US controls
@@ -106,9 +164,9 @@ local function ConstructModelPicker(frame)
 
   local modelTree = AceGUI:Create("WeakAurasTreeGroup");
   group.modelTree = modelTree;
-  group.frame:SetScript("OnUpdate", function()
+  group.frame:SetScript("OnSizeChanged", function()
     local frameWidth = frame:GetWidth();
-    local sliderWidth = (frameWidth - 50) / 3;
+    local sliderWidth = (frameWidth - 50) / 4;
     local narrowSliderWidth = (frameWidth - 50) / 7;
 
     modelTree:SetTreeWidth(frameWidth - 370);
@@ -121,6 +179,9 @@ local function ConstructModelPicker(frame)
 
     modelPickerY.frame:SetPoint("bottomleft", frame, "bottomleft", 35 + (2 * sliderWidth), 43);
     modelPickerY.frame:SetPoint("bottomright", frame, "bottomleft", 35 + (3 * sliderWidth), 43);
+
+    modelPickerRotation.frame:SetPoint("bottomleft", frame, "bottomleft", 45 + (3 * sliderWidth), 43);
+    modelPickerRotation.frame:SetPoint("bottomright", frame, "bottomleft", 45 + (4 * sliderWidth), 43);
 
     -- New controls
     modelPickerTX.frame:SetPoint("bottomleft", frame, "bottomleft", 15, 43);
@@ -151,7 +212,7 @@ local function ConstructModelPicker(frame)
     local path = string.gsub(value, "\001", "/");
     if(string.lower(string.sub(path, -3, -1)) == ".m2") then
       local model_path = path;
-      if (group.givenApi) then
+      if (group.selectedValues.api) then
         group:PickSt(model_path, fileId);
       else
         group:Pick(model_path, fileId);
@@ -165,131 +226,191 @@ local function ConstructModelPicker(frame)
   model:SetFrameStrata("FULLSCREEN");
   group.model = model;
 
+  local startX, rotation
+  local function OnUpdateScript()
+    local uiScale, x = UIParent:GetEffectiveScale(), GetCursorPosition()
+    local screenW, screenH = GetScreenWidth(), GetScreenHeight()
+    local diffX = startX/uiScale - x/uiScale
+    rotation = (rotation + 180 / screenW * diffX) % 360
+    model:SetFacing(rad(rotation))
+  end
+  model:EnableMouse()
+  model:SetScript("OnMouseDown", function(self)
+    if not group.selectedValues.api then
+      startX = GetCursorPosition()
+      rotation = group.selectedValues.rotation or 0
+      self:SetScript("OnUpdate", OnUpdateScript)
+    end
+  end)
+  model:SetScript("OnMouseUp", function(self)
+    if not group.selectedValues.api then
+      self:SetScript("OnUpdate", nil)
+      group:Pick(nil, nil, nil, nil, nil, rotation)
+    end
+  end)
+
+  local function SetStOnObject(object, model_path, model_fileId, model_tx, model_ty, model_tz, model_rx, model_ry, model_rz, model_us)
+    if model_path then
+      object.model_path = model_path
+    end
+    if model_fileId then
+      object.model_fileId = model_fileId
+    end
+    if model_tx then
+      object.model_st_tx = model_tx
+    end
+    if model_ty then
+      object.model_st_ty = model_ty
+    end
+    if model_tz then
+      object.model_st_tz = model_tz
+    end
+    if model_rx then
+      object.model_st_rx = model_rx
+    end
+    if model_ry then
+      object.model_st_ry = model_ry
+    end
+    if model_rz then
+      object.model_st_rz = model_rz
+    end
+    if model_us then
+      object.model_st_us = model_us
+    end
+  end
+
   function group.PickSt(self, model_path, model_fileId, model_tx, model_ty, model_tz, model_rx, model_ry, model_rz, model_us)
-    model_path = model_path or self.data.model_path;
-    model_fileId = model_fileId or self.data.model_fileId;
-    model_tx = model_tx or self.data.model_st_tx;
-    model_ty = model_ty or self.data.model_st_ty;
-    model_tz = model_tz or self.data.model_st_tz;
+    local valueFromPath = OptionsPrivate.Private.ValueFromPath
+    self.selectedValues.model_path = model_path or self.selectedValues.model_path
+    self.selectedValues.model_fileId = model_fileId or self.selectedValues.model_fileId
+    self.selectedValues.model_st_tx = model_tx or self.selectedValues.model_st_tx
+    self.selectedValues.model_st_ty = model_ty or self.selectedValues.model_st_ty
+    self.selectedValues.model_st_tz = model_tz or self.selectedValues.model_st_tz
 
-    model_rx = model_rx or self.data.model_st_rx;
-    model_ry = model_ry or self.data.model_st_ry;
-    model_rz = model_rz or self.data.model_st_rz;
+    self.selectedValues.model_st_rx = model_rx or self.selectedValues.model_st_rx;
+    self.selectedValues.model_st_ry = model_ry or self.selectedValues.model_st_ry;
+    self.selectedValues.model_st_rz = model_rz or self.selectedValues.model_st_rz;
 
-    model_us = model_us or self.data.model_st_us;
+    self.selectedValues.model_st_us = model_us or self.selectedValues.model_st_us;
 
-    WeakAuras.SetModel(self.model, model_path, model_fileId)
-    self.model:SetTransform(model_tx / 1000, model_ty / 1000, model_tz / 1000,
-      rad(model_rx), rad(model_ry), rad(model_rz),
-      model_us / 1000);
-    if(self.data.controlledChildren) then
-      for index, childId in pairs(self.data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          childData.model_path = model_path;
-          childData.model_fileId = model_fileId;
-          childData.model_st_tx = model_tx;
-          childData.model_st_ty = model_ty;
-          childData.model_st_tz = model_tz;
-          childData.model_st_rx = model_rx;
-          childData.model_st_ry = model_ry;
-          childData.model_st_rz = model_rz;
-          childData.model_st_us = model_us;
-          WeakAuras.Add(childData);
-          WeakAuras.UpdateThumbnail(childData);
-        end
-      end
-    else
-      self.data.model_path = model_path;
-      self.data.model_fileId = model_fileId;
-      self.data.model_st_tx = model_tx;
-      self.data.model_st_ty = model_ty;
-      self.data.model_st_tz = model_tz;
-      self.data.model_st_rx = model_rx;
-      self.data.model_st_ry = model_ry;
-      self.data.model_st_rz = model_rz;
-      self.data.model_st_us = model_us;
-      if self.parentData then
-        WeakAuras.Add(self.parentData);
-      else
-        WeakAuras.Add(self.data);
-        WeakAuras.UpdateThumbnail(self.data);
+    WeakAuras.SetModel(self.model, self.selectedValues.model_path, self.selectedValues.model_fileId)
+    self.model:SetTransform(self.selectedValues.model_st_tx / 1000, self.selectedValues.model_st_ty / 1000, self.selectedValues.model_st_tz / 1000,
+      rad(self.selectedValues.model_st_rx), rad(self.selectedValues.model_st_ry), rad(self.selectedValues.model_st_rz),
+      self.selectedValues.model_st_us / 1000);
+
+    for child in OptionsPrivate.Private.TraverseLeafsOrAura(self.baseObject) do
+      local object = valueFromPath(child, self.path)
+      if(object) then
+        SetStOnObject(object, model_path, model_fileId, model_tx, model_ty, model_tz, model_rx, model_ry, model_rz, model_us)
+        WeakAuras.Add(child);
+        WeakAuras.UpdateThumbnail(child);
       end
     end
   end
 
-  function group.Pick(self, model_path, model_fileId, model_z, model_x, model_y)
-    model_path = model_path or self.data.model_path;
-    model_fileId = model_fileId or self.data.model_fileId;
+  local function SetOnObject(object, model_path, model_fileId, model_z, model_x, model_y, rotation)
+    if model_path then
+      object.model_path = model_path
+    end
+    if model_fileId then
+      object.model_fileId = model_fileId
+    end
+    if model_z then
+      object.model_z = model_z
+    end
+    if model_x then
+      object.model_x = model_x
+    end
+    if model_y then
+      object.model_y = model_y
+    end
+    if rotation then
+      object.rotation = rotation
+    end
+  end
 
-    model_z = model_z or self.data.model_z;
-    model_x = model_x or self.data.model_x;
-    model_y = model_y or self.data.model_y;
+  function group.Pick(self, model_path, model_fileId, model_z, model_x, model_y, rotation)
+    local valueFromPath = OptionsPrivate.Private.ValueFromPath
 
-    WeakAuras.SetModel(self.model, model_path, model_fileId)
+    self.selectedValues.model_path = model_path or self.selectedValues.model_path
+    self.selectedValues.model_fileId = model_fileId or self.selectedValues.model_fileId
+    self.selectedValues.model_x = model_x or self.selectedValues.model_x
+    self.selectedValues.model_y = model_y or self.selectedValues.model_y
+    self.selectedValues.model_z = model_z or self.selectedValues.model_z
+    self.selectedValues.rotation = rotation or self.selectedValues.rotation
+
+    WeakAuras.SetModel(self.model, self.selectedValues.model_path, self.selectedValues.model_fileId)
 
     self.model:ClearTransform();
-    self.model:SetPosition(model_z, model_x, model_y);
-    self.model:SetFacing(rad(self.data.rotation));
+    self.model:SetPosition(self.selectedValues.model_z, self.selectedValues.model_x, self.selectedValues.model_y);
+    self.model:SetFacing(rad(self.selectedValues.rotation));
 
-    if(not self.parentData and self.data.controlledChildren) then
-      for index, childId in pairs(self.data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          childData.model_path = model_path;
-          childData.model_fileId = model_fileId;
-          childData.model_z = model_z;
-          childData.model_x = model_x;
-          childData.model_y = model_y;
-          WeakAuras.Add(childData);
-          WeakAuras.UpdateThumbnail(childData);
-        end
-      end
-    else
-      self.data.model_path = model_path;
-      self.data.model_fileId = model_fileId;
-      self.data.model_z = model_z;
-      self.data.model_x = model_x;
-      self.data.model_y = model_y;
-
-      if self.parentData then
-        WeakAuras.Add(self.parentData)
-      else
-        WeakAuras.Add(self.data);
-        WeakAuras.UpdateThumbnail(self.data);
+    for child in OptionsPrivate.Private.TraverseLeafsOrAura(self.baseObject) do
+      local object = valueFromPath(child, self.path)
+      if(object) then
+        SetOnObject(object, model_path, model_fileId, model_z, model_x, model_y, rotation)
+        WeakAuras.Add(child)
+        WeakAuras.UpdateThumbnail(child)
       end
     end
   end
 
-  function group.Open(self, data, parentData)
-    self.data = data;
-    self.parentData = parentData
-    WeakAuras.SetModel(self.model, data.model_path, data.model_fileId)
-    if (data.api) then
-      self.model:SetTransform(data.model_st_tx / 1000, data.model_st_ty / 1000, data.model_st_tz / 1000,
-        rad(data.model_st_rx), rad(data.model_st_ry), rad(data.model_st_rz),
-        data.model_st_us / 1000);
+  function group.Open(self, baseObject, path)
+    local valueFromPath = OptionsPrivate.Private.ValueFromPath
 
-      modelPickerTX:SetValue(data.model_st_tx);
-      modelPickerTX.editbox:SetText(("%.2f"):format(data.model_st_tx));
-      modelPickerTY:SetValue(data.model_st_ty);
-      modelPickerTY.editbox:SetText(("%.2f"):format(data.model_st_ty));
-      modelPickerTZ:SetValue(data.model_st_tz);
-      modelPickerTZ.editbox:SetText(("%.2f"):format(data.model_st_tz));
+    self.baseObject = baseObject
+    self.path = path
+    self.selectedValues = {}
 
-      modelPickerRX:SetValue(data.model_st_rx);
-      modelPickerRX.editbox:SetText(("%.2f"):format(data.model_st_rx));
-      modelPickerRY:SetValue(data.model_st_ry);
-      modelPickerRY.editbox:SetText(("%.2f"):format(data.model_st_ry));
-      modelPickerRZ:SetValue(data.model_st_rz);
-      modelPickerRZ.editbox:SetText(("%.2f"):format(data.model_st_rz));
+    self.selectedValues.model_path = GetAll(baseObject, path, "model_path", "spells/arcanepower_state_chest.m2")
+    self.selectedValues.model_fileId = GetAll(baseObject, path, "model_fileId", "122968")
 
-      modelPickerUS:SetValue(data.model_st_us);
-      modelPickerUS.editbox:SetText(("%.2f"):format(data.model_st_us));
+    WeakAuras.SetModel(self.model, self.selectedValues.model_path, self.selectedValues.model_fileId)
+
+    self.selectedValues.api = GetAll(baseObject, path, "api", false)
+    self.selectedValues.model_st_tx = GetAll(baseObject, path, "model_st_tx", 0)
+    self.selectedValues.model_st_ty = GetAll(baseObject, path, "model_st_ty", 0)
+    self.selectedValues.model_st_tz = GetAll(baseObject, path, "model_st_tz", 0)
+
+    self.selectedValues.model_st_rx = GetAll(baseObject, path, "model_st_rx", 0)
+    self.selectedValues.model_st_ry = GetAll(baseObject, path, "model_st_ry", 0)
+    self.selectedValues.model_st_rz = GetAll(baseObject, path, "model_st_rz", 0)
+
+    self.selectedValues.model_st_us = GetAll(baseObject, path, "model_st_us", 0)
+
+    self.selectedValues.model_x = GetAll(baseObject, path, "model_x", 0)
+    self.selectedValues.model_y = GetAll(baseObject, path, "model_y", 0)
+    self.selectedValues.model_z = GetAll(baseObject, path, "model_z", 0)
+    self.selectedValues.rotation = GetAll(baseObject, path, "rotation", 0)
+
+
+    if (self.selectedValues.api) then
+      self.model:SetTransform(self.selectedValues.model_st_tx / 1000, self.selectedValues.model_st_ty / 1000, self.selectedValues.model_st_tz / 1000,
+        rad(self.selectedValues.model_st_rx), rad(self.selectedValues.model_st_ry), rad(self.selectedValues.model_st_rz),
+        self.selectedValues.model_st_us / 1000);
+
+      modelPickerTX:SetValue(self.selectedValues.model_st_tx);
+      modelPickerTX.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_tx));
+
+      modelPickerTY:SetValue(self.selectedValues.model_st_ty);
+      modelPickerTY.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_ty));
+      modelPickerTZ:SetValue(self.selectedValues.model_st_tz);
+      modelPickerTZ.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_tz));
+
+      modelPickerRX:SetValue(self.selectedValues.model_st_rx);
+      modelPickerRX.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_rx));
+      modelPickerRY:SetValue(self.selectedValues.model_st_ry);
+      modelPickerRY.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_ry));
+      modelPickerRZ:SetValue(self.selectedValues.model_st_rz);
+      modelPickerRZ.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_rz));
+
+      modelPickerUS:SetValue(self.selectedValues.model_st_us);
+      modelPickerUS.editbox:SetText(("%.2f"):format(self.selectedValues.model_st_us));
 
       modelPickerZ.frame:Hide();
       modelPickerY.frame:Hide();
       modelPickerX.frame:Hide();
+      modelPickerRotation.frame:Hide();
 
       modelPickerTX.frame:Show();
       modelPickerTY.frame:Show();
@@ -298,21 +419,23 @@ local function ConstructModelPicker(frame)
       modelPickerRY.frame:Show();
       modelPickerRZ.frame:Show();
       modelPickerUS.frame:Show();
-
     else
       self.model:ClearTransform();
-      self.model:SetPosition(data.model_z, data.model_x, data.model_y);
-      self.model:SetFacing(rad(data.rotation));
-      modelPickerZ:SetValue(data.model_z);
-      modelPickerZ.editbox:SetText(("%.2f"):format(data.model_z));
-      modelPickerX:SetValue(data.model_x);
-      modelPickerX.editbox:SetText(("%.2f"):format(data.model_x));
-      modelPickerY:SetValue(data.model_y);
-      modelPickerY.editbox:SetText(("%.2f"):format(data.model_y));
+      self.model:SetPosition(self.selectedValues.model_z, self.selectedValues.model_x, self.selectedValues.model_y);
+      self.model:SetFacing(rad(self.selectedValues.rotation));
+      modelPickerZ:SetValue(self.selectedValues.model_z);
+      modelPickerZ.editbox:SetText(("%.2f"):format(self.selectedValues.model_z));
+      modelPickerX:SetValue(self.selectedValues.model_x);
+      modelPickerX.editbox:SetText(("%.2f"):format(self.selectedValues.model_x));
+      modelPickerY:SetValue(self.selectedValues.model_y);
+      modelPickerY.editbox:SetText(("%.2f"):format(self.selectedValues.model_y));
+      modelPickerRotation:SetValue(self.selectedValues.rotation);
+      modelPickerRotation.editbox:SetText(("%.2f"):format(self.selectedValues.rotation));
 
       modelPickerZ.frame:Show();
       modelPickerY.frame:Show();
       modelPickerX.frame:Show();
+      modelPickerRotation.frame:Show();
 
       modelPickerTX.frame:Hide();
       modelPickerTY.frame:Hide();
@@ -323,12 +446,14 @@ local function ConstructModelPicker(frame)
       modelPickerUS.frame:Hide();
     end
 
-    if(not parentData and data.controlledChildren) then
+    if(baseObject.controlledChildren) then
       self.givenModel = {};
+      self.givenModelId = {};
       self.givenApi = {};
       self.givenZ = {};
       self.givenX = {};
       self.givenY = {};
+      self.givenRotation = {};
       self.givenTX = {};
       self.givenTY = {};
       self.givenTZ = {};
@@ -336,43 +461,49 @@ local function ConstructModelPicker(frame)
       self.givenRY = {};
       self.givenRZ = {};
       self.givenUS = {};
-      for index, childId in pairs(data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          self.givenModel[childId] = childData.model_path;
-          self.givenApi[childId] = childData.api;
-          if (childData.api) then
-            self.givenTX[childId] = childData.model_st_tx;
-            self.givenTY[childId] = childData.model_st_ty;
-            self.givenTZ[childId] = childData.model_st_tz;
-            self.givenRX[childId] = childData.model_st_rx;
-            self.givenRY[childId] = childData.model_st_ry;
-            self.givenRZ[childId] = childData.model_st_rz;
-            self.givenUS[childId] = childData.model_st_us;
+      for child in OptionsPrivate.Private.TraverseLeafs(baseObject) do
+        local childId = child.id
+        local object = valueFromPath(child, path)
+        if(object) then
+          self.givenModel[childId] = object.model_path;
+          self.givenModelId[childId] = object.model_fileId;
+          self.givenApi[childId] = object.api;
+          if (object.api) then
+            self.givenTX[childId] = object.model_st_tx;
+            self.givenTY[childId] = object.model_st_ty;
+            self.givenTZ[childId] = object.model_st_tz;
+            self.givenRX[childId] = object.model_st_rx;
+            self.givenRY[childId] = object.model_st_ry;
+            self.givenRZ[childId] = object.model_st_rz;
+            self.givenUS[childId] = object.model_st_us;
           else
-            self.givenZ[childId] = childData.model_z;
-            self.givenX[childId] = childData.model_x;
-            self.givenY[childId] = childData.model_y;
+            self.givenZ[childId] = object.model_z;
+            self.givenX[childId] = object.model_x;
+            self.givenY[childId] = object.model_y;
+            self.givenRotation[childId] = object.rotation;
           end
         end
       end
     else
-      self.givenModel = data.model_path;
-      self.givenModelId = data.model_fileId;
-      self.givenApi = data.api;
+      local object = valueFromPath(baseObject, path)
 
-      if (data.api) then
-        self.givenTX = data.model_st_tx;
-        self.givenTY = data.model_st_ty;
-        self.givenTZ = data.model_st_tz;
-        self.givenRX = data.model_st_rx;
-        self.givenRY = data.model_st_ry;
-        self.givenRZ = data.model_st_rz;
-        self.givenUS = data.model_st_us;
+      self.givenModel = object.model_path;
+      self.givenModelId = object.model_fileId;
+      self.givenApi = object.api;
+
+      if (object.api) then
+        self.givenTX = object.model_st_tx;
+        self.givenTY = object.model_st_ty;
+        self.givenTZ = object.model_st_tz;
+        self.givenRX = object.model_st_rx;
+        self.givenRY = object.model_st_ry;
+        self.givenRZ = object.model_st_rz;
+        self.givenUS = object.model_st_us;
       else
-        self.givenZ = data.model_z;
-        self.givenX = data.model_x;
-        self.givenY = data.model_y;
+        self.givenZ = object.model_z;
+        self.givenX = object.model_x;
+        self.givenY = object.model_y;
+        self.givenRotation = object.rotation;
       end
     end
     frame.window = "model";
@@ -385,37 +516,57 @@ local function ConstructModelPicker(frame)
     WeakAuras.FillOptions()
   end
 
-  function group.CancelClose(self)
-    if(not group.parentData and group.data.controlledChildren) then
-      for index, childId in pairs(group.data.controlledChildren) do
-        local childData = WeakAuras.GetData(childId);
-        if(childData) then
-          childData.model_path = group.givenModel[childId];
-          childData.model_fileId = group.givenModelId[childId];
-          childData.api = group.givenApi[childId];
-          if (childData.api) then
-            childData.model_st_tx = group.givenTX[childId];
-            childData.model_st_ty = group.givenTY[childId];
-            childData.model_st_tz = group.givenTZ[childId];
-            childData.model_st_rx = group.givenRX[childId];
-            childData.model_st_ry = group.givenRY[childId];
-            childData.model_st_rz = group.givenRZ[childId];
-            childData.model_st_us = group.givenUS[childId];
+  function group.CancelClose()
+    local valueFromPath = OptionsPrivate.Private.ValueFromPath
+    if(group.baseObject.controlledChildren) then
+      for child in OptionsPrivate.Private.TraverseLeafs(group.baseObject) do
+        local childId = child.id
+        local object = valueFromPath(child, group.path)
+        if(object) then
+          object.model_path = group.givenModel[childId];
+          object.model_fileId = group.givenModelId[childId];
+          object.api = group.givenApi[childId];
+          if (object.api) then
+            object.model_st_tx = group.givenTX[childId];
+            object.model_st_ty = group.givenTY[childId];
+            object.model_st_tz = group.givenTZ[childId];
+            object.model_st_rx = group.givenRX[childId];
+            object.model_st_ry = group.givenRY[childId];
+            object.model_st_rz = group.givenRZ[childId];
+            object.model_st_us = group.givenUS[childId];
           else
-            childData.model_z = group.givenZ[childId];
-            childData.model_x = group.givenX[childId];
-            childData.model_y = group.givenY[childId];
+            object.model_z = group.givenZ[childId];
+            object.model_x = group.givenX[childId];
+            object.model_y = group.givenY[childId];
+            object.rotation = group.givenRotation[childId];
           end
-          WeakAuras.Add(childData);
-          WeakAuras.UpdateThumbnail(childData);
+          WeakAuras.Add(child);
+          WeakAuras.UpdateThumbnail(child);
         end
       end
     else
-      if (group.givenApi) then
-        group:PickSt(group.givenModel, group.givenModelId, group.givenTX, group.givenTY, group.givenTZ,
-          group.givenRX, group.givenRY, group.givenRZ, group.givenUS );
-      else
-        group:Pick(group.givenModel, group.givenModelId, group.givenZ, group.givenX, group.givenY);
+      local object = valueFromPath(group.baseObject, group.path)
+
+      if(object) then
+        object.model_path = group.givenModel
+        object.model_fileId = group.givenModelId
+        object.api = group.givenApi
+        if (object.api) then
+          object.model_st_tx = group.givenTX
+          object.model_st_ty = group.givenTY
+          object.model_st_tz = group.givenTZ
+          object.model_st_rx = group.givenRX
+          object.model_st_ry = group.givenRY
+          object.model_st_rz = group.givenRZ
+          object.model_st_us = group.givenUS
+        else
+          object.model_z = group.givenZ
+          object.model_x = group.givenX
+          object.model_y = group.givenY
+          object.rotation = group.givenRotation
+        end
+        WeakAuras.Add(group.baseObject);
+        WeakAuras.UpdateThumbnail(group.baseObject);
       end
     end
     group.Close();
@@ -438,7 +589,7 @@ local function ConstructModelPicker(frame)
   return group
 end
 
-function WeakAuras.ModelPicker(frame)
+function OptionsPrivate.ModelPicker(frame)
   modelPicker = modelPicker or ConstructModelPicker(frame)
   return modelPicker
 end

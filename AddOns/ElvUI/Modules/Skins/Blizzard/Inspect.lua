@@ -1,12 +1,10 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
-local unpack = unpack
+local unpack, select = unpack, select
 local ipairs = ipairs
---WoW API / Variables
+
 local GetInventoryItemID = GetInventoryItemID
 local GetItemInfo = GetItemInfo
 local GetItemQualityColor = GetItemQualityColor
@@ -17,7 +15,6 @@ function S:Blizzard_InspectUI()
 
 	local InspectFrame = _G.InspectFrame
 	S:HandleFrame(InspectFrame, true, nil, 11, -12, -32, 76)
-
 	S:HandleCloseButton(_G.InspectFrameCloseButton, InspectFrame.backdrop)
 
 	for i = 1, #_G.INSPECTFRAME_SUBFRAMES do
@@ -76,20 +73,78 @@ function S:Blizzard_InspectUI()
 	S:HandleRotateButton(_G.InspectModelFrameRotateRightButton)
 	_G.InspectModelFrameRotateRightButton:Point('TOPLEFT', _G.InspectModelFrameRotateLeftButton, 'TOPRIGHT', 3, 0)
 
-	-- Honor Frame
-	local InspectHonorFrame = _G.InspectHonorFrame
-	S:HandleFrame(InspectHonorFrame, true, nil, 18, -105, -39, 83)
-	InspectHonorFrame.backdrop:SetFrameLevel(InspectHonorFrame:GetFrameLevel())
+	-- Talents
+	S:HandleFrame(_G.InspectTalentFrame, true, nil, 11, -12, -32, 76)
+	S:HandleCloseButton(_G.InspectTalentFrameCloseButton, _G.InspectTalentFrame.backdrop)
 
-	_G.InspectHonorFrameProgressButton:CreateBackdrop('Transparent')
+	_G.InspectTalentFrameCancelButton:Kill()
 
-	local InspectHonorFrameProgressBar = _G.InspectHonorFrameProgressBar
-	InspectHonorFrameProgressBar:Width(325)
-	InspectHonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
+	for i = 1, 3 do
+		S:HandleTab(_G['InspectTalentFrameTab'..i], true)
+	end
 
-	S:HandlePointXY(InspectHonorFrameProgressBar, 19, -74)
+	_G.InspectTalentFrameScrollFrame:StripTextures()
+	_G.InspectTalentFrameScrollFrame:CreateBackdrop('Default')
 
-	E:RegisterStatusBar(InspectHonorFrameProgressBar)
+	S:HandleScrollBar(_G.InspectTalentFrameScrollFrameScrollBar)
+	_G.InspectTalentFrameScrollFrameScrollBar:Point('TOPLEFT', _G.InspectTalentFrameScrollFrame, 'TOPRIGHT', 10, -16)
+
+	for i = 1, _G.MAX_NUM_TALENTS do
+		local talent = _G['InspectTalentFrameTalent'..i]
+		local icon = _G['InspectTalentFrameTalent'..i..'IconTexture']
+		local rank = _G['InspectTalentFrameTalent'..i..'Rank']
+
+		if talent then
+			talent:StripTextures()
+			talent:SetTemplate('Default')
+			talent:StyleButton()
+
+			icon:SetInside()
+			icon:SetTexCoord(unpack(E.TexCoords))
+			icon:SetDrawLayer('ARTWORK')
+
+			rank:SetFont(E.LSM:Fetch('font', E.db['general'].font), 12, 'OUTLINE')
+		end
+	end
+
+	-- Honor/Arena/PvP Tab
+	local InspectPVPFrame = _G.InspectPVPFrame
+	InspectPVPFrame:StripTextures(true)
+
+	for i = 1, MAX_ARENA_TEAMS do
+		local inspectpvpTeam = _G['InspectPVPTeam'..i]
+
+		inspectpvpTeam:StripTextures()
+		inspectpvpTeam:CreateBackdrop('Default')
+		inspectpvpTeam.backdrop:Point('TOPLEFT', 9, -4)
+		inspectpvpTeam.backdrop:Point('BOTTOMRIGHT', -24, 3)
+
+		inspectpvpTeam:HookScript('OnEnter', S.SetModifiedBackdrop)
+		inspectpvpTeam:HookScript('OnLeave', S.SetOriginalBackdrop)
+
+		_G['InspectPVPTeam'..i..'Highlight']:Kill()
+	end
+
+	local PVPTeamDetails = _G.PVPTeamDetails
+	PVPTeamDetails:StripTextures()
+	PVPTeamDetails:SetTemplate('Transparent')
+	PVPTeamDetails:Point('TOPLEFT', InspectPVPFrame, 'TOPRIGHT', -30, -12)
+
+	for i = 1, 5 do
+		local header = _G['PVPTeamDetailsFrameColumnHeader'..i]
+		header:StripTextures()
+		header:StyleButton()
+	end
+
+	for i = 1, 10 do
+		local button = _G['PVPTeamDetailsButton'..i]
+		button:Width(335)
+		S:HandleButtonHighlight(button)
+	end
+
+	S:HandleButton(_G.PVPTeamDetailsAddTeamMember)
+	S:HandleNextPrevButton(_G.PVPTeamDetailsToggleButton)
+	S:HandleCloseButton(_G.PVPTeamDetailsCloseButton)
 end
 
 S:AddCallbackForAddon('Blizzard_InspectUI')

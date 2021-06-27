@@ -1,11 +1,10 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local AB = E:GetModule('ActionBars')
 local UF = E:GetModule('UnitFrames')
 local Misc = E:GetModule('Misc')
 local Bags = E:GetModule('Bags')
 local Skins = E:GetModule('Skins')
 
---Lua functions
 local _G = _G
 local pairs, type, unpack, assert = pairs, type, unpack, assert
 local tremove, tContains, tinsert, wipe = tremove, tContains, tinsert, wipe
@@ -13,6 +12,8 @@ local format, error = format, error
 
 local CreateFrame = CreateFrame
 local IsAddOnLoaded = IsAddOnLoaded
+local PickupContainerItem = PickupContainerItem
+local DeleteCursorItem = DeleteCursorItem
 local UnitIsDeadOrGhost, InCinematic = UnitIsDeadOrGhost, InCinematic
 local GetBindingFromClick, RunBinding = GetBindingFromClick, RunBinding
 local PurchaseSlot, GetBankSlotCost = PurchaseSlot, GetBankSlotCost
@@ -28,7 +29,7 @@ local STATICPOPUP_TEXTURE_ALERTGEAR = STATICPOPUP_TEXTURE_ALERTGEAR
 local YES, NO, OKAY, CANCEL, ACCEPT, DECLINE = YES, NO, OKAY, CANCEL, ACCEPT, DECLINE
 -- GLOBALS: ElvUIBindPopupWindowCheckButton
 
-local DOWNLOAD_URL = 'https://www.tukui.org/classic-addons.php?id=2'
+local DOWNLOAD_URL = 'https://www.tukui.org/classic-tbc-addons.php?id=2'
 
 E.PopupDialogs = {}
 E.StaticPopup_DisplayedFrames = {}
@@ -295,7 +296,16 @@ E.PopupDialogs.DELETE_GRAYS = {
 	text = format('|cffff0000%s|r', L["Delete gray items?"]),
 	button1 = YES,
 	button2 = NO,
-	OnAccept = function() Bags:VendorGrays(true) end,
+	OnAccept = function()
+		Bags:VendorGrays(true)
+
+		for _, info in ipairs(Bags.SellFrame.Info.itemList) do
+			PickupContainerItem(info[1], info[2])
+			DeleteCursorItem()
+		end
+
+		wipe(Bags.SellFrame.Info.itemList)
+	end,
 	OnShow = function(self)
 		MoneyFrame_Update(self.moneyFrame, E.PopupDialogs.DELETE_GRAYS.Money)
 	end,
@@ -421,46 +431,7 @@ E.PopupDialogs.WARNING_BLIZZARD_ADDONS = {
 
 E.PopupDialogs.APPLY_FONT_WARNING = {
 	text = L["Are you sure you want to apply this font to all ElvUI elements?"],
-	OnAccept = function()
-		local font = E.db.general.font
-		local fontSize = E.db.general.fontSize
-
-		E.db.bags.itemLevelFont = font
-		E.db.bags.itemLevelFontSize = fontSize
-		E.db.bags.countFont = font
-		E.db.bags.countFontSize = fontSize
-		E.db.nameplates.font = font
-		--E.db.nameplate.fontSize = fontSize --Dont use this because nameplate font it somewhat smaller than the rest of the font sizes
-		--E.db.nameplate.buffs.font = font
-		--E.db.nameplate.buffs.fontSize = fontSize  --Dont use this because nameplate font it somewhat smaller than the rest of the font sizes
-		--E.db.nameplate.debuffs.font = font
-		--E.db.nameplate.debuffs.fontSize = fontSize   --Dont use this because nameplate font it somewhat smaller than the rest of the font sizes
-		E.db.actionbar.font = font
-		--E.db.actionbar.fontSize = fontSize	--This may not look good if a big font size is chosen
-		E.db.auras.font = font
-		E.db.auras.fontSize = fontSize
-		E.db.chat.font = font
-		E.db.chat.fontSize = fontSize
-		E.db.chat.tabFont = font
-		E.db.chat.tabFontSize = fontSize
-		E.db.datatexts.font = font
-		E.db.datatexts.fontSize = fontSize
-		E.db.general.minimap.locationFont = font
-		E.db.tooltip.font = font
-		E.db.tooltip.fontSize = fontSize
-		E.db.tooltip.headerFontSize = fontSize
-		E.db.tooltip.textFontSize = fontSize
-		E.db.tooltip.smallTextFontSize = fontSize
-		E.db.tooltip.healthBar.font = font
-		--E.db.tooltip.healthbar.fontSize = fontSize -- Size is smaller than default
-		E.db.unitframe.font = font
-		--E.db.unitframe.fontSize = fontSize  -- Size is smaller than default
-		E.db.unitframe.units.party.rdebuffs.font = font
-		E.db.unitframe.units.raid.rdebuffs.font = font
-		E.db.unitframe.units.raid40.rdebuffs.font = font
-
-		E:StaggeredUpdateAll(nil, true)
-	end,
+	OnAccept = function() E:GeneralMedia_ApplyToAll() end,
 	OnCancel = function() E:StaticPopup_Hide('APPLY_FONT_WARNING'); end,
 	button1 = YES,
 	button2 = CANCEL,
@@ -804,7 +775,7 @@ function E:StaticPopup_Resize(dialog, which)
 		width = width + (info.editBoxWidth - 260)
 	end
 
-	if ( width > maxWidthSoFar )  then
+	if ( width > maxWidthSoFar ) then
 		dialog:Width(width)
 		dialog.maxWidthSoFar = width
 	end
@@ -888,7 +859,7 @@ function E:StaticPopup_Show(which, text_arg1, text_arg2, data)
 		end
 		for i = index, MAX_STATIC_POPUPS do
 			local frame = _G["ElvUI_StaticPopup"..i]
-			if ( frame and  not frame:IsShown() ) then
+			if ( frame and not frame:IsShown() ) then
 				dialog = frame
 				break
 			end

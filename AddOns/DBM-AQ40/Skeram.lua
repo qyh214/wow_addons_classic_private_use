@@ -1,11 +1,14 @@
 local mod	= DBM:NewMod("Skeram", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210523005243")
 mod:SetCreatureID(15263)
 mod:SetEncounterID(709)
 mod:SetModelID(15345)
 mod:SetUsedIcons(4, 5, 6, 7, 8)
+mod.noBossDeathKill = true
+mod:SetHotfixNoticeRev(20210522000000)--2021-05-22
+mod:SetMinSyncRevision(20210522000000)
 
 mod:RegisterCombat("combat")
 
@@ -44,50 +47,37 @@ local function warnMCTargets(self)
 	self.vb.MCIcon = 8
 end
 
-do
-	local TrueFulfillment = DBM:GetSpellInfo(785)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 785 then
-		if args.spellName == TrueFulfillment then
-			MCTargets[#MCTargets + 1] = args.destName
-			self:Unschedule(warnMCTargets)
-			if #MCTargets >= 3 then
-				warnMCTargets(self)
-			else
-				self:Schedule(0.5, warnMCTargets, self)
-			end
-			if self.Options.SetIconOnMC then
-				self:SetIcon(args.destName, self.vb.MCIcon)
-			end
-			self.vb.MCIcon = self.vb.MCIcon - 1
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 785 then
+		MCTargets[#MCTargets + 1] = args.destName
+		self:Unschedule(warnMCTargets)
+		if self.Options.SetIconOnMC then
+			self:SetIcon(args.destName, self.vb.MCIcon)
 		end
-	end
-
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 785 and self.Options.SetIconOnMC then
-		if args.spellName == TrueFulfillment and self.Options.SetIconOnMC then
-			self:SetIcon(args.destName, 0)
+		if #MCTargets >= 3 then
+			warnMCTargets(self)
+		else
+			self:Schedule(0.5, warnMCTargets, self)
 		end
+		self.vb.MCIcon = self.vb.MCIcon - 1
 	end
 end
 
-do
-	local Teleport = DBM:GetSpellInfo(4801)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args:IsSpellID(20449, 4801, 8195) and self:AntiSpam() then
-		if args.spellName == Teleport and args:IsSrcTypeHostile() and self:AntiSpam(3, 1) then
-			warnTeleport:Show()
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 785 and self.Options.SetIconOnMC then
+		self:SetIcon(args.destName, 0)
 	end
 end
 
-do
-	local SummonImages = DBM:GetSpellInfo(747)
-	function mod:SPELL_SUMMON(args)
-		--if args.spellId == 747 then
-		if args.spellName == SummonImages and self:AntiSpam(3, 2) then
-			warnSummon:Show()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args:IsSpellID(20449, 4801, 8195) and args:IsSrcTypeHostile() and self:AntiSpam(3, 1) then
+		warnTeleport:Show()
+	end
+end
+
+function mod:SPELL_SUMMON(args)
+	if args.spellId == 747 and self:AntiSpam(3, 2) then
+		warnSummon:Show()
 	end
 end
 

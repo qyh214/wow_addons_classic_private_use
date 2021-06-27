@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Majordomo", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210613212942")
 mod:SetCreatureID(12018, 11663, 11664)
 mod:SetEncounterID(671)
 mod:SetModelID(12029)
@@ -33,31 +33,23 @@ function mod:OnCombatStart(delay)
 	timerShieldCD:Start(27.8-delay)--27-30
 end
 
-do
-	local MagicReflect, MeleeReflect, Teleport = DBM:GetSpellInfo(20619), DBM:GetSpellInfo(21075), DBM:GetSpellInfo(20534)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--local spellId = args.spellId
-		local spellName = args.spellName
-		--if spellId == 20619 then
-		if spellName == MagicReflect then
-			specWarnMagicReflect:Show(BOSS)--Always a threat to casters
-			specWarnMagicReflect:Play("stopattack")
-			timerMagicReflect:Start()
-			timerShieldCD:Start()
-		--elseif spellId == 21075 then
-		elseif spellName == MeleeReflect then
-			if self.Options.SpecWarn21075reflect and (self:IsDifficulty("event40") or not self:IsTrivial(75)) then--Not a threat to high level melee
-				specWarnDamageShield:Show(BOSS)
-				specWarnDamageShield:Play("stopattack")
-			else
-				warnDamageShield:Show()
-			end
-			timerDamageShield:Start()
-			timerShieldCD:Start()
-		--elseif spellId == 20534 then
-		elseif spellName == Teleport then
-			warnTeleport:Show(args.destName)
-			timerTeleportCD:Start()
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 20619 then
+		specWarnMagicReflect:Show(BOSS)--Always a threat to casters
+		specWarnMagicReflect:Play("stopattack")
+		timerMagicReflect:Start()
+		timerShieldCD:Start()
+	elseif args.spellId == 21075 then
+		if self.Options.SpecWarn21075reflect and (self:IsEvent() or not self:IsTrivial()) then--Not a threat to high level melee
+			specWarnDamageShield:Show(BOSS)
+			specWarnDamageShield:Play("stopattack")
+		else
+			warnDamageShield:Show()
 		end
+		timerDamageShield:Start()
+		timerShieldCD:Start()
+	elseif args.spellId == 20534 then
+		warnTeleport:Show(args.destName)
+		timerTeleportCD:Start()
 	end
 end

@@ -207,7 +207,8 @@ L:SetMiscLocalization({
 L:SetOptionLocalization({
 	WarningChargeChanged	= "Show special warning when your polarity changed",
 	WarningChargeNotChanged	= "Show special warning when your polarity did not change",
-	ArrowsEnabled			= "Show arrows (normal \"2 camp\" strategy)",
+	ArrowsEnabled			= "Show arrows during $spell:28089",
+	TwoCamp					= "Show arrows (normal \"2 camp\" run through strategy)",
 	ArrowsRightLeft			= "Show left/right arrows for the \"4 camp\" strategy (show left arrow if polarity changed, right if not)",
 	ArrowsInverse			= "Inverse \"4 camp\" strategy (show right arrow if polarity changed, left if not)"
 })
@@ -215,10 +216,6 @@ L:SetOptionLocalization({
 L:SetWarningLocalization({
 	WarningChargeChanged	= "Polarity changed to %s",
 	WarningChargeNotChanged	= "Polarity did not change"
-})
-
-L:SetOptionCatLocalization({
-	Arrows	= "Arrows"
 })
 
 ----------------------------
@@ -283,6 +280,7 @@ L:SetMiscLocalization({
 	WarningWave3	= "%d %s, %d %s and %d %s",
 	Trainee			= "Trainees",
 	Knight			= "Knights",
+	Horse			= "Spectral Horse",
 	Rider			= "Riders"
 })
 
@@ -297,16 +295,16 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	WarningMarkSoon				= "Show pre-warning for Mark",
-	WarningMarkNow				= "Show warning for Mark",
-	SpecialWarningMarkOnPlayer	= "Show special warning when you are affected by more than 4 marks"
+	SpecialWarningMarkOnPlayer	= "Show special warning when you are affected by more than 4 marks",
+	timerMark					= "Show timer for next horseman's Mark (with count)",
 })
 
 L:SetTimerLocalization({
+	timerMark	= "Mark %d",
 })
 
 L:SetWarningLocalization({
 	WarningMarkSoon				= "Mark %d in 3 seconds",
-	WarningMarkNow				= "Mark %d",
 	SpecialWarningMarkOnPlayer	= "%s: %s"
 })
 

@@ -3,21 +3,19 @@
 -- Harlem Shake: 	Try it out with the command /harlemshake
 -- Hello Kitty: 	Try it out with the command /hellokitty (pay attention to the popups, read what it says)
 ------------------------------------------------------------------------
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local UF = E:GetModule('UnitFrames')
 local AB = E:GetModule('ActionBars')
 
---Lua functions
 local _G = _G
 local pairs = pairs
-local twipe, tinsert = wipe, tinsert
---WoW API / Variables
+local wipe, tinsert = wipe, tinsert
+
 local CreateFrame = CreateFrame
 local DoEmote = DoEmote
 local GetCVar, SetCVar = GetCVar, SetCVar
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
 local PlayMusic, StopMusic = PlayMusic, StopMusic
-local SendChatMessage = SendChatMessage
 -- GLOBALS: ElvUI_StaticPopup1, ElvUI_StaticPopup1Button1, ElvUI_StanceBar
 
 --Harlem Shake (Activate with command: /harlemshake)
@@ -42,7 +40,7 @@ do
 
 		E.global.aprilFools = true
 		E:StaticPopup_Hide('HARLEM_SHAKE')
-		twipe(self.massiveShakeObjects)
+		wipe(self.massiveShakeObjects)
 		DoEmote('Dance')
 	end
 
@@ -57,7 +55,6 @@ do
 		end
 
 		E.massiveShakeTimer = E:ScheduleTimer('StopHarlemShake', 42.5)
-		SendChatMessage('DO THE HARLEM SHAKE!', 'YELL')
 	end
 
 	function E:BeginHarlemShake()
@@ -125,19 +122,19 @@ do
 	end
 
 	local function OnUpdate(self, elapsed)
-		if(self.elapsed and self.elapsed > 0.1) then
+		if self.elapsed and self.elapsed > 0.1 then
 			self.tex:SetTexCoord((self.curFrame - 1) * 0.1, 0, (self.curFrame - 1) * 0.1, 1, self.curFrame * 0.1, 0, self.curFrame * 0.1, 1)
 
-			if(self.countUp) then
+			if self.countUp then
 				self.curFrame = self.curFrame + 1
 			else
 				self.curFrame = self.curFrame - 1
 			end
 
-			if(self.curFrame > 10) then
+			if self.curFrame > 10 then
 				self.countUp = false
 				self.curFrame = 9
-			elseif(self.curFrame < 1) then
+			elseif self.curFrame < 1 then
 				self.countUp = true
 				self.curFrame = 2
 			end
@@ -155,7 +152,7 @@ do
 		--Store old settings
 		local t = self.db.tempSettings
 		local c = self.db.general.backdropcolor
-		if(self:HelloKittyFixCheck()) then
+		if self:HelloKittyFixCheck() then
 			E:HelloKittyFix()
 		else
 			self.oldEnableAllSound = GetCVar('Sound_EnableAllSound')
@@ -217,13 +214,13 @@ do
 	function E:RestoreHelloKitty()
 		--Store old settings
 		self.db.general.kittys = false
-		if(_G.HelloKittyLeft) then
+		if _G.HelloKittyLeft then
 			_G.HelloKittyLeft:Hide()
 			_G.HelloKittyRight:Hide()
 		end
 
 		if not(self.db.tempSettings) then return end
-		if(self:HelloKittyFixCheck()) then
+		if self:HelloKittyFixCheck() then
 			self:HelloKittyFix()
 			self.db.tempSettings = nil
 			return
@@ -261,13 +258,13 @@ do
 	end
 
 	function E:CreateKittys()
-		if(_G.HelloKittyLeft) then
+		if _G.HelloKittyLeft then
 			_G.HelloKittyLeft:Show()
 			_G.HelloKittyRight:Show()
 			return
 		end
 		local helloKittyLeft = CreateFrame('Frame', 'HelloKittyLeft', _G.UIParent)
-		helloKittyLeft:SetSize(120, 128)
+		helloKittyLeft:Size(120, 128)
 		helloKittyLeft:SetMovable(true)
 		helloKittyLeft:EnableMouse(true)
 		helloKittyLeft:RegisterForDrag('LeftButton')
@@ -284,7 +281,7 @@ do
 		helloKittyLeft:SetScript('OnUpdate', OnUpdate)
 
 		local helloKittyRight = CreateFrame('Frame', 'HelloKittyRight', _G.UIParent)
-		helloKittyRight:SetSize(120, 128)
+		helloKittyRight:Size(120, 128)
 		helloKittyRight:SetMovable(true)
 		helloKittyRight:EnableMouse(true)
 		helloKittyRight:RegisterForDrag('LeftButton')
@@ -304,8 +301,8 @@ do
 	--When it bugged out for a user the command '/hellokittyfix' attempted to restore the changed settings to default
 	function E:HelloKittyFixCheck(secondCheck)
 		local t = self.db.tempSettings
-		if(not t and not secondCheck) then t = self.db.general end
-		if(t and t.backdropcolor)then
+		if not t and not secondCheck then t = self.db.general end
+		if t and t.backdropcolor then
 			return self:Round(t.backdropcolor.r, 2) == 0.87 and self:Round(t.backdropcolor.g, 2) == 0.3 and self:Round(t.backdropcolor.b, 2) == 0.74
 		end
 	end
@@ -337,7 +334,7 @@ do
 		self.db.unitframe.colors.auraBarBuff = {r = c.r, g = c.g, b = c.b}
 		self.db.unitframe.colors.transparentAurabars = false
 
-		if(_G.HelloKittyLeft) then
+		if _G.HelloKittyLeft then
 			_G.HelloKittyLeft:Hide()
 			_G.HelloKittyRight:Hide()
 			self.db.general.kittys = nil
@@ -349,7 +346,7 @@ do
 	end
 
 	function E:HelloKittyToggle()
-		if(_G.HelloKittyLeft and _G.HelloKittyLeft:IsShown()) then
+		if _G.HelloKittyLeft and _G.HelloKittyLeft:IsShown() then
 			self:RestoreHelloKitty()
 		else
 			self:StaticPopup_Show('HELLO_KITTY')

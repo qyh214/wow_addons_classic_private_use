@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(454, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(10435)
 mod:SetEncounterID(482)
 
@@ -22,17 +22,12 @@ function mod:OnCombatStart(delay)
 	timerMightyBlowCD:Start(1-delay)
 end
 
-do
-	local CrowdPummel, MightyBlow = DBM:GetSpellInfo(10887), DBM:GetSpellInfo(14099)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 10887 then
-		if args.spellName == CrowdPummel then
-			warningCrowdPummel:Show()
-			timerCrowdPummelCD:Start()
-		--elseif args.spellId == 14099 then
-		elseif args.spellName == MightyBlow then
-			warningMightyBlow:Show()
-			timerMightyBlowCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 10887 then
+		warningCrowdPummel:Show()
+		timerCrowdPummelCD:Start()
+	elseif args.spellId == 14099 then
+		warningMightyBlow:Show()
+		timerMightyBlowCD:Start()
 	end
 end

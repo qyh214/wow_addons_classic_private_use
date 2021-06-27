@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Taragaman", "DBM-Party-Classic", 9)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(11520)
 --mod:SetEncounterID(1446)
 
@@ -22,17 +22,12 @@ function mod:OnCombatStart(delay)
 	timerFireNovaCD:Start(1-delay)
 end
 
-do
-	local Uppercut, FireNova = DBM:GetSpellInfo(18072), DBM:GetSpellInfo(11970)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 18072 then
-		if args.spellName == Uppercut then
-			warningUppercut:Show()
-			timerUppercutCD:Start()
-		--elseif args.spellId == 11970 then
-		elseif args.spellName == FireNova then
-			warningFireNova:Show()
-			timerFireNovaCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 18072 then
+		warningUppercut:Show()
+		timerUppercutCD:Start()
+	elseif args.spellId == 11970 then
+		warningFireNova:Show()
+		timerFireNovaCD:Start()
 	end
 end

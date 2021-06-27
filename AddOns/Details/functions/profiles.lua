@@ -37,7 +37,7 @@ function _detalhes:CreateProfile (name)
 		end
 		
 	--> copy the default table
-		local new_profile = table_deepcopy (_detalhes.default_profile)
+		local new_profile = Details.CopyTable (_detalhes.default_profile)
 		new_profile.instances = {}
 	
 	--> add to global container
@@ -126,7 +126,7 @@ function _detalhes:SetProfileCProp (name, cprop, value)
 	
 	if (profile) then
 		if (type (value) == "table") then
-			rawset (profile, cprop, table_deepcopy (value))
+			rawset (profile, cprop, Details.CopyTable (value))
 		else
 			rawset (profile, cprop, value)
 		end
@@ -161,7 +161,7 @@ function _detalhes:ResetProfile (profile_name)
 				instance:AtivarInstancia()
 			end
 			instance.skin = ""
-			instance:ChangeSkin ("Minimalistic v2")
+			instance:ChangeSkin(_detalhes.default_skin_to_use)
 		end
 	
 	--> reset the profile
@@ -171,7 +171,7 @@ function _detalhes:ResetProfile (profile_name)
 		local instance = _detalhes:GetInstance (1)
 		local exported = instance:ExportSkin()
 		exported.__was_opened = instance:IsEnabled()
-		exported.__pos = table_deepcopy (instance:GetPosition())
+		exported.__pos = Details.CopyTable (instance:GetPosition())
 		exported.__locked = instance.isLocked
 		exported.__snap = {}
 		exported.__snapH = false
@@ -191,7 +191,7 @@ end
 	--> return the profile table requested
 
 function _detalhes:CreatePanicWarning()
-	_detalhes.instance_load_failed = CreateFrame ("frame", "DetailsPanicWarningFrame", UIParent)
+	_detalhes.instance_load_failed = CreateFrame ("frame", "DetailsPanicWarningFrame", UIParent,"BackdropTemplate")
 	_detalhes.instance_load_failed:SetHeight (80)
 	--tinsert (UISpecialFrames, "DetailsPanicWarningFrame")
 	_detalhes.instance_load_failed.text = _detalhes.instance_load_failed:CreateFontString (nil, "overlay", "GameFontNormal")
@@ -225,6 +225,8 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 			_detalhes:Msg ("Profile Not Found.")
 			return false
 		end
+
+		profile.ocd_tracker = nil --moved to local character saved
 		
 	--> always save the previous profile, except if nosave flag is up
 		if (not nosave) then
@@ -237,7 +239,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 			--> the entire key doesn't exist
 			if (profile [key] == nil) then
 				if (type (value) == "table") then
-					profile [key] = table_deepcopy (_detalhes.default_profile [key])
+					profile [key] = Details.CopyTable (_detalhes.default_profile [key])
 				else
 					profile [key] = value
 				end
@@ -246,18 +248,6 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 			elseif (type (value) == "table") then
 				--> deploy only copy non existing data
 				_detalhes.table.deploy (profile [key], value)
-				
-			--[=[
-				for key2, value2 in pairs (value) do 
-					if (profile [key] [key2] == nil) then
-						if (type (value2) == "table") then
-							profile [key] [key2] = table_deepcopy (_detalhes.default_profile [key] [key2])
-						else
-							profile [key] [key2] = value2
-						end
-					end
-				end
-			--]=]
 			end
 		end
 		
@@ -267,10 +257,10 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 
 			if (type (value) == "table") then
 				if (key == "class_specs_coords") then
-					value = table_deepcopy (_detalhes.default_profile.class_specs_coords)
+					value = Details.CopyTable (_detalhes.default_profile.class_specs_coords)
 				end
 			
-				local ctable = table_deepcopy (value)
+				local ctable = Details.CopyTable (value)
 				_detalhes [key] = ctable
 			else
 				_detalhes [key] = value
@@ -306,13 +296,13 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 
 		--> check if there is a skin saved or this is a empty profile
 		if (#saved_skins == 0) then
-			--> is empty profile, let's set "WoW Interface" on #1 window
 			local instance1 = _detalhes:GetInstance (1)
 			if (not instance1) then
 				instance1 = _detalhes:CreateInstance (1)
 			end
 
 			--> apply default config on this instance (flat skin texture was 'ResetInstanceConfig' running).
+			instance1.modo = 2
 			instance1:ResetInstanceConfig()
 			instance1.skin = "no skin"
 			instance1:ChangeSkin (_detalhes.default_skin_to_use)
@@ -326,12 +316,12 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 			
 			if (#_detalhes.tabela_instancias > 1) then
 				for i = #_detalhes.tabela_instancias, 2, -1 do
+					_detalhes.tabela_instancias [i].modo = 2
 					_detalhes.unused_instances [i] = _detalhes.tabela_instancias [i]
 					_detalhes.tabela_instancias [i] = nil
 				end
 			end
-			
-		else	
+		else
 		
 			--> load skins
 			local instances_loaded = 0
@@ -340,41 +330,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 				if (instance_limit < index) then
 					break
 				end
-				
-				--> fix for the old flat skin (10-10)
-					if (skin.skin == "Flat Color") then
-						skin.skin = "Serenity"
-					end
-					if (skin.skin == "Simply Gray") then
-						skin.skin = "Forced Square"
-					end					
-					if (skin.skin == "Default Skin") then
-						skin.skin = "WoW Interface"
-					end
-					if (skin.skin == "ElvUI Frame Style BW") then
-						skin.skin = "ElvUI Style II"
-					end
-				
-				--> fix for old left and right menus (15-10)
-					if (skin.menu_icons and type (skin.menu_icons[5]) ~= "boolean") then
-						skin.menu_icons[5] = true
-						skin.menu_icons[6] = true
-						
-						local skin_profile = _detalhes.skins [skin.skin] and _detalhes.skins [skin.skin].instance_cprops
-						if (skin_profile) then
-							skin.menu_icons_size = skin_profile.menu_icons_size
-							skin.menu_anchor = table_deepcopy (skin_profile.menu_anchor)
-							--print (skin.menu_anchor[1], skin.menu_anchor[2], skin.menu_anchor.side)
-							skin.menu_anchor_down = table_deepcopy (skin_profile.menu_anchor_down)
-						end
-					end
-					if (skin.menu_icons and not skin.menu_icons.space) then
-						skin.menu_icons.space = -4
-					end
-					if (skin.menu_icons and not skin.menu_icons.shadow) then
-						skin.menu_icons.shadow = false
-					end
-				
+
 				--> get the instance
 				local instance = _detalhes:GetInstance (index)
 				if (not instance) then
@@ -385,7 +341,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 				--> copy skin
 				for key, value in pairs (skin) do
 					if (type (value) == "table") then
-						instance [key] = table_deepcopy (value)
+						instance [key] = Details.CopyTable (value)
 					else
 						instance [key] = value
 					end
@@ -400,28 +356,17 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 				instance.verticalSnap = nil
 				instance:LockInstance (false)
 				
-				--> fix for old versions
-				if (type (instance.segmento) ~= "number") then
-					instance.segmento = 0
-				end
-				if (type (instance.atributo) ~= "number") then
-					instance.atributo = 1
-				end
-				if (type (instance.sub_atributo) ~= "number") then
-					instance.sub_atributo = 1
-				end
-				
 				--> load data saved for this character only
 				instance:LoadLocalInstanceConfig()
-				if (skin.__was_opened) then	
-					
+				if (skin.__was_opened) then
 					if (not safe_load (_detalhes.AtivarInstancia, instance)) then
 						return
 					end
-					
 				else
 					instance.ativa = false
 				end
+
+				instance.modo = instance.modo or 2
 				
 				--> load data saved again
 				instance:LoadLocalInstanceConfig()
@@ -429,7 +374,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 				if (_detalhes.profile_save_pos) then
 					--print ("is profile save pos", skin.__pos.normal.x, skin.__pos.normal.y)
 					if (skin.__pos) then
-						instance.posicao = table_deepcopy (skin.__pos)
+						instance.posicao = Details.CopyTable (skin.__pos)
 					else
 						if (not instance.posicao) then
 							print ("|cFFFF2222Details!: Position for a window wasn't found! Moving it to the center of the screen.|r\nType '/details exitlog' to check for errors.")
@@ -441,7 +386,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 					end
 
 					instance.isLocked = skin.__locked
-					instance.snap = table_deepcopy (skin.__snap) or {}
+					instance.snap = Details.CopyTable (skin.__snap) or {}
 					instance.horizontalSnap = skin.__snapH
 					instance.verticalSnap = skin.__snapV
 				else
@@ -471,7 +416,6 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 				end
 				
 				instances_loaded = instances_loaded + 1
-
 			end
 			
 			--> move unused instances for unused container
@@ -562,7 +506,7 @@ function _detalhes:ApplyProfile (profile_name, nosave, is_copy)
 		_detalhes.profile_loaded = true
 	end
 
-	return true	
+	return true
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -590,7 +534,7 @@ function _detalhes:SaveProfile (saveas)
 			local current_value = _detalhes [key]
 
 			if (type (current_value) == "table") then
-				local ctable = table_deepcopy (current_value)
+				local ctable = Details.CopyTable (current_value)
 				profile [key] = ctable
 			else
 				profile [key] = current_value
@@ -604,9 +548,9 @@ function _detalhes:SaveProfile (saveas)
 			for index, instance in ipairs (_detalhes.tabela_instancias) do
 				local exported = instance:ExportSkin()
 				exported.__was_opened = instance:IsEnabled()
-				exported.__pos = table_deepcopy (instance:GetPosition())
+				exported.__pos = Details.CopyTable (instance:GetPosition())
 				exported.__locked = instance.isLocked
-				exported.__snap = table_deepcopy (instance.snap)
+				exported.__snap = Details.CopyTable (instance.snap)
 				exported.__snapH = instance.horizontalSnap
 				exported.__snapV = instance.verticalSnap
 				profile.instances [index] = exported
@@ -893,6 +837,8 @@ local default_profile = {
 			},
 		},
 
+	fade_speed = 0.15,
+
 	--> minimap
 		minimap = {hide = false, radius = 160, minimapPos = 220, onclick_what_todo = 1, text_type = 1, text_format = 3},
 		data_broker_text = "",
@@ -916,7 +862,6 @@ local default_profile = {
 		disable_stretch_button = false,
 		disable_alldisplays_window = false,
 		damage_taken_everything = false,
-		force_class_icons = false,
 	
 	--> info window
 		player_details_window = {
@@ -930,14 +875,14 @@ local default_profile = {
 		},
 		
 	--> segments
-		segments_amount = 18,
-		segments_amount_to_save = 18,
+		segments_amount = 40,
+		segments_amount_to_save = 40,
 		segments_panic_mode = false,
 		segments_auto_erase = 1,
 		
 	--> instances
 		instances_amount = 5,
-		instances_segments_locked = false,
+		instances_segments_locked = true,
 		instances_disable_bar_highlight = false,
 		instances_menu_click_to_open = false,
 		instances_no_libwindow = false,
@@ -981,7 +926,7 @@ local default_profile = {
 		memory_ram = 64,
 		remove_realm_from_name = true,
 		trash_concatenate = false,
-		trash_auto_remove = true,
+		trash_auto_remove = false,
 		world_combat_is_trash = false,
 		
 	--> death log
@@ -1027,6 +972,7 @@ local default_profile = {
 		overall_flag = 0x10,
 		overall_clear_newboss = true,
 		overall_clear_newchallenge = true,
+		overall_clear_newtorghast = true,
 		overall_clear_logout = false,
 		data_cleanup_logout = false,
 		close_shields = false,
@@ -1039,7 +985,7 @@ local default_profile = {
 	
 	--> skins
 		standard_skin = false,
-		skin = "WoW Interface",
+		skin = "Minimalistic",
 		profile_save_pos = true,
 		options_group_edit = true,
 		
@@ -1155,10 +1101,26 @@ local default_profile = {
 
 _detalhes.default_profile = default_profile
 
-
-
 -- aqui fica as propriedades do jogador que n�o ser�o armazenadas no profile
 local default_player_data = {
+		coach = {
+			enabled = false,
+			welcome_panel_pos = {},
+			last_coach_name = false,
+		},
+
+	--> ocd tracker test
+		ocd_tracker = {
+			enabled = false,
+			cooldowns = {},
+			pos = {},
+			show_conditions = {
+				only_in_group = true,
+				only_inside_instance = true,
+			},
+			show_options = false,
+			current_cooldowns = {},
+		},
 
 	--> force all fonts to have this outline
 		force_font_outline = "",
@@ -1166,6 +1128,7 @@ local default_player_data = {
 	--> current combat number
 		cached_specs = {},
 		cached_talents = {},
+		cached_roles = {},
 	
 		last_day = date ("%d"),
 	
@@ -1269,10 +1232,31 @@ local default_global_data = {
 		lastUpdateWarning = 0,
 		update_warning_timeout = 10,
 		report_where = "SAY",
-		realm_sync = true,
+		realm_sync = true, --deprecated
 		spell_school_cache = {},
 		global_plugin_database = {},
-		data_sync = false,
+		last_changelog_size = 0,
+		auto_open_news_window = true,
+		immersion_special_units = true, --show a special unit as member of your group
+		immersion_unit_special_icons = true, --custom icons for specific units
+		immersion_pets_on_solo_play = false, --pets showing when solo play
+		damage_scroll_auto_open = true,
+		damage_scroll_position = {},
+		data_wipes_exp = {
+			["9"] = false,
+			["10"] = false,
+			["11"] = false,
+			["12"] = false,
+			["13"] = false,
+			["14"] = false,
+		},
+		current_exp_raid_encounters = {},
+		
+	--> profile by spec
+		profile_by_spec = {},
+	
+	--> displays by spec
+		displays_by_spec = {},
 		
 	--> death log
 		show_totalhitdamage_on_overkill = false,
@@ -1313,7 +1297,6 @@ local default_global_data = {
 		
 	--> ilvl
 		item_level_pool = {},
-		disable_talent_feature = false,
 		
 	--> latest report
 		latest_report_table = {},
@@ -1338,6 +1321,7 @@ local default_global_data = {
 		
 	--> min health done on the death report
 		deathlog_healingdone_min = 1,
+		deathlog_healingdone_min_arena = 400,
 		
 	--> mythic plus config
 		mythic_plus = {
@@ -1393,13 +1377,19 @@ local default_global_data = {
 	
 	--> dungeon information - can be accessed by plugins and third party mods
 		dungeon_data = {},
-
-	--> mobs data
-		mobs_data = {},
-		mobs_data_compiled = {},
 	
 	--> raid information - can be accessed by plugins and third party mods
 		raid_data = {},
+
+	--> store all npcids blacklisted by the user
+		npcid_ignored = {},
+	--> store all spellids blacklisted by the user
+		spellid_ignored = {},
+
+	--> 9.0 exp (store data only used for the 9.0 expansion)
+		exp90temp = {
+			delete_damage_TCOB = true, --delete damage on the concil of blood encounter
+		},
 }
 
 _detalhes.default_global_data = default_global_data
@@ -1433,7 +1423,7 @@ function _detalhes:SaveProfileSpecial()
 			local current_value = _detalhes_database [key] or _detalhes_global [key] or _detalhes.default_player_data [key] or _detalhes.default_global_data [key]
 
 			if (type (current_value) == "table") then
-				local ctable = table_deepcopy (current_value)
+				local ctable = Details.CopyTable (current_value)
 				profile [key] = ctable
 			else
 				profile [key] = current_value
@@ -1488,17 +1478,17 @@ end
 function _detalhes:RestoreState_CurrentMythicDungeonRun()
 
 	--no need to check for mythic+ if the user is playing on classic wow
-	if (DetailsFramework.IsClassicWow()) then
+	if (DetailsFramework.IsTimewalkWoW()) then
 		return
 	end
 
 	local savedTable = _detalhes.mythic_dungeon_currentsaved
 	local mythicLevel = C_ChallengeMode.GetActiveKeystoneInfo()
 	local zoneName, _, _, _, _, _, _, currentZoneID = GetInstanceInfo()
-	
 	local mapID =  C_Map.GetBestMapForUnit ("player")
 	
 	if (not mapID) then
+		--print("D! no mapID to restored mythic dungeon state.")
 		return
 	end
 	
@@ -1525,16 +1515,24 @@ function _detalhes:RestoreState_CurrentMythicDungeonRun()
 				_detalhes.MythicPlus.PreviousBossKilledAt = savedTable.previous_boss_killed_at
 				_detalhes.MythicPlus.IsRestoredState = true
 				DetailsMythicPlusFrame.IsDoingMythicDungeon = true
+
+				print("D! (debug) mythic dungeon state restored.")
 				
 				C_Timer.After (2, function()
 					_detalhes:SendEvent ("COMBAT_MYTHICDUNGEON_START")
 				end)
 				return
+			else
+				print("D! (debug) mythic level isn't equal.", mythicLevel, savedTable.level)
 			end
+		else
+			print("D! (debug) zone name or zone Id isn't the same:", zoneName, savedTable.dungeon_name, currentZoneID, savedTable.dungeon_zone_id)
 		end
 		
 		--> mythic run is over
 		savedTable.started = false
+	else
+		--print("D! savedTable.stated isn't true.")
 	end
 end
 
@@ -1706,10 +1704,29 @@ function Details:ImportProfile (profileString, newProfileName)
 				end
 			end
 		end
-		
+
+		--profile imported, set mythic dungeon to default settings
+		local mythicPlusSettings = Details.mythic_plus
+		mythicPlusSettings.always_in_combat = false
+		mythicPlusSettings.merge_boss_trash = true
+		mythicPlusSettings.delete_trash_after_merge = true
+		mythicPlusSettings.boss_dedicated_segment = true
+		mythicPlusSettings.make_overall_when_done = true
+		mythicPlusSettings.make_overall_boss_only = false
+		mythicPlusSettings.show_damage_graphic = true
+		mythicPlusSettings.delay_to_show_graphic = 5
+		mythicPlusSettings.last_mythicrun_chart = {}
+		mythicPlusSettings.mythicrun_chart_frame = {}
+		mythicPlusSettings.mythicrun_chart_frame_minimized = {}
+		mythicPlusSettings.mythicrun_chart_frame_ready = {}
+
+		--make the max amount of segments be 30
+		Details.segments_amount = 40
+		Details.segments_amount_to_save = 40
+
 		--transfer instance data to the new created profile
 		profileObject.instances = DetailsFramework.table.copy ({}, profileData.instances)
-		
+
 		Details:ApplyProfile (newProfileName)
 		
 		Details:Msg ("profile successfully imported.")--localize-me

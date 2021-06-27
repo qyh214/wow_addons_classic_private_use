@@ -2,7 +2,7 @@
 -- Diablohu(diablohudream@gmail.com)
 -- yleaf(yaroot@gmail.com)
 -- Mini Dragon(projecteurs@gmail.com)
--- Last update: 2020/06/08 （重新整理）
+-- Last update: 2020/09/10 （重新整理）
 
 if GetLocale() ~= "zhCN" then return end
 
@@ -43,7 +43,7 @@ L.LOOT_SPEC_REMINDER			= "你当前的人物专精为 %s。你当前的拾取选
 
 L.BIGWIGS_ICON_CONFLICT		    = L.DBM .. "检测到你同时开启了Bigwigs,请关闭自动标记以避免冲突。"
 
-L.MOD_AVAILABLE				    = L.DBM .. "已经为%s制作了相关模块。你可以在Curse/Twitch和WoWI 上找到下载。"
+L.MOD_AVAILABLE				    = L.DBM .. "已经为%s制作了相关模块。你可以在Curse和WoWI 上找到下载。"
 
 L.COMBAT_STARTED				= "%s作战开始，祝你走运 :)"
 L.COMBAT_STARTED_IN_PROGRESS	= "已进行的战斗-%s正在作战。祝你走运 :)"
@@ -89,6 +89,7 @@ L.MPROFILE_DELETE_SELF_ERROR	= "无法删除一个正在使用的模块配置文
 L.MPROFILE_DELETE_S_ERROR	    = "删除的源出错. 配置文件可能被篡改."
 
 L.NOTE_SHARE_SUCCESS			= "%s向你分享了他的%s的自定义注记"
+L.NOTE_SHARE_LINK				= "点击这里打开注记"
 L.NOTE_SHARE_FAIL			    = "%s想向你分享他的%s的自定义注记，但是相关的副本模块并没有被安装或被加载。如果你需要这个注记，请确保相关模块被正确加载，然后请小伙伴再向你分享一次。"
 
 L.NOTEHEADER					= "在此输入你针对%s的注记。在 >< 中插入玩家名字会被按职业着色。例子:'我种>下一棵<种子'。这个牧师会被染色成白色。多字符串请用 / 隔开。"
@@ -157,23 +158,20 @@ L.VERSIONCHECK_ENTRY_TWO	        = "%s: %s (r%d) & %s (r%d)"--Two Boss mods
 L.VERSIONCHECK_ENTRY_NO_DBM	        = "%s：未安装" .. L.DEADLY_BOSS_MODS
 L.VERSIONCHECK_FOOTER		        = "团队中有%d名成员正在使用" .. L.DEADLY_BOSS_MODS .. "， %d名成员正在使用Bigwigs"
 L.VERSIONCHECK_OUTDATED		        = "下列%d名玩家的" .. L.DEADLY_BOSS_MODS .. "版本已经过期:%s"
-L.YOUR_VERSION_OUTDATED		        = "你的" .. L.DEADLY_BOSS_MODS .. "已经过期。请访问Curse/Twitch，WoWI或者到GitHub Releases页面下载最新版本。"
+L.YOUR_VERSION_OUTDATED		        = "你的" .. L.DEADLY_BOSS_MODS .. "已经过期。请访问Curse，WoWI或者到GitHub Releases页面下载最新版本。"
 L.VOICE_PACK_OUTDATED		        = "你当前使用的" .. L.DEADLY_BOSS_MODS .. "语音包已经过期。有些特殊警告的屏蔽（当心，毁灭）已被禁用。请下载最新语音包，或联系语音包作者更新。"
 L.VOICE_MISSING				        =  L.DBM .. "找不到你当前选择的语音包。语音包选项已经被设置成'None'。请确保你的语音包被正确安装和启用。"
 L.VOICE_DISABLED			        = "你安装了语音包但是没有启动它。请在选项中的语音报警菜单中开启语音包。如果不需要语音报警请卸载语音包。"
 L.VOICE_COUNT_MISSING		        = "在 %d 语音包中找不到倒计时语音。倒计时已恢复为默认值"
 L.BIG_WIGS					        = "BigWigs"
 
-L.UPDATEREMINDER_HEADER			    = "您的" .. L.DEADLY_BOSS_MODS .. "版本已过期。\n您可以在Curse/Twitch, WOWI, 或者GitHub Releases页面下载到新版本：%s（%s）。如果您使用整合包，请使用更新器更新。"
-L.UPDATEREMINDER_HEADER_ALPHA	    = "您正在使用Alpha的" .. L.DEADLY_BOSS_MODS .. " 的版本已至少落后主干%d个版本。\n 我们建议使用Alpha版本的用户时刻追随主干更新，否则请切换到正式发行版。Alpha版的版本检查会比正式发行版严格。"
+L.UPDATEREMINDER_HEADER			    = "您的" .. L.DEADLY_BOSS_MODS .. "版本已过期。\n您可以在Curse, WOWI, 或者GitHub Releases页面下载到新版本：%s（%s）。如果您使用整合包，请使用更新器更新。"
 L.UPDATEREMINDER_FOOTER			    = "按下 " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  "复制下载地址到剪切板。"
 L.UPDATEREMINDER_FOOTER_GENERIC	    = "按下 " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  "复制链接到剪切板。"
 L.UPDATEREMINDER_DISABLE			= "警告：你的" .. L.DEADLY_BOSS_MODS .. "已经过期太久，它已被强制禁用，直到你更新。这是为了确保它不会导致你或其他团队成员出错。"
---L.UPDATEREMINDER_NODISABLE		    = "警告：你的" .. L.DEADLY_BOSS_MODS .. "已经过期太久，此消息过了某些指标后不能被禁用，直到你更新。"
 L.UPDATEREMINDER_HOTFIX			    = "你的" .. L.DEADLY_BOSS_MODS .. "版本会在这首领战斗中有问题。最新版的" .. L.DBM .. "已经修复了这个问题。"
 L.UPDATEREMINDER_HOTFIX_ALPHA	    = "你的" .. L.DEADLY_BOSS_MODS .. "版本会在这首领战斗中有问题。最新版的" .. L.DBM .. "（或Alpha版本）已经修复了这个问题。"
 L.UPDATEREMINDER_MAJORPATCH		    = "你的" .. L.DEADLY_BOSS_MODS .. "已经过期,它已被禁用,直到你更新.这是为了确保它不会导致你或其他团队成员出错.这次更新是一个非常重要的补丁,请确保你得到的是最新版."
-L.UPDATEREMINDER_TESTVERSION		= "警告：你使用了不正确版本的" .. L.DEADLY_BOSS_MODS .. "。请确保" .. L.DBM .. "版本和游戏版本一致。"
 L.VEM							    = "你好像在使用VEM。" .. L.DEADLY_BOSS_MODS .. "在这种情况下无法被载入。"
 L.OUTDATEDPROFILES					= "警告: DBM-Profiles已经无法和本版本" .. L.DBM .. "兼容。" .. L.DEADLY_BOSS_MODS .. "核心已经自带配置文件管理系统，请移除DBM-Profiles避免冲突。"
 L.OUTDATEDSPELLTIMERS				= "警告: DBM-SpellTimers 干扰到 " .. L.DBM .. "。 DBM-SpellTimers 不再得到支持，必须将其删除。 " .. L.DBM .. " 才能正常运行。"
@@ -181,7 +179,7 @@ L.OUTDATEDRLT						= "警告: DBM-RaidLeadTools 干扰到 " .. L.DBM .. "。 DBM
 L.DPMCORE						    = "警告: DBM-PVP已经已经很久没人维护了,并无法兼容。请移除DBM-PVP避免冲突。"
 L.DBMLDB							= "警告: DBM-LDB 已经集成入" .. L.DEADLY_BOSS_MODS .. "核心。建议在插件目录删掉'DBM-LDB'。"
 L.UPDATE_REQUIRES_RELAUNCH		    = "警告: 如果你不完全重启游戏，" .. L.DEADLY_BOSS_MODS .. "可能会工作不正常。此次更新包含了新的文件，或者toc文件的改变，这是重载界面无法加载的。不重启游戏可能导致作战模块功能错误。"
-L.OUT_OF_DATE_NAG				    = "你的" .. L.DEADLY_BOSS_MODS .. "已经过期并且你决定不弹出升级提示窗口。这可能导致你或其他团队成员出错。千万不要成为害群之马！"
+L.OUT_OF_DATE_NAG				    = "你的" .. L.DBM .. "版本已经过期，新版本针对特定的首领战斗增加新的功能和错误的修复。建议您进行更新来改善您的游戏体验。"
 L.CLASSIC_ONLY						= "警告: 你所用的 " .. L.DBM .. " 是正式服的版本，请删除这个，去下载怀旧服使用的 " .. L.DBM .. " 版本。"
 
 L.MOVABLE_BAR				        = "拖动我！"
@@ -618,17 +616,6 @@ L.SILENTMODE_IS					= "静音模式为："
 
 L.LDB_LOAD_MODS		            = "载入首领模块"
 
-L.LDB_CAT_BFA					= "争霸艾泽拉斯"
-L.LDB_CAT_LEG					= "军团再临"
-L.LDB_CAT_WOD					= "德拉诺之王"
-L.LDB_CAT_MOP					= "熊猫人之谜"
-L.LDB_CAT_CATA					= "大地的裂变"
-L.LDB_CAT_WOTLK					= "巫妖王之怒"
-L.LDB_CAT_BC					= "燃烧的远征"
-L.LDB_CAT_CLASSIC 				= "经典"
-L.LDB_CAT_OTHER		            = "其他首领"
-
-L.LDB_CAT_GENERAL		        = "常规"
 L.LDB_ENABLE_BOSS_MOD	        = "启用首领模块"
 --首领喊话应该没错吧-Localizers, do not copy entire table, follow same guidelines as other tables, overwrite each entry with L.WORLD_BUFFS.hordeOny = "stuff" for example.
 

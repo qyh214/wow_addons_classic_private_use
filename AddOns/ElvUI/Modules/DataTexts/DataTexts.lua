@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 local TT = E:GetModule('Tooltip')
 local LDB = E.Libs.LDB
@@ -29,6 +29,7 @@ DT.SelectedDatatext = nil
 DT.HyperList = HyperList
 DT.RegisteredPanels = {}
 DT.RegisteredDataTexts = {}
+DT.DataTextList = {}
 DT.LoadedInfo = {}
 DT.PanelPool = {
 	InUse = {},
@@ -60,7 +61,7 @@ function DT:SetEasyMenuAnchor(menu, dt)
 end
 
 --> [HyperDT Credits] <--
---> Original Work: NihilisticPandemonium
+--> Original Work: Nihilistzsche
 --> Modified by Azilroka! :)
 
 function DT:SingleHyperMode(_, key, active)
@@ -194,13 +195,13 @@ function DT:ReleasePanel(givenName)
 	end
 end
 
-function DT:BuildPanelFrame(name, db, fromInit)
-	db = db or E.global.datatexts.customPanels[name] or DT:Panel_DefaultGlobalSettings(name)
+function DT:BuildPanelFrame(name, fromInit)
+	local db = DT:GetPanelSettings(name)
 
 	local Panel = DT:FetchFrame(name)
 	Panel:ClearAllPoints()
-	Panel:Point('CENTER')
-	Panel:Size(db.width, db.height)
+	Panel:SetPoint('CENTER')
+	Panel:SetSize(db.width, db.height)
 
 	local MoverName = 'DTPanel'..name..'Mover'
 	Panel.moverName = MoverName
@@ -210,7 +211,7 @@ function DT:BuildPanelFrame(name, db, fromInit)
 	if holder then
 		E:SetMoverPoints(MoverName, Panel)
 	else
-		E:CreateMover(Panel, MoverName, name, nil, nil, nil, nil, nil, 'general,solo')
+		E:CreateMover(Panel, MoverName, name, nil, nil, nil, nil, nil, 'datatexts,panels')
 	end
 
 	DT:RegisterPanel(Panel, db.numPoints, db.tooltipAnchor, db.tooltipXOffset, db.tooltipYOffset, db.growth == 'VERTICAL')
@@ -330,10 +331,16 @@ function DT:RegisterPanel(panel, numPoints, anchor, xOff, yOff, vertical)
 	panel.vertical = vertical
 end
 
-function DT:Panel_DefaultGlobalSettings(name)
+function DT:GetPanelSettings(name)
 	local db = E:CopyTable({}, G.datatexts.newPanelInfo)
 
-	E.global.datatexts.customPanels[name] = db
+	local customPanels = E.global.datatexts.customPanels
+	local customPanel = customPanels[name]
+	if customPanel then
+		db = E:CopyTable(db, customPanel)
+	end
+
+	customPanels[name] = db
 
 	return db
 end
@@ -370,7 +377,6 @@ function DT:AssignPanelToDataText(dt, data, event, ...)
 		if not data.objectEvent then
 			dt:SetScript('OnEvent', data.eventFunc)
 		end
-
 		data.eventFunc(dt, ev, ...)
 	end
 
@@ -419,26 +425,6 @@ function DT:GetTextAttributes(panel, db)
 	return width, height, vertical, numPoints
 end
 
--- this is used to make texts show on init load, when the font was added after elvui but registers
--- during the load screen, for some reason blizzard doesnt render the font unless we change the
--- text after the first frame? its probably related to the texture not inheriting alpha problem.
--- also, this seems to be a problem with SetJustifyH not triggering a rerender too. ~Simpy
-local RerenderFont = function(fs)
-	local text = fs:GetText()
-	fs:SetText('\10')
-	fs:SetText(text)
-end
-
-local FixFonts = CreateFrame('Frame')
-FixFonts:Hide()
-FixFonts:SetScript('OnUpdate', function(self)
-	for fs in pairs(DT.FontStrings) do
-		RerenderFont(fs)
-	end
-
-	self:Hide()
-end)
-
 function DT:UpdatePanelInfo(panelName, panel, ...)
 	if not panel then panel = DT.RegisteredPanels[panelName] end
 	local db = panel.db or P.datatexts.panels[panelName] and DT.db.panels[panelName]
@@ -486,15 +472,24 @@ function DT:UpdatePanelInfo(panelName, panel, ...)
 		end
 	end
 
+	--Note: some plugins dont have db.border, we need the nil checks
+	panel.forcedBorderColors = (db.border == false and {0,0,0,0}) or nil
 	panel:SetTemplate(db.backdrop and (db.panelTransparency and 'Transparent' or 'Default') or 'NoBackdrop', true)
+
+	--Show Border option
+	if db.border ~= nil then
+		if panel.iborder then panel.iborder:SetShown(db.border) end
+		if panel.oborder then panel.oborder:SetShown(db.border) end
+	end
 
 	--Restore Panels
 	for i, dt in ipairs(panel.dataPanels) do
 		dt:SetShown(i <= numPoints)
-		dt:Size(width, height)
+		dt:SetSize(width, height)
 		dt:ClearAllPoints()
-		dt:Point(DT:GetDataPanelPoint(panel, i, numPoints, vertical))
+		dt:SetPoint(DT:GetDataPanelPoint(panel, i, numPoints, vertical))
 		dt:UnregisterAllEvents()
+		dt:EnableMouseWheel(false)
 		dt:SetScript('OnUpdate', nil)
 		dt:SetScript('OnEvent', nil)
 		dt:SetScript('OnClick', nil)
@@ -520,7 +515,7 @@ function DT:UpdatePanelInfo(panelName, panel, ...)
 		dt.text:FontTemplate(font, fontSize, fontOutline)
 		dt.text:SetJustifyH(db.textJustify or 'CENTER')
 		dt.text:SetWordWrap(DT.db.wordWrap)
-		RerenderFont(dt.text) -- SetJustifyH wont update without a rerender?
+		dt.text:SetText()
 
 		if battlePanel then
 			dt:SetScript('OnClick', DT.ToggleBattleStats)
@@ -537,7 +532,7 @@ function DT:LoadDataTexts(...)
 	local data = DT.LoadedInfo
 	data.font, data.fontSize, data.fontOutline = LSM:Fetch('font', DT.db.font), DT.db.fontSize, DT.db.fontOutline
 	data.inInstance, data.instanceType = IsInInstance()
-	data.isInBattle = data.inInstance and (data.instanceType == 'pvp' or data.instanceType == 'arena')
+	data.isInBattle = data.inInstance and data.instanceType == 'pvp'
 
 	for panel, db in pairs(E.global.datatexts.customPanels) do
 		DT:UpdatePanelAttributes(panel, db, true)
@@ -561,9 +556,9 @@ function DT:PanelSizeChanged()
 	local width, height, vertical, numPoints = DT:GetTextAttributes(self, db)
 
 	for i, dt in ipairs(self.dataPanels) do
-		dt:Size(width, height)
+		dt:SetSize(width, height)
 		dt:ClearAllPoints()
-		dt:Point(DT:GetDataPanelPoint(self, i, numPoints, vertical))
+		dt:SetPoint(DT:GetDataPanelPoint(self, i, numPoints, vertical))
 	end
 end
 
@@ -578,17 +573,17 @@ function DT:UpdatePanelAttributes(name, db, fromLoad)
 	Panel.yOff = db.tooltipYOffset
 	Panel.anchor = db.tooltipAnchor
 	Panel.vertical = db.growth == 'VERTICAL'
-	Panel:Size(db.width, db.height)
+	Panel:SetSize(db.width, db.height)
 	Panel:SetFrameStrata(db.frameStrata)
 	Panel:SetFrameLevel(db.frameLevel)
 
 	E:UIFrameFadeIn(Panel, 0.2, Panel:GetAlpha(), db.mouseover and 0 or 1)
 
-	if not DT.db.panels[name] then
+	if not DT.db.panels[name] or type(DT.db.panels[name]) ~= 'table' then
 		DT.db.panels[name] = { enable = false }
 	end
 
-	for i = 1, E.global.datatexts.customPanels[name].numPoints do
+	for i = 1, (E.global.datatexts.customPanels[name].numPoints or 1) do
 		if not DT.db.panels[name][i] then
 			DT.db.panels[name][i] = ''
 		end
@@ -669,12 +664,8 @@ function DT:RegisterHyperDT()
 	DT:RegisterEvent('MODIFIER_STATE_CHANGED', 'SingleHyperMode')
 end
 
-function DT:PLAYER_ENTERING_WORLD(_, initLogin)
+function DT:PLAYER_ENTERING_WORLD()
 	DT:LoadDataTexts()
-
-	if initLogin then
-		FixFonts:Show()
-	end
 end
 
 function DT:Initialize()
@@ -698,10 +689,12 @@ function DT:Initialize()
 		return dt and (DT.db.panels[dt.parentName] and DT.db.panels[dt.parentName][dt.pointIndex] == value)
 	end
 
-	TT:HookScript(DT.tooltip, 'OnShow', 'SetStyle')
+	if E.private.skins.blizzard.enable and E.private.skins.blizzard.tooltip then
+		TT:HookScript(DT.tooltip, 'OnShow', 'SetStyle')
+	end
 
 	-- Ignore header font size on DatatextTooltip
-	local font = E.Libs.LSM:Fetch('font', E.db.tooltip.font)
+	local font = LSM:Fetch('font', E.db.tooltip.font)
 	local fontOutline = E.db.tooltip.fontOutline
 	local textSize = E.db.tooltip.textFontSize
 	_G.DataTextTooltipTextLeft1:FontTemplate(font, textSize, fontOutline)
@@ -710,8 +703,8 @@ function DT:Initialize()
 	LDB.RegisterCallback(E, 'LibDataBroker_DataObjectCreated', DT.SetupObjectLDB)
 	DT:RegisterLDB() -- LibDataBroker
 
-	for name, db in pairs(E.global.datatexts.customPanels) do
-		DT:BuildPanelFrame(name, db, true)
+	for name in pairs(E.global.datatexts.customPanels) do
+		DT:BuildPanelFrame(name, true)
 	end
 
 	do -- we need to register the panels to access them for the text
@@ -777,6 +770,7 @@ function DT:RegisterDatatext(name, category, events, eventFunc, updateFunc, clic
 	end
 
 	DT.RegisteredDataTexts[name] = data
+	DT.DataTextList[name] = localizedName or name
 
 	return data
 end

@@ -1,6 +1,6 @@
 local L = DBM_GUI_L
 
-local pairs, next, type, ipairs, setmetatable, mmax = pairs, next, type, ipairs, setmetatable, math.max
+local pairs, next, type, ipairs, setmetatable, mfloor, mmax = pairs, next, type, ipairs, setmetatable, math.floor, math.max
 local CreateFrame, GameFontNormalSmall = CreateFrame, GameFontNormalSmall
 local DBM = DBM
 
@@ -13,18 +13,23 @@ function OptionsList_OnLoad(self, ...)
 	end
 end
 
-local tabFrame1 = CreateFrame("Frame", "DBM_GUI_DropDown", _G["DBM_GUI_OptionsFrame"], "OptionsFrameListTemplate")
+local tabFrame1 = CreateFrame("Frame", "DBM_GUI_DropDown", _G["DBM_GUI_OptionsFrame"], DBM:IsShadowlands() and "BackdropTemplate,OptionsFrameListTemplate" or "OptionsFrameListTemplate")
 tabFrame1:Hide()
 tabFrame1:SetFrameStrata("TOOLTIP")
 tabFrame1.offset = 0
-tabFrame1:SetBackdrop({
+tabFrame1.backdropInfo = {
 	bgFile		= "Interface\\ChatFrame\\ChatFrameBackground", -- 130937
 	edgeFile	= "Interface\\Tooltips\\UI-Tooltip-Border", -- 137057
 	tile		= true,
 	tileSize	= 16,
 	edgeSize	= 16,
 	insets		= { left = 3, right = 3, top = 5, bottom = 3 }
-})
+}
+if not DBM:IsShadowlands() then
+	tabFrame1:SetBackdrop(tabFrame1.backdropInfo)
+else
+	tabFrame1:ApplyBackdrop()
+end
 tabFrame1:SetBackdropColor(0.1, 0.1, 0.1, 0.6)
 tabFrame1:SetBackdropBorderColor(0.4, 0.4, 0.4)
 
@@ -35,34 +40,37 @@ tabFrame1List:SetScript("OnVerticalScroll", function(self, offset)
 	scrollbar:SetValue(offset)
 	_G[self:GetName() .. "ScrollBarScrollUpButton"]:SetEnabled(offset ~= 0)
 	_G[self:GetName() .. "ScrollBarScrollDownButton"]:SetEnabled(scrollbar:GetValue() - max ~= 0)
-	tabFrame1.offset = math.floor((offset / 16) + 0.5)
+	tabFrame1.offset = mfloor(offset)
 	tabFrame1:Refresh()
 end)
+if DBM:IsShadowlands() then
+	Mixin(tabFrame1List, BackdropTemplateMixin)
+end
 tabFrame1List:SetBackdropBorderColor(0.6, 0.6, 0.6, 0.6)
 
 local tabFrame1ScrollBar = _G[tabFrame1List:GetName() .. "ScrollBar"]
 tabFrame1ScrollBar:SetMinMaxValues(0, 11)
-tabFrame1ScrollBar:SetValueStep(16)
+tabFrame1ScrollBar:SetValueStep(1)
 tabFrame1ScrollBar:SetValue(0)
 
 local scrollUpButton = _G[tabFrame1ScrollBar:GetName() .. "ScrollUpButton"]
 scrollUpButton:SetSize(12, 12)
 scrollUpButton:Disable()
 scrollUpButton:SetScript("OnClick", function(self)
-	self:GetParent():SetValue(self:GetParent():GetValue() - 16)
+	self:GetParent():SetValue(self:GetParent():GetValue() - 1)
 end)
 local scrollDownButton = _G[tabFrame1ScrollBar:GetName() .. "ScrollDownButton"]
 scrollDownButton:SetSize(12, 12)
 scrollDownButton:Enable()
 scrollDownButton:SetScript("OnClick", function(self)
-	self:GetParent():SetValue(self:GetParent():GetValue() + 16)
+	self:GetParent():SetValue(self:GetParent():GetValue() + 1)
 end)
 
 _G[tabFrame1ScrollBar:GetName() .. "ThumbTexture"]:SetSize(12, 16)
 
 tabFrame1:EnableMouseWheel(true)
 tabFrame1:SetScript("OnMouseWheel", function(_, delta)
-	tabFrame1ScrollBar:SetValue(tabFrame1ScrollBar:GetValue() - (delta * 16))
+	tabFrame1ScrollBar:SetValue(tabFrame1ScrollBar:GetValue() - delta)
 end)
 
 local ClickFrame = CreateFrame("Button", nil, UIParent)
@@ -78,7 +86,7 @@ end)
 
 tabFrame1.buttons = {}
 for i = 1, 10 do
-	local button = CreateFrame("Button", tabFrame1:GetName() .. "Button" .. i, tabFrame1, "UIDropDownMenuButtonTemplate")
+	local button = CreateFrame("Button", tabFrame1:GetName() .. "Button" .. i, tabFrame1, DBM:IsShadowlands() and "BackdropTemplate,UIDropDownMenuButtonTemplate" or "UIDropDownMenuButtonTemplate")
 	_G[button:GetName() .. "Check"]:Hide()
 	_G[button:GetName() .. "UnCheck"]:Hide()
 	button:SetFrameLevel(tabFrame1ScrollBar:GetFrameLevel() - 1)
@@ -112,7 +120,11 @@ for i = 1, 10 do
 		_G[self:GetName() .. "NormalText"]:SetFont(defaultFont, defaultFontSize)
 		self:SetHeight(0)
 		self:SetText("")
-		self:SetBackdrop(nil)
+		if DBM:IsShadowlands() then
+			self:ClearBackdrop()
+		else
+			self:SetBackdrop(nil)
+		end
 	end
 	tabFrame1.buttons[i] = button
 end
@@ -126,9 +138,14 @@ function tabFrame1:ShowMenu()
 			button:SetText((entry.value == self.dropdown.value and "|TInterface\\Buttons\\UI-CheckBox-Check:0|t" or "   ") .. entry.text)
 			button.entry = entry
 			if entry.texture then
-				button:SetBackdrop({
+				button.backdropInfo = {
 					bgFile	= entry.value
-				})
+				}
+				if DBM:IsShadowlands() then
+					button:ApplyBackdrop()
+				else
+					button:SetBackdrop(button.backdropInfo)
+				end
 			end
 		end
 	end
@@ -164,7 +181,7 @@ function tabFrame1:Refresh()
 	self:SetHeight(#self.buttons * 16 + 8)
 	if #self.dropdown.values > #self.buttons then
 		tabFrame1List:Show()
-		tabFrame1ScrollBar:SetMinMaxValues(0, valuesWOButtons * 16)
+		tabFrame1ScrollBar:SetMinMaxValues(0, valuesWOButtons)
 	else
 		if #self.dropdown.values < #self.buttons then
 			tabFrame1List:Hide()
@@ -211,7 +228,7 @@ function DBM_GUI:CreateDropdown(title, values, vartype, var, callfunc, width, he
 	local dropdownText = _G[dropdown:GetName() .. "Text"]
 	if not width then
 		width = 120
-		if title ~= L.Warn_FontType and title ~= L.Warn_FontStyle and title ~= L.Bar_Font then
+		if title ~= L.FontType and title ~= L.FontStyle and title ~= L.FontShadow then
 			for _, v in ipairs(values) do
 				dropdownText:SetText(v.text)
 				width = mmax(width, dropdownText:GetStringWidth())
@@ -250,7 +267,7 @@ function DBM_GUI:CreateDropdown(title, values, vartype, var, callfunc, width, he
 		end)
 	elseif vartype and vartype == "DBT" then
 		dropdown:SetScript("OnShow", function()
-			dropdown:SetSelectedValue(DBM.Bars:GetOption(var))
+			dropdown:SetSelectedValue(DBT.Options[var])
 		end)
 	elseif vartype then
 		dropdown:SetScript("OnShow", function()

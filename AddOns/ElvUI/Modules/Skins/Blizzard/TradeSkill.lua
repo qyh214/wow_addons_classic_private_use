@@ -1,12 +1,9 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local strfind = strfind
 local unpack, select = unpack, select
---WoW API / Variables
 local GetItemInfo = GetItemInfo
 local GetTradeSkillNumReagents = GetTradeSkillNumReagents
 local GetTradeSkillInfo = GetTradeSkillInfo
@@ -181,4 +178,3 @@ function S:Blizzard_TradeSkillUI()
 end
 
 S:AddCallbackForAddon('Blizzard_TradeSkillUI')
-

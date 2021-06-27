@@ -27,16 +27,16 @@ At least one of the above widgets must be present for the element to work.
 .['growth-y']       - Vertical growth direction. Defaults to 'UP' (string)
 .initialAnchor      - Anchor point for the icons. Defaults to 'BOTTOMLEFT' (string)
 .filter             - Custom filter list for auras to display. Defaults to 'HELPFUL' for buffs and 'HARMFUL' for
-					  debuffs (string)
+                      debuffs (string)
 .tooltipAnchor      - Anchor point for the tooltip. Defaults to 'ANCHOR_BOTTOMRIGHT', however, if a frame has anchoring
-					  restrictions it will be set to 'ANCHOR_CURSOR' (string)
+                      restrictions it will be set to 'ANCHOR_CURSOR' (string)
 
 ## Options Auras
 
 .numBuffs     - The maximum number of buffs to display. Defaults to 32 (number)
 .numDebuffs   - The maximum number of debuffs to display. Defaults to 40 (number)
 .numTotal     - The maximum number of auras to display. Prioritizes buffs over debuffs. Defaults to the sum of
-				.numBuffs and .numDebuffs (number)
+                .numBuffs and .numDebuffs (number)
 .gap          - Controls the creation of an invisible icon between buffs and debuffs. Defaults to false (boolean)
 .buffFilter   - Custom filter list for buffs to display. Takes priority over `filter` (string)
 .debuffFilter - Custom filter list for debuffs to display. Takes priority over `filter` (string)
@@ -58,13 +58,13 @@ button.isPlayer - indicates if the aura caster is the player or their vehicle (b
 
 ## Examples
 
-	-- Position and size
-	local Buffs = CreateFrame('Frame', nil, self)
-	Buffs:SetPoint('RIGHT', self, 'LEFT')
-	Buffs:SetSize(16 * 2, 16 * 16)
+    -- Position and size
+    local Buffs = CreateFrame('Frame', nil, self)
+    Buffs:SetPoint('RIGHT', self, 'LEFT')
+    Buffs:SetSize(16 * 2, 16 * 16)
 
-	-- Register with oUF
-	self.Buffs = Buffs
+    -- Register with oUF
+    self.Buffs = Buffs
 --]]
 
 local _, ns = ...
@@ -75,6 +75,7 @@ local HIDDEN = 0
 
 -- ElvUI changed block
 local CREATED = 2
+
 local pcall = pcall
 local tinsert = tinsert
 local CreateFrame = CreateFrame
@@ -82,32 +83,34 @@ local GetSpellInfo = GetSpellInfo
 local UnitAura = UnitAura
 local UnitIsUnit = UnitIsUnit
 local GameTooltip = GameTooltip
-local UnitIsEnemy = UnitIsEnemy
 local floor, min = math.floor, math.min
-local LCD = LibStub('LibClassicDurations', true)
-local myClass = select(2, UnitClass('player'))
-
--- GLOBALS: GameTooltip
 -- end block
 
+-- ElvUI adds IsForbidden checks
 local function UpdateTooltip(self)
-	if GameTooltip:IsForbidden() then return end
+	if(GameTooltip:IsForbidden()) then return end
+
 	GameTooltip:SetUnitAura(self:GetParent().__owner.unit, self:GetID(), self.filter)
 end
 
 local function onEnter(self)
-	if GameTooltip:IsForbidden() or not self:IsVisible() then return end
-	GameTooltip:SetOwner(self, self:GetParent().tooltipAnchor)
+	if(GameTooltip:IsForbidden() or not self:IsVisible()) then return end
+
+	-- Avoid parenting GameTooltip to frames with anchoring restrictions,
+	-- otherwise it'll inherit said restrictions which will cause issues with
+	-- its further positioning, clamping, etc
+	GameTooltip:SetOwner(self, self:GetParent().__restricted and 'ANCHOR_CURSOR' or self:GetParent().tooltipAnchor)
 	self:UpdateTooltip()
 end
 
 local function onLeave()
-	if GameTooltip:IsForbidden() then return end
+	if(GameTooltip:IsForbidden()) then return end
+
 	GameTooltip:Hide()
 end
 
 local function createAuraIcon(element, index)
-	local button = CreateFrame('Button', element:GetName() .. 'Button' .. index, element)
+	local button = CreateFrame('Button', element:GetName() .. 'Button' .. index, element, "BackdropTemplate")
 	button:RegisterForClicks('RightButtonUp')
 
 	local cd = CreateFrame('Cooldown', '$parentCooldown', button, 'CooldownFrameTemplate')
@@ -162,30 +165,21 @@ local function customFilter(element, unit, button, name)
 end
 
 local function updateIcon(element, unit, index, offset, filter, isDebuff, visible)
-	local name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3
+	local name, texture, count, debuffType, duration, expiration, caster, isStealable,
+		nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll,
+		timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
 
-	if LCD and not UnitIsUnit('player', unit) then
-		local durationNew, expirationTimeNew
-		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = LCD:UnitAura(unit, index, filter)
-
-		if spellID then
-			durationNew, expirationTimeNew = LCD:GetAuraDurationByUnit(unit, spellID, caster, name)
-		end
-
-		if durationNew and durationNew > 0 then
-			duration, expiration = durationNew, expirationTimeNew
-		end
-	else
-		name, texture, count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, spellID, canApply, isBossDebuff, casterIsPlayer, nameplateShowAll, timeMod, effect1, effect2, effect3 = UnitAura(unit, index, filter)
-	end
-
-	-- ElvUI block
+	-- ElvUI changed block
 	if element.forceShow or element.forceCreate then
-		spellID = 9853
+		spellID = 5782
 		name, _, texture = GetSpellInfo(spellID)
 		if element.forceShow then
 			count, debuffType, duration, expiration, caster, isStealable, nameplateShowSelf, isBossDebuff = 5, "Magic", 0, 60, "player", nil, nil, nil
 		end
+	end
+
+	if isStealable then
+		element.hasStealable = true -- for Style Filters
 	end
 	-- end Block
 
@@ -241,7 +235,7 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 			-- object to this point, but I think that will just make things needlessly
 			-- complicated.
 			if(button.cd and not element.disableCooldown) then
-				if (expiration and expiration > 0) and (duration and duration > 0) then
+				if(duration and duration > 0) then
 					button.cd:SetCooldown(expiration - duration, duration)
 					button.cd:Show()
 				else
@@ -340,9 +334,9 @@ local function filterIcons(element, unit, filter, limit, isDebuff, offset, dontH
 	local index = 1
 	local visible = 0
 	local hidden = 0
-	-- ElvUI changed block
-	local created = 0
-	-- end block
+	local created = 0 -- ElvUI
+	element.hasStealable = nil -- ElvUI
+
 	while(visible < limit) do
 		local result = updateIcon(element, unit, index, offset, filter, isDebuff, visible)
 		if(not result) then
@@ -361,9 +355,7 @@ local function filterIcons(element, unit, filter, limit, isDebuff, offset, dontH
 		index = index + 1
 	end
 
-	-- ElvUI changed block
-	visible = visible - created
-	-- end block
+	visible = visible - created -- ElvUI changed
 
 	if(not dontHide) then
 		for i = visible + offset + 1, #element do
@@ -523,26 +515,14 @@ end
 local function Update(self, event, unit)
 	if (self.isForced and event ~= 'ElvUI_UpdateAllElements') or (self.unit ~= unit) then return end -- ElvUI changed
 
-	UpdateAuras(self, event, unit)
-
-	-- Assume no event means someone wants to re-anchor things. This is usually
-	-- done by UpdateAllElements and :ForceUpdate.
-	if(event == 'ForceUpdate' or not event) then
-		local buffs = self.Buffs
-		if(buffs) then
-			(buffs.SetPosition or SetPosition) (buffs, 1, buffs.createdIcons)
-		end
-
-		local debuffs = self.Debuffs
-		if(debuffs) then
-			(debuffs.SetPosition or SetPosition) (debuffs, 1, debuffs.createdIcons)
-		end
-
-		local auras = self.Auras
-		if(auras) then
-			(auras.SetPosition or SetPosition) (auras, 1, auras.createdIcons)
-		end
+	-- Assume no event means someone wants to re-anchor things. This is usually done by UpdateAllElements and :ForceUpdate.
+	if not event or event == 'ForceUpdate' or event == 'ElvUI_UpdateAllElements' then -- ElvUI changed
+		if self.Buffs then self.Buffs.anchoredIcons = 0 end
+		if self.Debuffs then self.Debuffs.anchoredIcons = 0 end
+		if self.Auras then self.Auras.anchoredIcons = 0 end
 	end
+
+	UpdateAuras(self, event, unit)
 end
 
 local function ForceUpdate(element)
@@ -598,45 +578,27 @@ local function Enable(self)
 		local buffs = self.Buffs
 		if(buffs) then
 			buffs.__owner = self
+			-- check if there's any anchoring restrictions
+			buffs.__restricted = not pcall(self.GetCenter, self)
 			buffs.ForceUpdate = ForceUpdate
 
 			buffs.createdIcons = buffs.createdIcons or 0
 			buffs.anchoredIcons = 0
-
-			-- Avoid parenting GameTooltip to frames with anchoring restrictions,
-			-- otherwise it'll inherit said restrictions which will cause issues
-			-- with its further positioning, clamping, etc
-			if(not pcall(self.GetCenter, self)) then
-				buffs.tooltipAnchor = 'ANCHOR_CURSOR'
-			else
-				buffs.tooltipAnchor = buffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
-			end
+			buffs.tooltipAnchor = buffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
 			buffs:Show()
-
-			if not UnitIsUnit("player", self.unit) then
-				LCD.RegisterCallback('ElvUI', "UNIT_BUFF", function(event, unit)
-					Update(buffs, "UNIT_AURA", unit)
-				end)
-			end
 		end
 
 		local debuffs = self.Debuffs
 		if(debuffs) then
 			debuffs.__owner = self
+			-- check if there's any anchoring restrictions
+			debuffs.__restricted = not pcall(self.GetCenter, self)
 			debuffs.ForceUpdate = ForceUpdate
 
 			debuffs.createdIcons = debuffs.createdIcons or 0
 			debuffs.anchoredIcons = 0
-
-			-- Avoid parenting GameTooltip to frames with anchoring restrictions,
-			-- otherwise it'll inherit said restrictions which will cause issues
-			-- with its further positioning, clamping, etc
-			if(not pcall(self.GetCenter, self)) then
-				debuffs.tooltipAnchor = 'ANCHOR_CURSOR'
-			else
-				debuffs.tooltipAnchor = debuffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
-			end
+			debuffs.tooltipAnchor = debuffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
 			debuffs:Show()
 		end
@@ -644,19 +606,13 @@ local function Enable(self)
 		local auras = self.Auras
 		if(auras) then
 			auras.__owner = self
+			-- check if there's any anchoring restrictions
+			auras.__restricted = not pcall(self.GetCenter, self)
 			auras.ForceUpdate = ForceUpdate
 
 			auras.createdIcons = auras.createdIcons or 0
 			auras.anchoredIcons = 0
-
-			-- Avoid parenting GameTooltip to frames with anchoring restrictions,
-			-- otherwise it'll inherit said restrictions which will cause issues
-			-- with its further positioning, clamping, etc
-			if(not pcall(self.GetCenter, self)) then
-				auras.tooltipAnchor = 'ANCHOR_CURSOR'
-			else
-				auras.tooltipAnchor = auras.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
-			end
+			auras.tooltipAnchor = auras.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
 			auras:Show()
 		end

@@ -1,17 +1,37 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local strjoin = strjoin
---WoW API / Variables
+
 local GetSpellCritChance = GetSpellCritChance
 local CRIT_ABBR = CRIT_ABBR
 local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel = ''
 
+-- Modified version of PaperDoll.lua
+function GetRealSpellCrit()
+
+	local holySchool = 2
+	local minCrit = GetSpellCritChance(holySchool)
+	local spellCrit
+
+	realSpellCrit = {}
+	realSpellCrit[holySchool] = minCrit
+
+	for i=(holySchool+1), 7 do
+
+		spellCrit = GetSpellCritChance(i)
+		minCrit = min(minCrit, spellCrit)
+		realSpellCrit[i] = spellCrit
+	end
+
+	minCrit = format("%.2f", minCrit)
+	return minCrit
+end
+
 local function OnEvent(self)
-	self.text:SetFormattedText(displayString, CRIT_ABBR, GetSpellCritChance())
+	self.text:SetFormattedText(displayString, CRIT_ABBR, GetRealSpellCrit())
 
 	lastPanel = self
 end

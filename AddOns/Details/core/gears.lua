@@ -6,20 +6,21 @@ local UnitGUID = UnitGUID
 local UnitGroupRolesAssigned = DetailsFramework.UnitGroupRolesAssigned
 local select = select
 local floor = floor
-
 local GetNumGroupMembers = GetNumGroupMembers
+
+local CONST_INSPECT_ACHIEVEMENT_DISTANCE = 1 --Compare Achievements, 28 yards
 
 local ItemUpgradeInfo = LibStub ("LibItemUpgradeInfo-1.0")
 --local LibGroupInSpecT = LibStub ("LibGroupInSpecT-1.1") --disabled due to classic wow
 local ItemUpgradeInfo
 local LibGroupInSpecT
 
-if (DetailsFramework.IsClassicWow()) then
+if (DetailsFramework.IsTimewalkWoW()) then
 	ItemUpgradeInfo = false
 	LibGroupInSpecT = false
 end
 
-local storageDebug = false
+local storageDebug = false --remember to turn this to false!
 local store_instances = _detalhes.InstancesToStoreData
 
 function _detalhes:UpdateGears()
@@ -61,18 +62,11 @@ end
 			end
 		end
 	end
-
-	--to hook secure functions only when using the tab system
-	local isWindowHooked = false
+	hooksecurefunc ("FCF_SetWindowName", _detalhes.chat_embed.hook_settabname)
+	hooksecurefunc ("FCF_Close", _detalhes.chat_embed.hook_closetab)
 	
 	function _detalhes.chat_embed:SetTabSettings (tab_name, is_enabled, is_single)
-
-		if (not isWindowHooked) then
-			--hook blizzard chat functions
-			hooksecurefunc ("FCF_SetWindowName", _detalhes.chat_embed.hook_settabname)
-			hooksecurefunc ("FCF_Close", _detalhes.chat_embed.hook_closetab)
-		end
-
+	
 		local current_enabled_state = _detalhes.chat_tab_embed.enabled
 		local current_name = _detalhes.chat_tab_embed.tab_name
 	
@@ -180,11 +174,12 @@ end
 					window1.baseframe:ClearAllPoints()
 					
 					window1.baseframe:SetParent (ChatFrame)
+
 					window1.rowframe:SetParent (window1.baseframe)
 					window1.rowframe:ClearAllPoints()
 					window1.rowframe:SetAllPoints()
 
-					window1.windowSwitchButton:SetParent(window1.baseframe)
+					window1.windowSwitchButton:SetParent (window1.baseframe)
 					window1.windowSwitchButton:ClearAllPoints()
 					window1.windowSwitchButton:SetAllPoints()
 					
@@ -223,10 +218,10 @@ end
 					window1.rowframe:SetParent (window1.baseframe)
 					window2.rowframe:SetParent (window2.baseframe)
 
-					window1.windowSwitchButton:SetParent(window1.baseframe)
+					window1.windowSwitchButton:SetParent (window1.baseframe)
 					window1.windowSwitchButton:ClearAllPoints()
 					window1.windowSwitchButton:SetAllPoints()
-					window2.windowSwitchButton:SetParent(window2.baseframe)
+					window2.windowSwitchButton:SetParent (window2.baseframe)
 					window2.windowSwitchButton:ClearAllPoints()
 					window2.windowSwitchButton:SetAllPoints()
 
@@ -256,12 +251,6 @@ end
 					window2:SaveMainWindowPosition()
 					
 				--	/dump ChatFrame3Background:GetSize()
---[[
-					_detalhes.move_janela_func (window1.baseframe, true, window1)
-					_detalhes.move_janela_func (window1.baseframe, false, window1)
-					_detalhes.move_janela_func (window2.baseframe, true, window2)
-					_detalhes.move_janela_func (window2.baseframe, false, window2)
---]]
 				end
 			end
 		end
@@ -440,85 +429,6 @@ function _detalhes:TrackSpecsNow (track_everything)
 	
 end
 
-Details.specToRole = {
-	--DRUID
-	[102] = "DAMAGER", --BALANCE
-	[103] = "DAMAGER", --FERAL DRUID
-	[105] = "HEALER", --RESTORATION
-
-	--HUNTER
-	[253] = "DAMAGER", --BM
-	[254] = "DAMAGER", --MM
-	[255] = "DAMAGER", --SURVIVOR
-
-	--MAGE
-	[62] = "DAMAGER", --ARCANE
-	[64] = "DAMAGER", --FROST
-	[63] = "DAMAGER", ---FIRE
-
-	--PALADIN
-	[70] = "DAMAGER", --RET
-	[65] = "HEALER", --HOLY
-	[66] = "TANK", --PROT
-
-	--PRIEST
-	[257] = "HEALER", --HOLY
-	[256] = "HEALER", --DISC
-	[258] = "DAMAGER", --SHADOW
-
-	--ROGUE
-	[259] = "DAMAGER", --ASSASSINATION
-	[260] = "DAMAGER", --COMBAT
-	[261] = "DAMAGER", --SUB
-
-	--SHAMAN
-	[262] = "DAMAGER", --ELEMENTAL
-	[263] = "DAMAGER", --ENHAN
-	[264] = "HEALER", --RESTO
-
-	--WARLOCK
-	[265] = "DAMAGER", --AFF
-	[266] = "DAMAGER", --DESTRO
-	[267] = "DAMAGER", --DEMO
-
-	--WARRIOR
-	[71] = "DAMAGER", --ARMS
-	[71] = "DAMAGER", --ARMS
-	[72] = "DAMAGER", --FURY
-	[73] = "TANK", --PROT
-}
-
---/dump _detalhes:GetRoleFromSpec (103, UnitGUID("target"))
---open the talent frame at level 1:
---/run SHOW_TALENT_LEVEL = 1
---/run SHOW_SPEC_LEVEL = 1
-
-function _detalhes:GetRoleFromSpec (specId, unitGUID)
-	if (specId == 103) then --feral druid
-		local talents = _detalhes.cached_talents [unitGUID]
-		if (talents) then
-			local tankTalents = 0
-			for i = 1, #talents do
-				local iconTexture, rank, tier, column = unpack (talents [i])
-				if (tier == 2) then
-					if (column == 1 and rank == 5) then
-						tankTalents = tankTalents + 5
-					end
-					if (column == 3 and rank == 5) then
-						tankTalents = tankTalents + 5
-					end
-
-					if (tankTalents >= 10) then
-						return "TANK"
-					end
-				end
-			end
-		end
-	end
-	
-	return Details.specToRole [specId] or "NONE"
-end
-
 function _detalhes:ResetSpecCache (forced)
 
 	local isininstance = IsInInstance()
@@ -570,7 +480,7 @@ function _detalhes:ResetSpecCache (forced)
 	
 end
 
-function _detalhes:RefreshUpdater (suggested_interval)
+function _detalhes:RefreshUpdater(suggested_interval)
 	local updateInterval = suggested_interval or _detalhes.update_speed
 	
 	if (_detalhes.streamer_config.faster_updates) then
@@ -579,17 +489,19 @@ function _detalhes:RefreshUpdater (suggested_interval)
 	end
 	
 	if (_detalhes.atualizador) then
-		_detalhes:CancelTimer (_detalhes.atualizador)
+		--_detalhes:CancelTimer(_detalhes.atualizador)
+		Details.Schedules.Cancel(_detalhes.atualizador)
 	end
-	_detalhes.atualizador = _detalhes:ScheduleRepeatingTimer ("AtualizaGumpPrincipal", updateInterval, -1)
+	--_detalhes.atualizador = _detalhes:ScheduleRepeatingTimer("RefreshMainWindow", updateInterval, -1)
+	_detalhes.atualizador = Details.Schedules.NewTicker(updateInterval, Details.RefreshMainWindow, Details, -1)
 end
 
-function _detalhes:SetWindowUpdateSpeed (interval, nosave)
+function _detalhes:SetWindowUpdateSpeed(interval, nosave)
 	if (not interval) then
 		interval = _detalhes.update_speed
 	end
 
-	if (type (interval) ~= "number") then
+	if (type(interval) ~= "number") then
 		interval = _detalhes.update_speed or 0.3
 	end
 	
@@ -597,10 +509,10 @@ function _detalhes:SetWindowUpdateSpeed (interval, nosave)
 		_detalhes.update_speed = interval
 	end
 	
-	_detalhes:RefreshUpdater (interval)
+	_detalhes:RefreshUpdater(interval)
 end
 
-function _detalhes:SetUseAnimations (enabled, nosave)
+function _detalhes:SetUseAnimations(enabled, nosave)
 	if (enabled == nil) then
 		enabled = _detalhes.use_row_animations
 	end
@@ -634,13 +546,13 @@ function _detalhes:CheckForPerformanceProfile()
 	local profile = _detalhes.performance_profiles [type]
 	
 	if (profile and profile.enabled) then
-		_detalhes:SetWindowUpdateSpeed (profile.update_speed, true)
-		_detalhes:SetUseAnimations (profile.use_row_animations, true)
-		_detalhes:CaptureSet (profile.damage, "damage")
-		_detalhes:CaptureSet (profile.heal, "heal")
-		_detalhes:CaptureSet (profile.energy, "energy")
-		_detalhes:CaptureSet (profile.miscdata, "miscdata")
-		_detalhes:CaptureSet (profile.aura, "aura")
+		_detalhes:SetWindowUpdateSpeed(profile.update_speed, true)
+		_detalhes:SetUseAnimations(profile.use_row_animations, true)
+		_detalhes:CaptureSet(profile.damage, "damage")
+		_detalhes:CaptureSet(profile.heal, "heal")
+		_detalhes:CaptureSet(profile.energy, "energy")
+		_detalhes:CaptureSet(profile.miscdata, "miscdata")
+		_detalhes:CaptureSet(profile.aura, "aura")
 		
 		if (not _detalhes.performance_profile_lastenabled or _detalhes.performance_profile_lastenabled ~= type) then
 			_detalhes:InstanceAlert (Loc ["STRING_OPTIONS_PERFORMANCE_PROFILE_LOAD"] .. type, {_detalhes.PerformanceIcons [type].icon, 14, 14, false, 0, 1, 0, 1, unpack (_detalhes.PerformanceIcons [type].color)} , 5, {_detalhes.empty_function})
@@ -649,13 +561,13 @@ function _detalhes:CheckForPerformanceProfile()
 		_detalhes.performance_profile_enabled = type
 		_detalhes.performance_profile_lastenabled = type
 	else
-		_detalhes:SetWindowUpdateSpeed (_detalhes.update_speed)
-		_detalhes:SetUseAnimations (_detalhes.use_row_animations)
-		_detalhes:CaptureSet (_detalhes.capture_real ["damage"], "damage")
-		_detalhes:CaptureSet (_detalhes.capture_real ["heal"], "heal")
-		_detalhes:CaptureSet (_detalhes.capture_real ["energy"], "energy")
-		_detalhes:CaptureSet (_detalhes.capture_real ["miscdata"], "miscdata")
-		_detalhes:CaptureSet (_detalhes.capture_real ["aura"], "aura")
+		_detalhes:SetWindowUpdateSpeed(_detalhes.update_speed)
+		_detalhes:SetUseAnimations(_detalhes.use_row_animations)
+		_detalhes:CaptureSet(_detalhes.capture_real ["damage"], "damage")
+		_detalhes:CaptureSet(_detalhes.capture_real ["heal"], "heal")
+		_detalhes:CaptureSet(_detalhes.capture_real ["energy"], "energy")
+		_detalhes:CaptureSet(_detalhes.capture_real ["miscdata"], "miscdata")
+		_detalhes:CaptureSet(_detalhes.capture_real ["aura"], "aura")
 		_detalhes.performance_profile_enabled = nil
 	end
 	
@@ -1006,6 +918,7 @@ function _detalhes.storage:GetBestFromPlayer (diff, encounter_id, role, playerna
 	local db = _detalhes.storage:OpenRaidStorage()
 	
 	if (not db) then
+		print("DB noot found on GetBestFromPlayer()")
 		return
 	end
 	
@@ -1122,7 +1035,8 @@ function _detalhes.storage:GetIDsToGuildSync()
 	end
 	
 	local IDs = {}
-	
+	local myGuildName = GetGuildInfo("player")
+
 	--build the encounter ID list
 	for diff, diffTable in pairs (db or {}) do
 		if (type (diffTable) == "table") then
@@ -1130,7 +1044,9 @@ function _detalhes.storage:GetIDsToGuildSync()
 				if (encounter_is_current_tier (encounterID)) then
 					for index, encounter in ipairs (encounterTable) do
 						if (encounter.servertime) then
-							tinsert (IDs, encounter.servertime)
+							if (myGuildName == encounter.guild) then
+								tinsert (IDs, encounter.servertime)
+							end
 						end
 					end
 				end
@@ -1541,7 +1457,124 @@ function _detalhes.OpenStorage()
 	end
 end
 
-function _detalhes:StoreEncounter (combat)
+Details.Database = {}
+
+function Details.Database.LoadDB()
+	--check if the storage is already loaded
+	if (not IsAddOnLoaded("Details_DataStorage")) then
+		local loaded, reason = LoadAddOn("Details_DataStorage")
+		if (not loaded) then
+			if (_detalhes.debug) then
+				print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
+			end
+			return
+		end
+	end
+
+	--> get the storage table
+	local db = _G.DetailsDataStorage
+	
+	if (not db and _detalhes.CreateStorageDB) then
+		db = _detalhes:CreateStorageDB()
+		if (not db) then
+			if (_detalhes.debug) then
+				print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
+			end
+			return
+		end
+	elseif (not db) then
+		if (_detalhes.debug) then
+			print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
+		end
+		return
+	end
+
+	return db
+end
+
+function Details.Database.GetBossKillsDB(db)
+	--total kills in a boss on raid or dungeon
+	local totalkills_database = db["totalkills"]
+	if (not totalkills_database) then
+		db["totalkills"] = {}
+		totalkills_database = db["totalkills"]
+	end
+
+	return totalkills_database
+end
+
+function Details.Database.StoreWipe(combat)
+
+	combat = combat or _detalhes.tabela_vigente
+
+	if (not combat) then
+		if (_detalhes.debug) then
+			print ("|cFFFFFF00Details! Storage|r: combat not found.")
+		end
+		return
+	end
+
+	local name, type, difficulty, difficultyName, maxPlayers, playerDifficulty, isDynamicInstance, mapID, instanceGroupSize = GetInstanceInfo()
+	
+	local bossCLEUID = combat.boss_info and combat.boss_info.id
+	
+	if (not store_instances [mapID]) then
+		if (_detalhes.debug) then
+			print ("|cFFFFFF00Details! Storage|r: instance not allowed.")
+		end
+		return
+	end
+
+	local boss_info = combat:GetBossInfo()
+	local encounter_id = boss_info and boss_info.id
+	
+	if (not encounter_id) then
+		if (_detalhes.debug) then
+			print ("|cFFFFFF00Details! Storage|r: encounter ID not found.")
+		end
+		return
+	end
+
+	--get the difficulty
+	local diff = combat:GetDifficulty()
+	
+	--database
+		local db = Details.Database.LoadDB()
+		if (not db) then
+			return
+		end
+
+		local diff_storage = db [diff]
+		if (not diff_storage) then
+			db [diff] = {}
+			diff_storage = db [diff]
+		end
+		
+		local encounter_database = diff_storage [encounter_id]
+		if (not encounter_database) then
+			diff_storage [encounter_id] = {}
+			encounter_database = diff_storage [encounter_id]
+		end
+
+		--total kills in a boss on raid or dungeon
+		local totalkills_database = Details.Database.GetBossKillsDB(db)
+
+		if (IsInRaid()) then
+			totalkills_database[encounter_id] = totalkills_database[encounter_id] or {}
+			totalkills_database[encounter_id][diff] = totalkills_database[encounter_id][diff] or {kills = 0, wipes = 0, time_fasterkill = 0, time_fasterkill_when = 0, time_incombat = 0, dps_best = 0, dps_best_when = 0, dps_best_raid = 0, dps_best_raid_when = 0}
+
+			local bossData = totalkills_database[encounter_id][diff]
+
+			--wipes amount
+			bossData.wipes = bossData.wipes + 1
+
+			Details:Msg("Wipe stored, you have now " .. bossData.wipes .. " wipes on this boss.")
+		end
+end
+
+function Details.Database.StoreEncounter(combat)
+
+	--note: this only runs on boss kill
 	
 	combat = combat or _detalhes.tabela_vigente
 	
@@ -1556,7 +1589,7 @@ function _detalhes:StoreEncounter (combat)
 	
 	local bossCLEUID = combat.boss_info and combat.boss_info.id
 	
-	if (not store_instances [mapID] and not _detalhes.EncountersToStoreData [bossCLEUID]) then
+	if (not store_instances [mapID]) then
 		if (_detalhes.debug) then
 			print ("|cFFFFFF00Details! Storage|r: instance not allowed.")
 		end
@@ -1572,64 +1605,13 @@ function _detalhes:StoreEncounter (combat)
 		end
 		return
 	end
-	
+
+	--get the difficulty
 	local diff = combat:GetDifficulty()
 	
-	--> check for heroic and mythic
-	if (storageDebug or (diff == 15 or diff == 16)) then --test on raid finder  ' or diff == 17' -- normal mode: diff == 14 or 
-	
-		--> check the guild name
-		local match = 0
-		local guildName = select (1, GetGuildInfo ("player"))
-		local raid_size = GetNumGroupMembers() or 0
-		
-		if (guildName) then
-			for i = 1, raid_size do
-				local gName = select (1, GetGuildInfo ("raid" .. i)) or ""
-				if (gName == guildName) then
-					match = match + 1
-				end
-			end
-			
-			if (match < raid_size * 0.75 and not storageDebug) then
-				if (_detalhes.debug) then
-					print ("|cFFFFFF00Details! Storage|r: can't save the encounter, need at least 75% of players be from your guild.")
-				end
-				return
-			end
-		else
-			if (_detalhes.debug) then
-				print ("|cFFFFFF00Details! Storage|r: player isn't in a guild.")
-			end
-			return
-		end
-		
-		--> check if the storage is already loaded
-		if (not IsAddOnLoaded ("Details_DataStorage")) then
-			local loaded, reason = LoadAddOn ("Details_DataStorage")
-			if (not loaded) then
-				if (_detalhes.debug) then
-					print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
-				end
-				return
-			end
-		end
-		
-		--> get the storage table
-		local db = DetailsDataStorage
-		
-		if (not db and _detalhes.CreateStorageDB) then
-			db = _detalhes:CreateStorageDB()
-			if (not db) then
-				if (_detalhes.debug) then
-					print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
-				end
-				return
-			end
-		elseif (not db) then
-			if (_detalhes.debug) then
-				print ("|cFFFFFF00Details! Storage|r: can't save the encounter, couldn't load DataStorage, may be the addon is disabled.")
-			end
+	--database
+		local db = Details.Database.LoadDB()
+		if (not db) then
 			return
 		end
 		
@@ -1643,6 +1625,84 @@ function _detalhes:StoreEncounter (combat)
 		if (not encounter_database) then
 			diff_storage [encounter_id] = {}
 			encounter_database = diff_storage [encounter_id]
+		end
+
+		--total kills in a boss on raid or dungeon
+		local totalkills_database = Details.Database.GetBossKillsDB(db)
+
+	--> store total kills on this boss
+		--if the player is facing a raid boss
+		if (IsInRaid()) then
+			totalkills_database[encounter_id] = totalkills_database[encounter_id] or {}
+			totalkills_database[encounter_id][diff] = totalkills_database[encounter_id][diff] or {kills = 0, wipes = 0, time_fasterkill = 0, time_fasterkill_when = 0, time_incombat = 0, dps_best = 0, dps_best_when = 0, dps_best_raid = 0, dps_best_raid_when = 0}
+
+			local bossData = totalkills_database[encounter_id][diff]
+			local encounterElapsedTime = combat:GetCombatTime()
+
+			--kills amount
+			bossData.kills = bossData.kills + 1
+
+			--best time
+			if (encounterElapsedTime > bossData.time_fasterkill) then
+				bossData.time_fasterkill = encounterElapsedTime
+				bossData.time_fasterkill_when = time()
+			end
+
+			--total time in combat
+			bossData.time_incombat = bossData.time_incombat + encounterElapsedTime
+
+			--player best dps
+			local player = combat(DETAILS_ATTRIBUTE_DAMAGE, UnitName("player"))
+			if (player) then
+				local playerDps = player.total / encounterElapsedTime
+				if (playerDps > bossData.dps_best) then
+					bossData.dps_best = playerDps
+					bossData.dps_best_when = time()
+				end
+			end
+
+			--raid best dps
+			local raidTotalDamage = combat:GetTotal(DETAILS_ATTRIBUTE_DAMAGE, false, true)
+			local raidDps = raidTotalDamage / encounterElapsedTime
+			if (raidDps > bossData.dps_best_raid) then
+				bossData.dps_best_raid = raidDps
+				bossData.dps_best_raid_when = time()
+			end
+
+		end
+
+
+	--> check for heroic and mythic
+	if (storageDebug or (diff == 15 or diff == 16 or diff == 14)) then --test on raid finder:  ' or diff == 17' -- normal mode: diff == 14 or 
+	
+		--> check the guild name
+		local match = 0
+		local guildName = GetGuildInfo ("player")
+		local raidSize = GetNumGroupMembers() or 0
+		
+		if (not storageDebug) then
+			if (guildName) then
+				for i = 1, raidSize do
+					local gName = GetGuildInfo("raid" .. i) or ""
+					if (gName == guildName) then
+						match = match + 1
+					end
+				end
+				
+				if (match < raidSize * 0.75 and not storageDebug) then
+					if (_detalhes.debug) then
+						print ("|cFFFFFF00Details! Storage|r: can't save the encounter, need at least 75% of players be from your guild.")
+					end
+					return
+				end
+			else
+				if (_detalhes.debug) then
+					print ("|cFFFFFF00Details! Storage|r: player isn't in a guild.")
+				end
+				return
+			end
+		else
+			guildName = "Test Guild"
 		end
 		
 		local this_combat_data = {
@@ -1704,7 +1764,8 @@ function _detalhes:StoreEncounter (combat)
 
 		local myrole = UnitGroupRolesAssigned ("player")
 		local mybest, onencounter = _detalhes.storage:GetBestFromPlayer (diff, encounter_id, myrole, _detalhes.playername, true) --> get dps or hps
-		local myBestDps = mybest [1] / onencounter.elapsed
+		local mybest2 = mybest and mybest[1] or 0
+		local myBestDps = mybest2 / onencounter.elapsed
 
 		if (mybest) then
 			local d_one = 0
@@ -1846,7 +1907,7 @@ function ilvl_core:CalcItemLevel (unitid, guid, shout)
 		unitid = unitid [1]
 	end
 
-	if (CheckInteractDistance (unitid, 1)) then
+	if (unitid and CanInspect(unitid) and UnitPlayerControlled(unitid) and CheckInteractDistance(unitid, CONST_INSPECT_ACHIEVEMENT_DISTANCE)) then
 
 		--> 16 = all itens including main and off hand
 		local item_amount = 16
@@ -1900,7 +1961,7 @@ function ilvl_core:CalcItemLevel (unitid, guid, shout)
 		local spec
 		local talents = {}
 		
-		if (not DetailsFramework.IsClassicWow()) then
+		if (not DetailsFramework.IsTimewalkWoW()) then
 			spec = GetInspectSpecialization (unitid)
 			if (spec and spec ~= 0) then
 				_detalhes.cached_specs [guid] = spec
@@ -1989,11 +2050,17 @@ end
 
 function ilvl_core:GetItemLevel (unitid, guid, is_forced, try_number)
 
+	--disable for timewalk wow ~timewalk
+	if (DetailsFramework.IsTimewalkWoW()) then
+		return
+	end
+
 	--> ddouble check
 	if (not is_forced and (UnitAffectingCombat ("player") or InCombatLockdown())) then
 		return
 	end
-	if (not unitid or not CanInspect (unitid) or not CheckInteractDistance (unitid, 1)) then
+
+	if (not unitid or not CanInspect(unitid) or not UnitPlayerControlled(unitid) or not CheckInteractDistance(unitid, CONST_INSPECT_ACHIEVEMENT_DISTANCE)) then
 		if (is_forced) then
 			try_number = try_number or 0
 			if (try_number > 18) then
@@ -2013,7 +2080,6 @@ function ilvl_core:GetItemLevel (unitid, guid, is_forced, try_number)
 end
 
 local NotifyInspectHook = function (unitid)
-
 	local unit = unitid:gsub ("%d+", "")
 	
 	if ((IsInRaid() or IsInGroup()) and (_detalhes:GetZoneType() == "raid" or _detalhes:GetZoneType() == "party")) then
@@ -2032,7 +2098,7 @@ local NotifyInspectHook = function (unitid)
 		end
 	end
 end
---hooksecurefunc ("NotifyInspect", NotifyInspectHook) --disabled on classic
+hooksecurefunc ("NotifyInspect", NotifyInspectHook)
 
 function ilvl_core:Reset()
 	ilvl_core.raid_id = 1
@@ -2147,10 +2213,7 @@ local can_start_loop = function()
 	if ((_detalhes:GetZoneType() ~= "raid" and _detalhes:GetZoneType() ~= "party") or ilvl_core.loop_process or _detalhes.in_combat or not _detalhes.track_item_level) then
 		return false
 	end
-
-	--looks like data feed is getting some issues, disabling for further investigating
-	return false
-	--return true
+	return true
 end
 
 function ilvl_core:LeaveCombat()
@@ -2187,20 +2250,9 @@ end
 
 --> ilvl API
 function _detalhes.ilevel:IsTrackerEnabled()
-	--looks like data feed is getting some issues, disabling for further investigating
-	if (true) then
-		return false
-	end
-	
 	return _detalhes.track_item_level
 end
 function _detalhes.ilevel:TrackItemLevel (bool)
-
-	--looks like data feed is getting some issues, disabling for further investigating
-	if (true) then
-		return false
-	end
-
 	if (type (bool) == "boolean") then
 		if (bool) then
 			_detalhes.track_item_level = true
@@ -2275,700 +2327,6 @@ if (LibGroupInSpecT) then
 	LibGroupInSpecT.RegisterCallback (_detalhes, "GroupInSpecT_Update", "LibGroupInSpecT_UpdateReceived")
 end
 
---talents
-local talentWatchClassic = CreateFrame ("frame")
-talentWatchClassic:RegisterEvent ("CHARACTER_POINTS_CHANGED")
-talentWatchClassic:RegisterEvent ("SPELLS_CHANGED")
-talentWatchClassic:RegisterEvent ("PLAYER_ENTERING_WORLD")
-talentWatchClassic:RegisterEvent ("GROUP_ROSTER_UPDATE")
-
-talentWatchClassic.cooldown = 0
-
-C_Timer.NewTicker (600, function()
-	Details:SendPlayerClassicInformation()
-end)
-
-talentWatchClassic:SetScript ("OnEvent", function (self, event, ...)
-	if (talentWatchClassic.delayedUpdate and not talentWatchClassic.delayedUpdate._cancelled) then
-		return
-	else
-		talentWatchClassic.delayedUpdate = C_Timer.NewTimer (10, Details.SendPlayerClassicInformation)
-	end
-end)
-
-function Details:SendPlayerClassicInformation (targetPlayer)
-
-	if (not targetPlayer) then
-		if (time() > talentWatchClassic.cooldown) then
-			--isn't in cooldown, set a new cooldown
-			talentWatchClassic.cooldown = time() + 5
-		else
-			--it's on cooldown
-			if (not talentWatchClassic.delayedUpdate or talentWatchClassic.delayedUpdate._cancelled) then
-				talentWatchClassic.delayedUpdate = C_Timer.NewTimer (10, Details.SendPlayerClassicInformation)
-			end
-			return
-		end
-
-		--cancel any schedule
-		if (talentWatchClassic.delayedUpdate and not talentWatchClassic.delayedUpdate._cancelled) then
-			talentWatchClassic.delayedUpdate:Cancel()
-		end
-		talentWatchClassic.delayedUpdate = nil
-	end
-
-	--amount of tabs existing
-	local numTabs = GetNumTalentTabs() or 3
-
-	--store the background textures for each tab
-	local pointsPerSpec = {}
-	local talentsSelected = {}
-
-	for i = 1, (MAX_TALENT_TABS or 3) do
-		if (i <= numTabs) then
-			--tab information
-			local name, iconTexture, pointsSpent, fileName = GetTalentTabInfo (i)
-			if (name) then
-				tinsert (pointsPerSpec, {name, pointsSpent, fileName})
-			end
-
-			--talents information
-			local numTalents = GetNumTalents (i) or 20
-			local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 20
-
-			for talentIndex = 1, MAX_NUM_TALENTS do
-				if (talentIndex <= numTalents) then
-					local name, iconTexture, tier, column, rank, maxRank, isExceptional, available = GetTalentInfo (i, talentIndex)
-					if (name and rank and type (rank) == "number") then
-						--send the specID instead of the specName
-						local specID = Details.textureToSpec [fileName]
-						tinsert (talentsSelected, {iconTexture, rank, tier, column, i, specID, maxRank})
-					end
-				end
-			end
-		end
-	end
-
-	local MIN_SPECS = 4
-
-	--put the spec with more talent point to the top
-	table.sort (pointsPerSpec, function (t1, t2) return t1[2] > t2[2] end)
-
-	--get the spec with more points spent
-	local spec = pointsPerSpec [1]
-	if (spec and spec [2] >= MIN_SPECS) then
-
-		local specName = spec [1]
-		local spentPoints = spec [2]
-		local specTexture = spec [3]
-
-		--add the spec into the spec cache
-		Details.playerClassicSpec = {}
-		Details.playerClassicSpec.specs = Details.GetClassicSpecByTalentTexture (specTexture)
-		Details.playerClassicSpec.talents = talentsSelected
-
-		--cache the player specId
-		_detalhes.cached_specs [UnitGUID ("player")] = Details.playerClassicSpec.specs
-		--cache the player talents
-		_detalhes.cached_talents [UnitGUID ("player")] = talentsSelected
-
-		if (Details.playerClassicSpec.specs == 103) then
-			if (Details:GetRoleFromSpec (Details.playerClassicSpec.specs, UnitGUID ("player")) == "TANK") then
-				Details.playerClassicSpec.specs = 104
-				_detalhes.cached_specs [UnitGUID ("player")] = Details.playerClassicSpec.specs
-			end
-		end
-
-		local CONST_DETAILS_PREFIX = "DTLS"
-		local CONST_ITEMLEVEL_DATA = "IL"
-		local CONST_ASK_TALENTS = "AT"
-		local CONST_ANSWER_TALENTS = "AWT"
-
-		local compressedTalents = Details:CompressData (talentsSelected, "comm")
-
-		if (targetPlayer) then
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_ANSWER_TALENTS, UnitName("player"), GetRealmName(), _detalhes.realversion, UnitGUID ("player"), 0, compressedTalents, Details.playerClassicSpec.specs), "WHISPER", targetPlayer)
-
-			if (_detalhes.debug) then
-				_detalhes:Msg ("(debug) sent talents data to: " .. (targetPlayer or "UNKNOWN-PLAYER"))
-			end
-
-		elseif (IsInRaid()) then
-			_detalhes:SendRaidData (CONST_ITEMLEVEL_DATA, UnitGUID ("player"), 0, compressedTalents, Details.playerClassicSpec.specs)
-			if (_detalhes.debug) then
-				_detalhes:Msg ("(debug) sent talents data to Raid")
-			end
-			
-		elseif (IsInGroup()) then
-			_detalhes:SendPartyData (CONST_ITEMLEVEL_DATA, UnitGUID ("player"), 0, compressedTalents, Details.playerClassicSpec.specs)
-			if (_detalhes.debug) then
-				_detalhes:Msg ("(debug) sent talents data to Party")
-			end
-		end
-	end
-end
-
-function Details:ClassicSpecFromNetwork (player, realm, core, serialNumber, itemLevel, talentsSelected, currentSpec)
-	if (_detalhes.debug) then
-		_detalhes:Msg ("(debug) Received PlayerInfo Data: " .. (player or "Invalid Player Name") .. " | " .. (itemLevel or "Invalid Item Level") .. " | " .. (currentSpec or "Invalid Spec") .. " | {} | " .. (serialNumber or "Invalid Serial"))
-	end
-
-	if (type (talentsSelected) == "string") then
-		talentsSelected = Details:DecompressData (talentsSelected, "comm")
-	end
-	
-	if (not player) then
-		return
-	end
-
-	--> older versions of details wont send serial nor talents nor spec
-	if (not serialNumber or not itemLevel or not talentsSelected or not currentSpec) then
-		--if any data is invalid, abort
-		return
-	end
-
-	if (type (serialNumber) ~= "string") then
-		return
-	end
-
-	--> won't inspect this actor
-	_detalhes.trusted_characters [serialNumber] = true
-
-	--store the item level
-	if (type (itemLevel) == "number") then
-		_detalhes.item_level_pool [serialNumber] = {name = player, ilvl = itemLevel, time = time()}
-	end
-	
-	--store talents
-	if (type (talentsSelected) == "table") then
-		if (talentsSelected [1]) then
-			_detalhes.cached_talents [serialNumber] = talentsSelected
-		end
-	end
-	
-	--store the spec the player is playing
-	if (type (currentSpec) == "number") then
-		_detalhes.cached_specs [serialNumber] = currentSpec
-	end
-
-	if (InspectFrame and InspectFrame:IsShown() and UnitIsUnit (InspectFrame.unit, "target")) then
-		if (DetailsTalentFrame and (not DetailsTalentFrame:IsShown() or DetailsTalentFrame.showAnimation:IsPlaying())) then
-			DetailsTalentFrame.showAnimation:Stop()
-			Details:ShowTalentsPanel()
-		end
-	end
-end
-
-Details.validSpecIds = {
-	[250] = true,
-	[252] = true,
-	[251] = true,
-	[102] = true,
-	[103] = true,
-	[104] = true,
-	[105] = true,
-	[253] = true,
-	[254] = true,
-	[255] = true,
-	[62] = true,
-	[63] = true,
-	[64] = true,
-	[70] = true,
-	[65] = true,
-	[66] = true,
-	[257] = true,
-	[256] = true,
-	[258] = true,
-	[259] = true,
-	[260] = true,
-	[261] = true,
-	[262] = true,
-	[263] = true,
-	[264] = true,
-	[265] = true,
-	[266] = true,
-	[267] = true,
-	[71] = true,
-	[72] = true,
-	[73] = true,
-}
-
-Details.textureToSpec = {
-
-	DruidBalance = 102,
-	DruidFeralCombat = 103,
-	DruidRestoration = 105,
-
-	HunterBeastMaster = 253,
-	HunterMarksmanship = 254,
-	HunterSurvival = 255,
-
-	MageArcane = 62,
-	MageFrost = 64,
-	MageFire = 63,
-
-	PaladinCombat = 70,
-	PaladinHoly = 65,
-	PaladinProtection = 66,
-
-	PriestHoly = 257,
-	PriestDiscipline = 256,
-	PriestShadow = 258,
-
-	RogueAssassination = 259,
-	RogueCombat = 260,
-	RogueSubtlety = 261,
-
-	ShamanElementalCombat = 262,
-	ShamanEnhancement = 263,
-	ShamanRestoration = 264,
-
-	WarlockCurses = 265,
-	WarlockDestruction = 266,
-	WarlockSummoning = 267,
-
-	WarriorArm = 71,
-	WarriorArms = 71,
-	WarriorFury = 72,
-	WarriorProtection = 73,
-}
-
-
-Details.specToTexture = {
-	[102] = "DruidBalance",
-	[103] = "DruidFeralCombat",
-	[105] = "DruidRestoration",
-
-	[253] = "HunterBeastMaster",
-	[254] = "HunterMarksmanship",
-	[255] = "HunterSurvival",
-
-	[62] = "MageArcane",
-	[64] = "MageFrost",
-	[63] = "MageFire",
-
-	[70] = "PaladinCombat",
-	[65] = "PaladinHoly",
-	[66] = "PaladinProtection",
-
-	[257] = "PriestHoly",
-	[256] = "PriestDiscipline",
-	[258] = "PriestShadow",
-
-	[259] = "RogueAssassination",
-	[260] = "RogueCombat",
-	[261] = "RogueSubtlety",
-
-	[262] = "ShamanElementalCombat",
-	[263] = "ShamanEnhancement",
-	[264] = "ShamanRestoration",
-
-	[265] = "WarlockCurses",
-	[266] = "WarlockDestruction",
-	[267] = "WarlockSummoning",
-
-	[71] = "WarriorArm",
-	[71] = "WarriorArms",
-	[72] = "WarriorFury",
-	[73] = "WarriorProtection",
-}
-
-function Details.IsValidSpecId (specId)
-	return Details.validSpecIds [specId]
-end
-
-function Details.GetClassicSpecByTalentTexture (talentTexture)
-	return Details.textureToSpec [talentTexture] or 0
-end
-
-local CONST_ICON_WIDTH_SPACE_REQUIRED = 10
-local MAX_NUM_TALENT_TIERS = 8
-local NUM_TALENT_COLUMNS = 4
-local CONST_ICON_SIZE = 32
-local CONST_TALENTFRAME_WIDTH = 184
-
---cache the original function since other addons are replacing it
-local tooltipSetTalent = GameTooltip.SetTalent
-
-local talentButtonOnEnter = function (self)
-	--GameTooltip:SetOwner (self, "ANCHOR_RIGHT")
-	--tooltipSetTalent (GameTooltip, PanelTemplates_GetSelectedTab (self:GetParent()), self:GetID())
-	--GameTooltip:Show()
-
-	--self.UpdateTooltip = TalentFrameTalent_OnEnter
-end
-
-local createTalentButton = function (parent, tier, column)
-	local button = CreateFrame ("button", "$parentTalent_T" .. tier .. "C" .. column, parent)
-	button:SetScript ("OnEnter", talentButtonOnEnter)
-	button:SetHighlightTexture ([[Interface\Buttons\ButtonHilight-Square]])
-
-	local talentIcon = DetailsFramework:CreateImage (button, [[Interface\Buttons\UI-EmptySlot-White]], CONST_ICON_SIZE, CONST_ICON_SIZE, "background", {0, 1, 0, 1}, "talentIcon", "$parentTalentIcon")
-	button.talentIcon:SetPoint ("topleft", -1, 1)
-	button.talentIcon:SetPoint ("bottomright", 1, -1)
-
-	DetailsFramework:CreateImage (button, [[Interface\TalentFrame\TalentFrame-RankBorder]], 32, 32, "overlay", {0, 1, 0, 1}, "rankBorder", "$parentRankBorder")
-	button.rankBorder:SetPoint ("center", button, "bottomright", 0, 0)
-
-	DetailsFramework:CreateLabel (button, "", 10, "white", "GameFontNormalSmall", "rankText", "$parentRankText", "overlay")
-	button.rankText:SetPoint ("center", button.rankBorder, "center", 0, 0)
-
-	local offset = 14
-	DetailsFramework:CreateImage (button, [[Interface\Buttons\UI-Quickslot2]], 32, 32, "artwork", {0, 1, 0, 1}, "border", "$parentBorder")
-	button.border:SetPoint ("topleft", -offset, offset - 1)
-	button.border:SetPoint ("bottomright", offset, -offset - 1)
-	
-	return button
-end
-
-function Details.IsPlayingTalentLoadAnimation()
-	return DetailsTalentFrame.loadingTalentsAnimation.IsPlaying
-end
-
-function Details.PlayTalentLoadingAnimation()
-	if (not Details.IsPlayingTalentLoadAnimation()) then
-		DetailsTalentFrame.loadingTalentsAnimation.FadeIN:Stop()
-		DetailsTalentFrame.loadingTalentsAnimation.Loop:Stop()
-		DetailsTalentFrame.loadingTalentsAnimation.FadeOUT:Stop()
-
-		DetailsTalentFrame.loadingTalentsAnimation:Show()
-		DetailsTalentFrame.loadingTalentsAnimation.FadeIN:Play()
-		DetailsTalentFrame.loadingTalentsAnimation.Loop:Play()
-		DetailsTalentFrame.loadingTalentsAnimation.IsPlaying = true
-	end
-end
-
-function Details.StopTalentLoadingAnimation()
-	DetailsTalentFrame.loadingTalentsAnimation.FadeIN:Stop()
-	DetailsTalentFrame.loadingTalentsAnimation.Loop:Stop()
-	DetailsTalentFrame.loadingTalentsAnimation.FadeOUT:Play()
-	DetailsTalentFrame.loadingTalentsAnimation.IsPlaying = false
-end
-
-function Details.CreateTalentLoadingAnimation()
-	local f = CreateFrame ("frame", nil, DetailsTalentFrame)
-	f:SetSize (48, 48)
-	f:SetPoint ("center", DetailsTalentFrame, "center", 0, 0)
-	f:SetFrameLevel (3000)
-	
-	local animGroup1 = f:CreateAnimationGroup()
-	local anim1 = animGroup1:CreateAnimation ("Alpha")
-	anim1:SetOrder (1)
-	anim1:SetFromAlpha (.7)
-	anim1:SetToAlpha (1)
-	anim1:SetDuration (2.4)
-	f.FadeIN = animGroup1
-	
-	local animGroup2 = f:CreateAnimationGroup()
-	local anim2 = animGroup2:CreateAnimation ("Alpha")
-	f.FadeOUT = animGroup2
-	anim2:SetOrder (2)
-	anim2:SetFromAlpha (1)
-	anim2:SetToAlpha (0)
-	anim2:SetDuration (0.1)
-	animGroup2:SetScript ("OnFinished", function()
-		f:Hide()
-	end)
-	
-	f.Text = f:CreateFontString (nil, "overlay", "GameFontNormal")
-	f.Text:SetText ("")
-	f.Text:SetPoint ("left", f, "right", -5, 1)
-	f.TextBackground = f:CreateTexture (nil, "background")
-	f.TextBackground:SetPoint ("left", f, "right", -20, 0)
-	f.TextBackground:SetSize (160, 14)
-	f.TextBackground:SetTexture ([[Interface\COMMON\ShadowOverlay-Left]])
-	
-	f.Text:Hide()
-	f.TextBackground:Hide()
-	
-	f.CircleAnimStatic = CreateFrame ("frame", nil, f)
-	f.CircleAnimStatic:SetAllPoints()
-	f.CircleAnimStatic.Alpha = f.CircleAnimStatic:CreateTexture (nil, "overlay")
-	f.CircleAnimStatic.Alpha:SetTexture ([[Interface\COMMON\StreamFrame]])
-	f.CircleAnimStatic.Alpha:SetAllPoints()
-	f.CircleAnimStatic.Background = f.CircleAnimStatic:CreateTexture (nil, "background")
-	f.CircleAnimStatic.Background:SetTexture ([[Interface\COMMON\StreamBackground]])
-	f.CircleAnimStatic.Background:SetAllPoints()
-	
-	f.CircleAnim = CreateFrame ("frame", nil, f)
-	f.CircleAnim:SetAllPoints()
-	f.CircleAnim.Spinner = f.CircleAnim:CreateTexture (nil, "artwork")
-	f.CircleAnim.Spinner:SetTexture ([[Interface\COMMON\StreamCircle]])
-	f.CircleAnim.Spinner:SetVertexColor (.5, .5, .5, 1)
-	f.CircleAnim.Spinner:SetAllPoints()
-	f.CircleAnim.Spark = f.CircleAnim:CreateTexture (nil, "overlay")
-	f.CircleAnim.Spark:SetTexture ([[Interface\COMMON\StreamSpark]])
-	f.CircleAnim.Spark:SetAllPoints()
-
-	local animGroup3 = f.CircleAnim:CreateAnimationGroup()
-	animGroup3:SetLooping ("Repeat")
-	local animLoop = animGroup3:CreateAnimation ("Rotation")
-	f.Loop = animGroup3
-	animLoop:SetOrder (1)
-	animLoop:SetDuration (.7)
-	animLoop:SetDegrees (-360)
-	animLoop:SetTarget (f.CircleAnim)
-	
-	DetailsTalentFrame.loadingTalentsAnimation = f
-	
-	f:Hide()
-end
-
-function Details:ShowTalentsPanel()
-	--build the frame to show icons
-	if (not DetailsTalentFrame) then
-		local talentsFrame = CreateFrame ("frame", "DetailsTalentFrame", InspectFrame)
-		talentsFrame:SetPoint ("topleft", InspectFrame, "topright", -20, -14)
-		talentsFrame:SetPoint ("bottomleft", InspectFrame, "bottomright", -20, 74)
-		
-		talentsFrame:SetWidth (CONST_TALENTFRAME_WIDTH)
-		talentsFrame.tabFrames = {}
-		--table to be used to sort the frames
-		talentsFrame.tabFramesSort = {}
-		DetailsFramework:ApplyStandardBackdrop (talentsFrame)
-
-		--build 3 frames within the talent frame
-		for talentTabIndex = 1, 3 do
-			local talentTab = CreateFrame ("frame", "$parentTab" .. talentTabIndex, talentsFrame)
-			talentTab.backgroundTexture = talentTab:CreateTexture (nil, "background")
-			talentTab.backgroundTexture:SetAllPoints()
-			talentTab:SetWidth (CONST_TALENTFRAME_WIDTH)
-			tinsert (talentsFrame.tabFrames, talentTab)
-			tinsert (talentsFrame.tabFramesSort, talentTab)
-
-			talentTab.selectedTab = talentTabIndex
-
-			talentTab.allButtons = {}
-
-			local idCounter = 1
-			for i = 1, MAX_NUM_TALENT_TIERS do
-				tinsert (talentTab.allButtons, {})
-				for o = 1, NUM_TALENT_COLUMNS do
-					local talentButton = createTalentButton (talentTab, i, o)
-
-					talentButton:SetSize (CONST_ICON_SIZE, CONST_ICON_SIZE)
-
-					tinsert (talentTab.allButtons [#talentTab.allButtons], talentButton)
-					--CONST_ICON_WIDTH_SPACE_REQUIRED is the space required due to the border size being bigger than the button it self
-					talentButton:SetPoint ("topleft", talentTab, "topleft", ((o - 1) * CONST_ICON_SIZE) + (CONST_ICON_WIDTH_SPACE_REQUIRED * o), (-(i - 1) * CONST_ICON_SIZE) + (-i * CONST_ICON_WIDTH_SPACE_REQUIRED))
-					talentButton:SetID (idCounter)
-					idCounter = idCounter + 1
-				end
-			end
-		end
-
-		--create animation
-		local animHub = DetailsFramework:CreateAnimationHub (DetailsTalentFrame, function() 
-			DetailsTalentFrame:SetAlpha (0)
-
-			Details.PlayTalentLoadingAnimation()
-		end,
-		function()
-			DetailsTalentFrame:SetAlpha (1)
-			Details.StopTalentLoadingAnimation()
-
-			if (not InspectFrame:IsShown()) then
-				return DetailsTalentFrame:Hide()
-			end
-
-			if (not _detalhes.cached_talents [UnitGUID (InspectFrame.unit)]) then
-				return DetailsTalentFrame:Hide()
-			end
-		end)
-
-		DetailsFramework:CreateAnimation (animHub, "ALPHA", 1, .1, 0, .1)
-		DetailsFramework:CreateAnimation (animHub, "ALPHA", 2, 2, .1, .2)
-		DetailsFramework:CreateAnimation (animHub, "ALPHA", 3, .3, .2, 0)
-
-		local queryTalentsLabel = DetailsFramework:CreateLabel (DetailsTalentFrame, "Details!\nRetriving Talents", 10, "silver", "GameFontNormalSmall", "queryTalentLabel", "$parentQueryTalentLabel", "border")
-		queryTalentsLabel.align = "center"
-		queryTalentsLabel.alpha = .7
-		queryTalentsLabel:SetPoint ("center", DetailsTalentFrame, "center", 0, 26)
-
-		Details.CreateTalentLoadingAnimation()
-		DetailsTalentFrame.showAnimation = animHub
-		
-	end
-
-	--reset all talent tabs
-	for talentTabIndex = 1, 3 do
-		local talentTab = DetailsTalentFrame.tabFrames [talentTabIndex]
-		talentTab.numTalents = talentTabIndex / 1000
-		talentTab.maxTier = 0
-		talentTab:ClearAllPoints()
-		talentTab.backgroundTexture:SetTexture (nil)
-		for i = 1, MAX_NUM_TALENT_TIERS do
-			local columnTalents = talentTab.allButtons [i]
-			for o = 1, NUM_TALENT_COLUMNS do
-				local button = columnTalents [o]
-				button:Hide()
-				button.talentIcon:SetDesaturated (false)
-				button.rankBorder:Show()
-				button.rankText:Show()
-				button.tabIndex = 0
-			end
-		end
-	end
-
-	--reset talent frame height
-	DetailsTalentFrame:SetPoint ("bottomleft", InspectFrame, "bottomright", -20, 74)
-	local talentsSpent = 17
-
-	--local playerTalents = _detalhes.cached_talents [UnitGUID ("player")] --
-	local playerTalents = _detalhes.cached_talents [UnitGUID (InspectFrame.unit)]
-	if (playerTalents) then
-
-		local unusedButtonsByTier = {}
-		local tiersWithRanks = {}
-		for i = 1, #playerTalents do
-
-			local iconTexture, rank, tier, column, tabIndex, tabTexture, maxRank = unpack (playerTalents [i])
-
-			tabTexture = Details.specToTexture [tabTexture]
-
-			if (not tabTexture or not maxRank) then
-				DetailsTalentFrame:Hide()
-				return
-			end
-
-			DetailsTalentFrame:Show()
-
-			local talentTab = DetailsTalentFrame.tabFrames [tabIndex]
-			talentTab.backgroundTexture:SetTexture ("Interface\\TALENTFRAME\\" .. tabTexture .. "-TopLeft")
-			--add the amount of talents spent on this tab
-			talentTab.numTalents = talentTab.numTalents + (rank or 0)
-			--set the max tier of the talent tree
-
-			if (rank > 0) then
-				talentTab.maxTier = max (talentTab.maxTier, tier)
-
-				--setup the talent button
-				local tierTable = talentTab.allButtons [tier]
-				local button = tierTable [column]
-				button:Show()
-
-				button.rankText.text = rank
-				button.talentIcon.texture = iconTexture
-
-				if (rank == maxRank) then
-					button.border.vertexcolor = "yellow"
-					button.rankText.color = "yellow"
-
-				else
-					button.border.vertexcolor = "limegreen"
-					button.rankText.color = "limegreen"
-				end
-
-				tiersWithRanks [tabTexture] = tiersWithRanks [tabTexture] or {}
-				tiersWithRanks [tabTexture] [tier] = tiersWithRanks [tabTexture] [tier] or {}
-				tiersWithRanks [tabTexture] [tier] = true
-
-				button.tabIndex = tabIndex
-			else
-				--if the talent has zero ranks
-				
-				local tierTable = talentTab.allButtons [tier]
-				local button = tierTable [column]
-				--button:Show() do not show yet
-
-				unusedButtonsByTier [tabTexture] = unusedButtonsByTier [tabTexture] or {}
-				unusedButtonsByTier [tabTexture] [tier] = unusedButtonsByTier [tabTexture] [tier] or {}
-				tinsert (unusedButtonsByTier [tabTexture] [tier], button)
-
-				button.talentIcon.texture = iconTexture
-
-				--set as no rank spent on this talent
-				button.talentIcon.blackwhite = true
-				button.rankBorder:Hide()
-				button.rankText:Hide()
-			end
-		end
-
-		for tabTexture, tabTextureTable in pairs (unusedButtonsByTier) do
-			for tierIndex, tierTable in pairs (tabTextureTable) do
-				for buttonIndex, button in ipairs (tierTable) do
-					if (tiersWithRanks [tabTexture] and tiersWithRanks [tabTexture] [tierIndex]) then
-						button:Show()
-					end
-				end
-			end
-		end
-
-	else
-		--the client doesn't have information about the talents of the unit
-		--query the target player for more information
-		local CONST_DETAILS_PREFIX = "DTLS"
-		local CONST_ITEMLEVEL_DATA = "IL"
-		local CONST_ASK_TALENTS = "AT"
-		local CONST_ANSWER_TALENTS = "AWT"
-
-		local targetName = Ambiguate (GetUnitName (InspectFrame.unit, true), "none")
-
-		if (targetName) then
-			_detalhes:SendCommMessage (CONST_DETAILS_PREFIX, _detalhes:Serialize (CONST_ASK_TALENTS, UnitName("player"), GetRealmName(), _detalhes.realversion, UnitGUID ("player")), "WHISPER", targetName)
-		
-			DetailsTalentFrame:Show()
-			DetailsTalentFrame.showAnimation:Play()
-			
-		else
-			DetailsTalentFrame:Hide()
-		end
-
-		return
-	end
-
-	table.sort (DetailsTalentFrame.tabFramesSort, function (frame1, frame2)
-		return frame1.numTalents > frame2.numTalents
-	end)
-
-	--organize talent tabs
-	local heightUsed = 0
-	local heightAvailable = DetailsTalentFrame:GetHeight()
-
-	for talentTabIndex = 1, 3 do
-		local talentTab = DetailsTalentFrame.tabFramesSort [talentTabIndex]
-
-		if (talentTab.maxTier > 0) then
-			local height = max (min (130, heightAvailable), ((talentTab.maxTier) * CONST_ICON_SIZE) + (talentTab.maxTier * CONST_ICON_WIDTH_SPACE_REQUIRED) + 10)
-			heightAvailable = heightAvailable - height
-			heightUsed = heightUsed + height
-
-			talentTab:SetHeight (height)
-
-			if (talentTabIndex == 1) then
-				talentTab:SetPoint ("topleft", DetailsTalentFrame, "topleft", 1, -1)
-				talentTab:SetPoint ("topright", DetailsTalentFrame, "topright", -1, -1)
-
-			else
-				talentTab:SetPoint ("topleft", DetailsTalentFrame.tabFramesSort [talentTabIndex - 1], "bottomleft", 0, 0)
-				talentTab:SetPoint ("topright", DetailsTalentFrame.tabFramesSort [talentTabIndex - 1], "bottomright", 0, 0)
-			end
-
-			talentTab:Show()
-		end
-	end
-
-	if (heightAvailable > 0) then
-		local talentTab = DetailsTalentFrame.tabFramesSort [1]
-		talentTab:SetHeight (talentTab:GetHeight() + heightAvailable)
-	else
-		DetailsTalentFrame:SetPoint ("bottomleft", InspectFrame, "bottomright", -20, 74 + heightAvailable - 2)
-	end
-end
-
-local LatestInspectFrameUpdate = 0
-C_Timer.After (1, function()
-	hooksecurefunc ("InspectFrame_LoadUI", function()
-		hooksecurefunc ("InspectPaperDollFrame_UpdateButtons", function()
-			if (LatestInspectFrameUpdate < GetTime()) then
-				if (not Details.disable_talent_feature) then
-					Details:ShowTalentsPanel()
-				end
-				LatestInspectFrameUpdate = GetTime() + 1.0
-			end
-		end)
-	end)
-end)
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 --compress data
@@ -2977,9 +2335,12 @@ end)
 function Details:CompressData (data, dataType)
 	local LibDeflate = LibStub:GetLibrary ("LibDeflate")
 	local LibAceSerializer = LibStub:GetLibrary ("AceSerializer-3.0")
-	
+
+	--check if there isn't funtions in the data to export
+	local dataCopied = DetailsFramework.table.copytocompress({}, data)
+
 	if (LibDeflate and LibAceSerializer) then
-		local dataSerialized = LibAceSerializer:Serialize (data)
+		local dataSerialized = LibAceSerializer:Serialize (dataCopied)
 		if (dataSerialized) then
 			local dataCompressed = LibDeflate:CompressDeflate (dataSerialized, {level = 9})
 			if (dataCompressed) then
@@ -3035,5 +2396,353 @@ function Details:DecompressData (data, dataType)
 		end
 		
 		return data
+	end
+end
+
+--oldschool talent tree
+if (DetailsFramework.IsTBCWow()) then
+	local talentWatchClassic = CreateFrame ("frame")
+	talentWatchClassic:RegisterEvent("CHARACTER_POINTS_CHANGED")
+	talentWatchClassic:RegisterEvent("SPELLS_CHANGED")
+	talentWatchClassic:RegisterEvent("PLAYER_ENTERING_WORLD")
+	talentWatchClassic:RegisterEvent("GROUP_ROSTER_UPDATE")
+
+	talentWatchClassic.cooldown = 0
+
+	C_Timer.NewTicker (600, function()
+		Details:GetOldSchoolTalentInformation()
+	end)
+
+	talentWatchClassic:SetScript("OnEvent", function(self, event, ...)
+		if (talentWatchClassic.delayedUpdate and not talentWatchClassic.delayedUpdate._cancelled) then
+			return
+		else
+			talentWatchClassic.delayedUpdate = C_Timer.NewTimer(5, Details.GetOldSchoolTalentInformation)
+		end
+	end)
+
+	function Details.GetOldSchoolTalentInformation()
+		--cancel any schedule
+		if (talentWatchClassic.delayedUpdate and not talentWatchClassic.delayedUpdate._cancelled) then
+			talentWatchClassic.delayedUpdate:Cancel()
+		end
+		talentWatchClassic.delayedUpdate = nil
+
+		--amount of tabs existing
+		local numTabs = GetNumTalentTabs() or 3
+
+		--store the background textures for each tab
+		local pointsPerSpec = {}
+		local talentsSelected = {}
+
+		for i = 1, (MAX_TALENT_TABS or 3) do
+			if (i <= numTabs) then
+				--tab information
+				local name, iconTexture, pointsSpent, fileName = GetTalentTabInfo (i)
+				if (name) then
+					tinsert (pointsPerSpec, {name, pointsSpent, fileName})
+				end
+
+				--talents information
+				local numTalents = GetNumTalents (i) or 20
+				local MAX_NUM_TALENTS = MAX_NUM_TALENTS or 20
+
+				for talentIndex = 1, MAX_NUM_TALENTS do
+					if (talentIndex <= numTalents) then
+						local name, iconTexture, tier, column, rank, maxRank, isExceptional, available = GetTalentInfo (i, talentIndex)
+						if (name and rank and type (rank) == "number") then
+							--send the specID instead of the specName
+							local specID = Details.textureToSpec [fileName]
+							tinsert (talentsSelected, {iconTexture, rank, tier, column, i, specID, maxRank})
+						end
+					end
+				end
+			end
+		end
+
+		local MIN_SPECS = 4
+
+		--put the spec with more talent point to the top
+		table.sort (pointsPerSpec, function (t1, t2) return t1[2] > t2[2] end)
+
+		--get the spec with more points spent
+		local spec = pointsPerSpec[1]
+		if (spec and spec[2] >= MIN_SPECS) then
+			local specTexture = spec[3]
+
+			--add the spec into the spec cache
+			Details.playerClassicSpec = {}
+			Details.playerClassicSpec.specs = Details.GetClassicSpecByTalentTexture(specTexture)
+			Details.playerClassicSpec.talents = talentsSelected
+
+			--cache the player specId
+			_detalhes.cached_specs [UnitGUID ("player")] = Details.playerClassicSpec.specs
+			--cache the player talents
+			_detalhes.cached_talents [UnitGUID ("player")] = talentsSelected
+
+			local role = Details:GetRoleFromSpec(Details.playerClassicSpec.specs, UnitGUID("player"))
+
+			if (Details.playerClassicSpec.specs == 103) then
+				if (role == "TANK") then
+					Details.playerClassicSpec.specs = 104
+					_detalhes.cached_specs [UnitGUID ("player")] = Details.playerClassicSpec.specs
+				end
+			end
+
+			_detalhes.cached_roles[UnitGUID ("player")] = role
+
+			--gear status
+			local item_amount = 16
+			local item_level = 0
+			local failed = 0
+			
+			local two_hand = {
+				["INVTYPE_2HWEAPON"] = true,
+				["INVTYPE_RANGED"] = true,
+				["INVTYPE_RANGEDRIGHT"] = true,
+			}
+			
+			for equip_id = 1, 17 do
+				if (equip_id ~= 4) then --shirt slot, trinkets
+					local item = GetInventoryItemLink("player", equip_id)
+					if (item) then
+						local _, _, itemRarity, iLevel, _, _, _, _, equipSlot = GetItemInfo(item)
+						if (iLevel) then
+							if (ItemUpgradeInfo) then
+								local ilvl = ItemUpgradeInfo:GetUpgradedItemLevel (item)
+								item_level = item_level + (ilvl or iLevel)
+							else
+								item_level = item_level + iLevel
+							end
+							
+							--> 16 = main hand 17 = off hand
+							-->  if using a two-hand, ignore the off hand slot
+							if (equip_id == 16 and two_hand [equipSlot]) then
+								item_amount = 15
+								break
+							end
+						end
+					else
+						failed = failed + 1
+						if (failed > 2) then
+							break
+						end
+					end
+				end
+			end
+
+    		local itemLevel = floor(item_level / item_amount)
+			local dataToShare = {role or "NONE", Details.playerClassicSpec.specs or 0, itemLevel or 0, talentsSelected, UnitGUID("player")}
+			--local serialized = _detalhes:Serialize(dataToShare)
+			local compressedData = Details:CompressData(dataToShare, "comm")
+
+			if (IsInRaid()) then
+				_detalhes:SendRaidData(DETAILS_PREFIX_TBC_DATA, compressedData)
+				if (_detalhes.debug) then
+					_detalhes:Msg ("(debug) sent talents data to Raid")
+				end
+
+			elseif (IsInGroup()) then
+				_detalhes:SendPartyData(DETAILS_PREFIX_TBC_DATA, compressedData)
+				if (_detalhes.debug) then
+					_detalhes:Msg ("(debug) sent talents data to Party")
+				end
+			end
+		end
+	end
+
+	Details.specToRole = {
+		--DRUID
+		[102] = "DAMAGER", --BALANCE
+		[103] = "DAMAGER", --FERAL DRUID
+		[105] = "HEALER", --RESTORATION
+	
+		--HUNTER
+		[253] = "DAMAGER", --BM
+		[254] = "DAMAGER", --MM
+		[255] = "DAMAGER", --SURVIVOR
+	
+		--MAGE
+		[62] = "DAMAGER", --ARCANE
+		[64] = "DAMAGER", --FROST
+		[63] = "DAMAGER", ---FIRE
+	
+		--PALADIN
+		[70] = "DAMAGER", --RET
+		[65] = "HEALER", --HOLY
+		[66] = "TANK", --PROT
+	
+		--PRIEST
+		[257] = "HEALER", --HOLY
+		[256] = "HEALER", --DISC
+		[258] = "DAMAGER", --SHADOW
+	
+		--ROGUE
+		[259] = "DAMAGER", --ASSASSINATION
+		[260] = "DAMAGER", --COMBAT
+		[261] = "DAMAGER", --SUB
+	
+		--SHAMAN
+		[262] = "DAMAGER", --ELEMENTAL
+		[263] = "DAMAGER", --ENHAN
+		[264] = "HEALER", --RESTO
+	
+		--WARLOCK
+		[265] = "DAMAGER", --AFF
+		[266] = "DAMAGER", --DESTRO
+		[267] = "DAMAGER", --DEMO
+	
+		--WARRIOR
+		[71] = "DAMAGER", --ARMS
+		[72] = "DAMAGER", --FURY
+		[73] = "TANK", --PROT
+	}
+
+	function _detalhes:GetRoleFromSpec (specId, unitGUID)
+		if (specId == 103) then --feral druid
+			local talents = _detalhes.cached_talents [unitGUID]
+			if (talents) then
+				local tankTalents = 0
+				for i = 1, #talents do
+					local iconTexture, rank, tier, column = unpack (talents [i])
+					if (tier == 2) then
+						if (column == 1 and rank == 5) then
+							tankTalents = tankTalents + 5
+						end
+						if (column == 3 and rank == 5) then
+							tankTalents = tankTalents + 5
+						end
+	
+						if (tankTalents >= 10) then
+							return "TANK"
+						end
+					end
+				end
+			end
+		end
+		
+		return Details.specToRole [specId] or "NONE"
+	end
+
+	Details.validSpecIds = {
+		[250] = true,
+		[252] = true,
+		[251] = true,
+		[102] = true,
+		[103] = true,
+		[104] = true,
+		[105] = true,
+		[253] = true,
+		[254] = true,
+		[255] = true,
+		[62] = true,
+		[63] = true,
+		[64] = true,
+		[70] = true,
+		[65] = true,
+		[66] = true,
+		[257] = true,
+		[256] = true,
+		[258] = true,
+		[259] = true,
+		[260] = true,
+		[261] = true,
+		[262] = true,
+		[263] = true,
+		[264] = true,
+		[265] = true,
+		[266] = true,
+		[267] = true,
+		[71] = true,
+		[72] = true,
+		[73] = true,
+	}
+
+	Details.textureToSpec = {
+
+		DruidBalance = 102,
+		DruidFeralCombat = 103,
+		DruidRestoration = 105,
+
+		HunterBeastMaster = 253,
+		HunterMarksmanship = 254,
+		HunterSurvival = 255,
+
+		MageArcane = 62,
+		MageFrost = 64,
+		MageFire = 63,
+
+		PaladinCombat = 70,
+		PaladinHoly = 65,
+		PaladinProtection = 66,
+
+		PriestHoly = 257,
+		PriestDiscipline = 256,
+		PriestShadow = 258,
+
+		RogueAssassination = 259,
+		RogueCombat = 260,
+		RogueSubtlety = 261,
+
+		ShamanElementalCombat = 262,
+		ShamanEnhancement = 263,
+		ShamanRestoration = 264,
+
+		WarlockCurses = 265,
+		WarlockDestruction = 266,
+		WarlockSummoning = 267,
+
+		--WarriorArm = 71,
+		WarriorArms = 71,
+		WarriorFury = 72,
+		WarriorProtection = 73,
+	}
+
+
+	Details.specToTexture = {
+		[102] = "DruidBalance",
+		[103] = "DruidFeralCombat",
+		[105] = "DruidRestoration",
+
+		[253] = "HunterBeastMaster",
+		[254] = "HunterMarksmanship",
+		[255] = "HunterSurvival",
+
+		[62] = "MageArcane",
+		[64] = "MageFrost",
+		[63] = "MageFire",
+
+		[70] = "PaladinCombat",
+		[65] = "PaladinHoly",
+		[66] = "PaladinProtection",
+
+		[257] = "PriestHoly",
+		[256] = "PriestDiscipline",
+		[258] = "PriestShadow",
+
+		[259] = "RogueAssassination",
+		[260] = "RogueCombat",
+		[261] = "RogueSubtlety",
+
+		[262] = "ShamanElementalCombat",
+		[263] = "ShamanEnhancement",
+		[264] = "ShamanRestoration",
+
+		[265] = "WarlockCurses",
+		[266] = "WarlockDestruction",
+		[267] = "WarlockSummoning",
+
+		--[71] = "WarriorArm",
+		[71] = "WarriorArms",
+		[72] = "WarriorFury",
+		[73] = "WarriorProtection",
+	}
+
+	function Details.IsValidSpecId (specId)
+		return Details.validSpecIds [specId]
+	end
+
+	function Details.GetClassicSpecByTalentTexture (talentTexture)
+		return Details.textureToSpec [talentTexture] or 0
 	end
 end

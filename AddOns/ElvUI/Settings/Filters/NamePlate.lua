@@ -3,7 +3,7 @@
 
 	Add the nameplates name that you do NOT want to see.
 ]]
-local E, L, V, P, G = unpack(select(2, ...)) --Engine
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 G.nameplate.filters = {
 	ElvUI_Boss = {
@@ -38,43 +38,8 @@ G.nameplate.filters = {
 			}
 		},
 		actions = {
-			alpha = 60
+			alpha = 50
 		}
-	},
-	ElvUI_TankNonTarget = {
-		actions = {
-			color = {
-				healthColor = {r = 254/255, g = 045/255, b = 045/255},
-				health = true,
-			},
-		},
-		triggers = {
-			isNotTapDenied = true,
-			inCombatUnit = true,
-			nameplateType = {
-				enemyNPC = true,
-				enable = true,
-			},
-			inCombat = true,
-		},
-	},
-	ElvUI_TankTarget = {
-		actions = {
-			color = {
-				healthColor = {r = 050/255, g = 180/255, b = 000/255},
-				health = true,
-			},
-		},
-		triggers = {
-			isNotTapDenied = true,
-			inCombatUnit = true,
-			nameplateType = {
-				enemyNPC = true,
-				enable = true,
-			},
-			inCombat = true,
-			targetMe = true,
-		},
 	},
 }
 
@@ -85,7 +50,6 @@ E.StyleFilterDefaults = {
 		isTarget = false,
 		notTarget = false,
 		requireTarget = false,
-		questBoss = false,
 		level = false,
 		casting = {
 			isCasting = false,
@@ -95,11 +59,6 @@ E.StyleFilterDefaults = {
 			interruptible = false,
 			notSpell = false,
 			spells = {}
-		},
-		role = {
-			tank = false,
-			healer = false,
-			damager = false
 		},
 		classification = {
 			worldboss = false,
@@ -120,25 +79,6 @@ E.StyleFilterDefaults = {
 			square = false,
 			cross = false,
 			skull = false
-		},
-		talent = {
-			type = "normal",
-			enabled = false,
-			requireAll = false,
-			tier1enabled = false,
-			tier1 = {missing = false, column = 0},
-			tier2enabled = false,
-			tier2 = {missing = false, column = 0},
-			tier3enabled = false,
-			tier3 = {missing = false, column = 0},
-			tier4enabled = false,
-			tier4 = {missing = false, column = 0},
-			tier5enabled = false,
-			tier5 = {missing = false, column = 0},
-			tier6enabled = false,
-			tier6 = {missing = false, column = 0},
-			tier7enabled = false,
-			tier7 = {missing = false, column = 0}
 		},
 		threat = {
 			enable = false,
@@ -170,15 +110,15 @@ E.StyleFilterDefaults = {
 			Demon = false,
 			Dragonkin = false,
 			Elemental = false,
-			["Gas Cloud"] = false,
+			['Gas Cloud'] = false,
 			Giant = false,
 			Humanoid = false,
 			Mechanical = false,
-			["Not specified"] = false,
+			['Not specified'] = false,
 			Totem = false,
 			Undead = false,
-			["Wild Pet"] = false,
-			["Non-combat Pet"] = false
+			['Wild Pet'] = false,
+			['Non-combat Pet'] = false
 		},
 		nameplateType = {
 			enable = false,
@@ -205,7 +145,18 @@ E.StyleFilterDefaults = {
 			scenario = false,
 			party = false,
 			raid = false,
-			pvp = false,
+			arena = false,
+			pvp = false
+		},
+		location = {
+			mapIDEnabled = false,
+			mapIDs = {},
+			instanceIDEnabled = false,
+			instanceIDs = {},
+			zoneNamesEnabled = false,
+			zoneNames = {},
+			subZoneNamesEnabled = false,
+			subZoneNames = {},
 		},
 		keyMod = {
 			enable = false,
@@ -224,21 +175,7 @@ E.StyleFilterDefaults = {
 			dungeon = {
 				normal = false,
 				heroic = false,
-				mythic = false,
-				["mythic+"] = false,
-				timewalking = false
 			},
-			raid = {
-				lfr = false,
-				normal = false,
-				heroic = false,
-				mythic = false,
-				timewalking = false,
-				legacy10normal = false,
-				legacy25normal = false,
-				legacy10heroic = false,
-				legacy25heroic = false
-			}
 		},
 		cooldowns = {
 			names = {},
@@ -249,7 +186,9 @@ E.StyleFilterDefaults = {
 			missing = false,
 			names = {},
 			minTimeLeft = 0,
-			maxTimeLeft = 0
+			maxTimeLeft = 0,
+			hasStealable = false,
+			hasNoStealable = false
 		},
 		debuffs = {
 			mustHaveAll = false,
@@ -271,16 +210,13 @@ E.StyleFilterDefaults = {
 		isNotTapDenied = false,
 		playerCanAttack = false,
 		playerCanNotAttack = false,
+		hasTitleNPC = false,
+		noTitleNPC = false,
 		-- combat
 		inCombat = false,
 		outOfCombat = false,
 		inCombatUnit = false,
 		outOfCombatUnit = false,
-		-- vehicle
-		inVehicle = false,
-		outOfVehicle = false,
-		inVehicleUnit = false,
-		outOfVehicleUnit = false
 	},
 	actions = {
 		color = {
@@ -293,7 +229,7 @@ E.StyleFilterDefaults = {
 		},
 		texture = {
 			enable = false,
-			texture = "ElvUI Norm"
+			texture = 'ElvUI Norm'
 		},
 		flash = {
 			enable = false,

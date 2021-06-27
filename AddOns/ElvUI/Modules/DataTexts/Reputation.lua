@@ -1,16 +1,13 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
 local _G = _G
 local format = format
 
-local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
-local ExpandAllFactionHeaders = ExpandAllFactionHeaders
-local SetWatchedFactionIndex = SetWatchedFactionIndex
-
 local GetWatchedFactionInfo, GetNumFactions, GetFactionInfo = GetWatchedFactionInfo, GetNumFactions, GetFactionInfo
 local ToggleCharacter = ToggleCharacter
 local REPUTATION, STANDING = REPUTATION, STANDING
+local NOT_APPLICABLE = NOT_APPLICABLE
 
 local function OnEvent(self, event, eventType)
 	local name, reaction, min, max, value = GetWatchedFactionInfo()
@@ -64,6 +61,7 @@ local function OnEnter()
 	local name, reaction, min, max, value = GetWatchedFactionInfo()
 
 	if name then
+		DT.tooltip:ClearLines()
 		DT.tooltip:AddLine(name)
 		DT.tooltip:AddLine(' ')
 
@@ -71,9 +69,8 @@ local function OnEnter()
 		if reaction ~= _G.MAX_REPUTATION_REACTION then
 			DT.tooltip:AddDoubleLine(REPUTATION..':', format('%d / %d (%d%%)', value - min, max - min, (value - min) / ((max - min == 0) and max or (max - min)) * 100), 1, 1, 1)
 		end
+		DT.tooltip:Show()
 	end
-
-	DT.tooltip:Show()
 end
 
 local function OnClick()

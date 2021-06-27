@@ -24,8 +24,8 @@ local function setCompatibleRestrictedRange(range)
 		range = 10
 	elseif range <= 11 then
 		range = 11
---	elseif range <= 13 then
---		range = 13
+	elseif range <= 13 then
+		range = 13
 	elseif range <= 18 then
 		range = 18
 	elseif range <= 23 then
@@ -36,12 +36,12 @@ local function setCompatibleRestrictedRange(range)
 		range = 33
 	elseif range <= 43 then
 		range = 43
---	elseif range <= 48 then
---		range = 48
+	elseif range <= 48 then
+		range = 48
 --	elseif range <= 53 then
 --		range = 53
---	elseif range <= 60 then
---		range = 60
+	elseif range <= 60 then
+		range = 60
 --	elseif range <= 80 then
 --		range = 80
 	end
@@ -55,18 +55,18 @@ do
 	-- All ranges are tested and compared against UnitDistanceSquared.
 	-- Example: Worgsaw has a tooltip of 6 but doesn't factor in hitboxes/etc. It doesn't return false until UnitDistanceSquared of 8.
 	local itemRanges = {
-	--	[4] = 90175,--Gin-Ji Knife Set
-	--	[6] = 37727,--Ruby Acorn
+	--	[4] = 90175,--Gin-Ji Knife Set (MoP)
+	--	[6] = 37727,--Ruby Acorn (WotLK)
 		[8] = 8149,--Voodoo Charm
-	--	[13] = 32321,--Sparrowhawk Net
+		[13] = 32321,--Sparrowhawk Net
 		[18] = 6450,--Silk Bandage
 		[23] = 21519,--Mistletoe
 		[33] = 1180,--Scroll of Stamina
-	--	[43] = 34471,--Vial of the Sunwell (UnitInRange api alternate if item checks break)
-	--	[48] = 32698,--Wrangling Rope
-	--	[53] = 116139,--Haunting Memento
-	--	[60] = 32825,--Soul Cannon
-	--	[80] = 35278,--Reinforced Net
+		[43] = 34471,--Vial of the Sunwell (UnitInRange api alternate if item checks break)
+		[48] = 32698,--Wrangling Rope
+	--	[53] = 116139,--Haunting Memento (WoD)
+		[60] = 32825,--Soul Cannon
+	--	[80] = 35278,--Reinforced Net (WotLK)
 	}
 
 	local apiRanges = {
@@ -97,15 +97,15 @@ do
 			if IsItemInRange(8149, uId) then return 8
 			elseif CheckInteractDistance(uId, 3) then return 10
 			elseif CheckInteractDistance(uId, 2) then return 11
-	--		elseif IsItemInRange(32321, uId) then return 13
+			elseif IsItemInRange(32321, uId) then return 13
 			elseif IsItemInRange(6450, uId) then return 18
 			elseif IsItemInRange(21519, uId) then return 23
 	--		elseif CheckInteractDistance(uId, 1) then return 30
 			elseif IsItemInRange(1180, uId) then return 33
 			elseif UnitInRange(uId) then return 43
-	--		elseif IsItemInRange(32698, uId) then return 48
+			elseif IsItemInRange(32698, uId) then return 48
 	--		elseif IsItemInRange(116139, uId) then return 53
-	--		elseif IsItemInRange(32825, uId) then return 60
+			elseif IsItemInRange(32825, uId) then return 60
 	--		elseif IsItemInRange(35278, uId) then return 80
 			else return 1000 end--Just so it has a numeric value, even if it's unknown to protect from nil errors
 		end
@@ -391,13 +391,18 @@ end
 --  Create the frame  --
 ------------------------
 local function createTextFrame()
-	textFrame = CreateFrame("Frame", "DBMRangeCheck", UIParent)
+	textFrame = CreateFrame("Frame", "DBMRangeCheck", UIParent, DBM:IsShadowlands() and "BackdropTemplate")
 	textFrame:SetFrameStrata("DIALOG")
-	textFrame:SetBackdrop({
-		bgFile		= "Interface\\DialogFrame\\UI-DialogBox-Background", -- 131071
+	textFrame.backdropInfo = {
+		bgFile		= "Interface\\DialogFrame\\UI-DialogBox-Background",--131071
 		tile		= true,
 		tileSize	= 16
-	})
+	}
+	if not DBM:IsShadowlands() then
+		textFrame:SetBackdrop(textFrame.backdropInfo)
+	else
+		textFrame:ApplyBackdrop()
+	end
 	textFrame:SetPoint(DBM.Options.RangeFramePoint, UIParent, DBM.Options.RangeFramePoint, DBM.Options.RangeFrameX, DBM.Options.RangeFrameY)
 	textFrame:SetSize(128, 12)
 	textFrame:SetClampedToScreen(true)
@@ -426,16 +431,19 @@ local function createTextFrame()
 	end)
 
 	local text = textFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-	text:SetWidth(128)
-	text:SetHeight(15)
+	text:SetSize(128, 15)
 	text:SetPoint("BOTTOMLEFT", textFrame, "TOPLEFT")
 	text:SetTextColor(1, 1, 1, 1)
 	text:Show()
+	text.OldSetText = text.SetText
+	text.SetText = function(self, text)
+		self:OldSetText(text)
+		self:SetWidth(0) -- Set the text width to 0, so the system can auto-calculate the size
+	end
 	textFrame.text = text
 
 	local inRangeText = textFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-	inRangeText:SetWidth(128)
-	inRangeText:SetHeight(15)
+	inRangeText:SetSize(128, 15)
 	inRangeText:SetPoint("TOPLEFT", textFrame, "BOTTOMLEFT")
 	inRangeText:SetTextColor(1, 1, 1, 1)
 	inRangeText:Hide()
@@ -506,16 +514,14 @@ local function createRadarFrame()
 	player:SetPoint("CENTER")
 
 	local text = radarFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-	text:SetWidth(128)
-	text:SetHeight(15)
+	text:SetSize(128, 15)
 	text:SetPoint("BOTTOMLEFT", radarFrame, "TOPLEFT")
 	text:SetTextColor(1, 1, 1, 1)
 	text:Show()
 	radarFrame.text = text
 
 	local inRangeText = radarFrame:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-	inRangeText:SetWidth(128)
-	inRangeText:SetHeight(15)
+	inRangeText:SetSize(128, 15)
 	inRangeText:SetPoint("TOPLEFT", radarFrame, "BOTTOMLEFT")
 	inRangeText:SetTextColor(1, 1, 1, 1)
 	inRangeText:Hide()
@@ -538,7 +544,7 @@ end
 ----------------
 do
 	local UnitExists, UnitIsUnit, UnitIsDeadOrGhost, UnitIsConnected, UnitInPhase, GetPlayerFacing, UnitName, UnitClass, IsInRaid, GetNumGroupMembers, GetRaidTargetIndex, GetBestMapForUnit = UnitExists, UnitIsUnit, UnitIsDeadOrGhost, UnitIsConnected, UnitInPhase, GetPlayerFacing, UnitName, UnitClass, IsInRaid, GetNumGroupMembers, GetRaidTargetIndex, C_Map.GetBestMapForUnit
-	local max, sin, cos, pi2 = math.max, math.sin, math.cos, math.pi * 2
+	local min, max, sin, cos, pi2 = math.min, math.max, math.sin, math.cos, math.pi * 2
 	local circleColor, rotation, pixelsperyard, activeDots, prevRange, prevThreshold, prevNumClosePlayer, prevclosestRange, prevColor, prevType = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	local unitList = {}
 	local BLIP_TEX_COORDS = {
@@ -688,8 +694,8 @@ do
 						rangeCheck:Hide(true)
 						return
 					end
-					dot.x = -(x - playerX)
-					dot.y = -(y - playerY)
+					dot.y = -(x - playerX)
+					dot.x = -(y - playerY)
 					dot.range = range
 					setDot(i, sinTheta, cosTheta)
 				end

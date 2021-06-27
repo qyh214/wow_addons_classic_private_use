@@ -1,14 +1,13 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Lua functions
 local _G = _G
 local unpack, sort, gsub, wipe = unpack, sort, gsub, wipe
 local strupper, ipairs, tonumber = strupper, ipairs, tonumber
 local floor, select, type, min = floor, select, type, min
 local pairs, tinsert, tContains = pairs, tinsert, tContains
 local strsplit = strsplit
---WoW API / Variables
+
 local hooksecurefunc = hooksecurefunc
 local EnableAddOn = EnableAddOn
 local LoadAddOn = LoadAddOn
@@ -24,7 +23,7 @@ local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
 local RESET = RESET
 -- GLOBALS: ElvUIMoverPopupWindow, ElvUIMoverNudgeWindow, ElvUIMoverPopupWindowDropDown
 
-local ConfigTooltip = CreateFrame("GameTooltip", "ElvUIConfigTooltip", E.UIParent, "GameTooltipTemplate")
+local ConfigTooltip = CreateFrame('GameTooltip', 'ElvUIConfigTooltip', E.UIParent, 'GameTooltipTemplate, BackdropTemplate')
 
 local grid
 E.ConfigModeLayouts = {
@@ -34,7 +33,8 @@ E.ConfigModeLayouts = {
 	'PARTY',
 	'ARENA',
 	'RAID',
-	'ACTIONBARS'
+	'ACTIONBARS',
+	'WIDGETS'
 }
 
 E.ConfigModeLocalizedStrings = {
@@ -44,7 +44,8 @@ E.ConfigModeLocalizedStrings = {
 	PARTY = _G.PARTY,
 	ARENA = _G.ARENA,
 	RAID = _G.RAID,
-	ACTIONBARS = _G.ACTIONBARS_LABEL
+	ACTIONBARS = _G.ACTIONBARS_LABEL,
+	WIDGETS = L["Blizzard Widgets"]
 }
 
 function E:Grid_Show()
@@ -70,13 +71,14 @@ function E:ToggleMoveMode(which)
 
 	if not which or which == '' then
 		E.ConfigurationMode = mode
-		which = 'ALL'
+		which = 'all'
 	else
+		E.ConfigurationMode = true
 		mode = true
-		which = strupper(which)
 	end
 
 	self:ToggleMovers(mode, which)
+
 	if mode then
 		E:Grid_Show()
 		_G.ElvUIGrid:SetAlpha(0.4)
@@ -86,7 +88,7 @@ function E:ToggleMoveMode(which)
 		end
 
 		ElvUIMoverPopupWindow:Show()
-		_G.UIDropDownMenu_SetSelectedValue(ElvUIMoverPopupWindowDropDown, which)
+		_G.UIDropDownMenu_SetSelectedValue(ElvUIMoverPopupWindowDropDown, strupper(which))
 
 		if IsAddOnLoaded('ElvUI_OptionsUI') then
 			E:Config_CloseWindow()
@@ -130,31 +132,36 @@ function E:Grid_Create()
 		end
 	end
 
-	local size = E.mult
 	local width, height = E.UIParent:GetSize()
+	local size, half = E.mult / 2, height / 2
+
+	local gSize = E.db.gridSize
+	local gHalf = gSize / 2
 
 	local ratio = width / height
-	local hStepheight = height * ratio
-	local wStep = width / E.db.gridSize
-	local hStep = hStepheight / E.db.gridSize
+	local hHeight = height * ratio
+	local wStep = width / gSize
+	local hStep = hHeight / gSize
 
-	grid.boxSize = E.db.gridSize
-	grid:Point('CENTER', E.UIParent)
+	grid.boxSize = gSize
+	grid:SetPoint('CENTER', E.UIParent)
 	grid:Size(width, height)
 	grid:Show()
 
-	for i = 0, E.db.gridSize do
+	for i = 0, gSize do
 		local tx = E:Grid_GetRegion()
-		if i == E.db.gridSize / 2 then
+		if i == gHalf then
 			tx:SetColorTexture(1, 0, 0)
 			tx:SetDrawLayer('BACKGROUND', 1)
 		else
 			tx:SetColorTexture(0, 0, 0)
 			tx:SetDrawLayer('BACKGROUND', 0)
 		end
+
+		local iwStep = i*wStep
 		tx:ClearAllPoints()
-		tx:Point('TOPLEFT', grid, 'TOPLEFT', i*wStep - (size/2), 0)
-		tx:Point('BOTTOMRIGHT', grid, 'BOTTOMLEFT', i*wStep + (size/2), 0)
+		tx:SetPoint('TOPLEFT', grid, 'TOPLEFT', iwStep - size, 0)
+		tx:SetPoint('BOTTOMRIGHT', grid, 'BOTTOMLEFT', iwStep + size, 0)
 	end
 
 	do
@@ -162,24 +169,27 @@ function E:Grid_Create()
 		tx:SetColorTexture(1, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 1)
 		tx:ClearAllPoints()
-		tx:Point('TOPLEFT', grid, 'TOPLEFT', 0, -(height/2) + (size/2))
-		tx:Point('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2 + size/2))
+		tx:SetPoint('TOPLEFT', grid, 'TOPLEFT', 0, -half + size)
+		tx:SetPoint('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(half + size))
 	end
 
-	for i = 1, floor((height/2)/hStep) do
+	local hSteps = floor((height/2)/hStep)
+	for i = 1, hSteps do
+		local ihStep = i*hStep
+
 		local tx = E:Grid_GetRegion()
 		tx:SetColorTexture(0, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 0)
 		tx:ClearAllPoints()
-		tx:Point('TOPLEFT', grid, 'TOPLEFT', 0, -(height/2+i*hStep) + (size/2))
-		tx:Point('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2+i*hStep + size/2))
+		tx:SetPoint('TOPLEFT', grid, 'TOPLEFT', 0, -(half+ihStep) + size)
+		tx:SetPoint('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(half+ihStep + size))
 
 		tx = E:Grid_GetRegion()
 		tx:SetColorTexture(0, 0, 0)
 		tx:SetDrawLayer('BACKGROUND', 0)
 		tx:ClearAllPoints()
-		tx:Point('TOPLEFT', grid, 'TOPLEFT', 0, -(height/2-i*hStep) + (size/2))
-		tx:Point('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2-i*hStep + size/2))
+		tx:SetPoint('TOPLEFT', grid, 'TOPLEFT', 0, -(half-ihStep) + size)
+		tx:SetPoint('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(half-ihStep + size))
 	end
 end
 
@@ -201,28 +211,12 @@ local function ConfigMode_Initialize()
 	_G.UIDropDownMenu_SetSelectedValue(dd, dd.selectedValue or 'ALL')
 end
 
-function E:MoverNudgeOnShow()
-	self:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-end
-
-function E:MoverNudgeHeaderOnShow()
-	self:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-end
-
-function E:MoverPopupOnShow()
-	self:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-end
-
-function E:MoverPopupHeaderOnShow()
-	self:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-end
-
 function E:NudgeMover(nudgeX, nudgeY)
 	local mover = ElvUIMoverNudgeWindow.child
 	local x, y, point = E:CalculateMoverPoints(mover, nudgeX, nudgeY)
 
 	mover:ClearAllPoints()
-	mover:Point(point, E.UIParent, point, x, y)
+	mover:SetPoint(point, E.UIParent, point, x, y)
 	E:SaveMoverPosition(mover.name)
 
 	--Update coordinates in Nudge Window
@@ -251,55 +245,56 @@ function E:AssignFrameToNudge()
 end
 
 function E:CreateMoverPopup()
-	local f = CreateFrame('Frame', 'ElvUIMoverPopupWindow', _G.UIParent)
-	f:SetFrameStrata('DIALOG')
+	local r, g, b = unpack(E.media.rgbvaluecolor)
+
+	local f = CreateFrame('Frame', 'ElvUIMoverPopupWindow', _G.UIParent, 'BackdropTemplate')
+	f:SetFrameStrata('FULLSCREEN_DIALOG')
 	f:SetToplevel(true)
 	f:EnableMouse(true)
 	f:SetMovable(true)
-	f:SetFrameLevel(99)
+	f:SetFrameLevel(200)
 	f:SetClampedToScreen(true)
-	f:Width(370)
-	f:Height(190)
+	f:Size(370, 190)
 	f:SetTemplate('Transparent')
 	f:Point('BOTTOM', _G.UIParent, 'CENTER', 0, 100)
-	f:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-	f:SetScript('OnShow', E.MoverPopupOnShow)
-	f:CreateShadow(5)
 	f:Hide()
 
-	local header = CreateFrame('Button', nil, f)
+	local header = CreateFrame('Button', nil, f, 'BackdropTemplate')
 	header:SetTemplate(nil, true)
-	header:Width(100); header:Height(25)
-	header:Point('CENTER', f, 'TOP')
+	header:Size(100, 25)
+	header:SetPoint('CENTER', f, 'TOP')
 	header:SetFrameLevel(header:GetFrameLevel() + 2)
 	header:EnableMouse(true)
 	header:RegisterForClicks('AnyUp', 'AnyDown')
 	header:SetScript('OnMouseDown', function() f:StartMoving() end)
 	header:SetScript('OnMouseUp', function() f:StopMovingOrSizing() end)
-	header:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-	header:SetScript('OnShow', E.MoverPopupHeaderOnShow)
+	f.header = header
 
-	local title = header:CreateFontString('OVERLAY')
+	local title = header:CreateFontString(nil, 'OVERLAY')
 	title:FontTemplate()
 	title:Point('CENTER', header, 'CENTER')
 	title:SetText('ElvUI')
+	f.title = title
 
-	local desc = f:CreateFontString('ARTWORK')
+	local desc = f:CreateFontString(nil, 'ARTWORK')
 	desc:SetFontObject('GameFontHighlight')
 	desc:SetJustifyV('TOP')
 	desc:SetJustifyH('LEFT')
 	desc:Point('TOPLEFT', 18, -20)
 	desc:Point('BOTTOMRIGHT', -18, 48)
 	desc:SetText(L["DESC_MOVERCONFIG"])
+	f.desc = desc
 
-	local snapping = CreateFrame('CheckButton', f:GetName()..'CheckButton', f, 'OptionsCheckButtonTemplate')
-	_G[snapping:GetName() .. 'Text']:SetText(L["Sticky Frames"])
-
+	local snapName = f:GetName()..'CheckButton'
+	local snapping = CreateFrame('CheckButton', snapName, f, 'OptionsCheckButtonTemplate')
 	snapping:SetScript('OnShow', function(cb) cb:SetChecked(E.db.general.stickyFrames) end)
 	snapping:SetScript('OnClick', function(cb) E.db.general.stickyFrames = cb:GetChecked() end)
+	snapping.text = _G[snapName..'Text']
+	snapping.text:SetText(L["Sticky Frames"])
+	f.snapping = snapping
 
-	local lock = CreateFrame('Button', f:GetName()..'CloseButton', f, 'OptionsButtonTemplate')
-	_G[lock:GetName() .. 'Text']:SetText(L["Lock"])
+	local lock = CreateFrame('Button', f:GetName()..'CloseButton', f, 'OptionsButtonTemplate, BackdropTemplate')
+	lock.Text:SetText(L["Lock"])
 	lock:SetScript('OnClick', function()
 		E:ToggleMoveMode()
 
@@ -311,10 +306,10 @@ function E:CreateMoverPopup()
 			end
 		end
 	end)
+	f.lock = lock
 
-	local align = CreateFrame('EditBox', f:GetName()..'EditBox', f, 'InputBoxTemplate')
-	align:Width(24)
-	align:Height(17)
+	local align = CreateFrame('EditBox', f:GetName()..'EditBox', f, 'InputBoxTemplate, BackdropTemplate')
+	align:Size(24, 17)
 	align:SetAutoFocus(false)
 	align:SetScript('OnEscapePressed', function(eb)
 		eb:SetText(E.db.gridSize)
@@ -346,6 +341,7 @@ function E:CreateMoverPopup()
 	align.text = align:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
 	align.text:Point('RIGHT', align, 'LEFT', -4, 0)
 	align.text:SetText(L["Grid Size:"])
+	f.align = align
 
 	--position buttons
 	snapping:Point('BOTTOMLEFT', 14, 10)
@@ -365,27 +361,26 @@ function E:CreateMoverPopup()
 		end
 	end)
 
-	local configMode = CreateFrame('Frame', f:GetName()..'DropDown', f, 'UIDropDownMenuTemplate')
-	configMode:Point('BOTTOMRIGHT', lock, 'TOPRIGHT', 8, -5)
-	S:HandleDropDownBox(configMode, 165)
-	configMode.text = configMode:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
-	configMode.text:Point('RIGHT', configMode.backdrop, 'LEFT', -2, 0)
-	configMode.text:SetText(L["Config Mode:"])
+	local dropDown = CreateFrame('Frame', f:GetName()..'DropDown', f, 'UIDropDownMenuTemplate')
+	dropDown:Point('BOTTOMRIGHT', lock, 'TOPRIGHT', 8, -5)
+	S:HandleDropDownBox(dropDown, 165)
+	dropDown.text = dropDown:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
+	dropDown.text:Point('RIGHT', dropDown.backdrop, 'LEFT', -2, 0)
+	dropDown.text:SetText(L["Config Mode:"])
+	f.dropDown = dropDown
 
-	_G.UIDropDownMenu_Initialize(configMode, ConfigMode_Initialize)
+	_G.UIDropDownMenu_Initialize(dropDown, ConfigMode_Initialize)
 
-	local nudgeFrame = CreateFrame('Frame', 'ElvUIMoverNudgeWindow', E.UIParent)
+	local nudgeFrame = CreateFrame('Frame', 'ElvUIMoverNudgeWindow', E.UIParent, 'BackdropTemplate')
 	nudgeFrame:SetFrameStrata('DIALOG')
-	nudgeFrame:Width(200)
-	nudgeFrame:Height(110)
+	nudgeFrame:Size(200, 110)
 	nudgeFrame:SetTemplate('Transparent')
 	nudgeFrame:CreateShadow(5)
-	nudgeFrame:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
+	nudgeFrame.shadow:SetBackdropBorderColor(r, g, b, 0.9)
 	nudgeFrame:SetFrameLevel(500)
 	nudgeFrame:EnableMouse(true)
 	nudgeFrame:SetClampedToScreen(true)
 	nudgeFrame:SetPropagateKeyboardInput(true)
-	nudgeFrame:SetScript('OnShow', E.MoverNudgeOnShow)
 	nudgeFrame:SetScript('OnKeyDown', function(_, btn)
 		local Mod = IsAltKeyDown() or IsControlKeyDown()
 		if btn == 'NUMPAD4' then
@@ -401,31 +396,30 @@ function E:CreateMoverPopup()
 
 	ElvUIMoverPopupWindow:HookScript('OnHide', function() ElvUIMoverNudgeWindow:Hide() end)
 
-	desc = nudgeFrame:CreateFontString('ARTWORK')
+	desc = nudgeFrame:CreateFontString(nil, 'ARTWORK')
 	desc:SetFontObject('GameFontHighlight')
 	desc:SetJustifyV('TOP')
 	desc:SetJustifyH('LEFT')
 	desc:Point('TOPLEFT', 18, -15)
 	desc:Point('BOTTOMRIGHT', -18, 28)
 	desc:SetJustifyH('CENTER')
-	nudgeFrame.title = desc
+	nudgeFrame.desc = desc
 
-	header = CreateFrame('Button', nil, nudgeFrame)
+	header = CreateFrame('Button', nil, nudgeFrame, 'BackdropTemplate')
 	header:SetTemplate(nil, true)
-	header:Width(100); header:Height(25)
-	header:Point('CENTER', nudgeFrame, 'TOP')
+	header:Size(100, 25)
+	header:SetPoint('CENTER', nudgeFrame, 'TOP')
 	header:SetFrameLevel(header:GetFrameLevel() + 2)
-	header:SetBackdropBorderColor(unpack(E.media.rgbvaluecolor))
-	header:SetScript('OnShow', E.MoverNudgeHeaderOnShow)
+	nudgeFrame.header = header
 
-	title = header:CreateFontString('OVERLAY')
+	title = header:CreateFontString(nil, 'OVERLAY')
 	title:FontTemplate()
 	title:Point('CENTER', header, 'CENTER')
 	title:SetText(L["Nudge"])
+	nudgeFrame.title = title
 
 	local xOffset = CreateFrame('EditBox', nudgeFrame:GetName()..'XEditBox', nudgeFrame, 'InputBoxTemplate')
-	xOffset:Width(50)
-	xOffset:Height(17)
+	xOffset:Size(50, 17)
 	xOffset:SetAutoFocus(false)
 	xOffset.currentValue = 0
 	xOffset:SetScript('OnEscapePressed', function(eb)
@@ -455,12 +449,11 @@ function E:CreateMoverPopup()
 	xOffset.text:Point('RIGHT', xOffset, 'LEFT', -4, 0)
 	xOffset.text:SetText('X:')
 	xOffset:Point('BOTTOMRIGHT', nudgeFrame, 'CENTER', -6, 8)
-	nudgeFrame.xOffset = xOffset
 	S:HandleEditBox(xOffset)
+	nudgeFrame.xOffset = xOffset
 
 	local yOffset = CreateFrame('EditBox', nudgeFrame:GetName()..'YEditBox', nudgeFrame, 'InputBoxTemplate')
-	yOffset:Width(50)
-	yOffset:Height(17)
+	yOffset:Size(50, 17)
 	yOffset:SetAutoFocus(false)
 	yOffset.currentValue = 0
 	yOffset:SetScript('OnEscapePressed', function(eb)
@@ -490,10 +483,10 @@ function E:CreateMoverPopup()
 	yOffset.text:Point('RIGHT', yOffset, 'LEFT', -4, 0)
 	yOffset.text:SetText('Y:')
 	yOffset:Point('BOTTOMLEFT', nudgeFrame, 'CENTER', 16, 8)
-	nudgeFrame.yOffset = yOffset
 	S:HandleEditBox(yOffset)
+	nudgeFrame.yOffset = yOffset
 
-	local resetButton = CreateFrame('Button', nudgeFrame:GetName()..'ResetButton', nudgeFrame, 'UIPanelButtonTemplate')
+	local resetButton = CreateFrame('Button', nudgeFrame:GetName()..'ResetButton', nudgeFrame, 'UIPanelButtonTemplate, BackdropTemplate')
 	resetButton:SetText(RESET)
 	resetButton:Point('TOP', nudgeFrame, 'CENTER', 0, 2)
 	resetButton:Size(100, 25)
@@ -503,34 +496,39 @@ function E:CreateMoverPopup()
 		end
 	end)
 	S:HandleButton(resetButton)
+	nudgeFrame.resetButton = resetButton
 
-	local upButton = CreateFrame('Button', nudgeFrame:GetName()..'UpButton', nudgeFrame)
+	local upButton = CreateFrame('Button', nudgeFrame:GetName()..'UpButton', nudgeFrame, 'BackdropTemplate')
 	upButton:Point('BOTTOMRIGHT', nudgeFrame, 'BOTTOM', -6, 4)
 	upButton:SetScript('OnClick', function() E:NudgeMover(nil, 1) end)
 	S:HandleNextPrevButton(upButton)
 	S:HandleButton(upButton)
 	upButton:Size(22)
+	nudgeFrame.upButton = upButton
 
-	local downButton = CreateFrame('Button', nudgeFrame:GetName()..'DownButton', nudgeFrame)
+	local downButton = CreateFrame('Button', nudgeFrame:GetName()..'DownButton', nudgeFrame, 'BackdropTemplate')
 	downButton:Point('BOTTOMLEFT', nudgeFrame, 'BOTTOM', 6, 4)
 	downButton:SetScript('OnClick', function() E:NudgeMover(nil, -1) end)
 	S:HandleNextPrevButton(downButton)
 	S:HandleButton(downButton)
 	downButton:Size(22)
+	nudgeFrame.downButton = downButton
 
-	local leftButton = CreateFrame('Button', nudgeFrame:GetName()..'LeftButton', nudgeFrame)
+	local leftButton = CreateFrame('Button', nudgeFrame:GetName()..'LeftButton', nudgeFrame, 'BackdropTemplate')
 	leftButton:Point('RIGHT', upButton, 'LEFT', -6, 0)
 	leftButton:SetScript('OnClick', function() E:NudgeMover(-1) end)
 	S:HandleNextPrevButton(leftButton)
 	S:HandleButton(leftButton)
 	leftButton:Size(22)
+	nudgeFrame.leftButton = leftButton
 
-	local rightButton = CreateFrame('Button', nudgeFrame:GetName()..'RightButton', nudgeFrame)
+	local rightButton = CreateFrame('Button', nudgeFrame:GetName()..'RightButton', nudgeFrame, 'BackdropTemplate')
 	rightButton:Point('LEFT', downButton, 'RIGHT', 6, 0)
 	rightButton:SetScript('OnClick', function() E:NudgeMover(1) end)
 	S:HandleNextPrevButton(rightButton)
 	S:HandleButton(rightButton)
 	rightButton:Size(22)
+	nudgeFrame.rightButton = rightButton
 end
 
 function E:Config_ResetSettings()
@@ -597,7 +595,7 @@ end
 local function Config_ButtonOnEnter(self)
 	if ConfigTooltip:IsForbidden() or not self.desc then return end
 
-	ConfigTooltip:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 2)
+	ConfigTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT', 0, 2)
 	ConfigTooltip:AddLine(self.desc, 1, 1, 1, true)
 	ConfigTooltip:Show()
 end
@@ -635,12 +633,12 @@ local function ConfigSliderOnMouseWheel(self, offset)
 	if newValue > maxValue then return end
 
 	self:SetValue(newValue)
-	self.buttons:Point("TOPLEFT", 0, newValue * 36)
+	self.buttons:Point('TOPLEFT', 0, newValue * 36)
 end
 
 local function ConfigSliderOnValueChanged(self, value)
 	self:SetValue(value)
-	self.buttons:Point("TOPLEFT", 0, value * 36)
+	self.buttons:Point('TOPLEFT', 0, value * 36)
 end
 
 function E:Config_SetButtonText(btn, noColor)
@@ -659,7 +657,7 @@ function E:Config_CreateSeparatorLine(frame, lastButton)
 	line:SetTexture(E.Media.Textures.White8x8)
 	line:SetVertexColor(1, .82, 0, .4)
 	line:Size(179, 2)
-	line:Point("TOP", lastButton, "BOTTOM", 0, -6)
+	line:Point('TOP', lastButton, 'BOTTOM', 0, -6)
 	line.separator = true
 	return line
 end
@@ -696,7 +694,7 @@ function E:Config_CreateButton(info, frame, unskinned, ...)
 	btn.info = info
 
 	if not unskinned then
-		E.Skins:HandleButton(btn)
+		E.Skins:HandleButton(btn, nil, nil, nil, true)
 	end
 
 	E:Config_SetButtonText(btn)
@@ -705,9 +703,17 @@ function E:Config_CreateButton(info, frame, unskinned, ...)
 	btn:HookScript('OnLeave', Config_ButtonOnLeave)
 	btn:SetScript('OnClick', info.func)
 	btn:Width(btn:GetTextWidth() + 40)
-	btn.ignoreBorderColors = true
 
 	return btn
+end
+
+function E:Config_DialogOpened(name)
+	if name ~= 'ElvUI' then return end
+
+	local frame = E:Config_GetWindow()
+	if frame and frame.leftHolder then
+		E:Config_WindowOpened(frame)
+	end
 end
 
 function E:Config_UpdateLeftButtons()
@@ -735,7 +741,7 @@ function E:Config_UpdateLeftScroller(frame)
 	local btns = left.buttons
 	local bottom = btns:GetBottom()
 	if not bottom then return end
-	btns:Point("TOPLEFT", 0, 0)
+	btns:Point('TOPLEFT', 0, 0)
 
 	local max = 0
 	for _, btn in ipairs(btns) do
@@ -809,16 +815,16 @@ function E:Config_CreateLeftButtons(frame, unskinned, options)
 		info.key = key
 		info.func = function()
 			local ACD = E.Libs.AceConfigDialog
-			if ACD then ACD:SelectGroup("ElvUI", key) end
+			if ACD then ACD:SelectGroup('ElvUI', key) end
 		end
 
-		local btn = E:Config_CreateButton(info, frame, unskinned, 'Button', nil, buttons, 'UIPanelButtonTemplate')
+		local btn = E:Config_CreateButton(info, frame, unskinned, 'Button', nil, buttons, 'UIPanelButtonTemplate, BackdropTemplate')
 		btn:Width(177)
 
 		if not last then
-			btn:Point("TOP", buttons, "TOP", 0, 0)
+			btn:Point('TOP', buttons, 'TOP', 0, 0)
 		else
-			btn:Point("TOP", last, "BOTTOM", 0, (last.separator and -6) or -4)
+			btn:Point('TOP', last, 'BOTTOM', 0, (last.separator and -6) or -4)
 		end
 
 		buttons[index] = btn
@@ -845,14 +851,7 @@ end
 
 function E:Config_OpenWindow()
 	local ACD = E.Libs.AceConfigDialog
-	if ACD then
-		ACD:Open('ElvUI')
-
-		local frame = E:Config_GetWindow()
-		if frame then
-			E:Config_WindowOpened(frame)
-		end
-	end
+	if ACD then ACD:Open('ElvUI') end
 
 	if not ConfigTooltip:IsForbidden() then
 		ConfigTooltip:Hide()
@@ -866,9 +865,13 @@ function E:Config_GetWindow()
 end
 
 local ConfigLogoTop
-E.valueColorUpdateFuncs[function(_, r, b, g)
+E.valueColorUpdateFuncs[function(_, r, g, b)
 	if ConfigLogoTop then
-		ConfigLogoTop:SetVertexColor(r, b, g)
+		ConfigLogoTop:SetVertexColor(r, g, b)
+	end
+
+	if ElvUIMoverNudgeWindow and ElvUIMoverNudgeWindow.shadow then
+		ElvUIMoverNudgeWindow.shadow:SetBackdropBorderColor(r, g, b, 0.9)
 	end
 end] = true
 
@@ -896,7 +899,7 @@ function E:Config_WindowClosed()
 end
 
 function E:Config_WindowOpened(frame)
-	if frame and frame.bottomHolder then
+	if frame and frame.bottomHolder and not ConfigLogoTop then
 		frame.bottomHolder:Show()
 		frame.leftHolder:Show()
 		frame.topHolder:Show()
@@ -915,20 +918,20 @@ function E:Config_WindowOpened(frame)
 		local version = frame.topHolder.version
 		E:Config_SaveOldPosition(version)
 		version:ClearAllPoints()
-		version:Point("LEFT", frame.topHolder, "LEFT", unskinned and 8 or 6, unskinned and -4 or 0)
+		version:Point('LEFT', frame.topHolder, 'LEFT', unskinned and 8 or 6, unskinned and -4 or 0)
 
 		local holderHeight = frame.bottomHolder:GetHeight()
 		local content = frame.obj.content
 		E:Config_SaveOldPosition(content)
 		content:ClearAllPoints()
-		content:Point("TOPLEFT", frame, "TOPLEFT", offset, -(unskinned and 50 or 40))
-		content:Point("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -offset, holderHeight + 3)
+		content:Point('TOPLEFT', frame, 'TOPLEFT', offset, -(unskinned and 50 or 40))
+		content:Point('BOTTOMRIGHT', frame, 'BOTTOMRIGHT', -offset, holderHeight + 3)
 
 		local titlebg = frame.obj.titlebg
 		E:Config_SaveOldPosition(titlebg)
 		titlebg:ClearAllPoints()
-		titlebg:SetPoint("TOPLEFT", frame)
-		titlebg:SetPoint("TOPRIGHT", frame)
+		titlebg:SetPoint('TOPLEFT', frame)
+		titlebg:SetPoint('TOPRIGHT', frame)
 	end
 end
 
@@ -986,14 +989,14 @@ function E:Config_CreateBottomButtons(frame, unskinned)
 			end
 		}
 	}) do
-		local btn = E:Config_CreateButton(info, frame, unskinned, 'Button', nil, frame.bottomHolder, 'UIPanelButtonTemplate')
+		local btn = E:Config_CreateButton(info, frame, unskinned, 'Button', nil, frame.bottomHolder, 'UIPanelButtonTemplate, BackdropTemplate')
 		local offset = unskinned and 14 or 8
 
 		if not last then
-			btn:Point("BOTTOMLEFT", frame.bottomHolder, "BOTTOMLEFT", unskinned and 24 or offset, offset)
+			btn:Point('BOTTOMLEFT', frame.bottomHolder, 'BOTTOMLEFT', unskinned and 24 or offset, offset)
 			last = btn
 		else
-			btn:Point("LEFT", last, "RIGHT", 4, 0)
+			btn:Point('LEFT', last, 'RIGHT', 4, 0)
 			last = btn
 		end
 
@@ -1068,7 +1071,7 @@ function E:ToggleOptionsUI(msg)
 			LoadAddOn('ElvUI_OptionsUI')
 
 			-- version check elvui options if it's actually enabled
-			if GetAddOnMetadata('ElvUI_OptionsUI', 'Version') ~= '1.07' then
+			if GetAddOnMetadata('ElvUI_OptionsUI', 'Version') ~= '2.10' then
 				self:StaticPopup_Show('CLIENT_UPDATE_REQUEST')
 			end
 		else
@@ -1081,10 +1084,18 @@ function E:ToggleOptionsUI(msg)
 		end
 	end
 
-	local ACD = E.Libs.AceConfigDialog
 	local frame = E:Config_GetWindow()
 	local mode, pages = E:Config_GetToggleMode(frame, msg)
-	if ACD then ACD[mode](ACD, E.name) end
+
+	local ACD = E.Libs.AceConfigDialog
+	if ACD then
+		if not ACD.OpenHookedElvUI then
+			hooksecurefunc(E.Libs.AceConfigDialog, 'Open', E.Config_DialogOpened)
+			ACD.OpenHookedElvUI = true
+		end
+
+		ACD[mode](ACD, E.name)
+	end
 
 	if not frame then
 		frame = E:Config_GetWindow()
@@ -1098,9 +1109,7 @@ function E:ToggleOptionsUI(msg)
 			E:Config_UpdateSize()
 		end
 
-		if frame.bottomHolder then
-			E:Config_WindowOpened(frame)
-		else -- window was released or never opened
+		if not frame.bottomHolder then -- window was released or never opened
 			frame:HookScript('OnHide', E.Config_WindowClosed)
 
 			for i=1, frame:GetNumChildren() do
@@ -1125,84 +1134,82 @@ function E:ToggleOptionsUI(msg)
 				end
 			end
 
-			local bottom = CreateFrame('Frame', nil, frame)
-			bottom:Point("BOTTOMLEFT", 2, 2)
-			bottom:Point("BOTTOMRIGHT", -2, 2)
+			local bottom = CreateFrame('Frame', nil, frame, 'BackdropTemplate')
+			bottom:Point('BOTTOMLEFT', 2, 2)
+			bottom:Point('BOTTOMRIGHT', -2, 2)
 			bottom:Height(37)
 			frame.bottomHolder = bottom
 
-			local close = CreateFrame('Button', nil, frame, 'UIPanelCloseButton')
-			close:SetScript("OnClick", E.Config_CloseClicked)
+			local close = CreateFrame('Button', nil, frame, 'UIPanelCloseButton, BackdropTemplate')
+			close:SetScript('OnClick', E.Config_CloseClicked)
 			close:SetFrameLevel(1000)
-			close:Point("TOPRIGHT", unskinned and -8 or 1, unskinned and -8 or 2)
-			close:Size(32)
+			close:Point('TOPRIGHT', unskinned and -8 or 1, unskinned and -8 or 2)
+			close:Size(32, 32)
 			close.originalClose = frame.originalClose
 			frame.closeButton = close
 
-			local left = CreateFrame('Frame', nil, frame)
-			left:Point("BOTTOMRIGHT", bottom, "BOTTOMLEFT", 181, 0)
-			left:Point("BOTTOMLEFT", bottom, "TOPLEFT", 0, 1)
-			left:Point("TOPLEFT", unskinned and 10 or 2, unskinned and -6 or -2)
+			local left = CreateFrame('Frame', nil, frame, 'BackdropTemplate')
+			left:Point('BOTTOMRIGHT', bottom, 'BOTTOMLEFT', 181, 0)
+			left:Point('BOTTOMLEFT', bottom, 'TOPLEFT', 0, 1)
+			left:Point('TOPLEFT', unskinned and 10 or 2, unskinned and -6 or -2)
 			frame.leftHolder = left
 
-			local top = CreateFrame('Frame', nil, frame)
+			local top = CreateFrame('Frame', nil, frame, 'BackdropTemplate')
 			top.version = frame.obj.titletext
-			top:Point("TOPRIGHT", frame, -2, 0)
-			top:Point("TOPLEFT", left, "TOPRIGHT", 1, 0)
+			top:Point('TOPRIGHT', frame, -2, 0)
+			top:Point('TOPLEFT', left, 'TOPRIGHT', 1, 0)
 			top:Height(24)
 			frame.topHolder = top
 
 			local LogoBottom = left:CreateTexture()
 			LogoBottom:SetTexture(E.Media.Textures.LogoBottomSmall)
-			LogoBottom:Point("CENTER", left, "TOP", unskinned and 10 or 0, unskinned and -40 or -36)
+			LogoBottom:Point('CENTER', left, 'TOP', unskinned and 10 or 0, unskinned and -40 or -36)
 			LogoBottom:Size(128, 64)
 			left.LogoBottom = LogoBottom
 
 			local LogoTop = left:CreateTexture()
 			LogoTop:SetTexture(E.Media.Textures.LogoTopSmall)
-			LogoTop:Point("CENTER", left, "TOP", unskinned and 10 or 0, unskinned and -40 or -36)
+			LogoTop:Point('CENTER', left, 'TOP', unskinned and 10 or 0, unskinned and -40 or -36)
 			LogoTop:Size(128, 64)
 			left.LogoTop = LogoTop
 
 			local buttonsHolder = CreateFrame('Frame', nil, left)
-			buttonsHolder:Point("BOTTOMLEFT", bottom, "TOPLEFT", 0, 1)
-			buttonsHolder:Point("TOPLEFT", left, "TOPLEFT", 0, -70)
-			buttonsHolder:Point("BOTTOMRIGHT")
-			buttonsHolder:SetFrameLevel(5)
+			buttonsHolder:Point('BOTTOMLEFT', bottom, 'TOPLEFT', 0, 1)
+			buttonsHolder:Point('TOPLEFT', left, 'TOPLEFT', 0, -70)
+			buttonsHolder:Point('BOTTOMRIGHT')
 			buttonsHolder:SetClipsChildren(true)
 			left.buttonsHolder = buttonsHolder
 
-			local buttons = CreateFrame('Frame', nil, buttonsHolder)
-			buttons:Point("BOTTOMLEFT", bottom, "TOPLEFT", 0, 1)
-			buttons:Point("BOTTOMRIGHT")
-			buttons:Point("TOPLEFT", 0, 0)
+			local buttons = CreateFrame('Frame', nil, buttonsHolder, 'BackdropTemplate')
+			buttons:Point('BOTTOMLEFT', bottom, 'TOPLEFT', 0, 1)
+			buttons:Point('BOTTOMRIGHT')
+			buttons:Point('TOPLEFT', 0, 0)
 			left.buttons = buttons
 
-			local slider = CreateFrame('Slider', nil, frame)
+			local slider = CreateFrame('Slider', nil, frame, 'BackdropTemplate')
 			slider:SetThumbTexture(E.Media.Textures.White8x8)
 			slider:SetScript('OnMouseWheel', ConfigSliderOnMouseWheel)
 			slider:SetScript('OnValueChanged', ConfigSliderOnValueChanged)
-			slider:SetOrientation("VERTICAL")
+			slider:SetOrientation('VERTICAL')
 			slider:SetObeyStepOnDrag(true)
-			slider:SetFrameLevel(4)
 			slider:SetValueStep(1)
 			slider:SetValue(0)
 			slider:Width(192)
-			slider:Point("BOTTOMLEFT", bottom, "TOPLEFT", 0, 1)
-			slider:Point("TOPLEFT", buttons, "TOPLEFT", 0, 0)
+			slider:Point('BOTTOMLEFT', bottom, 'TOPLEFT', 0, 1)
+			slider:Point('TOPLEFT', buttons, 'TOPLEFT', 0, 0)
 			slider.buttons = buttons
 			left.slider = slider
 
 			local thumb = slider:GetThumbTexture()
-			thumb:Point("LEFT", left, "RIGHT", 2, 0)
+			thumb:Point('LEFT', left, 'RIGHT', 2, 0)
 			thumb:SetVertexColor(1, 1, 1, 0.5)
-			thumb:SetSize(8, 12)
+			thumb:Size(8, 12)
 			left.slider.thumb = thumb
 
 			if not unskinned then
-				bottom:SetTemplate("Transparent")
-				left:SetTemplate("Transparent")
-				top:SetTemplate("Transparent")
+				bottom:SetTemplate('Transparent')
+				left:SetTemplate('Transparent')
+				top:SetTemplate('Transparent')
 				E.Skins:HandleCloseButton(close)
 			end
 

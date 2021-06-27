@@ -1,8 +1,9 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+
 local _, ns = ...
 local ElvUF = ns.oUF
-assert(ElvUF, "ElvUI was unable to locate oUF.")
+assert(ElvUF, 'ElvUI was unable to locate oUF.')
 
 local _G = _G
 local CreateFrame = CreateFrame
@@ -17,25 +18,25 @@ function UF:Construct_RaidpetFrames()
 
 	self.Health = UF:Construct_HealthBar(self, true, true, 'RIGHT')
 	self.Name = UF:Construct_NameText(self)
-
+	self.Portrait3D = UF:Construct_Portrait(self, 'model')
+	self.Portrait2D = UF:Construct_Portrait(self, 'texture')
 	self.Buffs = UF:Construct_Buffs(self)
 	self.Debuffs = UF:Construct_Debuffs(self)
-
 	self.AuraWatch = UF:Construct_AuraWatch(self)
-	self.customTexts = {}
-	self.Cutaway = UF:Construct_Cutaway(self)
-	self.AuraHighlight = UF:Construct_AuraHighlight(self)
-	self.Fader = UF:Construct_Fader()
-	self.HealthPrediction = UF:Construct_HealComm(self)
-	self.MouseGlow = UF:Construct_MouseGlow(self)
-	self.Portrait2D = UF:Construct_Portrait(self, 'texture')
-	self.Portrait3D = UF:Construct_Portrait(self, 'model')
 	self.RaidDebuffs = UF:Construct_RaidDebuffs(self)
-	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
+	self.AuraHighlight = UF:Construct_AuraHighlight(self)
 	self.TargetGlow = UF:Construct_TargetGlow(self)
+	self.FocusGlow = UF:Construct_FocusGlow(self)
+	self.MouseGlow = UF:Construct_MouseGlow(self)
 	self.ThreatIndicator = UF:Construct_Threat(self)
+	self.RaidTargetIndicator = UF:Construct_RaidIcon(self)
+	self.HealthPrediction = UF:Construct_HealComm(self)
+	self.Fader = UF:Construct_Fader()
+	self.Cutaway = UF:Construct_Cutaway(self)
 
-	self.unitframeType = "raidpet"
+	self.customTexts = {}
+
+	self.unitframeType = 'raidpet'
 
 	return self
 end
@@ -56,17 +57,9 @@ function UF:Update_RaidpetFrames(frame, db)
 	frame.db = db
 
 	frame.colors = ElvUF.colors
-	frame:RegisterForClicks(self.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
+	frame:RegisterForClicks(UF.db.targetOnMouseDown and 'AnyDown' or 'AnyUp')
 
 	do
-		if(self.thinBorders) then
-			frame.SPACING = 0
-			frame.BORDER = E.mult
-		else
-			frame.BORDER = E.Border
-			frame.SPACING = E.Spacing
-		end
-
 		frame.SHADOW_SPACING = 3
 		frame.ORIENTATION = db.orientation --allow this value to change when unitframes position changes on screen?
 		frame.UNIT_WIDTH = db.width
@@ -80,7 +73,7 @@ function UF:Update_RaidpetFrames(frame, db)
 		frame.POWERBAR_HEIGHT = 0
 		frame.POWERBAR_WIDTH = 0
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
-		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
+		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == 'MIDDLE')
 		frame.PORTRAIT_WIDTH = (frame.USE_PORTRAIT_OVERLAY or not frame.USE_PORTRAIT) and 0 or db.portrait.width
 		frame.CLASSBAR_YOFFSET = 0
 		frame.BOTTOM_OFFSET = 0
@@ -91,20 +84,20 @@ function UF:Update_RaidpetFrames(frame, db)
 
 	UF:Configure_HealthBar(frame)
 	UF:UpdateNameSettings(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_Threat(frame)
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_AllAuras(frame)
-	UF:Configure_AuraWatch(frame, true)
-	UF:Configure_CustomTexts(frame)
-	UF:Configure_Cutaway(frame)
-	UF:Configure_AuraHighlight(frame)
-	UF:Configure_Fader(frame)
-	UF:Configure_HealComm(frame)
-	UF:Configure_Portrait(frame)
 	UF:Configure_RaidDebuffs(frame)
 	UF:Configure_RaidIcon(frame)
-	UF:Configure_Threat(frame)
+	UF:Configure_AuraHighlight(frame)
+	UF:Configure_HealComm(frame)
+	UF:Configure_Fader(frame)
+	UF:Configure_AuraWatch(frame, true)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_CustomTexts(frame)
 
-	frame:UpdateAllElements("ElvUI_UpdateAllElements")
+	frame:UpdateAllElements('ElvUI_UpdateAllElements')
 end
 
 --Added an additional argument at the end, specifying the header Template we want to use

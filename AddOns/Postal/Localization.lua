@@ -84,7 +84,7 @@ L["OpenAll"] = true
 L["Opening Speed"] = true
 L["Other options"] = true
 L["Part %d"] = true
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = true
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = true
 L["Prints the amount of money collected during a mail session."] = true
 L["Processing Message"] = true
 L["Profile"] = true
@@ -202,7 +202,7 @@ L["OpenAll"] = "Alles öffnen"
 L["Opening Speed"] = "Öffnungsgeschwindigkeit"
 L["Other options"] = "Weitere Optionen"
 L["Part %d"] = "Teil %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Bitte melde Fehler oder Anregungen im Wowace-Forumsthread unter |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. Wenn du Fehler meldest, gebe bitte deine Sprache und Postals Versionsnummer v%s an."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Bitte melde Fehler oder Anregungen im CurseForge-Forumsthread unter |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. Wenn du Fehler meldest, gebe bitte deine Sprache und Postals Versionsnummer v%s an."
 L["Prints the amount of money collected during a mail session."] = "Gibt im Chat aus, wie viel Gold bei einer Nachrichtensitzung am Briefkasten entnommen wurde."
 L["Processing Message"] = "Bearbeite Nachricht"
 L["Profile"] = "Profil"
@@ -318,7 +318,7 @@ L["OpenAll"] = "Abrir todo"
 L["Opening Speed"] = "Velocidad de apertura"
 L["Other options"] = "Otras opciones"
 L["Part %d"] = "Parte %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Por favor, informe de errores o sugerencias en el hilo del foro de Wowace en |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. Al publicar errores, indique su localización y el número de versión de Postal v%s."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Por favor, informe de errores o sugerencias en el hilo del foro de CurseForge en |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. Al publicar errores, indique su localización y el número de versión de Postal v%s."
 L["Prints the amount of money collected during a mail session."] = "Muestra la cantidad de dinero reunida durante una sesión de correo."
 L["Processing Message"] = "Procesando mensaje"
 L["Profile"] = "Perfil"
@@ -433,7 +433,7 @@ L["OpenAll"] = "Tout Ouvrir"
 L["Opening Speed"] = "Vitesse d'ouverture"
 L["Other options"] = "Autres options"
 L["Part %d"] = "Partie %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Merci de signaler les bogues ou de faire part de vos suggestions sur le sujet du forum WoWAce dédié à Postal : |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. Lors du signalement d'un bogue, indiquez la langue de votre jeu ainsi que le numéro de version de Postal v%s."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Merci de signaler les bogues ou de faire part de vos suggestions sur le sujet du forum CurseForge dédié à Postal : |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. Lors du signalement d'un bogue, indiquez la langue de votre jeu ainsi que le numéro de version de Postal v%s."
 L["Prints the amount of money collected during a mail session."] = "Indique la quantité d'argent récoltée pendant la consultation du courrier."
 L["Processing Message"] = "En cours"
 L["Profile"] = "Profil"
@@ -548,7 +548,7 @@ L["OpenAll"] = "모두 열기"
 L["Opening Speed"] = "열기 속도"
 L["Other options"] = "기타 설정"
 L["Part %d"] = "구성원 %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "|cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r의 wowace 포럼에서 버그 제보나 제안을 할 수 있습니다. 버그 제보 시, 귀하의 지역 언어와 버전 번호(v%s)를 알려주세요."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "|cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r의 CurseForge 포럼에서 버그 제보나 제안을 할 수 있습니다. 버그 제보 시, 귀하의 지역 언어와 버전 번호(v%s)를 알려주세요."
 L["Prints the amount of money collected during a mail session."] = "우편함을 열고 있는 동안 수집되는 총 금액을 대화창에 출력합니다."
 L["Processing Message"] = "메시지를 처리 중입니다:"
 L["Profile"] = "프로필"
@@ -579,7 +579,7 @@ end
 L = AL3:NewLocale("Postal", "ruRU")
 if L then
 L["|cffeda55fAlt-Click|r to send this item to %s."] = "|cffeda55fAlt+щелчок|r чтобы выслать предмет в адрес %s."
-L["|cffeda55fControl-Click|r to attach similar items."] = "|cffeda55fControl+щелчок|r чтобы прикрепить аналогичные предеметы."
+L["|cffeda55fControl-Click|r to attach similar items."] = "|cffeda55fControl+щелчок|r чтобы прикрепить аналогичные предметы."
 L["|cffeda55fCtrl-Click|r to return it to sender."] = "|cffeda55fCtrl+щелчок|r чтобы вернуть отправителю."
 L["|cffeda55fShift-Click|r to take the contents."] = "|cffeda55fShift+щелчок|r чтобы взять содержимое."
 L[ [=[|cFFFFCC00*|r Selected mail will be batch opened or returned to sender by clicking Open or Return.
@@ -657,14 +657,14 @@ L["Open all Auction cancelled mail"] = "Открывать все письма �
 L["Open all Auction expired mail"] = "Открывать все письма с несостоявшихся аукционов"
 L["Open all Auction successful mail"] = "Открыть все письма с успешных аукционов"
 L["Open all Auction won mail"] = "Открывать все письма с выигранных аукционов"
-L["Open all mail with attachments"] = "Окрыть все письма с вложениями"
+L["Open all mail with attachments"] = "Открыть все письма с вложениями"
 L["Open all Outbid on mail"] = "Открыть все письма с перебитыми ставками"
-L["Open mail from the Postmaster"] = "Окрыть все письма Почтальон"
+L["Open mail from the Postmaster"] = "Открыть все письма Почтальон"
 L["OpenAll"] = "Открыть всё"
 L["Opening Speed"] = "Скорость открытия"
 L["Other options"] = "Прочие опции"
 L["Part %d"] = "Часть %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Пожалуйста, сообщите об ошибках или предложениях на форуме wowace |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. При отправке ошибки, сообщите язык вашего клиента и номер версии Postal v%s."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Пожалуйста, сообщите об ошибках или предложениях на форуме CurseForge |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. При отправке ошибки, сообщите язык вашего клиента и номер версии Postal v%s."
 L["Prints the amount of money collected during a mail session."] = "Сообщить сумму денег, собранных за сеанс работы с почтой"
 L["Processing Message"] = "Обработка сообщения"
 L["Profile"] = "Профиль"
@@ -779,7 +779,7 @@ L["OpenAll"] = "打开所有"
 L["Opening Speed"] = "收信速度"
 L["Other options"] = "其他选项"
 L["Part %d"] = "第%d组"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "请到 WowAce 的论坛|cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r 报告 Bug 或者提交建议。报告 Bug 时请说明 Postal 的版本 v%s。"
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "请到 CurseForge 的论坛|cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r 报告 Bug 或者提交建议。报告 Bug 时请说明 Postal 的版本 v%s。"
 L["Prints the amount of money collected during a mail session."] = "显示在一次邮件操作中所收到的金币。"
 L["Processing Message"] = "正在处理邮件"
 L["Profile"] = "配置文件"
@@ -823,7 +823,7 @@ L[ [=[|cFFFFCC00*|r Selected mail will be batch opened or returned to sender by 
 |cFFFFCC00*|r 您可以按Ctrl-點擊一個複選框來選定或取消選定一切來自該發件人的信件。
 |cFFFFCC00*|r 選擇 永遠不會刪除任何信件(當所有附在信件的物品和金錢被提取後，遊戲會自動刪除郵箱裡沒有文字的信件) 。
 |cFFFFCC00*|r 選擇 將跳過CoD信件和暴雪的信件。
-|cFFFFCC00*|r 關閉 消息模式 選項來停止當開啟信件時在聊天框的洗頻。]=]
+|cFFFFCC00*|r 關閉 訊息模式 選項來停止當開啟信件時在聊天框的洗頻。]=]
 L[ [=[|cFFFFCC00*|r Shift-Click to take item/money from mail.
 |cFFFFCC00*|r Ctrl-Click to return mail.
 |cFFFFCC00*|r Alt-Click to move an item from your inventory to the current outgoing mail (same as right click in default UI).]=] ] = [=[|cFFFFCC00*|r Shift-點擊將從郵件拿取物品/金錢。
@@ -837,8 +837,8 @@ L[ [=[|cFFFFCC00*|r Simple filters are available for various mail types.
 |cFFFFCC00*|r Disable the Verbose option to stop the chat spam while opening mail.]=] ] = [=[|cFFFFCC00*|r 簡單的篩選器可用於篩選各種信件類型。
 |cFFFFCC00*|r Shift-點擊 收取全部 按鈕將覆蓋所有的篩選器，並提取所有的信件。
 |cFFFFCC00*|r 收取全部 永遠不會刪除任何信件(當所有附在信件的物品和金錢被提取後，遊戲會自動刪除郵箱裡沒有文字的信件) 。
-|cFFFFCC00*|r 收取全部 將跳過CoD信件和暴雪的信件。
-|cFFFFCC00*|r 關閉 消息模式 選項來停止當開啟信件時在聊天框的洗頻。]=]
+|cFFFFCC00*|r 收取全部 將跳過付款取件信件和暴雪的信件。
+|cFFFFCC00*|r 關閉 訊息模式 選項來停止當開啟信件時在聊天框的洗頻。]=]
 L[ [=[|cFFFFCC00*|r This module will list your contacts, friends, guild mates, alts and track the last 10 people you mailed.
 |cFFFFCC00*|r It will also autocomplete all names in your BlackBook.]=] ] = [=[|cFFFFCC00*|r 此模組將您的聯絡人名單，朋友，公會隊友，分身，並追踪過去您曾郵寄的10人。
 |cFFFFCC00*|r 它也將自動填寫已在您的黑名單內所有的名字。]=]
@@ -848,7 +848,7 @@ L["Add Contact"] = "新增聯絡人"
 L["Add multiple item mail tooltips"] = "新增多個物品的郵件提示框"
 L["Adds a contact list next to the To: field."] = "在收件人輸入框旁邊添加一個聯絡列表。"
 L["AH-related mail"] = "拍賣相關信件"
-L["All Alts"] = "所有Alts"
+L["All Alts"] = "所有分身"
 L["Allows you to copy the contents of a mail."] = "允許你複製信的內容物。"
 L["Alts"] = "分身"
 L["Auto-Attach similar items on Control-Click"] = "Ctrl+點擊時自動附加相似物品"
@@ -895,7 +895,7 @@ L["OpenAll"] = "收取全部"
 L["Opening Speed"] = "收取速度"
 L["Other options"] = "其他選項"
 L["Part %d"] = "分組%d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "如要回報錯誤或建議請往wowace論壇|cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. 發帖時，說明你的語系和Postal的版本編號 v%s."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "回報 bug 和建議請到 CurseForge 網站相關頁面 |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r。回報 bug 時請註明你所使用的介面語言和 Postal 版本編號 v%s。"
 L["Prints the amount of money collected during a mail session."] = "顯示這次收取的金錢。"
 L["Processing Message"] = "正在處理訊息"
 L["Profile"] = "設定檔"
@@ -906,18 +906,18 @@ L["Remove Contact"] = "移除聯絡人"
 L["Reset Profile"] = "重置設定檔"
 L["Return"] = "返回"
 L["Select"] = "選擇"
-L["Set subject field to value of coins sent if subject is blank."] = "在「主題:」欄位自動填寫寄件金額。"
+L["Set subject field to value of coins sent if subject is blank."] = "如果「主題:」空白，則欄位自動填寫寄件金額。"
 L["Shows a clickable visual icon as to whether a mail will be returned or deleted on expiry."] = "視覺顯示點擊圖示是否郵件將被退回或刪除期滿。"
 L["Skipping"] = "略過"
 L["Some Messages May Have Been Skipped."] = "部份訊息可能會被略過。"
-L["Thaumaturge Vashreen"] = "魔术师瓦西里恩"
-L["The Postmaster"] = "邮政长"
+L["Thaumaturge Vashreen"] = "魔術師瓦西里恩"
+L["The Postmaster"] = "郵政長"
 L["There are %i more messages not currently shown."] = "有%i更多訊息沒有在目前顯示。"
 L["There are %i more messages not currently shown. More should become available in %i seconds."] = "有%i更多訊息沒有在目前顯示。在%i秒內將會顯示更多。"
 L["TradeBlock"] = "拒絕交易"
 L["Use Mr.Plow after opening"] = "在開啟郵件之後使用Mr.Plow 整理背包"
 L["Use Postal's auto-complete"] = "使用Postal的自動完成"
-L["Verbose mode"] = "消息模式"
+L["Verbose mode"] = "訊息模式"
 L["Wire"] = "自動填寫金額"
 
     return
@@ -1011,7 +1011,7 @@ L["OpenAll"] = "AbrirTudo"
 L["Opening Speed"] = "Velocidade de Abertura"
 L["Other options"] = "Outras opções"
 L["Part %d"] = "Parte %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Por favor poste bugs ou sugestões nos fórums do wowace em |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. Quando estiver postando bugs, indique seu locale e a versão do Postal v%s."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Por favor poste bugs ou sugestões nos fórums do CurseForge em |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. Quando estiver postando bugs, indique seu locale e a versão do Postal v%s."
 L["Prints the amount of money collected during a mail session."] = "Mostra a quantidade de dinheiro coletado durante uma sessão de cartas."
 L["Processing Message"] = "Processando Mensagem"
 L["Profile"] = "Perfil"
@@ -1126,7 +1126,7 @@ L["OpenAll"] = "Apri-tutto"
 L["Opening Speed"] = "Velocità d'apertura"
 L["Other options"] = "Altre opzioni"
 L["Part %d"] = "Parte %d"
-L["Please post bugs or suggestions at the wowace forums thread at |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Per favore riporta bug o suggerimenti al thread del forum wowace |cFF00FFFFhttp://forums.wowace.com/showthread.php?t=3909|r. Quando riporti un bug, indica la localizzazione e la versione v%s di Postal."
+L["Please post bugs or suggestions at the CurseForge forums thread at |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. When posting bugs, indicate your locale and Postal's version number v%s."] = "Per favore riporta bug o suggerimenti al thread del forum CurseForge |cFF00FFFFhttp://www.curseforge.com/wow/addons/postal/issues|r. Quando riporti un bug, indica la localizzazione e la versione v%s di Postal."
 L["Prints the amount of money collected during a mail session."] = "Scrivi l'ammontare di monete raccolte durante una sessione di posta"
 L["Processing Message"] = "Messaggio in elaborazione"
 L["Profile"] = "Profilo"

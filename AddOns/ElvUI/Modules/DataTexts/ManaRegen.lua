@@ -1,13 +1,11 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local strjoin = strjoin
---WoW API / Variables
+
 local GetManaRegen = GetManaRegen
 local InCombatLockdown = InCombatLockdown
 local MANA_REGEN = MANA_REGEN
-local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel = ''
 
@@ -31,4 +29,4 @@ local function ValueColorUpdate(hex)
 end
 E.valueColorUpdateFuncs[ValueColorUpdate] = true
 
-DT:RegisterDatatext('Mana Regen', STAT_CATEGORY_ATTRIBUTES, {'UNIT_STATS', 'UNIT_AURA'}, OnEvent, nil, nil, nil, nil, MANA_REGEN, nil, ValueColorUpdate)
+DT:RegisterDatatext('Mana Regen', _G.STAT_CATEGORY_ATTRIBUTES, {'UNIT_STATS', 'UNIT_AURA'}, OnEvent, nil, nil, nil, nil, MANA_REGEN, nil, ValueColorUpdate)

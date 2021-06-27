@@ -1,6 +1,9 @@
 local parent, ns = ...
 local oUF = ns.oUF
 
+-- sourced from Blizzard_ArenaUI/Blizzard_ArenaUI.lua
+local MAX_ARENA_ENEMIES = MAX_ARENA_ENEMIES or 5
+
 -- sourced from FrameXML/PartyMemberFrame.lua
 local MAX_PARTY_MEMBERS = MAX_PARTY_MEMBERS or 4
 
@@ -63,6 +66,10 @@ function oUF:DisableBlizzard(unit)
 
 		-- For the damn vehicle support:
 		PlayerFrame:RegisterEvent('PLAYER_ENTERING_WORLD')
+		PlayerFrame:RegisterEvent('UNIT_ENTERING_VEHICLE')
+		PlayerFrame:RegisterEvent('UNIT_ENTERED_VEHICLE')
+		PlayerFrame:RegisterEvent('UNIT_EXITING_VEHICLE')
+		PlayerFrame:RegisterEvent('UNIT_EXITED_VEHICLE')
 
 		-- User placed frames don't animate
 		PlayerFrame:SetUserPlaced(true)
@@ -72,6 +79,9 @@ function oUF:DisableBlizzard(unit)
 	elseif(unit == 'target') then
 		handleFrame(TargetFrame)
 		handleFrame(ComboFrame)
+	elseif(unit == 'focus') then
+		handleFrame(FocusFrame)
+		handleFrame(TargetofFocusFrame)
 	elseif(unit == 'targettarget') then
 		handleFrame(TargetFrameToT)
 	elseif(unit:match('party%d?$')) then
@@ -83,6 +93,19 @@ function oUF:DisableBlizzard(unit)
 				handleFrame(string.format('PartyMemberFrame%d', i))
 			end
 		end
+	elseif(unit:match('arena%d?$')) then
+		local id = unit:match('arena(%d)')
+		if(id) then
+			handleFrame('ArenaEnemyFrame' .. id)
+		else
+			for i = 1, MAX_ARENA_ENEMIES do
+				handleFrame(string.format('ArenaEnemyFrame%d', i))
+			end
+		end
+
+		-- Blizzard_ArenaUI should not be loaded
+		Arena_LoadUI = function() end
+		--SetCVar('showArenaEnemyFrames', '0', 'SHOW_ARENA_ENEMY_FRAMES_TEXT')
 	elseif(unit:match('nameplate%d+$')) then
 		local frame = C_NamePlate.GetNamePlateForUnit(unit)
 		if(frame and frame.UnitFrame) then

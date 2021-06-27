@@ -1,5 +1,6 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule('NamePlates')
+local LSM = E.Libs.LSM
 
 function NP:Construct_TagText(nameplate)
 	local Text = nameplate:CreateFontString(nil, 'OVERLAY')
@@ -13,11 +14,11 @@ function NP:Update_TagText(nameplate, element, db, hide)
 
 	if db.enable and not hide then
 		nameplate:Tag(element, db.format or '')
-		element:FontTemplate(E.LSM:Fetch('font', db.font), db.fontSize, db.fontOutline)
+		element:FontTemplate(LSM:Fetch('font', db.font), db.fontSize, db.fontOutline)
 		element:UpdateTag()
 
 		element:ClearAllPoints()
-		element:SetPoint(E.InversePoints[db.position], db.parent == 'Nameplate' and nameplate or nameplate[db.parent], db.position, db.xOffset, db.yOffset)
+		element:Point(E.InversePoints[db.position], db.parent == 'Nameplate' and nameplate or nameplate[db.parent], db.position, db.xOffset, db.yOffset)
 		element:Show()
 	else
 		nameplate:Untag(element)
@@ -25,10 +26,9 @@ function NP:Update_TagText(nameplate, element, db, hide)
 	end
 end
 
-function NP:Update_Tags(nameplate)
+function NP:Update_Tags(nameplate, nameOnlySF)
 	local db = NP:PlateDB(nameplate)
-	local sf = NP:StyleFilterChanges(nameplate)
-	local hide = db.nameOnly or sf.NameOnly
+	local hide = db.nameOnly or nameOnlySF
 
 	NP:Update_TagText(nameplate, nameplate.Name, db.name)
 	NP:Update_TagText(nameplate, nameplate.Title, db.title)

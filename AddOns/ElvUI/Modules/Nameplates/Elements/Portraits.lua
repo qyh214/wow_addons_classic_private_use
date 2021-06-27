@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule('NamePlates')
 
 local _G = _G
@@ -33,7 +33,7 @@ end
 function NP:Construct_Portrait(nameplate)
 	local Portrait = nameplate:CreateTexture(nameplate:GetName() .. 'Portrait', 'OVERLAY', nil, 2)
 	Portrait:SetTexCoord(.18, .82, .18, .82)
-	Portrait:CreateBackdrop()
+	Portrait:CreateBackdrop(nil, nil, nil, nil, nil, true)
 	Portrait:Hide()
 
 	Portrait.PostUpdate = NP.Portrait_PostUpdate
@@ -50,11 +50,14 @@ function NP:Update_Portrait(nameplate)
 	if sf.Portrait or (db.portrait and db.portrait.enable) then
 		if not nameplate:IsElementEnabled('Portrait') then
 			nameplate:EnableElement('Portrait')
+			nameplate.Portrait:ForceUpdate()
 		end
 
+		nameplate.Portrait:Size(db.portrait.width, db.portrait.height)
+
+		-- These values are forced in name only mode inside of DisablePlate
 		if not (db.nameOnly or sf.NameOnly) then
 			nameplate.Portrait:ClearAllPoints()
-			nameplate.Portrait:Size(db.portrait.width, db.portrait.height)
 			nameplate.Portrait:Point(E.InversePoints[db.portrait.position], nameplate, db.portrait.position, db.portrait.xOffset, db.portrait.yOffset)
 		end
 	elseif nameplate:IsElementEnabled('Portrait') then

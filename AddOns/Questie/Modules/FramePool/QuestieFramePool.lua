@@ -7,8 +7,6 @@ local QuestieFramePool = QuestieLoader:CreateModule("QuestieFramePool")
 local QuestieQuest = QuestieLoader:ImportModule("QuestieQuest")
 ---@type QuestieComms
 local QuestieComms = QuestieLoader:ImportModule("QuestieComms")
----@type QuestieTooltips
-local QuestieTooltips = QuestieLoader:ImportModule("QuestieTooltips")
 ---@type QuestieMap
 local QuestieMap = QuestieLoader:ImportModule("QuestieMap")
 ---@type QuestieLib
@@ -19,8 +17,12 @@ local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer")
 local QuestieDB = QuestieLoader:ImportModule("QuestieDB")
 ---@type QuestieEvent
 local QuestieEvent = QuestieLoader:ImportModule("QuestieEvent")
+---@type l10n
+local l10n = QuestieLoader:ImportModule("l10n")
 
-local tinsert = table.insert
+local WRAP_TEXT = 1;
+
+local tinsert = table.insert;
 local tremove = table.remove;
 local _QuestieFramePool = QuestieFramePool.private
 _QuestieFramePool.numberOfFrames = 0
@@ -42,42 +44,35 @@ HBDPins.MinimapGroup = CreateFrame("Frame", "QuestieFrameGroup", Minimap)
 
 
 function QuestieFramePool:SetIcons()
-    if (Questie.db.char.enableMinimalisticIcons) then
-        ICON_TYPE_SLAY =  QuestieLib.AddonPath.."Icons\\slay_tiny.blp"
-        ICON_TYPE_LOOT =  QuestieLib.AddonPath.."Icons\\loot_tiny.blp"
-        ICON_TYPE_EVENT =  QuestieLib.AddonPath.."Icons\\event_tiny.blp"
-        ICON_TYPE_OBJECT =  QuestieLib.AddonPath.."Icons\\object_tiny.blp"
-    else
-        ICON_TYPE_SLAY =  QuestieLib.AddonPath.."Icons\\slay.blp"
-        ICON_TYPE_LOOT =  QuestieLib.AddonPath.."Icons\\loot.blp"
-        ICON_TYPE_EVENT =  QuestieLib.AddonPath.."Icons\\event.blp"
-        ICON_TYPE_OBJECT =  QuestieLib.AddonPath.."Icons\\object.blp"
-    end
-    --TODO: Add all types (we gotta stop using globals, needs refactoring)
+    ICON_TYPE_SLAY =  QuestieLib.AddonPath.."Icons\\slay.blp"
+    ICON_TYPE_LOOT =  QuestieLib.AddonPath.."Icons\\loot.blp"
+    ICON_TYPE_EVENT =  QuestieLib.AddonPath.."Icons\\event.blp"
+    ICON_TYPE_OBJECT =  QuestieLib.AddonPath.."Icons\\object.blp"
+
+    -- TODO Add all types (we gotta stop using globals, needs refactoring)
     ICON_TYPE_AVAILABLE =  QuestieLib.AddonPath.."Icons\\available.blp"
     ICON_TYPE_AVAILABLE_GRAY =  QuestieLib.AddonPath.."Icons\\available_gray.blp"
     ICON_TYPE_COMPLETE =  QuestieLib.AddonPath.."Icons\\complete.blp"
     ICON_TYPE_GLOW = QuestieLib.AddonPath.."Icons\\glow.blp"
-    ICON_TYPE_BLACK = QuestieLib.AddonPath.."Icons\\black.blp"
     ICON_TYPE_REPEATABLE =  QuestieLib.AddonPath.."Icons\\repeatable.blp"
 end
 
 
 StaticPopupDialogs["QUESTIE_CONFIRMHIDE"] = {
     text = "", -- set before showing
-    QuestID = 0, -- set before showing
-    button1 = QuestieLocale:GetUIString("CONFIRM_HIDE_YES"),
-    button2 = QuestieLocale:GetUIString("CONFIRM_HIDE_NO"),
+    questID = 0, -- set before showing
+    button1 = l10n("Yes"),
+    button2 = l10n("No"),
     OnAccept = function()
-        QuestieQuest:HideQuest(StaticPopupDialogs["QUESTIE_CONFIRMHIDE"].QuestID)
+        QuestieQuest:HideQuest(StaticPopupDialogs["QUESTIE_CONFIRMHIDE"].questID)
     end,
     SetQuest = function(self, id)
-        self.QuestID = id
-        self.text = QuestieLocale:GetUIString("CONFIRM_HIDE_QUEST", QuestieDB:GetQuest(self.QuestID):GetColoredQuestName())
+        self.questID = id
+        self.text = l10n("Are you sure you want to hide the quest '%s'?\nIf this quest isn't actually available, please report it to us!", QuestieLib:GetColoredQuestName(id, Questie.db.global.enableTooltipsQuestLevel, false, true))
 
         -- locale might not be loaded when this is first created (this does happen almost always)
-        self.button1 = QuestieLocale:GetUIString("CONFIRM_HIDE_YES")
-        self.button2 = QuestieLocale:GetUIString("CONFIRM_HIDE_NO")
+        self.button1 = l10n("Yes")
+        self.button2 = l10n("No")
     end,
     OnShow = function(self)
         self:SetFrameStrata("TOOLTIP")
@@ -151,10 +146,7 @@ function QuestieFramePool:GetFrame()
 end
 
 function QuestieFramePool:UnloadAll()
-    --Questie:Debug(DEBUG_DEVELOP, "[QuestieFramePool] ".. QuestieLocale:GetUIString('DEBUG_UNLOAD_ALL', #_QuestieFramePool.allFrames))
-
-    for i, frame in ipairs(_QuestieFramePool.allFrames) do
-        --_QuestieFramePool:UnloadFrame(frame);
+    for _, frame in ipairs(_QuestieFramePool.allFrames) do
         frame:Unload()
     end
     QuestieMap.questIdFrames = {}
@@ -253,42 +245,44 @@ function _QuestieFramePool:IsMinimapInside()
 end
 
 ---@param iconFrame IconFrame @The parent frame for the current line.
----@param waypointTable table<integer, Point> @A table containing waypoints {{X, Y}, ...}
----@param lineWidth integer @Width of the line.
----@param color integer[] @A table consisting of 4 variable {1, 1, 1, 1} RGB-Opacity
+---@param waypointTable table<number, Point> @A table containing waypoints {{X, Y}, ...}
+---@param lineWidth number @Width of the line.
+---@param color number[] @A table consisting of 4 variable {1, 1, 1, 1} RGB-Opacity
 ---@return LineFrame[]
-function QuestieFramePool:CreateWaypoints(iconFrame, waypointTable, lineWidth, color)
+function QuestieFramePool:CreateWaypoints(iconFrame, waypointTable, lineWidth, color, areaId)
     local lineFrameList = {}
-    local lastPos = nil
+    local lastPos
     --Set defaults if needed.
     local lWidth = lineWidth or 1.5;
     local col = color or _QuestieFramePool.wayPointColor
 
-    for _, waypoint in pairs(waypointTable) do
-        if (lastPos == nil) then
-            lastPos = waypoint;
-        else
-            local lineFrame = QuestieFramePool:CreateLine(iconFrame, lastPos[1], lastPos[2], waypoint[1], waypoint[2], lWidth, col)
-            tinsert(lineFrameList, lineFrame);
-            lastPos = waypoint;
+    for _, waypointSubTable in pairs(waypointTable) do
+        lastPos = nil
+        for _, waypoint in pairs(waypointSubTable) do
+            if (lastPos == nil) then
+                lastPos = waypoint;
+            else
+                local lineFrame = QuestieFramePool:CreateLine(iconFrame, lastPos[1], lastPos[2], waypoint[1], waypoint[2], lWidth, col, areaId)
+                tinsert(lineFrameList, lineFrame);
+                lastPos = waypoint;
+            end
         end
     end
-    local lineFrame = QuestieFramePool:CreateLine(iconFrame, lastPos[1], lastPos[2], waypointTable[1][1], waypointTable[1][2], lWidth, col)
-    tinsert(lineFrameList, lineFrame);
     return lineFrameList;
 end
 
+local lineFrames = 1
+
 ---@param iconFrame IconFrame @The parent frame for the current line.
----@param startX integer @A value between 0-100
----@param startY integer @A value between 0-100
----@param endX integer @A value between 0-100
----@param endY integer @A value between 0-100
----@param lineWidth integer @Width of the line.
----@param color integer[] @A table consisting of 4 variable {1, 1, 1, 1} RGB-Opacity
+---@param startX number @A value between 0-100
+---@param startY number @A value between 0-100
+---@param endX number @A value between 0-100
+---@param endY number @A value between 0-100
+---@param lineWidth number @Width of the line.
+---@param color number[] @A table consisting of 4 variable {1, 1, 1, 1} RGB-Opacity
 ---@return LineFrame
 ---@class LineFrame @A frame that contains the line used in waypoints.
-local lineFrames = 1;
-function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, lineWidth, color)
+function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, lineWidth, color, areaId)
 
     --Create the framepool for lines if it does not already exist.
     if not QuestieFramePool.Routes_Lines then
@@ -298,25 +292,21 @@ function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, line
     local frameName = "questieLineFrame"..lineFrames;
 
     --tremove default always picks the last element, however counting arrays is kinda bugged? So just get index 1 instead.
-    local lineFrame = tremove(QuestieFramePool.Routes_Lines, 1) or CreateFrame("Frame", frameName, iconFrame);
+    local lineFrame = tremove(QuestieFramePool.Routes_Lines, 1) or CreateFrame("Button", frameName, iconFrame);
     if not lineFrame.frameId then
         lineFrame.frameId = lineFrames;
     end
 
-    local width = WorldMapFrame:GetCanvas():GetWidth();
-    local height = WorldMapFrame:GetCanvas():GetHeight();
+    local canvas = WorldMapFrame:GetCanvas()
+
+    local width = canvas:GetWidth();
+    local height = canvas:GetHeight();
 
     --Setting the parent is required to get the correct frame levels.
-    lineFrame:SetParent(iconFrame);
-    lineFrame:SetHeight(width);
-    lineFrame:SetWidth(height);
-    lineFrame:SetPoint("TOPLEFT", WorldMapFrame:GetCanvas(), "TOPLEFT", 0, 0)
-    local frameLevel = iconFrame:GetFrameLevel();
-    if (frameLevel > 1) then
-        frameLevel = frameLevel - 1;
-    end
-    lineFrame:SetFrameLevel(frameLevel)
-    lineFrame:SetFrameStrata("FULLSCREEN");
+
+    lineFrame:SetParent(canvas) --This fixes the pan and zoom for lines
+    lineFrame:SetFrameLevel(2015) -- This needs to be high, because of the regular WorldMapFrame.ScrollContainer
+    lineFrame:SetFrameStrata("FULLSCREEN")
 
     --How to identify what the frame actually contains, this is not used atm could easily be changed.
     lineFrame.type = "line"
@@ -327,6 +317,11 @@ function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, line
     end
     tinsert(iconFrame.data.lineFrames, lineFrame);
     lineFrame.iconFrame = iconFrame;
+    lineFrame.data = iconFrame.data
+    lineFrame.x = (startX + endX) / 2
+    lineFrame.y = (startY + endY) / 2
+    lineFrame.AreaID = areaId or iconFrame.AreaID
+    lineFrame.texture = iconFrame.texture
 
     function lineFrame:Unload()
         if not self.iconFrame then
@@ -334,6 +329,11 @@ function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, line
         end
         self:Hide();
         self.iconFrame = nil;
+        self.x = nil
+        self.y = nil
+        self.data = nil
+        self.texture = nil
+        self.AreaID = nil
         HBDPins:RemoveWorldMapIcon(Questie, self)
         tinsert(QuestieFramePool.Routes_Lines, self);
     end
@@ -346,16 +346,81 @@ function QuestieFramePool:CreateLine(iconFrame, startX, startY, endX, endY, line
     line.dA = color[4];
     line:SetColorTexture(color[1],color[2],color[3],color[4]);
 
+    local lineBorder = lineFrame.lineBorder or lineFrame:CreateLine();
+    lineFrame.lineBorder = lineBorder;
+
+    lineBorder.dR = color[1];
+    lineBorder.dG = color[2];
+    lineBorder.dB = color[3];
+    lineBorder.dA = color[4];
+    lineBorder:SetColorTexture(0,0,0,color[4]/2);
+
     -- Set texture coordinates and anchors
     --line:ClearAllPoints();
 
-    local calcX = width/100;
-    local calcY = height/100;
+    startX = startX * width / 100
+    startY = startY * height / -100 -- We do by / -100 due to using the top left point
+    endX = endX * width / 100
+    endY = endY * height / -100
+
+    width = abs(startX - endX) + lineWidth * 4
+    height = abs(startY - endY) + lineWidth * 4
+
+    local framePosX = max(startX, endX) - lineWidth * 2 - width / 2
+    local framePosY = min(startY, endY) + lineWidth * 2 + height / 2
+
+    lineFrame:SetHeight(height);
+    lineFrame:SetWidth(width);
+    lineFrame:SetPoint("TOPLEFT", canvas, "TOPLEFT", framePosX, framePosY)
 
     line:SetDrawLayer("OVERLAY", -5)
-    line:SetStartPoint("TOPLEFT", startX*calcX, (startY*calcY)*-1) -- We do by *-1 due to using the top left point
-    line:SetEndPoint("TOPLEFT", endX*calcX, (endY*calcY)*-1) -- We do by *-1 due to using the top left point
+    line:SetStartPoint("TOPLEFT", startX - framePosX, startY - framePosY)
+    line:SetEndPoint("TOPLEFT", endX - framePosX, endY - framePosY)
     line:SetThickness(lineWidth);
+
+    lineBorder:SetDrawLayer("OVERLAY", -6)
+    lineBorder:SetStartPoint("TOPLEFT", startX - framePosX, startY - framePosY)
+    lineBorder:SetEndPoint("TOPLEFT", endX - framePosX, endY - framePosY)
+    lineBorder:SetThickness(lineWidth+2);
+
+
+
+    lineFrame:EnableMouse(true)
+
+    --lineFrame:SetBackdrop({ -- mouseover debugging
+    --    bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+    --    edgeFile = nil,
+    --    edgeSize = 0,
+    --    insets = { left = 0, right = 0, top = 0, bottom = 0 },
+    --})
+
+    --lineFrame:SetBackdropColor(1,0,1,1)
+
+    lineFrame:SetScript("OnEnter", function(self)
+        if self and self.iconFrame then
+            local script = self.iconFrame:GetScript("OnEnter")
+            if script then
+                script(self.iconFrame)
+            end
+        end
+    end)
+    lineFrame:SetScript("OnLeave", function(self)
+        if self and self.iconFrame then
+            local script = self.iconFrame:GetScript("OnLeave")
+            if script then
+                script(self.iconFrame)
+            end
+        end
+    end)
+    lineFrame:RegisterForClicks("RightButtonUp", "LeftButtonUp")
+    lineFrame:SetScript("OnClick", function(self, button)
+        if self and self.iconFrame then
+            local script = self.iconFrame:GetScript("OnClick")
+            if script then
+                script(self.iconFrame, button)
+            end
+        end
+    end)
 
     --line:Hide()
     lineFrame:Hide();
@@ -377,24 +442,24 @@ end
 function _QuestieFramePool:GetAvailableOrCompleteTooltip(icon)
     local tip = {};
     if icon.data.Type == "complete" then
-        tip.type = QuestieLocale:GetUIString("TOOLTIP_QUEST_COMPLETE");
+        tip.type = "(" .. l10n("Complete") .. ")";
     else
 
         local quest = icon.data.QuestData
         local questType, questTag = quest:GetQuestTagInfo();
 
-        if (icon.data.QuestData.IsRepeatable) then
-            tip.type = QuestieLocale:GetUIString("TOOLTIP_QUEST_REPEATABLE");
+        if (QuestieDB:IsRepeatable(icon.data.Id)) then
+            tip.type = "(" .. l10n("Repeatable") .. ")";
         elseif (questType == 41 or questType == 81 or questType == 83 or questType == 62 or questType == 1) then
             -- Dungeon or Legendary or Raid or Group(Elite)
             tip.type = "("..questTag..")";
         elseif (QuestieEvent and QuestieEvent.activeQuests[icon.data.Id]) then
-            tip.type = QuestieLocale:GetUIString("TOOLTIP_QUEST_EVENT");
+            tip.type = "(" .. l10n("Event") .. ")";
         else
-            tip.type = QuestieLocale:GetUIString("TOOLTIP_QUEST_AVAILABLE");
+            tip.type = "(" .. l10n("Available") .. ")";
         end
     end
-    tip.title = icon.data.QuestData:GetColoredQuestName(true)
+    tip.title = QuestieLib:GetColoredQuestName(icon.data.Id, Questie.db.global.enableTooltipsQuestLevel, false, true)
     tip.subData = icon.data.QuestData.Description
     tip.questId = icon.data.Id;
 
@@ -425,14 +490,8 @@ function _QuestieFramePool:GetObjectiveTooltip(icon)
         local quest = QuestieComms:GetQuest(iconData.Id)
         if quest then
             for playerName, objectiveData in pairs(quest) do
-                --[[
-                    -.type = objective.type;
-                    -.finished = objective.finished;
-                    -.fulfilled = objective.numFulfilled;
-                    -.required = objective.numRequired;
-                ]]
                 local playerInfo = QuestiePlayer:GetPartyMemberByName(playerName)
-                local playerColor = nil
+                local playerColor
                 local playerType = ""
                 if playerInfo then
                     playerColor = "|c" .. playerInfo.colorHex
@@ -440,7 +499,7 @@ function _QuestieFramePool:GetObjectiveTooltip(icon)
                     playerColor = QuestieComms.remotePlayerClasses[playerName]
                     if playerColor then
                         playerColor = Questie:GetClassColor(playerColor)
-                        playerType = " ("..QuestieLocale:GetUIString("Nearby")..")"
+                        playerType = " (".. l10n("Nearby")..")"
                     end
                 end
                 if playerColor then
@@ -472,8 +531,8 @@ function _QuestieFramePool:GetObjectiveTooltip(icon)
             end
             if anotherPlayer then
                 local name = UnitName("player");
-                local className, classFilename = UnitClass("player");
-                local rPerc, gPerc, bPerc, argbHex = GetClassColor(classFilename)
+                local _, classFilename = UnitClass("player");
+                local _, _, _, argbHex = GetClassColor(classFilename)
                 name = " (|c"..argbHex..name.."|r"..color..")|r";
                 text = text .. name;
             end
@@ -514,8 +573,8 @@ end
 function _QuestieFramePool:QuestieTooltip()
     --Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:QuestieTooltip]", "minimapIcon =", self.miniMapIcon)
 
-    local r, g, b, a = self.texture:GetVertexColor();
-    if (a == 0) then
+    local _, _, _, alpha = self.texture:GetVertexColor();
+    if alpha == 0 then
         Questie:Debug(DEBUG_DEVELOP, "[_QuestieFramePool:QuestieTooltip]", "Alpha of texture is 0, nothing to show")
         return
     end
@@ -529,7 +588,6 @@ function _QuestieFramePool:QuestieTooltip()
     Tooltip:SetOwner(self, "ANCHOR_CURSOR"); --"ANCHOR_CURSOR" or (self, self)
 
     --if QuestieQuest._isResetting then -- temporary fix for lua errors during smoothreset. We need to dig through this and find a proper fix later
-    --    Tooltip:AddLine(QuestieLocale:GetUIString("QUESTIE_IS_LOADING"), 1, 0.2, 0.1)
     --    Tooltip:SetFrameStrata("TOOLTIP")
     --    Tooltip:Show()
     --    return
@@ -549,12 +607,12 @@ function _QuestieFramePool:QuestieTooltip()
             maxDistCluster = 0.5 / (1+Minimap:GetZoom())
         end
     end
-    r, g, b, a = unpack(QuestieMap.zoneWaypointHoverColorOverrides[self.AreaID] or _QuestieFramePool.wayPointColorHover)
+
+    local r, g, b, a = unpack(QuestieMap.zoneWaypointHoverColorOverrides[self.AreaID] or _QuestieFramePool.wayPointColorHover)
     --Highlight waypoints if they exist.
-    for k, lineFrame in pairs(self.data.lineFrames or {}) do
+    for _, lineFrame in pairs(self.data.lineFrames or {}) do
       lineFrame.line:SetColorTexture(
         r,g,b,a
-        --   math.min(lineFrame.line.dR*1.4, 1), math.min(lineFrame.line.dG*1.4, 1), math.min(lineFrame.line.dB*1.4, 1), math.min(lineFrame.line.dA*1.4, 1)
         )
     end
 
@@ -562,7 +620,7 @@ function _QuestieFramePool:QuestieTooltip()
     -- https://discordapp.com/channels/263036731165638656/263040777658171392/627808795715960842
     -- happens when a note doesn't get removed after a quest has been finished, see #1170
     -- TODO: change how the logic works, so this [ObjectiveIndex?] can be nil
-    -- it is nil on some notes like starters/finishers, because its for objectives. However, it needs to be an integer here for duplicate checks
+    -- it is nil on some notes like starters/finishers, because its for objectives. However, it needs to be an number here for duplicate checks
     if self.data.ObjectiveIndex == nil then
         self.data.ObjectiveIndex = 0
     end
@@ -608,20 +666,20 @@ function _QuestieFramePool:QuestieTooltip()
                     local tip = _QuestieFramePool:GetAvailableOrCompleteTooltip(icon)
                     npcOrder[iconData.Name][tip.title] = tip
                 elseif iconData.ObjectiveData and iconData.ObjectiveData.Description then
-                    local key = iconData.Id--.QuestData:GetColoredQuestName();
+                    local key = iconData.Id
                     if not questOrder[key] then
                         questOrder[key] = {};
                     end
 
                     local orderedTooltips = {}
-                    iconData.ObjectiveData:Update(); -- update progress info
+                    iconData.ObjectiveData:Update()
                     if iconData.Type == "event" then
                         local tip = _QuestieFramePool:GetEventObjectiveTooltip(icon)
 
                         -- We need to check for duplicates.
                         local add = true;
-                        for index, data in pairs(questOrder[key]) do
-                            for text, nameData in pairs(data) do
+                        for _, data in pairs(questOrder[key]) do
+                            for text, _ in pairs(data) do
                                 if (text == iconData.ObjectiveData.Description) then
                                     add = false;
                                     break;
@@ -645,7 +703,7 @@ function _QuestieFramePool:QuestieTooltip()
                     questOrder[iconData.CustomTooltipData.Title] = {}
                     tinsert(questOrder[iconData.CustomTooltipData.Title], iconData.CustomTooltipData.Body);
                 elseif iconData.ManualTooltipData then
-                    manualOrder[iconData.ManualTooltipData.Title] = iconData.ManualTooltipData.Body
+                    manualOrder[iconData.ManualTooltipData.Title] = iconData.ManualTooltipData
                 end
             end
         end
@@ -658,6 +716,11 @@ function _QuestieFramePool:QuestieTooltip()
     else
         for pin in HBDPins.worldmapProvider:GetMap():EnumeratePinsByTemplate("HereBeDragonsPinsTemplateQuestie") do
             handleMapIcon(pin.icon)
+            if pin.icon.data.lineFrames then
+                for _, line in pairs(pin.icon.data.lineFrames) do
+                    handleMapIcon(line)
+                end
+            end
         end
     end
 
@@ -666,31 +729,29 @@ function _QuestieFramePool:QuestieTooltip()
     Tooltip.manualOrder = manualOrder
     Tooltip.miniMapIcon = self.miniMapIcon
     Tooltip._Rebuild = function(self)
-        --Questie:Debug(DEBUG_SPAM, "[Tooltip:_Rebuild]")
-        local xpString = QuestieLocale:GetUIString('XP');
+        local xpString = l10n('xp');
         local shift = IsShiftKeyDown()
         local haveGiver = false -- hack
         local firstLine = true;
         for questTitle, quests in pairs(self.npcOrder) do -- this logic really needs to be improved
             haveGiver = true
             if (firstLine and not shift) then
-                self:AddDoubleLine(questTitle, "("..QuestieLocale:GetUIString('ICON_SHIFT_HOLD')..")", 0.2, 1, 0.2, 0.43, 0.43, 0.43); --"(Shift+click)"
+                self:AddDoubleLine(questTitle, "(".. l10n('Hold Shift')..")", 0.2, 1, 0.2, 0.43, 0.43, 0.43); --"(Shift+click)"
                 firstLine = false;
             elseif (firstLine and shift) then
-                --self:AddDoubleLine(questTitle, "(".."Click to hide"..")", 0.2, 1, 0.2, 0.43, 0.43, 0.43); --"(Shift+click)"
                 self:AddLine(questTitle, 0.2, 1, 0.2);
                 firstLine = false;
             else
               self:AddLine(questTitle, 0.2, 1, 0.2);
             end
-            for k2, questData in pairs(quests) do
+            for _, questData in pairs(quests) do
                 if questData.title ~= nil then
                     local quest = QuestieDB:GetQuest(questData.questId)
                     if (quest and shift) then
                         local rewardString = ""
-                        local rewardXP = GetQuestLogRewardXP(questData.questId)
-                        if rewardXP > 0 then -- Quest rewards XP
-                            rewardString = QuestieLib:PrintDifficultyColor(quest.level, "(".. rewardXP .. xpString .. ") ")
+                        local xpReward = GetQuestLogRewardXP(questData.questId)
+                        if xpReward > 0 then -- Quest rewards XP
+                            rewardString = QuestieLib:PrintDifficultyColor(quest.level, "(".. FormatLargeNumber(xpReward) .. xpString .. ") ")
                         end
 
                         local moneyReward = GetQuestLogRewardMoney(questData.questId)
@@ -706,10 +767,10 @@ function _QuestieFramePool:QuestieTooltip()
                     local dataType = type(questData.subData)
                     if dataType == "table" then
                         for _, line in pairs(questData.subData) do
-                            self:AddLine("      " .. line, 0.86, 0.86, 0.86);
+                            self:AddLine(line, 0.86, 0.86, 0.86, WRAP_TEXT);
                         end
                     elseif dataType == "string" then
-                        self:AddLine("      " .. questData.subData, 0.86, 0.86, 0.86);
+                        self:AddLine(questData.subData, 0.86, 0.86, 0.86, WRAP_TEXT);
                         --self:AddLine("      |cFFDDDDDD" .. v2.subData);
                     end
                 end
@@ -719,18 +780,19 @@ function _QuestieFramePool:QuestieTooltip()
         for questId, textList in pairs(self.questOrder) do -- this logic really needs to be improved
             ---@type Quest
             local quest = QuestieDB:GetQuest(questId);
-            local questTitle = quest:GetColoredQuestName();
+            local questTitle = QuestieLib:GetColoredQuestName(questId, Questie.db.global.enableTooltipsQuestLevel, true, true);
             if haveGiver then
                 self:AddLine(" ");
-                self:AddDoubleLine(questTitle, QuestieLocale:GetUIString("TOOLTIP_QUEST_ACTIVE"), 1, 1, 1, 1, 1, 0);
+                self:AddDoubleLine(questTitle, "(" .. l10n("Active") .. ")", 1, 1, 1, 1, 1, 0);
                 haveGiver = false -- looks better when only the first one shows (active)
             else
-                if (quest and shift and QuestiePlayer:GetPlayerLevel() ~= 60) then
-                    local r, g, b = QuestieLib:GetDifficultyColorPercent(quest.level);
-                    self:AddDoubleLine(questTitle, "("..GetQuestLogRewardXP(questId)..xpString..")", 0.2, 1, 0.2, r, g, b);
+                local xpReward = GetQuestLogRewardXP(questId)
+                if (quest and shift and xpReward > 0) then
+                    r, g, b = QuestieLib:GetDifficultyColorPercent(quest.level);
+                    self:AddDoubleLine(questTitle, "("..FormatLargeNumber(xpReward)..xpString..")", 0.2, 1, 0.2, r, g, b);
                     firstLine = false;
                 elseif (firstLine and not shift) then
-                    self:AddDoubleLine(questTitle, "("..QuestieLocale:GetUIString('ICON_SHIFT_HOLD')..")", 0.2, 1, 0.2, 0.43, 0.43, 0.43); --"(Shift+click)"
+                    self:AddDoubleLine(questTitle, "(".. l10n('Hold Shift')..")", 0.2, 1, 0.2, 0.43, 0.43, 0.43); --"(Shift+click)"
                     firstLine = false;
                 else
                     self:AddLine(questTitle);
@@ -785,7 +847,8 @@ function _QuestieFramePool:QuestieTooltip()
                 end
             end
         end
-        for title, body in pairs(self.manualOrder) do
+        for title, data in pairs(self.manualOrder) do
+            local body = data.Body
             self:AddLine(title)
             for _, stringOrTable in ipairs(body) do
                 local dataType = type(stringOrTable)
@@ -795,21 +858,12 @@ function _QuestieFramePool:QuestieTooltip()
                     self:AddDoubleLine(stringOrTable[1], '|cFFffffff'..stringOrTable[2]..'|r') --normal, white
                 end
             end
-            if self.miniMapIcon == false then
+            if self.miniMapIcon == false and not data.disableShiftToRemove then
                 self:AddLine('|cFFa6a6a6Shift-click to hide|r') -- grey
             end
         end
     end
     Tooltip:_Rebuild() -- we separate this so things like MODIFIER_STATE_CHANGED can redraw the tooltip
-    --Tooltip:AddDoubleLine("" .. self:GetFrameStrata(), ""..self:GetFrameLevel())
-    --Tooltip:AddDoubleLine("" .. self.glow:GetFrameStrata(), ""..self.glow:GetFrameLevel())
     Tooltip:SetFrameStrata("TOOLTIP");
-    QuestieTooltips.lastTooltipTime = GetTime() -- hack for object tooltips
     Tooltip:Show();
-end
-
-function _QuestieFramePool:Questie_Click(self)
-    Questie:Print("Click!");
-    --TODO Logic for click!
-    -- Preferably call something outside, keep it "abstract" here
 end

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("WolfMasterNandos", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(3927)
 
 mod:RegisterCombat("combat")
@@ -24,21 +24,15 @@ function mod:OnCombatStart(delay)
 	timerSlaveringWorgCD:Start(1-delay)
 end
 
-do
-	local BleakWorg, LupineHorror, SlaveringWorg = DBM:GetSpellInfo(7487), DBM:GetSpellInfo(7489), DBM:GetSpellInfo(7488)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 7487 then
-		if args.spellName == BleakWorg then
-			warningBleakWorg:Show()
-			timerBleakWorgCD:Start()
-		--elseif args.spellId == 7489 then
-		elseif args.spellName == LupineHorror then
-			warningLupineHorror:Show()
-			timerLupineHorrorCD:Start()
-		--elseif args.spellId == 7488 then
-		elseif args.spellName == SlaveringWorg then
-			warningSlaveringWorg:Show()
-			timerSlaveringWorgCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 7487 then
+		warningBleakWorg:Show()
+		timerBleakWorgCD:Start()
+	elseif args.spellId == 7489 then
+		warningLupineHorror:Show()
+		timerLupineHorrorCD:Start()
+	elseif args.spellId == 7488 then
+		warningSlaveringWorg:Show()
+		timerSlaveringWorgCD:Start()
 	end
 end

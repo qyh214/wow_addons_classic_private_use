@@ -1,12 +1,12 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
 function UF:Construct_AuraHighlight(frame)
-	local dbh = frame:CreateTexture(nil, "OVERLAY")
+	local dbh = frame:CreateTexture(nil, 'OVERLAY')
 	dbh:SetInside(frame.Health.backdrop)
 	dbh:SetTexture(E.media.blankTex)
 	dbh:SetVertexColor(0, 0, 0, 0)
-	dbh:SetBlendMode("ADD")
+	dbh:SetBlendMode('ADD')
 	dbh.PostUpdate = UF.PostUpdate_AuraHighlight
 
 	local glow = frame:CreateShadow(nil, true)
@@ -14,7 +14,7 @@ function UF:Construct_AuraHighlight(frame)
 
 	frame.AuraHightlightGlow = glow
 	frame.AuraHighlightFilter = true
-	frame.AuraHighlightFilterTable = E.global.unitframe.DebuffHighlightColors
+	frame.AuraHighlightFilterTable = E.global.unitframe.AuraHighlightColors
 
 	if frame.Health then
 		dbh:SetParent(frame.Health)
@@ -30,7 +30,7 @@ function UF:Configure_AuraHighlight(frame)
 
 		frame.AuraHighlight:SetBlendMode(UF.db.colors.debuffHighlight.blendMode)
 		frame.AuraHighlight:SetAllPoints(frame.Health:GetStatusBarTexture())
-		frame.AuraHighlightFilterTable = E.global.unitframe.DebuffHighlightColors
+		frame.AuraHighlightFilterTable = E.global.unitframe.AuraHighlightColors
 
 		if E.db.unitframe.debuffHighlighting == 'GLOW' then
 			frame.AuraHighlightBackdrop = true

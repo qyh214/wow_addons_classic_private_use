@@ -2,11 +2,10 @@ local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateD
 local DT = E:GetModule('DataTexts')
 local AB = E:GetModule('ActionBars')
 
---Lua functions
 local _G = _G
-local tonumber, type, pairs, select, gsub = tonumber, type, pairs, select, gsub
+local tonumber, type, pairs, select = tonumber, type, pairs, select
 local lower, split, format, wipe, next, print = strlower, strsplit, format, wipe, next, print
---WoW API / Variables
+
 local debugprofilestop = debugprofilestop
 local EnableAddOn = EnableAddOn
 local GetAddOnCPUUsage = GetAddOnCPUUsage
@@ -20,9 +19,9 @@ local GetNumGuildMembers = GetNumGuildMembers
 local GuildControlGetNumRanks = GuildControlGetNumRanks
 local GuildControlGetRankName = GuildControlGetRankName
 local GuildUninvite = GuildUninvite
-local ReloadUI = ReloadUI
 local ResetCPUUsage = ResetCPUUsage
 local SendChatMessage = SendChatMessage
+local ReloadUI = ReloadUI
 local SetCVar = SetCVar
 local UpdateAddOnCPUUsage = UpdateAddOnCPUUsage
 -- GLOBALS: ElvUIGrid, ElvDB
@@ -44,7 +43,7 @@ function E:LuaError(msg)
 	if switch == 'on' or switch == '1' then
 		for i=1, GetNumAddOns() do
 			local name = GetAddOnInfo(i)
-			if (name ~= 'ElvUI' and name ~= 'ElvUI_OptionsUI') and E:IsAddOnEnabled(name) then
+			if name ~= 'ElvUI' and name ~= 'ElvUI_OptionsUI' and E:IsAddOnEnabled(name) then
 				DisableAddOn(name, E.myname)
 				ElvDB.LuaErrorDisabledAddOns[name] = i
 			end
@@ -78,7 +77,7 @@ end
 function E:DelayScriptCall(msg)
 	local secs, command = msg:match('^(%S+)%s+(.*)$')
 	secs = tonumber(secs)
-	if (not secs) or (#command == 0) then
+	if not secs or (#command == 0) then
 		self:Print('usage: /in <seconds> <command>')
 		self:Print('example: /in 1.5 /say hi')
 	else
@@ -111,10 +110,6 @@ function E:MassGuildKick(msg)
 	for i = 1, GetNumGuildMembers() do
 		local name, _, rankIndex, level, _, _, note, officerNote, connected, _, classFileName = GetGuildRosterInfo(i)
 		local minLevelx = minLevel
-
-		if classFileName == 'DEATHKNIGHT' then
-			minLevelx = minLevelx + 55
-		end
 
 		if not connected then
 			local years, months, days = GetGuildRosterLastOnline(i)
@@ -164,35 +159,103 @@ function E:EHelp()
 end
 
 local BLIZZARD_ADDONS = {
-	'Blizzard_AuctionUI',
+	'Blizzard_APIDocumentation',
+	'Blizzard_AdventureMap',
+	'Blizzard_AlliedRacesUI',
+	'Blizzard_AnimaDiversionUI',
+	'Blizzard_ArchaeologyUI',
+	'Blizzard_ArdenwealdGardening',
+	'Blizzard_ArenaUI',
+	'Blizzard_ArtifactUI',
+	'Blizzard_AuctionHouseUI',
 	'Blizzard_AuthChallengeUI',
-	'Blizzard_BattlefieldMinimap',
+	'Blizzard_AzeriteEssenceUI',
+	'Blizzard_AzeriteRespecUI',
+	'Blizzard_AzeriteUI',
+	'Blizzard_BarbershopUI',
+	'Blizzard_BattlefieldMap',
 	'Blizzard_BindingUI',
+	'Blizzard_BlackMarketUI',
+	'Blizzard_BoostTutorial',
+	'Blizzard_CUFProfiles',
+	'Blizzard_Calendar',
+	'Blizzard_ChallengesUI',
+	'Blizzard_Channels',
+	'Blizzard_CharacterCreate',
+	'Blizzard_CharacterCustomize',
+	'Blizzard_ChromieTimeUI',
+	'Blizzard_ClassTrial',
 	'Blizzard_ClientSavedVariables',
+	'Blizzard_Collections',
 	'Blizzard_CombatLog',
 	'Blizzard_CombatText',
+	'Blizzard_Commentator',
+	'Blizzard_Communities',
 	'Blizzard_CompactRaidFrames',
-	'Blizzard_CUFProfiles',
+	'Blizzard_Console',
+	'Blizzard_Contribution',
+	'Blizzard_CraftUI',
+	'Blizzard_DeathRecap',
 	'Blizzard_DebugTools',
+	'Blizzard_Deprecated',
+	'Blizzard_EncounterJournal',
+	'Blizzard_EventTrace',
 	'Blizzard_FlightMap',
+	'Blizzard_FrameEffects',
 	'Blizzard_GMChatUI',
-	'Blizzard_GMSurveyUI',
+	'Blizzard_GuildBankUI',
+	'Blizzard_GuildControlUI',
+	'Blizzard_GuildRecruitmentUI',
+	'Blizzard_GuildUI',
+	'Blizzard_HybridMinimap',
 	'Blizzard_InspectUI',
+	'Blizzard_ItemInteractionUI',
+	'Blizzard_ItemSocketingUI',
+	'Blizzard_ItemUpgradeUI',
+	'Blizzard_Kiosk',
+	'Blizzard_LandingSoulbinds',
+	'Blizzard_LookingForGuildUI',
 	'Blizzard_MacroUI',
 	'Blizzard_MapCanvas',
+	'Blizzard_MawBuffs',
+	'Blizzard_MoneyReceipt',
 	'Blizzard_MovePad',
 	'Blizzard_NamePlates',
+	'Blizzard_NewPlayerExperience',
+	'Blizzard_NewPlayerExperienceGuide',
+	'Blizzard_ObjectiveTracker',
+	'Blizzard_ObliterumUI',
+	'Blizzard_PTRFeedback',
+	'Blizzard_PTRFeedbackGlue',
+	'Blizzard_PVPMatch',
+	'Blizzard_PVPUI',
+	'Blizzard_PartyPoseUI',
+	'Blizzard_PetBattleUI',
+	'Blizzard_PlayerChoiceUI',
+	'Blizzard_QuestNavigation',
 	'Blizzard_RaidUI',
+	'Blizzard_RuneforgeUI',
+	'Blizzard_ScrappingMachineUI',
 	'Blizzard_SecureTransferUI',
 	'Blizzard_SharedMapDataProviders',
 	'Blizzard_SocialUI',
+	'Blizzard_Soulbinds',
 	'Blizzard_StoreUI',
+	'Blizzard_SubscriptionInterstitialUI',
 	'Blizzard_TalentUI',
 	'Blizzard_TimeManager',
+	'Blizzard_TokenUI',
 	'Blizzard_TradeSkillUI',
 	'Blizzard_TrainerUI',
+	'Blizzard_Tutorial',
+	'Blizzard_TutorialTemplates',
+	'Blizzard_UIWidgets',
+	'Blizzard_WarfrontsPartyPoseUI',
+	'Blizzard_WeeklyRewards',
+	'Blizzard_WorldMap',
 	'Blizzard_WowTokenUI'
 }
+
 function E:EnableBlizzardAddOns()
 	for _, addon in pairs(BLIZZARD_ADDONS) do
 		local reason = select(5, GetAddOnInfo(addon))
@@ -223,13 +286,12 @@ do -- Blizzard Commands
 		_G.SLASH_RELOADUI2 = '/reloadui'
 		SlashCmdList.RELOADUI = _G.ReloadUI
 	end
+end
 
-	-- Stopwatch: /sw, /timer, /stopwatch
-	hooksecurefunc(_G, 'UIParentLoadAddOn', function(name)
-		if name == 'Blizzard_TimeManager' and not SlashCmdList.STOPWATCH then
-			SlashCmdList.STOPWATCH = _G.Stopwatch_Toggle
-		end
-	end)
+function E:DBConvertProfile()
+	E.db.dbConverted = nil
+	E:DBConversions()
+	ReloadUI()
 end
 
 function E:LoadCommands()
@@ -259,6 +321,7 @@ function E:LoadCommands()
 	self:RegisterChatCommand('estatus', 'ShowStatusReport')
 	self:RegisterChatCommand('ehelp', 'EHelp')
 	self:RegisterChatCommand('ecommands', 'EHelp')
+	self:RegisterChatCommand('efixdb', 'DBConvertProfile')
 	-- self:RegisterChatCommand('aprilfools', '') --Don't need this until next april fools
 
 	if E.private.actionbar.enable then

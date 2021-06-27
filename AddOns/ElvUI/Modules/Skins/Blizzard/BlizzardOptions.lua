@@ -1,13 +1,11 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local select = select
 local ipairs = ipairs
 local pairs = pairs
---WoW API / Variables
+
 local hooksecurefunc = hooksecurefunc
 local UnitIsUnit = UnitIsUnit
 local InCombatLockdown = InCombatLockdown
@@ -36,7 +34,7 @@ function S.AudioOptionsVoicePanel_InitializeCommunicationModeUI(btn)
 end
 
 function S:BlizzardOptions()
-	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.BlizzardOptions) then return end
+	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.blizzardOptions) then return end
 
 	-- here we reskin all 'normal' buttons
 	S:HandleButton(_G.ReadyCheckFrameYesButton)
@@ -106,6 +104,8 @@ function S:BlizzardOptions()
 		_G.ChatConfigOtherSettingsPVP,
 		_G.ChatConfigOtherSettingsSystem,
 		_G.ChatConfigOtherSettingsCreature,
+		_G.ChatConfigChannelSettingsAvailable,
+		_G.ChatConfigChannelSettingsAvailableBox,
 		_G.ChatConfigChannelSettingsLeft,
 		_G.CombatConfigMessageSourcesDoneBy,
 		_G.CombatConfigColorsUnitColors,
@@ -240,20 +240,15 @@ function S:BlizzardOptions()
 		_G.InterfaceOptionsFrame,
 		_G.InterfaceOptionsControlsPanel,
 		_G.InterfaceOptionsCombatPanel,
-		_G.InterfaceOptionsCombatPanelEnemyCastBars,
-		_G.InterfaceOptionsCombatTextPanel,
 		_G.InterfaceOptionsDisplayPanel,
-		_G.InterfaceOptionsObjectivesPanel,
 		_G.InterfaceOptionsSocialPanel,
 		_G.InterfaceOptionsActionBarsPanel,
 		_G.InterfaceOptionsNamesPanel,
 		_G.InterfaceOptionsNamesPanelFriendly,
 		_G.InterfaceOptionsNamesPanelEnemy,
 		_G.InterfaceOptionsNamesPanelUnitNameplates,
-		_G.InterfaceOptionsBattlenetPanel,
 		_G.InterfaceOptionsCameraPanel,
 		_G.InterfaceOptionsMousePanel,
-		_G.InterfaceOptionsHelpPanel,
 		_G.InterfaceOptionsAccessibilityPanel,
 		_G.VideoOptionsFrame,
 		_G.Display_,
@@ -267,12 +262,6 @@ function S:BlizzardOptions()
 		_G.AudioOptionsSoundPanelVolume,
 		_G.AudioOptionsSoundPanelPlayback,
 		_G.AudioOptionsVoicePanel,
-		_G.AudioOptionsVoicePanelTalking,
-		_G.AudioOptionsVoicePanelListening,
-		_G.AudioOptionsVoicePanelBinding,
-		_G.AudioOptionsVoicePanelMicTest,
-		_G.AudioOptionsVoicePanelChatMode1,
-		_G.AudioOptionsVoicePanelChatMode2,
 		_G.CompactUnitFrameProfiles,
 		_G.CompactUnitFrameProfilesGeneralOptionsFrame,
 	}
@@ -310,30 +299,32 @@ function S:BlizzardOptions()
 		end
 	end
 
-	-- Categories Buttons
-	for i = 1, 10 do
-		local Button = _G["InterfaceOptionsFrameCategoriesButton"..i]
-		S:HandleCategoriesButtons(Button)
-	end
-
-	for i = 1, MAX_ADDONS_DISPLAYED do
-		local Button = _G["InterfaceOptionsFrameAddOnsButton"..i]
-		S:HandleCategoriesButtons(Button)
-	end
-
-	for i = 1, 6 do
-		local Button = _G["VideoOptionsFrameCategoryFrameButton"..i]
-		S:HandleCategoriesButtons(Button)
-	end
-
 	_G.InterfaceOptionsFrameTab1:Point('BOTTOMLEFT', _G.InterfaceOptionsFrameCategories, 'TOPLEFT', 6, 1)
+	_G.InterfaceOptionsFrameTab1:StripTextures()
 	_G.InterfaceOptionsFrameTab2:Point('TOPLEFT', _G.InterfaceOptionsFrameTab1, 'TOPRIGHT', 1, 0)
+	_G.InterfaceOptionsFrameTab2:StripTextures()
 	_G.InterfaceOptionsSocialPanel.EnableTwitter.Logo:SetAtlas('WoWShare-TwitterLogo')
+
+	do -- plus minus buttons in addons category
+		local function skinButtons()
+			for i = 1, #_G.INTERFACEOPTIONS_ADDONCATEGORIES do
+				local button = _G['InterfaceOptionsFrameAddOnsButton'..i..'Toggle']
+				if button and not button.IsSkinned then
+					S:HandleCollapseTexture(button, true)
+					button.IsSkinned = true
+				end
+			end
+		end
+
+		hooksecurefunc('InterfaceOptions_AddCategory', skinButtons)
+		skinButtons()
+	end
 
 	--Create New Raid Profle
 	local newProfileDialog = _G.CompactUnitFrameProfilesNewProfileDialog
 	if newProfileDialog then
-		newProfileDialog:SetTemplate('Transparent')
+		newProfileDialog:StripTextures()
+		newProfileDialog:CreateBackdrop('Transparent')
 
 		S:HandleDropDownBox(_G.CompactUnitFrameProfilesNewProfileDialogBaseProfileSelector)
 		S:HandleButton(_G.CompactUnitFrameProfilesNewProfileDialogCreateButton)
@@ -348,7 +339,9 @@ function S:BlizzardOptions()
 	--Delete Raid Profile
 	local deleteProfileDialog = _G.CompactUnitFrameProfilesDeleteProfileDialog
 	if deleteProfileDialog then
-		deleteProfileDialog:SetTemplate('Transparent')
+		deleteProfileDialog:StripTextures()
+		deleteProfileDialog:CreateBackdrop('Transparent')
+
 		S:HandleButton(_G.CompactUnitFrameProfilesDeleteProfileDialogDeleteButton)
 		S:HandleButton(_G.CompactUnitFrameProfilesDeleteProfileDialogCancelButton)
 	end
@@ -357,7 +350,7 @@ function S:BlizzardOptions()
 	S:HandleButton(_G.AudioOptionsVoicePanel.TestInputDevice.ToggleTest)
 
 	local VUMeter = _G.AudioOptionsVoicePanelTestInputDevice.VUMeter
-	VUMeter:SetBackdrop(nil)
+	VUMeter:SetBackdrop()
 	VUMeter.Status:CreateBackdrop()
 	VUMeter.Status:SetStatusBarTexture(E.media.normTex)
 	E:RegisterStatusBar(VUMeter.Status)

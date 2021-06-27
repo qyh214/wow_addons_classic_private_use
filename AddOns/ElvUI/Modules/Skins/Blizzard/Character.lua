@@ -1,13 +1,11 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local unpack = unpack
 local pairs = pairs
 local strfind = strfind
---WoW API / Variables
+
 local HasPetUI = HasPetUI
 local GetPetHappiness = GetPetHappiness
 local GetInventoryItemQuality = GetInventoryItemQuality
@@ -26,6 +24,13 @@ function S:CharacterFrame()
 	S:HandleFrame(CharacterFrame, true, nil, 11, -12, -32, 76)
 
 	S:HandleCloseButton(_G.CharacterFrameCloseButton, CharacterFrame.backdrop)
+
+	S:HandleDropDownBox(_G.PlayerStatFrameRightDropDown, 145)
+	S:HandleDropDownBox(_G.PlayerStatFrameLeftDropDown, 147)
+	S:HandleDropDownBox(_G.PlayerTitleDropDown, 200)
+	_G.PlayerStatFrameRightDropDown:Point('TOP', -2, 24)
+	_G.PlayerStatFrameLeftDropDown:Point('LEFT', -25, 24)
+	_G.PlayerTitleDropDown:Point('TOP', -7, -51)
 
 	for i = 1, #CHARACTERFRAME_SUBFRAMES do
 		S:HandleTab(_G['CharacterFrameTab'..i])
@@ -83,6 +88,7 @@ function S:CharacterFrame()
 			slot:StyleButton()
 
 			S:HandleIcon(icon)
+			icon:SetInside()
 
 			if cooldown then
 				E:RegisterCooldown(cooldown)
@@ -91,11 +97,13 @@ function S:CharacterFrame()
 	end
 
 	hooksecurefunc('PaperDollItemSlotButton_Update', function(self)
-		local rarity = GetInventoryItemQuality('player', self:GetID())
-		if rarity and rarity > 1 then
-			E:SetBackdropBorderColor(self, GetItemQualityColor(rarity))
-		else
-			E:SetBackdropBorderColor(self, unpack(E.media.bordercolor))
+		if self.SetBackdropBorderColor then
+			local rarity = GetInventoryItemQuality('player', self:GetID())
+			if rarity and rarity > 1 then
+				self:SetBackdropBorderColor(GetItemQualityColor(rarity))
+			else
+				self:SetBackdropBorderColor(unpack(E.media.bordercolor))
+			end
 		end
 	end)
 
@@ -280,20 +288,49 @@ function S:CharacterFrame()
 	_G.SkillDetailStatusBarUnlearnButton:Point('LEFT', _G.SkillDetailStatusBarBorder, 'RIGHT', 5, 0)
 	_G.SkillDetailStatusBarUnlearnButton:SetHitRectInsets(0, 0, 0, 0)
 
-	-- Honor Frame
-	local HonorFrame = _G.HonorFrame
-	S:HandleFrame(HonorFrame, true, nil, 18, -105, -39, 83)
-	HonorFrame.backdrop:SetFrameLevel(HonorFrame:GetFrameLevel())
+	-- Honor/Arena/PvP Tab
+	local PVPFrame = _G.PVPFrame
+	PVPFrame:StripTextures(true)
 
-	_G.HonorFrameProgressButton:CreateBackdrop('Transparent')
+	for i = 1, MAX_ARENA_TEAMS do
+		local pvpTeam = _G['PVPTeam'..i]
 
-	local HonorFrameProgressBar = _G.HonorFrameProgressBar
-	HonorFrameProgressBar:Width(325)
-	HonorFrameProgressBar:SetStatusBarTexture(E.media.normTex)
+		pvpTeam:StripTextures()
+		pvpTeam:CreateBackdrop('Default')
+		pvpTeam.backdrop:Point('TOPLEFT', 9, -4)
+		pvpTeam.backdrop:Point('BOTTOMRIGHT', -24, 3)
 
-	S:HandlePointXY(HonorFrameProgressBar, 19, -74)
+		pvpTeam:HookScript('OnEnter', S.SetModifiedBackdrop)
+		pvpTeam:HookScript('OnLeave', S.SetOriginalBackdrop)
 
-	E:RegisterStatusBar(HonorFrameProgressBar)
+		_G['PVPTeam'..i..'Highlight']:Kill()
+	end
+
+	local PVPTeamDetails = _G.PVPTeamDetails
+	PVPTeamDetails:StripTextures()
+	PVPTeamDetails:SetTemplate('Transparent')
+	PVPTeamDetails:Point('TOPLEFT', PVPFrame, 'TOPRIGHT', -30, -12)
+
+	local PVPFrameToggleButton = _G.PVPFrameToggleButton
+	S:HandleNextPrevButton(PVPFrameToggleButton)
+	PVPFrameToggleButton:Point('BOTTOMRIGHT', PVPFrame, 'BOTTOMRIGHT', -48, 81)
+	PVPFrameToggleButton:Size(14)
+
+	for i = 1, 5 do
+		local header = _G['PVPTeamDetailsFrameColumnHeader'..i]
+		header:StripTextures()
+		header:StyleButton()
+	end
+
+	for i = 1, 10 do
+		local button = _G['PVPTeamDetailsButton'..i]
+		button:Width(335)
+		S:HandleButtonHighlight(button)
+	end
+
+	S:HandleButton(_G.PVPTeamDetailsAddTeamMember)
+	S:HandleNextPrevButton(_G.PVPTeamDetailsToggleButton)
+	S:HandleCloseButton(_G.PVPTeamDetailsCloseButton)
 end
 
 S:AddCallback('CharacterFrame')

@@ -1,36 +1,35 @@
+if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, OptionsPrivate = ...
 local L = WeakAuras.L
 local regionOptions = WeakAuras.regionOptions
 
-local flattenRegionOptions = WeakAuras.commonOptions.flattenRegionOptions
-local fixMetaOrders = WeakAuras.commonOptions.fixMetaOrders
-local parsePrefix = WeakAuras.commonOptions.parsePrefix
-local removeFuncs = WeakAuras.commonOptions.removeFuncs
-local replaceNameDescFuncs = WeakAuras.commonOptions.replaceNameDescFuncs
-local replaceImageFuncs = WeakAuras.commonOptions.replaceImageFuncs
-local replaceValuesFuncs = WeakAuras.commonOptions.replaceValuesFuncs
-local disabledAll = WeakAuras.commonOptions.CreateDisabledAll("region")
-local hiddenAll = WeakAuras.commonOptions.CreateHiddenAll("region")
-local getAll = WeakAuras.commonOptions.CreateGetAll("region")
-local setAll = WeakAuras.commonOptions.CreateSetAll("region", getAll)
-
-local function AddSubRegionImpl(data, subRegionName)
-  data.subRegions = data.subRegions or {}
-  if WeakAuras.subRegionTypes[subRegionName] and WeakAuras.subRegionTypes[subRegionName] then
-    if WeakAuras.subRegionTypes[subRegionName].supports(data.regionType) then
-      local default = WeakAuras.subRegionTypes[subRegionName].default
-      local subRegionData = type(default) == "function" and default(data.regionType) or CopyTable(default)
-      subRegionData.type = subRegionName
-      tinsert(data.subRegions, subRegionData)
-      WeakAuras.Add(data)
-      WeakAuras.ClearAndUpdateOptions(data.id)
-    end
-  end
-end
+local flattenRegionOptions = OptionsPrivate.commonOptions.flattenRegionOptions
+local fixMetaOrders = OptionsPrivate.commonOptions.fixMetaOrders
+local parsePrefix = OptionsPrivate.commonOptions.parsePrefix
+local removeFuncs = OptionsPrivate.commonOptions.removeFuncs
+local replaceNameDescFuncs = OptionsPrivate.commonOptions.replaceNameDescFuncs
+local replaceImageFuncs = OptionsPrivate.commonOptions.replaceImageFuncs
+local replaceValuesFuncs = OptionsPrivate.commonOptions.replaceValuesFuncs
+local disabledAll = OptionsPrivate.commonOptions.CreateDisabledAll("region")
+local hiddenAll = OptionsPrivate.commonOptions.CreateHiddenAll("region")
+local getAll = OptionsPrivate.commonOptions.CreateGetAll("region")
+local setAll = OptionsPrivate.commonOptions.CreateSetAll("region", getAll)
 
 local function AddSubRegion(data, subRegionName)
-  if (WeakAuras.ApplyToDataOrChildData(data, AddSubRegionImpl, subRegionName)) then
-    WeakAuras.ClearAndUpdateOptions(data.id)
+  for data in OptionsPrivate.Private.TraverseLeafsOrAura(data) do
+    data.subRegions = data.subRegions or {}
+    if OptionsPrivate.Private.subRegionTypes[subRegionName] and OptionsPrivate.Private.subRegionTypes[subRegionName] then
+      if OptionsPrivate.Private.subRegionTypes[subRegionName].supports(data.regionType) then
+        local default = OptionsPrivate.Private.subRegionTypes[subRegionName].default
+        local subRegionData = type(default) == "function" and default(data.regionType) or CopyTable(default)
+        subRegionData.type = subRegionName
+        tinsert(data.subRegions, subRegionData)
+        WeakAuras.Add(data)
+        OptionsPrivate.ClearOptions(data.id)
+      end
+    end
   end
+  WeakAuras.ClearAndUpdateOptions(data.id)
 end
 
 local function AddOptionsForSupportedSubRegion(regionOption, data, supported)
@@ -44,20 +43,21 @@ local function AddOptionsForSupportedSubRegion(regionOption, data, supported)
   result.__order = 300
   result.__title = L["Add Extra Elements"]
   result.__topLine = true
+  result.__withoutheader = true
+  result["subregiontypespace"] = {
+    type = "description",
+    width = WeakAuras.doubleWidth,
+    name = "",
+    order = order,
+  }
+  order = order + 1
   for subRegionType in pairs(supported) do
-    if WeakAuras.subRegionTypes[subRegionType].supportsAdd then
+    if OptionsPrivate.Private.subRegionTypes[subRegionType].supportsAdd then
       hasSubRegions = true
-      result[subRegionType .. "space"] = {
-        type = "description",
-        width = WeakAuras.doubleWidth,
-        name = "",
-        order = order,
-      }
-      order = order + 1
       result[subRegionType] = {
         type = "execute",
         width = WeakAuras.normalWidth,
-        name = string.format(L["Add %s"], WeakAuras.subRegionTypes[subRegionType].displayName),
+        name = string.format(L["Add %s"], OptionsPrivate.Private.subRegionTypes[subRegionType].displayName),
         order = order,
         func = function()
           AddSubRegion(data, subRegionType)
@@ -81,7 +81,7 @@ local function union(table1, table2)
   return meta;
 end
 
-function WeakAuras.GetDisplayOptions(data)
+function OptionsPrivate.GetDisplayOptions(data)
   local id = data.id
 
   if not data.controlledChildren then
@@ -97,10 +97,10 @@ function WeakAuras.GetDisplayOptions(data)
         local subIndex = {}
         for index, subRegionData in ipairs(data.subRegions) do
           local subRegionType = subRegionData.type
-          if WeakAuras.subRegionOptions[subRegionType] then
+          if OptionsPrivate.Private.subRegionOptions[subRegionType] then
             hasSubElements = true
             subIndex[subRegionType] = subIndex[subRegionType] and subIndex[subRegionType] + 1 or 1
-            local options, common = WeakAuras.subRegionOptions[subRegionType].create(data, subRegionData, index, subIndex[subRegionType])
+            local options, common = OptionsPrivate.Private.subRegionOptions[subRegionType].create(data, subRegionData, index, subIndex[subRegionType])
             options.__order = 200 + index
             regionOption["sub." .. index .. "." .. subRegionType] = options
             commonOption[subRegionType] = common
@@ -116,7 +116,7 @@ function WeakAuras.GetDisplayOptions(data)
       end
 
       local supported = {}
-      for subRegionName, subRegionType in pairs(WeakAuras.subRegionTypes) do
+      for subRegionName, subRegionType in pairs(OptionsPrivate.Private.subRegionTypes) do
         if subRegionType.supports(data.regionType) then
           supported[subRegionName] = true
         end
@@ -186,7 +186,7 @@ function WeakAuras.GetDisplayOptions(data)
             WeakAuras.Add(parentData);
           end
         end
-        WeakAuras.ResetMoverSizer();
+        OptionsPrivate.ResetMoverSizer();
       end,
       args = options
     };
@@ -206,42 +206,41 @@ function WeakAuras.GetDisplayOptions(data)
     local supportedSubRegions = {}
     local hasSubElements = false
 
-    for index, childId in ipairs(data.controlledChildren) do
-      local childData = WeakAuras.GetData(childId);
-      if childData and not handledRegionTypes[childData.regionType] then
-        handledRegionTypes[childData.regionType] = true;
-        if regionOptions[childData.regionType] then
-          allOptions = union(allOptions, regionOptions[childData.regionType].create(id, data));
+    for child in OptionsPrivate.Private.TraverseLeafs(data) do
+      if child and not handledRegionTypes[child.regionType] then
+        handledRegionTypes[child.regionType] = true;
+        if regionOptions[child.regionType] then
+          allOptions = union(allOptions, regionOptions[child.regionType].create(id, data));
         else
           unsupportedCount = unsupportedCount + 1
           allOptions["__unsupported" .. unsupportedCount] =  {
-            __title = "|cFFFFFF00" .. childData.regionType,
+            __title = "|cFFFFFF00" .. child.regionType,
             __order = 1,
             warning = {
               type = "description",
-              name = L["Regions of type \"%s\" are not supported."]:format(childData.regionType),
+              name = L["Regions of type \"%s\" are not supported."]:format(child.regionType),
               order = 1
             },
           }
         end
-        for subRegionName, subRegionType in pairs(WeakAuras.subRegionTypes) do
-          if subRegionType.supports(childData.regionType) then
+        for subRegionName, subRegionType in pairs(OptionsPrivate.Private.subRegionTypes) do
+          if subRegionType.supports(child.regionType) then
             supportedSubRegions[subRegionName] = true
           end
         end
       end
-      if childData.subRegions then
+      if child.subRegions then
         local subIndex = {}
-        for index, subRegionData in ipairs(childData.subRegions) do
+        for index, subRegionData in ipairs(child.subRegions) do
           local subRegionType = subRegionData.type
           local alreadyHandled = handledSubRegionTypes[index] and handledSubRegionTypes[index][subRegionType]
-          if WeakAuras.subRegionOptions[subRegionType] and not alreadyHandled then
+          if OptionsPrivate.Private.subRegionOptions[subRegionType] and not alreadyHandled then
             handledSubRegionTypes[index] = handledSubRegionTypes[index] or {}
             handledSubRegionTypes[index][subRegionType] = true
             hasSubElements = true
             subIndex[subRegionType] = subIndex[subRegionType] and subIndex[subRegionType] + 1 or 1
 
-            local options, common = WeakAuras.subRegionOptions[subRegionType].create(data, nil, index, subIndex[subRegionType])
+            local options, common = OptionsPrivate.Private.subRegionOptions[subRegionType].create(data, nil, index, subIndex[subRegionType])
             options.__order = 200 + index
 
             allOptions["sub." .. index .. "." .. subRegionType] = options
@@ -292,7 +291,7 @@ function WeakAuras.GetDisplayOptions(data)
       if(type(data.id) == "string") then
         WeakAuras.Add(data);
         WeakAuras.UpdateThumbnail(data);
-        WeakAuras.ResetMoverSizer();
+        OptionsPrivate.ResetMoverSizer();
       end
     end
     region.hidden = function(info, ...) return hiddenAll(data, info, ...); end;

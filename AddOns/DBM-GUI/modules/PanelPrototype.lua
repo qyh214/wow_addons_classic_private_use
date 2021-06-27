@@ -18,19 +18,14 @@ function PanelPrototype:SetLastObj(obj)
 	self.lastobject = obj
 end
 
-function PanelPrototype:AutoSetDimension() -- TODO: Remove in 9.x
-	DBM:Debug(self.frame:GetName() .. " is calling a deprecated function AutoSetDimension")
-end
-
-function PanelPrototype:SetMyOwnHeight() -- TODO: remove in 9.x
-	DBM:Debug(self.frame:GetName() .. " is calling a deprecated function SetMyOwnHeight")
-end
-
-function PanelPrototype:CreateCreatureModelFrame(width, height, creatureid)
+function PanelPrototype:CreateCreatureModelFrame(width, height, creatureid, scale)
 	local model = CreateFrame("PlayerModel", "DBM_GUI_Option_" .. self:GetNewID(), self.frame)
 	model.mytype = "modelframe"
 	model:SetSize(width or 100, height or 200)
 	model:SetCreature(tonumber(creatureid) or 448) -- Hogger!!! he kills all of you
+	if scale then
+		model:SetModelScale(scale)
+	end
 	self:SetLastObj(model)
 	return model
 end
@@ -45,7 +40,7 @@ function PanelPrototype:CreateText(text, width, autoplaced, style, justify, myhe
 	textblock.autowidth = not width
 	textblock:SetWidth(width or self.frame:GetWidth())
 	if autoplaced then
-		textblock:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 10, -10)
+		textblock:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 10, -5)
 	end
 	self:SetLastObj(textblock)
 	return textblock
@@ -136,7 +131,7 @@ function PanelPrototype:CreateScrollingMessageFrame(width, height, insertmode, f
 end
 
 function PanelPrototype:CreateEditBox(text, value, width, height)
-	local textbox = CreateFrame("EditBox", "DBM_GUI_Option_" .. self:GetNewID(), self.frame, "InputBoxTemplate")
+	local textbox = CreateFrame("EditBox", "DBM_GUI_Option_" .. self:GetNewID(), self.frame, DBM:IsShadowlands() and "BackdropTemplate,InputBoxTemplate" or "InputBoxTemplate")
 	textbox.mytype = "textbox"
 	textbox:SetSize(width or 100, height or 20)
 	textbox:SetAutoFocus(false)
@@ -288,7 +283,9 @@ do
 		local frame, frame2, textPad
 		if modvar then -- Special warning, has modvar for sound and note
 			if isTimer then
-				frame = self:CreateDropdown(nil, tcolors, mod, modvar .. "TColor", nil, 20, 25, button)
+				frame = self:CreateDropdown(nil, tcolors, mod, modvar .. "TColor", function(value)
+					mod.Options[modvar .. "TColor"] = value
+				end, 22, 25, button)
 				frame2 = self:CreateDropdown(nil, cvoice, mod, modvar .. "CVoice", function(value)
 					mod.Options[modvar.."CVoice"] = value
 					if type(value) == "string" then
@@ -296,15 +293,15 @@ do
 					elseif value > 0 then
 						DBM:PlayCountSound(1, value == 3 and DBM.Options.CountdownVoice3 or value == 2 and DBM.Options.CountdownVoice2 or DBM.Options.CountdownVoice)
 					end
-				end, 20, 25, button)
+				end, 22, 25, button)
 				frame:SetPoint("LEFT", button, "RIGHT", -20, 2)
 				frame2:SetPoint("LEFT", frame, "RIGHT", 18, 0)
-				textPad = 35
+				textPad = 37
 			else
 				frame = self:CreateDropdown(nil, sounds, mod, modvar .. "SWSound", function(value)
-					mod.Options[modvar.."SWSound"] = value
-					DBM:PlaySpecialWarningSound(value)
-				end, 20, 25, button)
+					mod.Options[modvar .. "SWSound"] = value
+					DBM:PlaySpecialWarningSound(value, true)
+				end, 22, 25, button)
 				frame:ClearAllPoints()
 				frame:SetPoint("LEFT", button, "RIGHT", -20, 2)
 				if mod.Options[modvar .. "SWNote"] then -- Mod has note, insert note hack
@@ -402,10 +399,10 @@ do
 		end
 		if dbtvar then
 			button:SetScript("OnShow", function(self)
-				button:SetChecked(DBM.Bars:GetOption(dbtvar))
+				button:SetChecked(DBT.Options[dbtvar])
 			end)
 			button:SetScript("OnClick", function(self)
-				DBM.Bars:SetOption(dbtvar, not DBM.Bars:GetOption(dbtvar))
+				DBT:SetOption(dbtvar, not DBT.Options[dbtvar])
 			end)
 		end
 		if globalvar and _G[globalvar] ~= nil then
@@ -422,7 +419,7 @@ do
 end
 
 function PanelPrototype:CreateArea(name)
-	local area = CreateFrame("Frame", "DBM_GUI_Option_" .. self:GetNewID(), self.frame, "OptionsBoxTemplate")
+	local area = CreateFrame("Frame", "DBM_GUI_Option_" .. self:GetNewID(), self.frame, DBM:IsShadowlands() and "BackdropTemplate,OptionsBoxTemplate" or "OptionsBoxTemplate")
 	area.mytype = "area"
 	area:SetBackdropColor(0.15, 0.15, 0.15, 0.5)
 	area:SetBackdropBorderColor(0.4, 0.4, 0.4)
@@ -443,50 +440,27 @@ function PanelPrototype:CreateArea(name)
 	})
 end
 
-function PanelPrototype:Rename(newname)
-	self.frame.name = newname
-end
-
-function PanelPrototype:Destroy()
-	tremove(DBM_GUI.frameTypes[self.frame.frameType], self.frame.categoryid)
-	tremove(self.parent.panels, self.frame.panelid)
-	self.frame:Hide()
-end
-
-do
-	local myid = 100
-
-	function DBM_GUI:CreateNewPanel(frameName, frameType, showSub, sortID, displayName)
-		local panel = CreateFrame("Frame", "DBM_GUI_Option_" .. self:GetNewID(), _G["DBM_GUI_OptionsFramePanelContainer"])
-		panel.mytype = "panel"
-		panel.sortID = self:GetCurrentID()
-		local container = _G["DBM_GUI_OptionsFramePanelContainer"]
-		panel:SetSize(container:GetWidth(), container:GetHeight())
-		panel:SetPoint("TOPLEFT", "DBM_GUI_OptionsFramePanelContainer", "TOPLEFT")
-		panel.name = frameName
-		panel.displayName = displayName or frameName
-		panel.showSub = showSub or showSub == nil
-		if sortID or 0 > 0 then
-			panel.sortid = sortID
-		else
-			myid = myid + 1
-			panel.sortid = myid
-		end
-		panel:Hide()
-		if frameType == "option" then
-			frameType = 2
-		end
-		panel.categoryid = DBM_GUI.frameTypes[frameType or 1]:CreateCategory(panel, self and self.frame and self.frame.name)
-		panel.frameType = frameType
-		PanelPrototype:SetLastObj(panel)
-		self.panels = self.panels or {}
-		tinsert(self.panels, {
-			frame	= panel,
-			parent	= self
-		})
-		panel.panelid = #self.panels
-		return setmetatable(self.panels[#self.panels], {
-			__index = PanelPrototype
-		})
+function DBM_GUI:CreateNewPanel(frameName, frameType, showSub, sortID, displayName)
+	local panel = CreateFrame("Frame", "DBM_GUI_Option_" .. self:GetNewID(), _G["DBM_GUI_OptionsFramePanelContainer"])
+	panel.mytype = "panel"
+	panel.ID = self:GetCurrentID()
+	local container = _G["DBM_GUI_OptionsFramePanelContainer"]
+	panel:SetSize(container:GetWidth(), container:GetHeight())
+	panel:SetPoint("TOPLEFT", "DBM_GUI_OptionsFramePanelContainer", "TOPLEFT")
+	panel.displayName = displayName or frameName
+	panel.showSub = showSub or showSub == nil
+	panel:Hide()
+	if frameType == "option" then
+		frameType = 2
 	end
+	self.tabs[frameType or 1]:CreateCategory(panel, self and self.frame and self.frame.ID)
+	PanelPrototype:SetLastObj(panel)
+	tinsert(self.panels, {
+		frame	= panel,
+		parent	= self
+	})
+	panel.panelid = #self.panels
+	return setmetatable(self.panels[#self.panels], {
+		__index = PanelPrototype
+	})
 end

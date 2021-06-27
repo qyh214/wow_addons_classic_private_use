@@ -1,21 +1,22 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
 
 local unpack = unpack
 local CreateFrame = CreateFrame
 
 function UF:Construct_Threat(frame)
-	local threat = CreateFrame("Frame", nil, frame)
+	local threat = CreateFrame('Frame', nil, frame)
 
 	--Main ThreatGlow
-	threat.MainGlow = frame:CreateShadow(nil, true)
+	threat.MainGlow = frame:CreateShadow(4, true)
+	threat.MainGlow:SetFrameStrata('BACKGROUND')
 	threat.MainGlow:SetParent(frame)
 	threat.MainGlow:Hide()
 
 	--Secondary ThreatGlow, for power frame when using power offset
-	threat.PowerGlow = frame:CreateShadow(nil, true)
-	threat.PowerGlow:SetParent(frame)
+	threat.PowerGlow = frame:CreateShadow(4, true)
 	threat.PowerGlow:SetFrameStrata('BACKGROUND')
+	threat.PowerGlow:SetParent(frame)
 	threat.PowerGlow:Hide()
 
 	threat.TextureIcon = threat:CreateTexture(nil, 'OVERLAY')
@@ -37,39 +38,25 @@ function UF:Configure_Threat(frame)
 			frame:EnableElement('ThreatIndicator')
 		end
 
-		if threatStyle == "GLOW" then
+		if threatStyle == 'GLOW' then
 			threat:SetFrameStrata('BACKGROUND')
-			threat.MainGlow:SetFrameStrata('BACKGROUND')
 			threat.MainGlow:ClearAllPoints()
+			threat.MainGlow:SetAllPoints(frame.TargetGlow)
 
 			if frame.USE_POWERBAR_OFFSET then
-				threat.MainGlow:Point("TOPLEFT", frame.Health.backdrop, "TOPLEFT", -frame.SHADOW_SPACING - frame.SPACING, frame.SHADOW_SPACING + frame.SPACING + (frame.USE_CLASSBAR and (frame.USE_MINI_CLASSBAR and 0 or frame.CLASSBAR_HEIGHT) or 0))
-				threat.MainGlow:Point("BOTTOMRIGHT", frame.Health.backdrop, "BOTTOMRIGHT", frame.SHADOW_SPACING + frame.SPACING, -frame.SHADOW_SPACING - frame.SPACING)
-
 				threat.PowerGlow:ClearAllPoints()
-				threat.PowerGlow:Point("TOPLEFT", frame.Power.backdrop, "TOPLEFT", -frame.SHADOW_SPACING - frame.SPACING, frame.SHADOW_SPACING + frame.SPACING)
-				threat.PowerGlow:Point("BOTTOMRIGHT", frame.Power.backdrop, "BOTTOMRIGHT", frame.SHADOW_SPACING + frame.SPACING, -frame.SHADOW_SPACING - frame.SPACING)
-			else
-				threat.MainGlow:Point("TOPLEFT", -frame.SHADOW_SPACING, frame.SHADOW_SPACING-(frame.USE_MINI_CLASSBAR and frame.CLASSBAR_YOFFSET or 0))
-
-				if frame.USE_MINI_POWERBAR then
-					threat.MainGlow:Point("BOTTOMLEFT", -frame.SHADOW_SPACING, -frame.SHADOW_SPACING + (frame.POWERBAR_HEIGHT/2))
-					threat.MainGlow:Point("BOTTOMRIGHT", frame.SHADOW_SPACING, -frame.SHADOW_SPACING + (frame.POWERBAR_HEIGHT/2))
-				else
-					threat.MainGlow:Point("BOTTOMLEFT", -frame.SHADOW_SPACING, -frame.SHADOW_SPACING)
-					threat.MainGlow:Point("BOTTOMRIGHT", frame.SHADOW_SPACING, -frame.SHADOW_SPACING)
-				end
+				threat.PowerGlow:SetAllPoints(frame.TargetGlow.powerGlow)
 			end
 		elseif threatStyle:match('^ICON') then
 			threat:SetFrameStrata('LOW')
 			threat:SetFrameLevel(75) --Inset power uses 50, we want it to appear above that
 
-			local point = threatStyle:gsub("ICON", "")
+			local point = threatStyle:gsub('ICON', '')
 			threat.TextureIcon:ClearAllPoints()
 			threat.TextureIcon:Point(point, frame.Health, point)
-		elseif threatStyle == "HEALTHBORDER" and frame.InfoPanel then
+		elseif threatStyle == 'HEALTHBORDER' and frame.InfoPanel then
 			frame.InfoPanel:SetFrameLevel(frame.Health:GetFrameLevel() - 3)
-		elseif threatStyle == "INFOPANELBORDER" and frame.InfoPanel then
+		elseif threatStyle == 'INFOPANELBORDER' and frame.InfoPanel then
 			frame.InfoPanel:SetFrameLevel(frame.Health:GetFrameLevel() + 3)
 		end
 	elseif frame:IsElementEnabled('ThreatIndicator') then
@@ -78,13 +65,15 @@ function UF:Configure_Threat(frame)
 end
 
 function UF:ThreatBorderColor(backdrop, lock, r, g, b)
+	backdrop.forcedBorderColors = lock and {r, g, b} or nil
 	backdrop:SetBackdropBorderColor(r, g, b)
-	backdrop.ignoreBorderColors = lock
 end
 
 do
 	local classPowers = {
 		DRUID = 'AdditionalPower',
+		PRIEST = 'AdditionalPower',
+		SHAMAN = 'AdditionalPower',
 	}
 
 	local myClassPower = classPowers[E.myclass]

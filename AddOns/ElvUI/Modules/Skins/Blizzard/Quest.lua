@@ -1,22 +1,16 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local unpack, type, gsub = unpack, type, gsub
 local select, ipairs, pairs = select, ipairs, pairs
 local strfind, strmatch = strfind, strmatch
---WoW API / Variables
+
 local GetItemInfo = GetItemInfo
 local GetItemQualityColor = GetItemQualityColor
 local GetMoney = GetMoney
-local GetNumQuestChoices = GetNumQuestChoices
 local GetNumQuestLeaderBoards = GetNumQuestLeaderBoards
-local GetNumQuestLogChoices = GetNumQuestLogChoices
 local GetNumQuestLogEntries = GetNumQuestLogEntries
-local GetNumQuestLogRewards = GetNumQuestLogRewards
-local GetNumQuestRewards = GetNumQuestRewards
 local GetQuestItemLink = GetQuestItemLink
 local GetQuestLogItemLink = GetQuestLogItemLink
 local GetQuestLogLeaderBoard = GetQuestLogLeaderBoard
@@ -157,6 +151,8 @@ function S:BlizzardQuestFrames()
 			quality = select(3, GetItemInfo(link))
 		end
 
+		frame:SetTemplate('NoBackdrop')
+
 		if quality and quality > 1 then
 			local r, g, b = GetItemQualityColor(quality)
 
@@ -200,7 +196,7 @@ function S:BlizzardQuestFrames()
 
 				if item ~= self then
 					name = _G['QuestInfoRewardsFrameQuestInfoItem'..i..'Name']
-					link = item.type and (QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
+					link = item.type and (_G.QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
 
 					questQualityColors(item, name, link)
 				end
@@ -214,7 +210,7 @@ function S:BlizzardQuestFrames()
 		for i = 1, #_G.QuestInfoRewardsFrame.RewardButtons do
 			item = _G['QuestInfoRewardsFrameQuestInfoItem'..i]
 			name = _G['QuestInfoRewardsFrameQuestInfoItem'..i..'Name']
-			link = item.type and (QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
+			link = item.type and (_G.QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
 
 			questQualityColors(item, name, link)
 		end
@@ -225,9 +221,9 @@ function S:BlizzardQuestFrames()
 
 		if requiredMoney > 0 then
 			if requiredMoney > GetMoney() then
-				QuestInfoRequiredMoneyText:SetTextColor(0.6, 0.6, 0.6)
+				_G.QuestInfoRequiredMoneyText:SetTextColor(0.6, 0.6, 0.6)
 			else
-				QuestInfoRequiredMoneyText:SetTextColor(1, 0.80, 0.10)
+				_G.QuestInfoRequiredMoneyText:SetTextColor(1, 0.80, 0.10)
 			end
 		end
 	end)
@@ -297,7 +293,7 @@ function S:BlizzardQuestFrames()
 		_G.QuestLogItem1:Point('TOPLEFT', _G.QuestLogItemChooseText, 'BOTTOMLEFT', 1, -3)
 
 		local numObjectives = GetNumQuestLeaderBoards()
-		local _, objType, finished, objective
+		local _, objType, finished
 		local numVisibleObjectives = 0
 
 		for i = 1, numObjectives do
@@ -368,7 +364,7 @@ function S:BlizzardQuestFrames()
 		for i = 1, #_G.QuestInfoRewardsFrame.RewardButtons do
 			item = _G['QuestInfoRewardsFrameQuestInfoItem'..i]
 			name = _G['QuestInfoRewardsFrameQuestInfoItem'..i..'Name']
-			link = item.type and (QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
+			link = item.type and (_G.QuestInfoFrame.questLog and GetQuestLogItemLink or GetQuestItemLink)(item.type, item:GetID())
 
 			questQualityColors(item, name, link)
 		end
@@ -424,6 +420,7 @@ function S:BlizzardQuestFrames()
 	_G.QuestLogTimerText:SetTextColor(1, 1, 1)
 
 	S:HandleFrame(_G.QuestFrame, true, nil, 11, -12, -32, 66)
+	S:HandleFrame(_G.QuestLogCount, true)
 	S:HandleFrame(_G.QuestLogFrame, true, nil, 11, -12, -32, 45)
 	S:HandleFrame(_G.QuestLogListScrollFrame, true, nil, -1, 2)
 	S:HandleFrame(_G.QuestLogDetailScrollFrame, true, nil, -1, 2)

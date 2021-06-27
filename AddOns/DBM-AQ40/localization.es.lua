@@ -1,4 +1,4 @@
-if GetLocale() ~= "esES" and GetLocale() ~= "esMX" then return end
+if GetLocale() ~= "esES" then return end
 local L
 
 ------------
@@ -59,12 +59,16 @@ L:SetOptionLocalization{
 	WarnShatter	= "Anunciar hacerse añicos"
 }
 L:SetMiscLocalization{
-	Slow	= "comienza a ir más despacio!",
-	Freezing= "se está congelando!",
-	Frozen	= "no se puede mover!",
-	Phase4 	= "comienza a desmoronarse!",
+	Slow	= "comienza a remitir!",
+	Freezing= "se queda inmóvil!",
+	Frozen	= "está paralizada!",
+	Phase4 	= "empieza a desmoronarse!",
 	Phase5 	= "parece a punto de hacerse añicos!",
-	Phase6 	= "explota!"
+	Phase6 	= "explota!",
+
+	HitsRemain	= "Golpes restantes",
+	Frost		= "Escarcha",
+	Physical	= "Daño físico"
 }
 -------------
 -- Huhuran --
@@ -100,7 +104,6 @@ L:SetWarningLocalization{
 	WarnClawTentacle2		= "Tentáculo Garral",
 	WarnGiantEyeTentacle	= "Tentáculo ocular gigante",
 	WarnGiantClawTentacle	= "Tentáculo garral gigante",
-	WarnWeakened			= "C'Thun débil",
 	SpecWarnWeakened		= "¡C'Thun está débil!"
 }
 L:SetTimerLocalization{

@@ -1,8 +1,10 @@
 <Ui xmlns='http://www.blizzard.com/wow/ui/'>
 	<Script file='AddonManager.lua'/>
+	<Script file='Arena.lua'/>
+	<Script file='ArenaRegistrar.lua'/>
 	<Script file='AuctionHouse.lua'/>
-	<Script file='Battlefield.lua'/>
 	<Script file='Bags.lua'/>
+	<Script file='Battlefield.lua'/>
 	<Script file='Battlenet.lua'/>
 	<Script file='BGMap.lua'/>
 	<Script file='BGScore.lua'/>
@@ -10,12 +12,13 @@
 	<Script file='BlizzardOptions.lua'/>
 	<Script file='Channels.lua'/>
 	<Script file='Character.lua'/>
+	<Script file='CombatLog.lua'/>
 	<Script file='Communities.lua'/>
 	<Script file='Craft.lua'/>
 	<Script file='Debug.lua'/>
 	<Script file='DressingRoom.lua'/>
+	<Script file='EventTrace.lua'/>
 	<Script file='Friends.lua'/>
-	<Script file='GMChat.lua'/>
 	<Script file='Gossip.lua'/>
 	<Script file='GuildRegistrar.lua'/>
 	<Script file='Help.lua'/>
@@ -30,6 +33,7 @@
 	<Script file='Quest.lua'/>
 	<Script file='QuestTimers.lua'/>
 	<Script file='Raid.lua'/>
+	<Script file='Socket.lua'/>
 	<Script file='SpellBook.lua'/>
 	<Script file='Stable.lua'/>
 	<Script file='Tabard.lua'/>

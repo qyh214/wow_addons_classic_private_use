@@ -1,18 +1,18 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Lua functions
 local _G = _G
-local select = select
-local unpack = unpack
---WoW API / Variables
+local unpack, select = unpack, select
+
 local ContainerIDToInventoryID = ContainerIDToInventoryID
+local CreateFrame = CreateFrame
 local GetContainerItemLink = GetContainerItemLink
 local GetContainerNumFreeSlots = GetContainerNumFreeSlots
+local GetInventoryItemID = GetInventoryItemID
 local GetInventoryItemLink = GetInventoryItemLink
 local GetItemInfo = GetItemInfo
 local GetItemQualityColor = GetItemQualityColor
-local GetInventoryItemID = GetInventoryItemID
+local hooksecurefunc = hooksecurefunc
 
 local BANK_CONTAINER = BANK_CONTAINER
 local LE_ITEM_CLASS_QUESTITEM = LE_ITEM_CLASS_QUESTITEM
@@ -21,7 +21,7 @@ function S:ContainerFrame()
 	if E.private.bags.enable or not (E.private.skins.blizzard.enable and E.private.skins.blizzard.bags) then return end
 
 	-- ContainerFrame
-	for i = 1, NUM_CONTAINER_FRAMES do
+	for i = 1, _G.NUM_CONTAINER_FRAMES do
 		local frame = _G['ContainerFrame'..i]
 		local closeButton = _G['ContainerFrame'..i..'CloseButton']
 
@@ -30,7 +30,7 @@ function S:ContainerFrame()
 
 		S:HandleCloseButton(closeButton, frame.backdrop)
 
-		for j = 1, MAX_CONTAINER_ITEMS do
+		for j = 1, _G.MAX_CONTAINER_ITEMS do
 			local item = _G['ContainerFrame'..i..'Item'..j]
 			local icon = _G['ContainerFrame'..i..'Item'..j..'IconTexture']
 			local questIcon = _G['ContainerFrame'..i..'Item'..j..'IconQuestTexture']
@@ -134,13 +134,15 @@ function S:ContainerFrame()
 	-- BankFrame
 	local BankFrame = _G.BankFrame
 	BankFrame:StripTextures(true)
-	S:HandleFrame(BankFrame, true, nil, 11, -12, -32, 93)
+	S:HandleFrame(BankFrame, true, nil, 12, 0, 10, 80)
 
-	S:HandleCloseButton(BankCloseButton, BankFrame.backdrop)
+	S:HandleCloseButton(_G.BankCloseButton, BankFrame.backdrop)
 
 	_G.BankSlotsFrame:StripTextures()
 
-	for i = 1, NUM_BANKGENERIC_SLOTS do
+	_G.BankFrameMoneyFrame:Point('RIGHT', 0, 0)
+
+	for i = 1, _G.NUM_BANKGENERIC_SLOTS do
 		local button = _G['BankFrameItem'..i]
 		local icon = _G['BankFrameItem'..i..'IconTexture']
 		local cooldown = _G['BankFrameItem'..i..'Cooldown']
@@ -165,17 +167,13 @@ function S:ContainerFrame()
 
 	BankFrame.itemBackdrop = CreateFrame('Frame', 'BankFrameItemBackdrop', BankFrame)
 	BankFrame.itemBackdrop:SetTemplate('Default')
-	BankFrame.itemBackdrop:Point('TOPLEFT', _G.BankFrameItem1, 'TOPLEFT', -6, 6)
-	BankFrame.itemBackdrop:Point('BOTTOMRIGHT', _G.BankFrameItem24, 'BOTTOMRIGHT', 6, -6)
 	BankFrame.itemBackdrop:SetFrameLevel(BankFrame:GetFrameLevel())
 
 	BankFrame.bagBackdrop = CreateFrame('Frame', 'BankFrameBagBackdrop', BankFrame)
 	BankFrame.bagBackdrop:SetTemplate('Default')
-	BankFrame.bagBackdrop:Point('TOPLEFT', _G.BankSlotsFrame.Bag1, 'TOPLEFT', -6, 6)
-	BankFrame.bagBackdrop:Point('BOTTOMRIGHT', _G.BankSlotsFrame.Bag6, 'BOTTOMRIGHT', 6, -6)
 	BankFrame.bagBackdrop:SetFrameLevel(BankFrame:GetFrameLevel())
 
-	S:HandleButton(BankFramePurchaseButton)
+	S:HandleButton(_G.BankFramePurchaseButton)
 
 	hooksecurefunc('BankFrameItemButton_Update', function(button)
 		local id = button:GetID()

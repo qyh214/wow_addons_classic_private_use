@@ -1,8 +1,8 @@
-﻿## Interface: 11305
+## Interface: 20501
 ## Author: Lag
-## Version: v1.5.6
+## Version: v2.3.1-bcc
 ## SavedVariables: AtlasLootClassicDB
-## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDBIcon-1.0, LibDataBroker-1.1, LibClassicItemSets-1.0
+## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibDBIcon-1.0, LibDataBroker-1.1
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 
@@ -35,7 +35,7 @@
 ## X-License: GPL v2
 ## X-Localizations: enUS, deDE, frFR, esES, koKR, zhCN, zhTW, esMX, ptBR, ruRU, itIT
 ## X-Curse-Project-ID: 326516
-## X-WoWI-ID: 25185
+## X-Wago-ID: RXKqzoGy
 
 embeds.xml
 
@@ -63,7 +63,6 @@ Core\TargetScan.lua
 MiniMapButton.lua
 
 Data\Token.lua
-Data\Sets.lua
 Data\Profession.lua
 Data\Recipe.lua
 Data\Mount.lua
@@ -71,6 +70,9 @@ Data\ContentPhase.lua
 Data\Droprate.lua
 Data\AutoSelect.lua
 Data\Requirements.lua
+Data\ClassFilter.lua
+Data\ItemSet.lua
+Data\VendorPrice.lua
 
 ItemDB\ItemDB.lua
 ItemDB\SoundData.lua

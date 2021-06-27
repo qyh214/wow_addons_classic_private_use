@@ -52,19 +52,22 @@ L:SetGeneralLocalization{
 }
 L:SetWarningLocalization{
 	WarnFreeze	= "Congelamento: %d/3",
-	WarnShatter	= "Shatter: %d/3"
+	WarnShatter	= "Estilhaçar: %d/3"
 }
 L:SetOptionLocalization{
 	WarnFreeze	= "Anunciar status de congelamento",
-	WarnShatter	= "Announce Shatter status" -- check when I have phase5 emote
+	WarnShatter	= "Anunciar status de estilhaçar"
 }
 L:SetMiscLocalization{
-	Slow	= "begins to slow",
-	Freezing= "is freezing up",
-	Frozen	= "is frozen solid",
-	Phase4 	= "begins to crack",
-	Phase5 	= "looks ready to shatter",
-	Phase6 	= "Explodes."
+	Slow	= "começa a ficar lento!",
+	Freezing= "está congelando!",
+	Frozen	= "está totalmente congelado!",
+	Phase4 	= "começa a rachar!",
+	Phase5 	= "parece estar a ponto de se estilhaçar!",
+	Phase6 	= "explode!",
+	HitsRemain	= "Acertos restantes",
+	Frost		= "Gelo",
+	Physical	= "Dano físico"
 }
 -------------
 -- Huhuran --
@@ -100,14 +103,14 @@ L:SetWarningLocalization{
 	WarnClawTentacle2		= "Tentáculo de Garra",
 	WarnGiantEyeTentacle	= "Tentóculo Gigante",
 	WarnGiantClawTentacle	= "Tentáculo de Garra Gigante",
-	SpecWarnWeakened		= "C'Thun enfraquecido!"
+	SpecWarnWeakened		= "C'Thun enfraquece!"
 }
 L:SetTimerLocalization{
 	TimerEyeTentacle		= "Próximo Tentóculo",
 	TimerClawTentacle		= "Próximo Tentáculo de Garra",
 	TimerGiantEyeTentacle	= "Próximo Tentóculo Gigante",
 	TimerGiantClawTentacle	= "Próximo Tentáculo de Garra Gigante",
-	TimerWeakened			= "Enfraquecido acaba"
+	TimerWeakened			= "Enfraquece acaba"
 }
 L:SetOptionLocalization{
 	WarnEyeTentacle			= "Exibir aviso para Tentóculo",
@@ -126,7 +129,7 @@ L:SetMiscLocalization{
 	Stomach		= "Estômago",
 	Eye			= "Olho de C'Thun",
 	FleshTent	= "Tentáculo de Carne",
-	Weakened 	= "enfraquecido",
+	Weakened 	= "enfraquece!",
 	NotValid	= "AQ40 parcialmente limpo. %s chefes opcionais permanecem."
 }
 ----------------
@@ -135,7 +138,7 @@ L:SetMiscLocalization{
 L = DBM:GetModLocalization("Ouro")
 
 L:SetGeneralLocalization{
-	name = "Ouro"
+	name = "Ouroboros"
 }
 L:SetWarningLocalization{
 	WarnSubmerge		= "Submersão",

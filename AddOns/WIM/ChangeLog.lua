@@ -16,25 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.8.1", "10/08/2019", [[
-	* Add option to display emotes in SAY chat windows.
-	* Rewrite code to manage fading of windows. This should fix the issues some of you've been having.
-]]);
-addEntry("3.7.26", "09/23/2019", [[
-	* Elimated WhoLib, blizzard killed it with fire. Some alternate solutions used to bring some but not all of the functionality back
-]]);
-addEntry("3.7.22", "01/24/2019", [[
-	* trying to fix emote misbehavior in BNet names introduced with patch 8.1
-	* fix class names and icon display for non-english clients
-]]);
-addEntry("3.7.21", "01/24/2019", [[
-	* update BNetWhisper handler for 8.1
-	* update ExtractTellTarget handler
-]]);
-addEntry("3.7.20", "01/24/2019", [[
-	*TOC update for 8.1
-	*fix LibWho error
-	*fix changed BNet name handler
+addEntry("3.9.0", "03/31/2021", [[
+	*TOC update for 9.0.5
+	*Compatible with TBC Beta
 ]]);
 
 local function entryExists(version)
@@ -80,9 +64,11 @@ local function logSort(a, b)
 end
 
 local changeLogWindow;
+
 local function createChangeLogWindow()
-    -- create frame object
-    local win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent);
+    -- create frame object - changes for Patch 9.0.1 - Shadowlands, retail and classic
+	local win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent, WIM.isShadowlands and "BackdropTemplate");
+
     win:Hide(); -- hide initially, scripts aren't loaded yet.
     table.insert(UISpecialFrames, "WIM3_ChangeLog");
 
@@ -91,11 +77,17 @@ local function createChangeLogWindow()
     win:SetHeight(500);
     win:SetPoint("CENTER");
 
-    -- set backdrop
-    win:SetBackdrop({bgFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
+    -- set backdrop - changes for Patch 9.0.1 - Shadowlands, retail and classic
+    win.backdropInfo = {bgFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
         edgeFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame",
         tile = true, tileSize = 64, edgeSize = 64,
-        insets = { left = 64, right = 64, top = 64, bottom = 64 }});
+        insets = { left = 64, right = 64, top = 64, bottom = 64 }};
+
+	if not WIM.isShadowlands then
+		win:SetBackdrop(win.backdropInfo);
+	else
+		win:ApplyBackdrop();
+	end
 
     -- set basic frame properties
     win:SetClampedToScreen(true);

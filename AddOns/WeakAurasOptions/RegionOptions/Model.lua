@@ -1,4 +1,5 @@
 if not WeakAuras.IsCorrectVersion() then return end
+local AddonName, OptionsPrivate = ...
 
 local L = WeakAuras.L;
 
@@ -16,23 +17,19 @@ local function createOptions(id, data)
     -- Option for modelIsDisplayInfo added below
 
     -- Option for path/id added below
-    space2 = {
-      type = "execute",
-      width = WeakAuras.normalWidth,
-      name = "",
-      order = 1.5,
-      image = function() return "", 0, 0 end,
-      hidden = function() return data.modelIsUnit end
-    },
     chooseModel = {
       type = "execute",
-      width = WeakAuras.normalWidth,
+      width = 0.15,
       name = L["Choose"],
       order = 2,
       func = function()
-        WeakAuras.OpenModelPicker(data);
+        OptionsPrivate.OpenModelPicker(data, {});
       end,
-      hidden = function() return data.modelIsUnit end
+      disabled = function() return data.modelIsUnit end,
+      imageWidth = 24,
+      imageHeight = 24,
+      control = "WeakAurasIcon",
+      image = "Interface\\AddOns\\WeakAuras\\Media\\Textures\\browse",
     },
     advance = {
       type = "toggle",
@@ -203,26 +200,26 @@ local function createOptions(id, data)
     }
     options.model_fileId = {
       type = "input",
-      width = WeakAuras.doubleWidth,
+      width = WeakAuras.doubleWidth - 0.15,
       name = L["Model"],
       order = 1
     }
   else
     options.model_path = {
       type = "input",
-      width = WeakAuras.doubleWidth,
+      width = WeakAuras.doubleWidth - 0.15,
       name = L["Model"],
       order = 1
     }
   end
 
-  for k, v in pairs(WeakAuras.commonOptions.BorderOptions(id, data, nil, nil, 70)) do
+  for k, v in pairs(OptionsPrivate.commonOptions.BorderOptions(id, data, nil, nil, 70)) do
     options[k] = v
   end
 
   return {
     model = options,
-    position = WeakAuras.commonOptions.PositionOptions(id, data, nil, nil, nil),
+    position = OptionsPrivate.commonOptions.PositionOptions(id, data, nil, nil, nil),
   };
 end
 
@@ -305,8 +302,11 @@ local templates = {
     title = L["Default"],
     data = {
     };
-  },
-  {
+  }
+}
+
+if WeakAuras.IsRetail() then
+  tinsert(templates, {
     title = L["Fire Orb"],
     description = "",
     data = {
@@ -318,8 +318,8 @@ local templates = {
       model_y = -0.5,
       model_z = -1.5
     },
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Blue Sparkle Orb"],
     description = "",
     data = {
@@ -333,8 +333,8 @@ local templates = {
       model_y = 0.7,
       model_z = 1.5
     },
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Arcane Orb"],
     description = "",
     data = {
@@ -348,8 +348,8 @@ local templates = {
       model_y = 0.8,
       model_z = 2
     },
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Orange Rune"],
     description = "",
     data = {
@@ -360,8 +360,8 @@ local templates = {
       model_path = "spells/7fx_godking_orangerune_state.m2",
       model_fileId = "1307356", -- spells/7fx_godking_orangerune_state.m2
     },
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Blue Rune"],
     description = "",
     data = {
@@ -372,8 +372,8 @@ local templates = {
       model_path = "spells/7fx_godking_bluerune_state.m2",
       model_fileId = "1307354", -- spells/7fx_godking_bluerune_state.m2
     }
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Yellow Rune"],
     description = "",
     data = {
@@ -384,8 +384,8 @@ local templates = {
       model_path = "spells/7fx_godking_yellowrune_state.m2",
       model_fileId = "1307358", -- spells/7fx_godking_yellowrune_state.m2
     }
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Purple Rune"],
     description = "",
     data = {
@@ -396,8 +396,8 @@ local templates = {
       model_path = "spells/7fx_godking_purplerune_state.m2",
       model_fileId = "1307355", -- spells/7fx_godking_purplerune_state.m2
     }
-  },
-  {
+  })
+  tinsert(templates, {
     title = L["Green Rune"],
     description = "",
     data = {
@@ -408,7 +408,7 @@ local templates = {
       model_path = "spells/7fx_godking_greenrune_state.m2",
       model_fileId = "1307357", -- spells/7fx_godking_greenrune_state.m2
     }
-  },
-}
+  })
+end
 
 WeakAuras.RegisterRegionOptions("model", createOptions, createIcon, L["Model"], createThumbnail, modifyThumbnail, L["Shows a 3D model from the game files"], templates);

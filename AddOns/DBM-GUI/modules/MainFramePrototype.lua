@@ -2,14 +2,14 @@ local select, ipairs, mfloor, mmax = select, pairs, math.floor, math.max
 local CreateFrame, GameFontHighlightSmall, GameFontNormalSmall, GameFontNormal = CreateFrame, GameFontHighlightSmall, GameFontNormalSmall, GameFontNormal
 local DBM, DBM_GUI = DBM, DBM_GUI
 
-local frame = CreateFrame("Frame", "DBM_GUI_OptionsFrame", UIParent)
+local frame = CreateFrame("Frame", "DBM_GUI_OptionsFrame", UIParent, DBM:IsShadowlands() and "BackdropTemplate")
 
 function frame:UpdateMenuFrame()
 	local listFrame = _G["DBM_GUI_OptionsFrameList"]
 	if not listFrame.buttons then
 		return
 	end
-	local displayedElements = self.tab and DBM_GUI.frameTypes[self.tab]:GetVisibleTabs() or {}
+	local displayedElements = self.tab and DBM_GUI.tabs[self.tab]:GetVisibleTabs() or {}
 	local bigList = mfloor((listFrame:GetHeight() - 8) / 18)
 	if #displayedElements > bigList then
 		_G[listFrame:GetName() .. "List"]:Show()
@@ -25,6 +25,7 @@ function frame:UpdateMenuFrame()
 		local element = displayedElements[i + (listFrame.offset or 0)]
 		if not element or i > bigList then
 			button:Hide()
+			button:SetHeight(-1)
 		else
 			self:DisplayButton(button, element.frame)
 			if (self.tab and self.tabs[self.tab].selection) == element.frame then
@@ -36,6 +37,7 @@ end
 
 function frame:DisplayButton(button, element)
 	button:Show()
+	button:SetHeight(18)
 	button.element = element
 	button.text:ClearAllPoints()
 	button.text:SetPoint("LEFT", 12 + 8 * element.depth, 2)
@@ -131,13 +133,12 @@ function frame:DisplayFrame(frame)
 		DBM_GUI.currentViewing:Hide()
 	end
 	DBM_GUI.currentViewing = frame
-	_G["DBM_GUI_OptionsFramePanelContainerHeaderText"]:SetText(frame.displayName)
 	_G["DBM_GUI_DropDown"]:Hide()
 	local FOV = _G["DBM_GUI_OptionsFramePanelContainerFOV"]
 	FOV:SetScrollChild(frame)
 	FOV:Show()
 	frame:Show()
-	frame:SetSize(FOV:GetWidth(), FOV:GetHeight())
+	frame:SetSize(FOV:GetSize())
 	local mymax = resize(frame, true) - _G["DBM_GUI_OptionsFramePanelContainer"]:GetHeight()
 	if mymax <= 0 then
 		mymax = 0
@@ -156,12 +157,12 @@ function frame:DisplayFrame(frame)
 	if DBM.Options.EnableModels then
 		local bossPreview = _G["DBM_BossPreview"]
 		if not bossPreview then
-			local mobstyle = CreateFrame("PlayerModel", "DBM_BossPreview", _G["DBM_GUI_OptionsFramePanelContainer"])
-			mobstyle:SetPoint("BOTTOMRIGHT", "DBM_GUI_OptionsFramePanelContainer", "BOTTOMRIGHT", -5, 5)
-			mobstyle:SetSize(300, 230)
-			mobstyle:SetPortraitZoom(0.4)
-			mobstyle:SetRotation(0)
-			mobstyle:SetClampRectInsets(0, 0, 24, 0)
+			bossPreview = CreateFrame("PlayerModel", "DBM_BossPreview", _G["DBM_GUI_OptionsFramePanelContainer"])
+			bossPreview:SetPoint("BOTTOMRIGHT", "DBM_GUI_OptionsFramePanelContainer", "BOTTOMRIGHT", -5, 5)
+			bossPreview:SetSize(300, 300)
+			bossPreview:SetPortraitZoom(0.4)
+			bossPreview:SetRotation(0)
+			bossPreview:SetClampRectInsets(0, 0, 24, 0)
 		end
 		bossPreview.enabled = false
 		bossPreview:Hide()
@@ -170,8 +171,11 @@ function frame:DisplayFrame(frame)
 				bossPreview.currentMod = mod
 				bossPreview:Show()
 				bossPreview:ClearModel()
+				bossPreview:SetModelScale(1)
+				bossPreview:SetPosition(mod.modelOffsetX or 0, mod.modelOffsetY or 0, mod.modelOffsetZ or 0)
+				bossPreview:SetFacing(mod.modelRotation or 0)
+				bossPreview:SetSequence(mod.modelSequence or 4)
 				bossPreview:SetDisplayInfo(mod.modelId or 0)
-				bossPreview:SetSequence(4)
 				if mod.modelSoundShort and DBM.Options.ModelSoundValue == "Short" then
 					DBM:PlaySoundFile(mod.modelSoundShort)
 				elseif mod.modelSoundLong and DBM.Options.ModelSoundValue == "Long" then
@@ -225,11 +229,21 @@ end
 function frame:ShowTab(tab)
 	self.tab = tab
 	self:UpdateMenuFrame()
-	for i = 1, #self.tabs do
+	for i = 1, #DBM_GUI.tabs do
 		if i == tab then
-			self:SelectTab(i)
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Left"]:Hide()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Middle"]:Hide()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Right"]:Hide()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "LeftDisabled"]:Show()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "MiddleDisabled"]:Show()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "RightDisabled"]:Show()
 		else
-			self:DeselectTab(i)
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Left"]:Show()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Middle"]:Show()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "Right"]:Show()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "LeftDisabled"]:Hide()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "MiddleDisabled"]:Hide()
+			_G["DBM_GUI_OptionsFrameTab" .. i .. "RightDisabled"]:Hide()
 		end
 	end
 end

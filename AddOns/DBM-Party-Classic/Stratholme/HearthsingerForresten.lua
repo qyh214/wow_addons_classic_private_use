@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(443, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(10558)
 mod:SetEncounterID(473)
 
@@ -23,23 +23,18 @@ function mod:OnCombatStart(delay)
 	timerEnchantingLullabyCD:Start(1-delay)
 end
 
-do
-	local EnchantingLullaby = DBM:GetSpellInfo(16798)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 16798 then
-		if args.spellName == EnchantingLullaby then
-			timerEnchantingLullabyCD:Start()
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnEnchantingLullaby:Show(args.sourceName)
-				specWarnEnchantingLullaby:Play("kickcast")
-			end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 16798 then
+		timerEnchantingLullabyCD:Start()
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnEnchantingLullaby:Show(args.sourceName)
+			specWarnEnchantingLullaby:Play("kickcast")
 		end
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 16798 then
-		if args.spellName == EnchantingLullaby then
-			warningEnchantingLullaby:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 16798 then
+		warningEnchantingLullaby:Show(args.destName)
 	end
 end

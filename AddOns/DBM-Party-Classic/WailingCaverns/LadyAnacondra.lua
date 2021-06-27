@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(474, "DBM-Party-Classic", 19, 240)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(3671)
 mod:SetEncounterID(585)
 
@@ -26,26 +26,20 @@ function mod:OnCombatStart(delay)
 	timerHealingTouchCD:Start(1-delay)
 end
 
-do
-	local DruidsSlumber, HealingTouch = DBM:GetSpellInfo(8040), DBM:GetSpellInfo(23381)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 8040 then
-		if args.spellName == DruidsSlumber and args:IsSrcTypeHostile() then
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnDruidsSlumber:Show(args.sourceName)
-				specWarnDruidsSlumber:Play("kickcast")
-			end
-		--elseif args.spellId == 23381 then
-		elseif args.spellName == HealingTouch and args:IsSrcTypeHostile() then
-			warningHealingTouch:Show()
-			timerHealingTouchCD:Start()
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 8040 and args:IsSrcTypeHostile() then
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnDruidsSlumber:Show(args.sourceName)
+			specWarnDruidsSlumber:Play("kickcast")
 		end
+	elseif args.spellId == 23381 and args:IsSrcTypeHostile() then
+		warningHealingTouch:Show()
+		timerHealingTouchCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 8040 then
-		if args.spellName == DruidsSlumber and args:IsDestTypePlayer() then
-			warningDruidSlumber:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 8040 and args:IsDestTypePlayer() then
+		warningDruidSlumber:Show(args.destName)
 	end
 end

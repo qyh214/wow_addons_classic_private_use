@@ -1,6 +1,8 @@
 # BlizzMove
 
-## [2.1.6](https://github.com/the-rebel-Mermaid/BlizzMove/tree/2.1.6) (2020-07-29)
-[Full Changelog](https://github.com/the-rebel-Mermaid/BlizzMove/commits/2.1.6) [Previous Releases](https://github.com/the-rebel-Mermaid/BlizzMove/releases)
+## [v3.1.0](https://github.com/Kiatra/BlizzMove/tree/v3.1.0) (2021-06-20)
+[Full Changelog](https://github.com/Kiatra/BlizzMove/commits/v3.1.0) [Previous Releases](https://github.com/Kiatra/BlizzMove/releases)
 
-- Remove LevelUpDisplay for now. Fixes issue #28  
+- Added UI Widget containers as default-disabled frames (#70)  
+    Added an error message for frames that are incorrectly marked as incompatible  
+    Added a button in the main config info screen, to search for plugins  

@@ -67,9 +67,9 @@ function QuestieStreamLib:GetStream(mode) -- returns a new stream
         stream._mode = mode
         if mode == "raw" then
             stream.ReadByte = QuestieStreamLib._ReadByte_raw
-            --stream.ReadTinyString = QuestieStreamLib._ReadTinyStringBySubstring
-            --stream.ReadShortString = QuestieStreamLib._ReadShortStringBySubstring
-            --stream.ReadTinyStringNil = QuestieStreamLib._ReadTinyStringNilBySubstring
+            stream.ReadTinyString = QuestieStreamLib._ReadTinyStringBySubstring
+            stream.ReadShortString = QuestieStreamLib._ReadShortStringBySubstring
+            stream.ReadTinyStringNil = QuestieStreamLib._ReadTinyStringNilBySubstring
             stream._WriteByte = QuestieStreamLib._writeByte
         elseif mode == "1short" then
             stream.ReadByte = QuestieStreamLib._ReadByte_1short
@@ -184,10 +184,9 @@ function QuestieStreamLib:_ReadByte_1short()
     elseif v == _1short_control then
         v = self:_readByte()
         return _1short_control_table[v]
-    else
-        return v
     end
-    return -1
+
+    return v
 end
 
 function QuestieStreamLib:_WriteByte_raw(e)
@@ -265,7 +264,7 @@ end
 function QuestieStreamLib:_ReadTinyStringBySubstring()
     local length = self:ReadByte()
     if length == 0 then return "" end
-    local ret = string.sub(self._bin, self._pointer, self._pointer+length)
+    local ret = string.sub(self._bin, self._pointer, self._pointer+length-1)
     self._pointer = self._pointer + length
     return ret
 end
@@ -273,7 +272,7 @@ end
 function QuestieStreamLib:_ReadTinyStringNilBySubstring()
     local length = self:ReadByte()
     if length == 0 then return nil end
-    local ret = string.sub(self._bin, self._pointer, self._pointer+length)
+    local ret = string.sub(self._bin, self._pointer, self._pointer+length-1)
     self._pointer = self._pointer + length
     return ret
 end
@@ -306,7 +305,7 @@ end
 
 function QuestieStreamLib:_ReadShortStringBySubstring()
     local length = self:ReadShort()
-    local ret = string.sub(self._bin, self._pointer, self._pointer+length)
+    local ret = string.sub(self._bin, self._pointer, self._pointer+length-1)
     self._pointer = self._pointer + length
     return ret
 end

@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
 local format, strjoin, abs = format, strjoin, abs
@@ -18,7 +18,7 @@ local PARRY_CHANCE = PARRY_CHANCE
 local STAT_CATEGORY_ENHANCEMENTS = STAT_CATEGORY_ENHANCEMENTS
 
 local displayString, lastPanel, targetlv, playerlv
-local basemisschance, leveldifference, dodge, parry, block, unhittable
+local basemisschance, misschance, baseDef, armorDef, leveldifference, dodge, parry, block, unhittable
 local AVD_DECAY_RATE, chanceString = 1.5, '%.2f%%'
 
 local function IsWearingShield()
@@ -73,9 +73,11 @@ local function OnEvent(self)
 		numAvoidances = numAvoidances - 1
 	end
 
-	unhittableMax = unhittableMax + ((AVD_DECAY_RATE * leveldifference) * numAvoidances)
+	unhittableMax = unhittableMax + ((AVD_DECAY_RATE * leveldifference) * numAvoidances);
+    baseDef, armorDef = UnitDefense("player");
+    misschance = (basemisschance + (armorDef + baseDef - (5*playerlv))*0.04);
 
-	local avoided = (dodge+parry+basemisschance) --First roll on hit table determining if the hit missed
+	local avoided = (dodge+parry+misschance) --First roll on hit table determining if the hit missed
 	local blocked = (100 - avoided)*block/100 --If the hit landed then the second roll determines if the his was blocked
 	local avoidance = (avoided+blocked)
 	unhittable = avoidance - unhittableMax
@@ -91,6 +93,7 @@ local function OnEvent(self)
 end
 
 local function OnEnter()
+	DT.tooltip:ClearLines()
 	if targetlv > 1 then
 		DT.tooltip:AddDoubleLine(L["Avoidance Breakdown"], strjoin('', ' (', L["lvl"], ' ', targetlv, ')'))
 	elseif targetlv == -1 then
@@ -98,11 +101,11 @@ local function OnEnter()
 	else
 		DT.tooltip:AddDoubleLine(L["Avoidance Breakdown"], strjoin('', ' (', L["lvl"], ' ', playerlv, ')'))
 	end
-	DT.tooltip:AddLine' '
+	DT.tooltip:AddLine(' ')
 	DT.tooltip:AddDoubleLine(DODGE_CHANCE, format(chanceString, dodge),1,1,1)
 	DT.tooltip:AddDoubleLine(PARRY_CHANCE, format(chanceString, parry),1,1,1)
 	DT.tooltip:AddDoubleLine(BLOCK_CHANCE, format(chanceString, block),1,1,1)
-	DT.tooltip:AddDoubleLine(MISS_CHANCE, format(chanceString, basemisschance),1,1,1)
+	DT.tooltip:AddDoubleLine(MISS_CHANCE, format(chanceString, misschance),1,1,1)
 	DT.tooltip:AddLine(' ')
 
 	if unhittable > 0 then

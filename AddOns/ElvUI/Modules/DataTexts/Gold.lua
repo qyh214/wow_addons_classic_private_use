@@ -1,7 +1,6 @@
-local E, L, P, G = unpack(select(2, ...)); --Inport: Engine, Locales, ProfileDB, GlobalDB
+local E, L, P, G = unpack(select(2, ...)) --Import: Engine, Locales, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local _G = _G
 local type, wipe, pairs, ipairs, sort = type, wipe, pairs, ipairs, sort
 local format, strjoin, tinsert = format, strjoin, tinsert
@@ -51,9 +50,9 @@ local function OnEvent(self)
 
 	local OldMoney = oldMoney or NewMoney
 	local Change = NewMoney-OldMoney -- Positive if we gain money
-	if OldMoney>NewMoney then		-- Lost Money
+	if OldMoney>NewMoney then -- Lost Money
 		Spent = Spent - Change
-	else							-- Gained Moeny
+	else -- Gained Moeny
 		Profit = Profit + Change
 	end
 

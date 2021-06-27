@@ -1,7 +1,7 @@
 --[[
 # Element: Health Prediction Bars
 
-Handles the visibility and updating of incoming heals and heal/damage absorbs.
+Handles the visibility and updating of incoming heals.
 
 ## Widget
 
@@ -11,10 +11,6 @@ HealthPrediction - A `table` containing references to sub-widgets and options.
 
 myBar          - A `StatusBar` used to represent incoming heals from the player.
 otherBar       - A `StatusBar` used to represent incoming heals from others.
-absorbBar      - A `StatusBar` used to represent damage absorbs.
-healAbsorbBar  - A `StatusBar` used to represent heal absorbs.
-overAbsorb     - A `Texture` used to signify that the amount of damage absorb is greater than the unit's missing health.
-overHealAbsorb - A `Texture` used to signify that the amount of heal absorb is greater than the unit's current health.
 
 ## Notes
 
@@ -41,17 +37,10 @@ A default texture will be applied to the Texture widgets if they don't have a te
     otherBar:SetPoint('LEFT', myBar:GetStatusBarTexture(), 'RIGHT')
     otherBar:SetWidth(200)
 
-    local absorbBar = CreateFrame('StatusBar', nil, self.Health)
-    absorbBar:SetPoint('TOP')
-    absorbBar:SetPoint('BOTTOM')
-    absorbBar:SetPoint('LEFT', otherBar:GetStatusBarTexture(), 'RIGHT')
-    absorbBar:SetWidth(200)
-
     -- Register with oUF
     self.HealthPrediction = {
         myBar = myBar,
         otherBar = otherBar,
-        absorbBar = absorbBar,
         maxOverflow = 1.05,
     }
 --]]
@@ -104,36 +93,8 @@ local function Update(self, event, unit)
 		element.otherBar:SetValue(otherIncomingHeal)
 		element.otherBar:Show()
 	end
---[[
-	if(element.absorbBar) then
-		element.absorbBar:SetMinMaxValues(0, maxHealth)
-		element.absorbBar:SetValue(absorb)
-		element.absorbBar:Show()
-	end
 
-	if(element.healAbsorbBar) then
-		element.healAbsorbBar:SetMinMaxValues(0, maxHealth)
-		element.healAbsorbBar:SetValue(healAbsorb)
-		element.healAbsorbBar:Show()
-	end
-
-	if(element.overAbsorb) then
-		if(hasOverAbsorb) then
-			element.overAbsorb:Show()
-		else
-			element.overAbsorb:Hide()
-		end
-	end
-
-	if(element.overHealAbsorb) then
-		if(hasOverHealAbsorb) then
-			element.overHealAbsorb:Show()
-		else
-			element.overHealAbsorb:Hide()
-		end
-	end
-]]
-	--[[ Callback: HealthPrediction:PostUpdate(unit, myIncomingHeal, otherIncomingHeal, absorb, healAbsorb, hasOverAbsorb, hasOverHealAbsorb)
+	--[[ Callback: HealthPrediction:PostUpdate(unit, myIncomingHeal, otherIncomingHeal)
 	Called after the element has been updated.
 
 	* self              - the HealthPrediction element
@@ -142,7 +103,6 @@ local function Update(self, event, unit)
 	* otherIncomingHeal - the amount of incoming healing done by others (number)
 	--]]
 	if(element.PostUpdate) then
-		-- return element:PostUpdate(unit, myIncomingHeal, otherIncomingHeal, absorb, healAbsorb, hasOverAbsorb, hasOverHealAbsorb)
 		return element:PostUpdate(unit, myIncomingHeal, otherIncomingHeal)
 	end
 end
@@ -213,32 +173,6 @@ local function Enable(self)
 			end
 		end
 
-		if(element.absorbBar) then
-			if(element.absorbBar:IsObjectType('StatusBar') and not element.absorbBar:GetStatusBarTexture()) then
-				element.absorbBar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
-			end
-		end
-
-		if(element.healAbsorbBar) then
-			if(element.healAbsorbBar:IsObjectType('StatusBar') and not element.healAbsorbBar:GetStatusBarTexture()) then
-				element.healAbsorbBar:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
-			end
-		end
-
-		if(element.overAbsorb) then
-			if(element.overAbsorb:IsObjectType('Texture') and not element.overAbsorb:GetTexture()) then
-				element.overAbsorb:SetTexture([[Interface\RaidFrame\Shield-Overshield]])
-				element.overAbsorb:SetBlendMode('ADD')
-			end
-		end
-
-		if(element.overHealAbsorb) then
-			if(element.overHealAbsorb:IsObjectType('Texture') and not element.overHealAbsorb:GetTexture()) then
-				element.overHealAbsorb:SetTexture([[Interface\RaidFrame\Absorb-Overabsorb]])
-				element.overHealAbsorb:SetBlendMode('ADD')
-			end
-		end
-
 		return true
 	end
 end
@@ -252,22 +186,6 @@ local function Disable(self)
 
 		if(element.otherBar) then
 			element.otherBar:Hide()
-		end
-
-		if(element.absorbBar) then
-			element.absorbBar:Hide()
-		end
-
-		if(element.healAbsorbBar) then
-			element.healAbsorbBar:Hide()
-		end
-
-		if(element.overAbsorb) then
-			element.overAbsorb:Hide()
-		end
-
-		if(element.overHealAbsorb) then
-			element.overHealAbsorb:Hide()
 		end
 
 		HealComm.UnregisterCallback(element, 'HealComm_HealStarted')

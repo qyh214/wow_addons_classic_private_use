@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("AQ40Trash", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200830191526")
+mod:SetRevision("20210402014659")
 mod:SetModelID(15347)-- Anubisath Sentinel
 mod:SetMinSyncRevision(20200810000000)--2020, 8, 10
 
@@ -45,13 +45,9 @@ do-- Anubisath Plague/Explode - keep in sync - AQ40/AQ40Trash.lua AQ20/AQ20Trash
 	local yellPlague                    = mod:NewYell(22997)
 	local specWarnExplode               = mod:NewSpecialWarningRun(25698, "Melee", nil, 3, 4, 2)
 
-	local Plague = DBM:GetSpellInfo(22997)
-	local Explode = DBM:GetSpellInfo(25698)
-	local CauseInsanity = DBM:GetSpellInfo(26079)-- aq40 only mind control - qiraji brainwasher/mindslayer
-
 	-- aura applied didn't seem to catch the reflects and other buffs
 	function mod:SPELL_AURA_APPLIED(args)
-		if args.spellName == Plague then
+		if args.spellId == 22997 then
 			if args:IsPlayer() then
 				specWarnPlague:Show()
 				specWarnPlague:Play("runout")
@@ -62,16 +58,16 @@ do-- Anubisath Plague/Explode - keep in sync - AQ40/AQ40Trash.lua AQ20/AQ20Trash
 			else
 				warnPlague:Show(args.destName)
 			end
-		elseif args.spellName == Explode then
+		elseif args.spellId == 25698 then
 			specWarnExplode:Show()
 			specWarnExplode:Play("justrun")
-		elseif args.spellName == CauseInsanity then
+		elseif args.spellId == 26079 then
 			warnCauseInsanity:CombinedShow(0.75, args.destName)
 		end
 	end
 
 	function mod:SPELL_AURA_REMOVED(args)
-		if args.spellName == Plague then
+		if args.spellId == 22997 then
 			if args:IsPlayer() and self.Options.RangeFrame then
 				DBM.RangeCheck:Hide()
 			end
@@ -91,7 +87,7 @@ do
 				self.vb.firstEngageTime = GetServerTime()
 				if self.Options.FastestClear3 and self.Options.SpeedClearTimer then
 					--Custom bar creation that's bound to core, not mod, so timer doesn't stop when mod stops it's own timers
-					DBM.Bars:CreateBar(self.Options.FastestClear3, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
+					DBT:CreateBar(self.Options.FastestClear3, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
 				end
 				self:SendSync("AQ40Started", self.vb.firstEngageTime)--Also sync engage time
 			end
@@ -108,9 +104,8 @@ do
 
 	-- todo: thorns
 	local playerGUID = UnitGUID("player")
-	local ShadowStorm = DBM:GetSpellInfo(26555)
-	function mod:SPELL_DAMAGE(_, sourceName, _, _, destGUID, _, _, _, _, spellName)
-		if spellName == ShadowStorm and destGUID == playerGUID and self:AntiSpam(3, 3) then
+	function mod:SPELL_DAMAGE(_, sourceName, _, _, destGUID, _, _, _, spellId)
+		if spellId == 26555 and destGUID == playerGUID and self:AntiSpam(3, 3) then
 			specWarnShadowStorm:Show(sourceName)
 			specWarnShadowStorm:Play("findshelter")
 		end
@@ -148,7 +143,7 @@ do
 			if encounterId == 710 or encounterId == 713 or encounterId == 716 or encounterId == 717 or encounterId == 714 then
 				self.vb.requiredBosses = self.vb.requiredBosses + 1
 				if self.vb.requiredBosses == 5 then
-					DBM.Bars:CancelBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT)
+					DBT:CancelBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT)
 					if self.vb.firstEngageTime then
 						local thisTime = GetServerTime() - self.vb.firstEngageTime
 						if thisTime and thisTime > 0 then
@@ -175,14 +170,14 @@ do
 	function mod:OnSync(msg, timeOrEncounter, sender)
 		--Sync recieved with start time and ours is currently not started
 		--The reason this doesn't just check self.vb.firstEngageTime is nil, because it might not be if SendVariableInfo send it first
-		if msg == "AQ40Started" and timeOrEncounter and not DBM.Bars:GetBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT) then
+		if msg == "AQ40Started" and timeOrEncounter and not DBT:GetBar(DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT) then
 			if not self.vb.firstEngageTime then
 				self.vb.firstEngageTime = tonumber(timeOrEncounter)
 			end
 			if self.Options.FastestClear3 and self.Options.SpeedClearTimer then
 				--Custom bar creation that's bound to core, not mod, so timer doesn't stop when mod stops it's own timers
 				local adjustment = GetServerTime() - self.vb.firstEngageTime
-				DBM.Bars:CreateBar(self.Options.FastestClear3 - adjustment, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
+				DBT:CreateBar(self.Options.FastestClear3 - adjustment, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
 			end
 			--Unregister high CPU combat log events
 			self:UnregisterShortTermEvents()

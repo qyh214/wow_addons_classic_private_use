@@ -101,9 +101,9 @@ L:SetOptionLocalization({
 
 L:SetMiscLocalization({
 	Pull				= "죽어라, 침입자들아!",
-	AddsYell			= "Rise, my soldiers! Rise and fight once more!",
-	Adds				= "summons forth Skeletal Warriors!",
-	AddsTwo				= "raises more skeletons!"
+	AddsYell			= "일어나라, 병사들이여! 다시 일어나 싸워라!",
+--	Adds				= "summons forth Skeletal Warriors!",
+--	AddsTwo				= "raises more skeletons!"
 })
 
 --------------------------
@@ -210,18 +210,15 @@ L:SetMiscLocalization({
 L:SetOptionLocalization({
 	WarningChargeChanged	= "극성이 바뀔때 특수 알림 보기",
 	WarningChargeNotChanged	= "극성이 바뀌지 않으면 특수 알림 보기",
-	ArrowsEnabled			= "기본 화살표 보기 (일반 \"2점\" 공략용)",
-	ArrowsRightLeft			= "\"4점\" 공략용 왼쪽/오른쪽 화살표 보기 (극성이 바뀌면 왼쪽 화살표가 나오고 바뀌지 않으면 오른쪽이 나옴)",
-	ArrowsInverse			= "역 \"4점\" 공략 (극성이 바뀌면 오른쪽 화살표가 나오고 바뀌지 않으면 왼쪽이 나옴)"
+	ArrowsEnabled			= "$spell:28089 동안 화살표 보기",
+	TwoCamp					= "화살표 보기 (일반 \"2점\" 택틱)",
+	ArrowsRightLeft			= "\"4점\" 택틱 왼쪽/오른쪽 화살표 보기 (극성이 바뀌면 왼쪽 화살표가 나오고 바뀌지 않으면 오른쪽이 나옴)",
+	ArrowsInverse			= "역 \"4점\" 택틱 (극성이 바뀌면 오른쪽 화살표가 나오고 바뀌지 않으면 왼쪽이 나옴)"
 })
 
 L:SetWarningLocalization({
 	WarningChargeChanged	= "극성 변경: %s",
 	WarningChargeNotChanged	= "극성 변경 안됨"
-})
-
-L:SetOptionCatLocalization({
-	Arrows	= "화살표"
 })
 
 ---------------------------
@@ -281,11 +278,11 @@ L:SetWarningLocalization({
 
 L:SetMiscLocalization({
 	yell			= "어리석은 것들, 스스로 죽음을 자초하다니!",
-	WarningWave1	= "%d %s",
 	WarningWave2	= "%d %s, %d %s",
 	WarningWave3	= "%d %s, %d %s, %d %s",
 	Trainee			= "수련생",
 	Knight			= "기사",
+	Horse			= "말 망령",
 	Rider			= "기병"
 })
 
@@ -300,17 +297,16 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	WarningMarkSoon				= "징표 사전 경고 보기",
-	WarningMarkNow				= "징표 경고 보기",
-	SpecialWarningMarkOnPlayer	= "징표가 4중첩 이상이 되면 특수 알림 보기"
-})
-
-L:SetTimerLocalization({
+	SpecialWarningMarkOnPlayer	= "징표가 4개 이상 걸리면 특수 알림 보기",
+	timerMark					= "다음 기사의 징표 타이머 바 보기 (횟수 포함)",
 })
 
 L:SetWarningLocalization({
-	WarningMarkSoon				= "3초 후 징표 %d",
-	WarningMarkNow				= "징표 %d",
-	SpecialWarningMarkOnPlayer	= "%s: %s"
+	timerMark	= "%d번 징표",
+})
+
+L:SetWarningLocalization({
+	WarningMarkSoon				= "3초 후 %d번 징표",
 })
 
 L:SetMiscLocalization({

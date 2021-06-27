@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("GhamooRa", "DBM-Party-Classic", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(4887)
 --mod:SetEncounterID(1667)
 
@@ -19,13 +19,9 @@ function mod:OnCombatStart(delay)
 	timerTrampleCD:Start(1-delay)
 end
 
-do
-	local Trample = DBM:GetSpellInfo(5568)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 5568 then
-		if args.spellName == Trample then
-			warningTrample:Show()
-			timerTrampleCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 5568 then
+		warningTrample:Show()
+		timerTrampleCD:Start()
 	end
 end

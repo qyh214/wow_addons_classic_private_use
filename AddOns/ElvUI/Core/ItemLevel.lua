@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
 local _G = _G
 local tinsert, strfind, strmatch = tinsert, strfind, strmatch
@@ -56,7 +56,7 @@ function E:CollectEssenceInfo(index, lineText, slotInfo)
 	local step = 1
 	local essence = slotInfo.essences[step]
 	if essence and next(essence) and (strfind(lineText, ITEM_SPELL_TRIGGER_ONEQUIP, nil, true) and strfind(lineText, ESSENCE_DESCRIPTION, nil, true)) then
-		for i = 4, 2, -1 do
+		for i = 5, 2, -1 do
 			local line = _G['ElvUI_ScanTooltipTextLeft'..index - i]
 			local text = line and line:GetText()
 
@@ -169,7 +169,7 @@ function E:CalculateAverageItemLevel(iLevelDB, unit)
 	end
 
 	if mainItemLevel and offItemLevel then
-		if (mainQuality == 6) or (not offEquipLoc and X2_INVTYPES[mainEquipLoc] and X2_EXCEPTIONS[mainItemClass] ~= mainItemSubClass and spec ~= 72) then
+		if mainQuality == 6 or (not offEquipLoc and X2_INVTYPES[mainEquipLoc] and X2_EXCEPTIONS[mainItemClass] ~= mainItemSubClass and spec ~= 72) then
 			mainItemLevel = max(mainItemLevel, offItemLevel)
 			total = total + mainItemLevel * 2
 		else
@@ -193,7 +193,7 @@ end
 do
 	local iLevelDB, tryAgain = {}, {}
 	function E:GetUnitItemLevel(unit)
-		if UnitIsUnit('player', unit) then
+		if UnitIsUnit(unit, 'player') then
 			return E:GetPlayerItemLevel()
 		end
 

@@ -1,12 +1,10 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local _G = _G
 local format, strjoin = format, strjoin
 local date = date
 
---WoW API / Variables
 local GetGameTime = GetGameTime
 local RequestRaidInfo = RequestRaidInfo
 local TIMEMANAGER_TOOLTIP_LOCALTIME = TIMEMANAGER_TOOLTIP_LOCALTIME
@@ -61,8 +59,8 @@ local function OnLeave()
 	enteredFrame = false
 end
 
-local function OnEnter(self)
-	DT:SetupTooltip(self)
+local function OnEnter()
+	DT.tooltip:ClearLines()
 
 	if(not enteredFrame) then
 		enteredFrame = true

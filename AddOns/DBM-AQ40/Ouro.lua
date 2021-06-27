@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Ouro", "DBM-AQ40", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210402014659")
 mod:SetCreatureID(15517)
 mod:SetEncounterID(716)
 mod:SetModelID(15509)
@@ -42,7 +42,6 @@ function mod:OnCombatStart(delay)
 	timerSweepCD:Start(22-delay)--22-25
 	timerBlastCD:Start(20-delay)--20-26
 	timerSubmerge:Start(184-delay)
-	DBM:AddMsg("DBM will now show submerge timer for natural submerge timing if he remains in melee range of his current target. If at anytime he can't reach his current target it triggers an automatic submerge")
 end
 
 function mod:Emerge()
@@ -52,46 +51,33 @@ function mod:Emerge()
 	timerSubmerge:Start(184)
 end
 
-do
-	local Berserk = DBM:GetSpellInfo(26615)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 26615 then
-		if args.spellName == Berserk and args:IsDestTypeHostile() then
-			self.vb.Berserked = true
-			warnBerserk:Show()
-			timerSubmerge:Stop()
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 26615 and args:IsDestTypeHostile() then
+		self.vb.Berserked = true
+		warnBerserk:Show()
+		timerSubmerge:Stop()
 	end
 end
 
-do
-	local SandBlast, Sweep = DBM:GetSpellInfo(26102), DBM:GetSpellInfo(26103)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 26102 then
-		if args.spellName == SandBlast then
-			specWarnBlast:Show()
-			specWarnBlast:Play("stunsoon")
-			timerBlastCD:Start()
-		--elseif args.spellId == 26103 then
-		elseif args.spellName == Sweep and args:IsSrcTypeHostile() then
-			warnSweep:Show()
-			timerSweepCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 26102 then
+		specWarnBlast:Show()
+		specWarnBlast:Play("stunsoon")
+		timerBlastCD:Start()
+	elseif args.spellId == 26103 and args:IsSrcTypeHostile() then
+		warnSweep:Show()
+		timerSweepCD:Start()
 	end
 end
 
-do
-	local SummonOuroMounds = DBM:GetSpellInfo(26058)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 26058 and self:AntiSpam(3) and not self.vb.Berserked then
-		if args.spellName == SummonOuroMounds and not self.vb.Berserked then
-			timerBlastCD:Stop()
-			timerSweepCD:Stop()
-			timerSubmerge:Stop()
-			warnSubmerge:Show()
-			timerEmerge:Start()
-			self:ScheduleMethod(30, "Emerge")
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 26058 and self:AntiSpam(3) and not self.vb.Berserked then
+		timerBlastCD:Stop()
+		timerSweepCD:Stop()
+		timerSubmerge:Stop()
+		warnSubmerge:Show()
+		timerEmerge:Start()
+		self:ScheduleMethod(30, "Emerge")
 	end
 end
 

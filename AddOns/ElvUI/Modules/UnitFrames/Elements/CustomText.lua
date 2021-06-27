@@ -1,9 +1,8 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+local LSM = E.Libs.LSM
 
---Lua functions
 local pairs = pairs
---WoW API / Variables
 
 function UF:Configure_CustomTexts(frame)
 	local frameDB = frame.db
@@ -18,7 +17,7 @@ function UF:Configure_CustomTexts(frame)
 	end
 
 	if frameDB.customTexts then
-		local font = UF.LSM:Fetch('font', UF.db.font)
+		local font = LSM:Fetch('font', UF.db.font)
 		for name in pairs(frameDB.customTexts) do
 			local object = frame.customTexts[name]
 			if not object then
@@ -27,7 +26,7 @@ function UF:Configure_CustomTexts(frame)
 
 			local db, tagFont = frameDB.customTexts[name]
 			if db.font then
-				tagFont = UF.LSM:Fetch('font', db.font)
+				tagFont = LSM:Fetch('font', db.font)
 			end
 
 			local attachPoint = self:GetObjectAnchorPoint(frame, db.attachTextTo)
@@ -59,6 +58,23 @@ function UF:Configure_CustomTexts(frame)
 
 			if not frame.customTexts[name] then
 				frame.customTexts[name] = object
+			end
+		end
+	end
+end
+
+function UF:ToggleVisibility_CustomTexts(frame, show)
+	local frameDB = frame.db
+
+	if frameDB.customTexts then
+		for name in pairs(frameDB.customTexts) do
+			local object = frame.customTexts[name]
+			local db = frameDB.customTexts[name]
+
+			if show and db.enable then
+				object:Show()
+			else
+				object:Hide()
 			end
 		end
 	end

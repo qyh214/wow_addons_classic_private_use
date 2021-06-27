@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(458, "DBM-Party-Classic", 17, 237)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(5710)--5711 Ogom the Wretched
 mod:SetEncounterID(488)
 
@@ -41,73 +41,58 @@ function mod:OnCombatStart(delay)
 	timerHexofJammalanCD:Start(1-delay)
 end
 
-do
-	local HealingWave, Flamestrike, Earthgrab, Shadowbolt = DBM:GetSpellInfo(12492), DBM:GetSpellInfo(12468), DBM:GetSpellInfo(8376), DBM:GetSpellInfo(12471)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 12492 then
-		if args.spellName == HealingWave and args:IsSrcTypeHostile() then
-			warningHealingWave:Show()
-			--timerHealingWaveCD:Start()
-		--elseif args.spellId == 12468 then
-		elseif args.spellName == Flamestrike and args:IsSrcTypeHostile() then
-			warningFlamestrike:Show()
-		--elseif args.spellId == 8376 then
-		elseif args.spellName == Earthgrab and args:IsSrcTypeHostile() then
-			warningEarthgrabTotem:Show()
-			timerEarthgrabTotemCD:Start()
-		--elseif args.spellId == 12471 then
-		elseif args.spellName == Shadowbolt and args:IsSrcTypeHostile() then
-			timerShadowBoltCD:Start()
-			if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-				specWarnShadowBolt:Show(args.sourceName)
-				specWarnShadowBolt:Play("kickcast")
-			end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 12492 and args:IsSrcTypeHostile() then
+		warningHealingWave:Show()
+		--timerHealingWaveCD:Start()
+	elseif args.spellId == 12468 and args:IsSrcTypeHostile() then
+		warningFlamestrike:Show()
+	elseif args.spellId == 8376 and args:IsSrcTypeHostile() then
+		warningEarthgrabTotem:Show()
+		timerEarthgrabTotemCD:Start()
+	elseif args.spellId == 12471 and args:IsSrcTypeHostile() then
+		timerShadowBoltCD:Start()
+		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
+			specWarnShadowBolt:Show(args.sourceName)
+			specWarnShadowBolt:Play("kickcast")
 		end
 	end
 end
 
-do
-	local HexofJammalan, ShadowWordPain, CurseofWeakness = DBM:GetSpellInfo(12479), DBM:GetSpellInfo(11639), DBM:GetSpellInfo(12493)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 12479 then
-		if args.spellName == HexofJammalan then
-			timerHexofJammalanCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 12479 then
+		timerHexofJammalanCD:Start()
 	end
-
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 12479 then--12480 is curse debuff ID after initial 10 seconds
-		if args.spellName == HexofJammalan then
-			if args:IsPlayer() then
-				specWarnHexofJammalan:Show()
-				specWarnHexofJammalan:Play("targetyou")
-				yellHexofJammalan:Yell()
-				--yellHexofJammalanFades:Countdown(12479)--Valid in retail, in classic we can't tell what version of debuff is so disabled
-			else
-				warningHexofJammalan:Show(args.destName)
-			end
-		--elseif args.spellId == 11639 then
-		elseif args.spellName == ShadowWordPain and args:IsDestTypePlayer() then
-			warningShadowWordPain:Show(args.destName)
-		--elseif args.spellId == 12493 then
-		elseif args.spellName == CurseofWeakness and args:IsDestTypePlayer() then
-			warningCurseofWeakness:Show(args.destName)
-		end
-	end
-	--[[
-	function mod:SPELL_AURA_REMOVED(args)
-		if args.spellId == 12479 then
-			if args:IsPlayer() then
-				yellHexofJammalanFades:Cancel()--Valid in retail, in classic we can't tell what version of debuff is so disabled
-			end
-		end
-	end
-	--]]
 end
+
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 12479 then--12480 is curse debuff ID after initial 10 seconds
+		if args:IsPlayer() then
+			specWarnHexofJammalan:Show()
+			specWarnHexofJammalan:Play("targetyou")
+			yellHexofJammalan:Yell()
+			--yellHexofJammalanFades:Countdown(12479)--Valid in retail, in classic we can't tell what version of debuff is so disabled
+		else
+			warningHexofJammalan:Show(args.destName)
+		end
+	elseif args.spellId == 11639 and args:IsDestTypePlayer() then
+		warningShadowWordPain:Show(args.destName)
+	elseif args.spellId == 12493 and args:IsDestTypePlayer() then
+		warningCurseofWeakness:Show(args.destName)
+	end
+end
+--[[
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 12479 then
+		if args:IsPlayer() then
+			yellHexofJammalanFades:Cancel()--Valid in retail, in classic we can't tell what version of debuff is so disabled
+		end
+	end
+end
+--]]
 
 function mod:UNIT_DIED(args)
-	local cid = self:GetCIDFromGUID(args.destGUID)
-	if cid == 5711 then--Ogom the Wretched
+	if self:GetCIDFromGUID(args.destGUID) == 5711 then--Ogom the Wretched
 		timerShadowBoltCD:Stop()
 	end
 end

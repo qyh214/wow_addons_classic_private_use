@@ -1,10 +1,9 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local M = E:GetModule('WorldMap')
 
---Lua functions
 local _G = _G
 local strfind = strfind
---WoW API / Variables
+
 local CreateFrame = CreateFrame
 local ShowUIPanel = ShowUIPanel
 local HideUIPanel = HideUIPanel
@@ -12,7 +11,6 @@ local IsPlayerMoving = IsPlayerMoving
 local InCombatLockdown = InCombatLockdown
 local MOUSE_LABEL = MOUSE_LABEL:gsub("|[TA].-|[ta]","")
 local PLAYER = PLAYER
--- GLOBALS: CoordsHolder
 
 local INVERTED_POINTS = {
 	['TOPLEFT'] = 'BOTTOMLEFT',
@@ -25,6 +23,7 @@ local INVERTED_POINTS = {
 
 -- this will be updated later
 local smallerMapScale = 0.8
+local CoordsHolder
 
 function M:SetLargeWorldMap()
 	local WorldMapFrame = _G.WorldMapFrame
@@ -186,7 +185,7 @@ function M:Initialize()
 
 	local WorldMapFrame = _G.WorldMapFrame
 	if E.global.general.WorldMapCoordinates.enable then
-		local CoordsHolder = CreateFrame('Frame', 'CoordsHolder', WorldMapFrame)
+		CoordsHolder = CreateFrame('Frame', 'ElvUI_CoordsHolder', WorldMapFrame)
 		CoordsHolder:SetFrameLevel(WorldMapFrame.BorderFrame:GetFrameLevel() + 2)
 		CoordsHolder:SetFrameStrata(WorldMapFrame.BorderFrame:GetFrameStrata())
 		CoordsHolder.playerCoords = CoordsHolder:CreateFontString(nil, 'OVERLAY')

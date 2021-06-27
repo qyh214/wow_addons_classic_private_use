@@ -64,7 +64,11 @@ L:SetMiscLocalization{
 	Frozen	= "est congelé !",
 	Phase4 	= "commence à se briser !",
 	Phase5 	= "semble prêt à se briser !",
-	Phase6 	= "explose !"
+	Phase6 	= "explose !",
+
+	HitsRemain	= "Touche restante",
+	Frost		= "Givre",
+	Physical	= "Physique"
 }
 -------------
 -- Huhuran --
@@ -80,7 +84,7 @@ L:SetGeneralLocalization{
 L = DBM:GetModLocalization("TwinEmpsAQ")
 
 L:SetGeneralLocalization{
-	name = "Empereurs jumeaux"
+	name = "Empereurs Jumeaux"
 }
 L:SetMiscLocalization{
 	Veklor = "Empereur Vek'lor",

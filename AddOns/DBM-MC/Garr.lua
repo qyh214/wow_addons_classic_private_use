@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Garr-Classic", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403080347")
 mod:SetCreatureID(12057)--, 12099
 mod:SetEncounterID(666)
 mod:SetModelID(12110)
@@ -24,23 +24,15 @@ function mod:OnCombatStart(delay)
 	timerAntiMagicPulseCD:Start(10-delay)
 end
 
-do
-	local ImmolateSpell = DBM:GetSpellInfo(15732)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 15732 and self:IsInCombat() then
-		if args.spellName == ImmolateSpell and args:IsDestTypePlayer() then
-			warnImmolate:CombinedShow(1, args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 15732 and args:IsDestTypePlayer() then
+		warnImmolate:CombinedShow(1, args.destName)
 	end
 end
 
-do
-	local AntiMagicPulse = DBM:GetSpellInfo(19492)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 19492 then
-		if args.spellName == AntiMagicPulse then
-			warnAntiMagicPulse:Show()
-			timerAntiMagicPulseCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 19492 then
+		warnAntiMagicPulse:Show()
+		timerAntiMagicPulseCD:Start()
 	end
 end

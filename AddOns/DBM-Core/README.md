@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/DeadlyBossMods/DBM-Classic.svg?branch=master)](https://travis-ci.org/DeadlyBossMods/DBM-Classic)
+[![Build Status](https://github.com/DeadlyBossMods/DBM-TBC/workflows/CI/badge.svg)](https://github.com/DeadlyBossMods/DBM-TBC/actions?workflow=CI)
 [![DeadlyBossMods on Discord](https://img.shields.io/badge/discord-DeadlyBossMods-738bd7.svg?style=flat)](https://discord.gg/DeadlyBossMods) 
 
 [![Patreon](https://media.forgecdn.net/attachments/76/25/patreon-medium-button.png)](https://www.patreon.com/deadlybossmods)
 
-# Deadly Boss Mods (Classic)
+# Deadly Boss Mods (TBC)
 ### [Supporter Benefits](https://www.deadlybossmods.com/forum/viewtopic.php?f=7&t=428#p1180)
 ### [Some basic DBM setup/advanced features guides](https://github.com/DeadlyBossMods/DeadlyBossMods/wiki)
 
@@ -28,8 +28,8 @@
 * [Search for more](https://curseforge.com/wow/addons/search?search=dbm+voice)
 
 ## Getting too many updates of DBM per day?
-Multiple alpha versions can get pushed to Curse on an average day, these versions may contain important new features or bug fixes for the bleeding edge raid content... These versions are tagged as alpha, so they will not be downloaded by default. Set your Twitch client to update to alpha if you want these latest versions (but they may contain bugs, downloads tagged as "Beta" or "Release" are more stable and released less frequently)
-Right click on DBM itself in Twitch client addon list and set to preferred release type to control update frequency.
+Multiple alpha versions can get pushed to Curse on an average day, these versions may contain important new features or bug fixes for the bleeding edge raid content... These versions are tagged as alpha, so they will not be downloaded by default. Set your addon client to update to alpha if you want these latest versions (but they may contain bugs, downloads tagged as "Beta" or "Release" are more stable and released less frequently)
+Right click on DBM itself in your addon client addon list and set to preferred release type to control update frequency.
 
 ## Features
 * Mods for raid, dungeon, special event and Brawlers Guild

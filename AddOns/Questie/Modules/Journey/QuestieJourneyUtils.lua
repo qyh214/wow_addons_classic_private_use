@@ -1,8 +1,7 @@
 ---@class QuestieJourneyUtils
-local QuestieJourneyUtils = QuestieLoader:CreateModule("QuestieJourneyUtils");
----@type QuestieJourney
-local QuestieJourney = QuestieLoader:CreateModule("QuestieJourney")
-local _QuestieJourney = QuestieJourney.private
+local QuestieJourneyUtils = QuestieLoader:CreateModule("QuestieJourneyUtils")
+---@type l10n
+local l10n = QuestieLoader:ImportModule("l10n")
 
 local AceGUI = LibStub("AceGUI-3.0");
 
@@ -13,7 +12,7 @@ function QuestieJourneyUtils:GetSortedZoneKeys(zones)
 
     local zoneNames = {}
     for k, _ in pairs(zones) do
-            table.insert(zoneNames, k)
+        table.insert(zoneNames, k)
     end
     table.sort(zoneNames, compare)
     return zoneNames
@@ -39,4 +38,15 @@ function QuestieJourneyUtils:AddLine(frame, text)
     label:SetText(text)
     label:SetFontObject(GameFontNormal)
     frame:AddChild(label)
+end
+
+function QuestieJourneyUtils:GetZoneName(id)
+    local name = l10n("Unknown Zone")
+    for category, data in pairs(l10n.zoneLookup) do
+        if data[id] then
+            name = l10n.zoneLookup[category][id]
+            break
+        end
+    end
+    return name
 end

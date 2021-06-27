@@ -11,6 +11,10 @@ do
 	local _unpack = unpack
 
 	local unknown_class_coords = {0.75, 1, 0.75, 1}
+
+	function Details:GetUnknownClassIcon()
+		return [[Interface\AddOns\Details\images\classes_small]], unpack(unknown_class_coords)
+	end
 	
 	function _detalhes:GetIconTexture (iconType, withAlpha)
 		iconType = string.lower (iconType)
@@ -95,6 +99,14 @@ do
 	
 	function _detalhes:GetSpecIcon (spec, useAlpha)
 		if (spec) then
+			if (spec > 600) then --hack to new spec ids on new leveling zones from level 1-10
+				spec = 65
+			end
+			
+			if (spec == 0) then
+				return [[Interface\AddOns\Details\images\classes_small]], unpack (_detalhes.class_coords["UNKNOW"])
+			end
+
 			if (useAlpha) then
 				return [[Interface\AddOns\Details\images\spec_icons_normal_alpha]], unpack (_detalhes.class_specs_coords [spec])
 			else
@@ -114,8 +126,10 @@ do
 		elseif (type (class) == "string") then
 			return unpack (_detalhes.class_colors [class] or default_color)
 			
+		elseif (self.color) then
+			return unpack(self.color)
 		else
-			unpack (default_color)
+			return unpack (default_color)
 		end
 	end
 	

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Lucifron", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403080347")
 mod:SetCreatureID(12118)--, 12119
 mod:SetEncounterID(663)
 mod:SetModelID(13031)
@@ -40,65 +40,52 @@ function mod:OnCombatStart(delay)
 	timerCurseCD:Start(12-delay)--12-15
 end
 
-do
-	local MindControl = DBM:GetSpellInfo(20604)
-	function mod:MCTarget(targetname, uId)
-		if not targetname then return end
-		warnMC:CombinedShow(1, targetname)
-		if targetname == UnitName("player") then
-			specWarnMC:Show()
-			specWarnMC:Play("targetyou")
-			yellMC:Yell()
-		end
+function mod:MCTarget(targetname, uId)
+	if not targetname then return end
+	if self.Options.SetIconOnMC then
+		self:SetIcon(targetname, self.vb.lastIcon)
+	end
+	warnMC:CombinedShow(1, targetname)
+	if targetname == UnitName("player") then
+		specWarnMC:Show()
+		specWarnMC:Play("targetyou")
+		yellMC:Yell()
+	end
+	--Alternate icon between 1 and 2
+	if self.vb.lastIcon == 1 then
+		self.vb.lastIcon = 2
+	else
+		self.vb.lastIcon = 1
+	end
+end
+
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 20604 and args:IsSrcTypeHostile() then
+		self:BossTargetScanner(args.sourceGUID, "MCTarget", 0.2, 8)
+	end
+end
+
+--[[function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 20604 then
+		warnMC:CombinedShow(1, args.destName)
+	end
+end--]]
+
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 20604 and args:IsDestTypePlayer() then
 		if self.Options.SetIconOnMC then
-			self:SetIcon(targetname, self.vb.lastIcon)
-		end
-		--Alternate icon between 1 and 2
-		if self.vb.lastIcon == 1 then
-			self.vb.lastIcon = 2
-		else
-			self.vb.lastIcon = 1
-		end
-	end
-
-	function mod:SPELL_CAST_START(args)
-		local spellName = args.spellName
-		if spellName == MindControl and args:IsSrcTypeHostile() then
-			self:BossTargetScanner(args.sourceGUID, "MCTarget", 0.2, 8)
-		end
-	end
-
-	--[[function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 20604 then
-		if args.spellName == MindControl then
-			warnMC:CombinedShow(1, args.destName)
-		end
-	end--]]
-
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 20604 then
-		if args.spellName == MindControl and args:IsDestTypePlayer() then
-			if self.Options.SetIconOnMC then
-				self:SetIcon(args.destName, 0)
-			end
+			self:SetIcon(args.destName, 0)
 		end
 	end
 end
 
-do
-	local Doom, Curse = DBM:GetSpellInfo(19702), DBM:GetSpellInfo(19703)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--local spellId = args.spellId
-		local spellName = args.spellName
-		--if spellId == 19702 then
-		if spellName == Doom then
-			warnDoom:Show()
---			timerDoom:Start()
-			timerDoomCD:Start()
-		--elseif spellId == 19703 then
-		elseif spellName == Curse then
-			warnCurse:Show()
-			timerCurseCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 19702 then
+		warnDoom:Show()
+		--timerDoom:Start()
+		timerDoomCD:Start()
+	elseif args.spellId == 19703 then
+		warnCurse:Show()
+		timerCurseCD:Start()
 	end
 end

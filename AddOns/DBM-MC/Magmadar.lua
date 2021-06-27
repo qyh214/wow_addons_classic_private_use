@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Magmadar", "DBM-MC", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210403080347")
 mod:SetCreatureID(11982)
 mod:SetEncounterID(664)
 mod:SetModelID(10193)
@@ -28,38 +28,29 @@ local specWarnEnrage	= mod:NewSpecialWarningDispel(19451, "RemoveEnrage", nil, n
 local timerPanicCD		= mod:NewCDTimer(30, 19408, nil, nil, nil, 2)--30-40
 local timerEnrage		= mod:NewBuffActiveTimer(8, 19451, nil, nil, nil, 5, nil, DBM_CORE_L.ENRAGE_ICON)
 
-do
-	local Enrage, Conflagration = DBM:GetSpellInfo(19451), DBM:GetSpellInfo(19428)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 19451 then
-		if args.spellName == Enrage and args:IsDestTypeHostile() then
-			if self.Options.SpecWarn19451dispel then
-				specWarnEnrage:Show(args.destName)
-				specWarnEnrage:Play("enrage")
-			else
-				warnEnrage:Show(args.destName)
-			end
-			timerEnrage:Start()
-		elseif args.spellName == Conflagration and args:IsDestTypePlayer() then
-			warnConflagration:CombinedShow(0.5, args.destName)
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 19451 and args:IsDestTypeHostile() then
+		if self.Options.SpecWarn19451dispel then
+			specWarnEnrage:Show(args.destName)
+			specWarnEnrage:Play("enrage")
+		else
+			warnEnrage:Show(args.destName)
 		end
-	end
-
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 19451 then
-		if args.spellName == Enrage and args:IsDestTypeHostile() then
-			timerEnrage:Stop()
-		end
+		timerEnrage:Start()
+	elseif args.spellId == 19428 and args:IsDestTypePlayer() then
+		warnConflagration:CombinedShow(0.5, args.destName)
 	end
 end
 
-do
-	local Panic = DBM:GetSpellInfo(19408)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 19408 then
-		if args.spellName == Panic then
-			warnPanic:Show()
-			timerPanicCD:Start()
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 19451 and args:IsDestTypeHostile() then
+		timerEnrage:Stop()
+	end
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 19408 then
+		warnPanic:Show()
+		timerPanicCD:Start()
 	end
 end

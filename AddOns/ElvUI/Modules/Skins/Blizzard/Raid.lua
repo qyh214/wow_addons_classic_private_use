@@ -1,12 +1,10 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
 local ipairs = ipairs
 local unpack = unpack
---WoW API / Variables
+
 local hooksecurefunc = hooksecurefunc
 
 function S:Blizzard_RaidUI()
@@ -75,7 +73,7 @@ function S:Blizzard_RaidUI()
 				icon:SetTexture('Interface\\RaidFrame\\UI-RaidFrame-MainAssist')
 				icon:SetTexCoord(unpack(E.TexCoords))
 			else
-				local coords = CLASS_ICON_TCOORDS[CLASS_SORT_ORDER[index]]
+				local coords = _G.CLASS_ICON_TCOORDS[_G.CLASS_SORT_ORDER[index]]
 				if coords then
 					icon:SetTexture('Interface\\WorldStateFrame\\Icons-Classes')
 					icon:SetTexCoord(coords[1] + 0.015, coords[2] - 0.02, coords[3] + 0.018, coords[4] - 0.02)

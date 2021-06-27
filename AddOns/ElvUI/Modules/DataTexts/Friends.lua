@@ -1,12 +1,11 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local DT = E:GetModule('DataTexts')
 
---Lua functions
 local _G = _G
 local type, ipairs, pairs, select = type, ipairs, pairs, select
 local sort, next, wipe, tremove, tinsert = sort, next, wipe, tremove, tinsert
 local format, gsub, strfind, strjoin = format, gsub, strfind, strjoin
---WoW API / Variables
+
 local BNet_GetValidatedCharacterName = BNet_GetValidatedCharacterName
 local BNGetFriendGameAccountInfo = BNGetFriendGameAccountInfo
 local BNGetFriendInfo = BNGetFriendInfo
@@ -26,7 +25,6 @@ local InviteToGroup = InviteToGroup
 local IsAltKeyDown = IsAltKeyDown
 local IsChatAFK = IsChatAFK
 local IsChatDND = IsChatDND
-local IsAltKeyDown = IsAltKeyDown
 local IsShiftKeyDown = IsShiftKeyDown
 local RequestInviteFromUnit = RequestInviteFromUnit
 local SendChatMessage = SendChatMessage
@@ -399,6 +397,7 @@ local function TooltipAddXLine(X, header, ...)
 end
 
 local function OnEnter()
+	DT.tooltip:ClearLines()
 	lastTooltipXLineHeader = nil
 
 	local onlineFriends = C_FriendList_GetNumOnlineFriends()
@@ -420,6 +419,7 @@ local function OnEnter()
 
 	local totalfriends = numberOfFriends + totalBNet
 	local zonec, classc, levelc, realmc, grouped
+	local shiftDown = IsShiftKeyDown()
 
 	DT.tooltip:AddDoubleLine(L["Friends List"], format(totalOnlineString, totalonline, totalfriends),tthead.r,tthead.g,tthead.b,tthead.r,tthead.g,tthead.b)
 	if (onlineFriends > 0) and not db.hideWoW then
@@ -484,14 +484,14 @@ local function OnEnter()
 
 								if UnitInParty(info[4]) or UnitInRaid(info[4]) then grouped = 1 else grouped = 2 end
 								TooltipAddXLine(true, header, format(levelNameString.."%s%s",levelc.r*255,levelc.g*255,levelc.b*255,info[16],classc.r*255,classc.g*255,classc.b*255,info[4],groupedTable[grouped],status),info[2],238,238,238,238,238,238)
-								if IsShiftKeyDown() then
+								if shiftDown then
 									if E.MapInfo.zoneText and (E.MapInfo.zoneText == info[15]) then zonec = activezone else zonec = inactivezone end
 									if GetRealmName() == info[11] then realmc = activezone else realmc = inactivezone end
 									TooltipAddXLine(true, header, info[15], info[11], zonec.r, zonec.g, zonec.b, realmc.r, realmc.g, realmc.b)
 								end
 							else
 								TooltipAddXLine(true, header, info[4]..status, info[2], .9, .9, .9, .9, .9, .9)
-								if IsShiftKeyDown() and (info[18] and info[18] ~= '') and (info[6] and info[6] ~= "App" and info[6] ~= "BSAp") then
+								if shiftDown and (info[18] and info[18] ~= '') and (info[6] and info[6] ~= "App" and info[6] ~= "BSAp") then
 									TooltipAddXLine(false, header, info[18], inactivezone.r, inactivezone.g, inactivezone.b)
 								end
 							end

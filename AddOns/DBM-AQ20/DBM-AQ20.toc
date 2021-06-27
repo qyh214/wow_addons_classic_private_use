@@ -1,5 +1,5 @@
-﻿## Interface: 11305
-## X-Min-Interface: 11302
+## Interface: 20501
+## X-Min-Interface: 20501
 ## Title:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Ruins of Ahn'Qiraj|r
 ## Title-deDE:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Ruinen von Ahn'Qiraj|r
 ## Title-esES:|cffffe00a<|r|cffff7d0aDBM|r|cffffe00a>|r |cff69ccf0Ruinas de Ahn'Qiraj|r
@@ -17,15 +17,17 @@
 ## X-DBM-Mod: 1
 ## X-DBM-Mod-Type: RAID
 ## X-DBM-Mod-Category: Classic
-## X-DBM-Mod-Has-Single-Format: 1
+## X-DBM-StatTypes: normal
 ## X-DBM-Mod-MapID: 509
-## X-DBM-Mod-Sort: 10
+## X-DBM-Mod-Sort: 1103
 ## X-DBM-Mod-MinCoreRevision: 12473
+## X-DBM-Mod-MinExpansion: 0
 localization.en.lua
 localization.de.lua
 localization.br.lua
 localization.fr.lua
 localization.es.lua
+localization.mx.lua
 localization.ru.lua
 localization.kr.lua
 localization.tw.lua

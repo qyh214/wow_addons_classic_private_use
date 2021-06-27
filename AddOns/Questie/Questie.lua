@@ -1,6 +1,3 @@
-if not QuestieConfigCharacter then
-    QuestieConfigCharacter = {}
-end
 
 -- Global debug levels, see bottom of this file and `debugLevel` in QuestieOptionsAdvanced.lua for relevant code
 -- When adding a new level here it MUST be assigned a number and name in `debugLevel.values` as well added to Questie:Debug below
@@ -10,9 +7,6 @@ DEBUG_INFO = "|cff00bc32[INFO]|r"
 DEBUG_DEVELOP = "|cff7c83ff[DEVELOP]|r"
 DEBUG_SPAM = "|cffff8484[SPAM]|r"
 
---Initialized below
----@class Questie
-Questie = {...}
 
 -------------------------
 --Import modules.
@@ -24,9 +18,9 @@ local QuestieComms = QuestieLoader:ImportModule("QuestieComms");
 ---@type QuestieOptions
 local QuestieOptions = QuestieLoader:ImportModule("QuestieOptions");
 ---@type QuestieOptionsDefaults
-local QuestieOptionsDefaults = QuestieLoader:ImportModule("QuestieOptionsDefaults");
----@type QuestieOptionsMinimapIcon
-local QuestieOptionsMinimapIcon = QuestieLoader:ImportModule("QuestieOptionsMinimapIcon");
+local QuestieOptionsDefaults = QuestieLoader:ImportModule("QuestieOptionsDefaults")
+---@type MinimapIcon
+local MinimapIcon = QuestieLoader:ImportModule("MinimapIcon");
 ---@type QuestieOptionsUtils
 local QuestieOptionsUtils = QuestieLoader:ImportModule("QuestieOptionsUtils");
 ---@type QuestieAuto
@@ -35,8 +29,6 @@ local QuestieAuto = QuestieLoader:ImportModule("QuestieAuto");
 local QuestieCoords = QuestieLoader:ImportModule("QuestieCoords");
 ---@type QuestieEventHandler
 local QuestieEventHandler = QuestieLoader:ImportModule("QuestieEventHandler");
----@type QuestieFramePool
-local QuestieFramePool = QuestieLoader:ImportModule("QuestieFramePool");
 ---@type QuestieJourney
 local QuestieJourney = QuestieLoader:ImportModule("QuestieJourney");
 ---@type QuestieMap
@@ -69,18 +61,13 @@ local QuestiePlayer = QuestieLoader:ImportModule("QuestiePlayer");
 local QuestieQuestTimers = QuestieLoader:ImportModule("QuestieQuestTimers")
 ---@type QuestieCombatQueue
 local QuestieCombatQueue = QuestieLoader:ImportModule("QuestieCombatQueue")
----@type QuestieCorrections
-local QuestieCorrections = QuestieLoader:ImportModule("QuestieCorrections")
 ---@type QuestieSlash
 local QuestieSlash = QuestieLoader:ImportModule("QuestieSlash")
----@type Migration
-local Migration = QuestieLoader:ImportModule("Migration")
----@type ZoneDB
-local ZoneDB = QuestieLoader:ImportModule("ZoneDB")
+---@type l10n
+local l10n = QuestieLoader:ImportModule("l10n")
 
 -- check if user has updated but not restarted the game (todo: add future new source files to this)
-if  (not LQuestie_EasyMenu) or
-    --Libs
+if  --Libs
     (not QuestieLib) or
     (not QuestiePlayer) or
     (not QuestieSerializer) or
@@ -90,7 +77,7 @@ if  (not LQuestie_EasyMenu) or
     --Options
     (not QuestieOptions) or
     (not QuestieOptionsDefaults) or
-    (not QuestieOptionsMinimapIcon) or
+    (not MinimapIcon) or
     (not QuestieOptionsUtils) or
     (not QuestieOptions.tabs) or
     (not QuestieOptions.tabs.advanced) or
@@ -104,7 +91,6 @@ if  (not LQuestie_EasyMenu) or
     (not QuestieAuto) or
     (not QuestieCoords) or
     (not QuestieEventHandler) or
-    (not QuestieFramePool) or
     (not QuestieJourney) or
     --Map
     (not QuestieMap) or
@@ -125,39 +111,21 @@ if  (not LQuestie_EasyMenu) or
     (not QuestieTracker) then
     --Delay the warning.
     C_Timer.After(8, function()
-        if QuestieLocale.locale['enUS'] and QuestieLocale.locale['enUS']['QUESTIE_UPDATED_RESTART'] then -- sometimes locale doesnt update without restarting also
-            print(QuestieLocale:GetUIString('QUESTIE_UPDATED_RESTART'))
-        else
-            print("|cFFFF0000WARNING!|r You have updated Questie without restarting the game, this will likely cause problems. Please restart the game before continuing")
-        end
+        print(Questie:Colorize(l10n("WARNING!"), "red") .. " " .. l10n("You have updated Questie without restarting the game, this will likely cause problems. Please restart the game before continuing"))
     end)
-  else
-    -- Initialize Questie
-    Questie = LibStub("AceAddon-3.0"):NewAddon("Questie", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0", "AceComm-3.0", "AceSerializer-3.0", "AceBucket-3.0")
-    _Questie = {...}
 end
 
 
 function Questie:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("QuestieConfig", QuestieOptionsDefaults:Load(), true)
-    QuestieFramePool:SetIcons()
+    Questie.TBC_BETA_BUILD_VERSION_SHORTHAND = ""
 
-    Migration:Migrate()
+    -- This has to happen OnInitialize to be available asap
+    Questie.db = LibStub("AceDB-3.0"):New("QuestieConfig", QuestieOptionsDefaults:Load(), true)
 
-    -- Set proper locale. Either default to client Locale or override based on user.
-    if Questie.db.global.questieLocaleDiff then
-        QuestieLocale:SetUILocale(Questie.db.global.questieLocale);
-    else
-        QuestieLocale:SetUILocale(GetLocale());
-    end
+    QuestieEventHandler:RegisterEarlyEvents()
+end
 
-    Questie:Debug(DEBUG_CRITICAL, "[Questie:OnInitialize] Questie addon loaded")
-    ZoneDB:Initialize()
-    QuestieCorrections:Initialize()
-    QuestieLocale:Initialize()
-
-    QuestieEventHandler:RegisterAllEvents()
-
+function Questie:ContinueInit()
     --QuestieTracker:Initialize() --moved to stage 2 init event function
     QuestieTooltips:Initialize()
     QuestieCoords:Initialize()
@@ -172,17 +140,14 @@ function Questie:OnInitialize()
     QuestieOptions:Initialize()
 
     --Initialize the DB settings.
-    Questie:Debug(DEBUG_DEVELOP, QuestieLocale:GetUIString('DEBUG_CLUSTER', Questie.db.global.clusterLevelHotzone))
+    Questie:Debug(DEBUG_DEVELOP, l10n("Setting clustering value, clusterLevelHotzone set to %s : Redrawing!", Questie.db.global.clusterLevelHotzone))
 
-    -- Creating the minimap config icon
-    Questie.minimapConfigIcon = LibStub("LibDBIcon-1.0");
-    Questie.minimapConfigIcon:Register("Questie", QuestieOptionsMinimapIcon:Get(), Questie.db.profile.minimap);
 
     -- Update the default text on the map show/hide button for localization
     if Questie.db.char.enabled then
-        Questie_Toggle:SetText(QuestieLocale:GetUIString('QUESTIE_MAP_BUTTON_HIDE'));
+        Questie_Toggle:SetText(l10n("Hide Questie"));
     else
-        Questie_Toggle:SetText(QuestieLocale:GetUIString('QUESTIE_MAP_BUTTON_SHOW'));
+        Questie_Toggle:SetText(l10n("Show Questie"));
     end
 
     -- Update status of Map button on hide between play sessions
@@ -204,7 +169,7 @@ function Questie:OnInitialize()
                 Questie_Toggle:SetPoint('RIGHT', WorldMapFrameCloseButton, 'LEFT', 0, 0);
             end
         end
-    end);
+    end)
 
     if Questie.db.global.dbmHUDEnable then
         QuestieDBMIntegration:EnableHUD()
@@ -231,19 +196,27 @@ function Questie:Colorize(str, color)
     local c = '';
 
     if color == 'red' then
-        c = '|cffff0000';
+        c = '|cFFff0000';
     elseif color == 'gray' then
-        c = '|cFFCFCFCF';
+        c = '|cFFa6a6a6';
     elseif color == 'purple' then
         c = '|cFFB900FF';
     elseif color == 'blue' then
         c = '|cB900FFFF';
+    elseif color == 'lightBlue' then
+        c = '|cB900FFFF';
+    elseif color == 'blizzardBlue' then
+        c = '|cFF00c0ff';
     elseif color == 'yellow' then
-        c = '|cFFFFB900';
+        c = '|cFFffff00';
+    elseif color == 'orange' then
+        c = '|cFFFF6F22';
+    elseif color == 'green' then
+        c = '|cFF00ff00';
     elseif color == "white" then
-        c = '|cFFFFFFFF';
+        c = '|cFFffffff';
     elseif color == "gold" then
-        c = "|cffffd100" -- this is the default game font
+        c = "|cFFffd100" -- this is the default game font
     end
 
     return c .. str .. "|r"
@@ -279,6 +252,12 @@ function Questie:Error(...)
     Questie:Print("|cffff0000[ERROR]|r", ...)
 end
 
+function Questie:Warning(...)
+    if Questie.db.global.debugEnabled then -- prints regardless of "debugPrint" toggle
+        Questie:Print("|cffffff00[WARNING]|r", ...)
+    end
+end
+
 function Questie:Debug(...)
     if(Questie.db.global.debugEnabled) then
         -- Exponents are defined by `debugLevel.values` in QuestieOptionsAdvanced.lua
@@ -293,9 +272,6 @@ function Questie:Debug(...)
         if(bit.band(Questie.db.global.debugLevel, math.pow(2, 1)) == 0 and select(1, ...) == DEBUG_ELEVATED)then return; end
         if(bit.band(Questie.db.global.debugLevel, math.pow(2, 0)) == 0 and select(1, ...) == DEBUG_CRITICAL)then return; end
         --Questie:Print(...)
-        if(QuestieConfigCharacter.log) then
-            QuestieConfigCharacter = {};
-        end
 
         if Questie.db.global.debugEnabledPrint then
             Questie:Print(...)

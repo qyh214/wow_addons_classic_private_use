@@ -1,34 +1,46 @@
 # Questie
 
-[![Discord](https://img.shields.io/badge/discord-Questie-738bd7)](https://discord.gg/phKnHVu)
+[![Discord](https://img.shields.io/badge/discord-Questie-738bd7)](https://discord.gg/s33MAYKeZd)
+[![Stars](https://img.shields.io/github/stars/Questie/Questie)](https://img.shields.io/github/stars/Questie/Questie)
 
-[![Downloads](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/)
-[![Downloads Latest](https://img.shields.io/github/downloads/AeroScripts/QuestieDev/v6.0.4/total.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
-[![Date Latest](https://img.shields.io/github/release-date/AeroScripts/QuestieDev.svg)](https://github.com/AeroScripts/QuestieDev/releases/latest)
-[![Commits Since Latest](https://img.shields.io/github/commits-since/AeroScripts/QuestieDev/latest.svg)](https://github.com/AeroScripts/QuestieDev/commits/master)
+[![Downloads](https://img.shields.io/github/downloads/Questie/Questie/total.svg)](https://github.com/Questie/Questie/releases/)
+[![Downloads Latest](https://img.shields.io/github/downloads/Questie/Questie/v6.3.11/total.svg)](https://github.com/Questie/Questie/releases/latest)
+[![Date Latest](https://img.shields.io/github/release-date/Questie/Questie.svg)](https://github.com/Questie/Questie/releases/latest)
+[![Commits Since Latest](https://img.shields.io/github/commits-since/Questie/Questie/latest.svg)](https://github.com/Questie/Questie/commits/master)
 
 
 ## Download
-https://github.com/AeroScripts/QuestieDev/releases/latest
+We suggest you use the [Curseforge Client](https://curseforge.overwolf.com/) to manage your Wow addons in general. You will find Questie [here on Curseforge](https://www.curseforge.com/wow/addons/questie).
 
-Follow the [Installation Guide](https://github.com/AeroScripts/QuestieDev/wiki/Installation-Guide) in the Wiki if you just want to get the latest version of Questie up and running. If you have problems, please read the [Frequently Asked Questions](https://github.com/AeroScripts/QuestieDev/wiki/FAQ-for-Classic-(1.13)).
+Alternatively you can always use [the latest GitHub release](https://github.com/Questie/Questie/releases/latest) and follow the [Installation Guide](https://github.com/Questie/Questie/wiki/Installation-Guide) in the Wiki to get the latest version of Questie up and running.
+
+If you have problems, please read the [Frequently Asked Questions](https://github.com/Questie/Questie/wiki/FAQ-for-Classic-(1.13)).
 
 
 ## Information
-- [Frequently Asked Questions](https://github.com/AeroScripts/QuestieDev/wiki/FAQ)
-- Come chat with us on [our Discord server](https://discord.gg/phKnHVu).
-- You can use the [issue tracker](https://github.com/AeroScripts/QuestieDev/issues) to report bugs and post feature requests (requires a Github account).
+- [Frequently Asked Questions](https://github.com/Questie/Questie/wiki/FAQ)
+- Come chat with us on [our Discord server](https://discord.gg/s33MAYKeZd).
+- You can use the [issue tracker](https://github.com/Questie/Questie/issues) to report bugs and post feature requests (requires a Github account).
 - When creating an issue please follow the templated structure to speed up a possible fix.
 - If you get an error message from the WoW client, please include the **complete** text or a screenshot of it in your report.
-- If you wish to submit a bug fix or feature addition you made, you can create a Pull Request on Github. Please read [the rules](https://github.com/AeroScripts/QuestieDev/wiki/Pull-Request-Rules) first.
+    - You need to enter `/console scriptErrors 1` once in the ingame chat for Lua error messages to be shown. You can later disable them again with `/console scriptErrors 0`.
 
 Trust us it's (Good)!
 
+## Contribution
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+- We are happy about every help and contribution we get, so feel free to sumbit a Pull Request on Github
+- Translators can search for missing translations by: `["<yourLanguage>"] = nil` (e.g. `["deDE"] = nil`) and replace the `nil` with a string of the new translation. Current translations can be found in the [Translation folder](https://github.com/Questie/Questie/tree/master/Localization/Translations)
+- Additional information you might find interesting can be found [here](https://github.com/Questie/Questie/wiki/Contributing)
+
+
 ## Donation
-If you'd like to support the development of Questie by donating, you can do so here:
+If you'd like to support the development of Questie by donating, you can do so on our [Patreon page](https://www.patreon.com/questie).
+
+You can also donate via PayPal here:
 
 <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=aero1861%40gmail%2ecom&lc=CA&item_name=Questie%20Devs&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted'><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif"/></a>
-
 
 ## Features
 

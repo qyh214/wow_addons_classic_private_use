@@ -15,11 +15,13 @@ function NPC:OnEvent(event, ...)
 	self.lastEvent = event
 	self.timeStamp = GetTime()
 	self:UpdateItems()
+	self:UpdateBackground()
 	return event
 end
 
 function NPC:OnHide()
 	self:ClearImmersionFocus()
+	self.TalkBox.BackgroundFrame.OverlayKit:Hide()
 end
 
 ----------------------------------
@@ -46,16 +48,12 @@ end
 
 function NPC:IsGossipAvailable(ignoreAutoSelect)
 	-- if there is only a non-gossip option, then go to it directly
-	if 	(GetNumGossipAvailableQuests() == 0) and 
-		(GetNumGossipActiveQuests() == 0) and 
-		(GetNumGossipOptions() == 1) and
-		not ForceGossip() then
+	if 	(API:GetNumGossipAvailableQuests() == 0) and 
+		(API:GetNumGossipActiveQuests() == 0) and 
+		(API:GetNumGossipOptions() == 1) and
+		not API:ForceGossip() then
 		----------------------------
-		local text, gossipType = GetGossipOptions()
-		if ( gossipType ~= 'gossip' ) then
-			if not ignoreAutoSelect then
-				SelectGossipOption(1)
-			end
+		if API:CanAutoSelectGossip(ignoreAutoSelect) then
 			return false
 		end
 	end
@@ -83,7 +81,7 @@ function NPC:IsQuestAutoAccepted(questStartItemID)
 		if AddAutoQuestPopUp(questID, 'OFFER') then
 			PlayAutoAcceptQuestSound()
 		end
-		CloseQuest()
+		API:CloseQuest()
 		return true
 	end
 
@@ -94,7 +92,7 @@ function NPC:IsQuestAutoAccepted(questStartItemID)
 		if AddAutoQuestPopUp(questID, 'OFFER') then
 			PlayAutoAcceptQuestSound()
 		end
-		CloseQuest()
+		API:CloseQuest()
 		return true
 	end
 end
@@ -118,6 +116,7 @@ function NPC:IsSpeechFinished()
 	return self.TalkBox.TextFrame.Text:IsFinished()
 end
 
+-- hack to figure out if event is related to quests
 function NPC:IsObstructingQuestEvent(forceEvent)
 	local event = forceEvent or self.lastEvent or ''
 	return ( event:match('^QUEST') and event ~= 'QUEST_ACCEPTED' )
@@ -129,10 +128,59 @@ function NPC:HandleGossipQuestOverlap(event)
 	-- events need to be checked so that an NPC interaction is correctly transitioned.
 	if (type(event) == 'string') then
 		if ( event == 'GOSSIP_SHOW' ) then
-		--	CloseQuest()
+		--	API:CloseQuest()
 		elseif self:IsObstructingQuestEvent(event) then
-			CloseGossip()
+			API:CloseGossip()
 		end
+	end
+end
+
+function NPC:HandleGossipOpenEvent(kit)
+	local handler = kit and self:GetGossipHandler(kit)
+	if handler then
+		self.customGossipFrame = handler(kit)
+	else
+		self:SetBackground(kit)
+		self:UpdateTalkingHead(API:GetUnitName('npc'), API:GetGossipText(), 'GossipGossip')
+		if self:IsGossipAvailable() then
+			self:PlayIntro('GOSSIP_SHOW')
+		end
+	end
+end
+
+function NPC:HandleGossipCloseEvent()
+	if self.customGossipFrame then
+		self.customGossipFrame:Hide()
+		self.customGossipFrame = nil;
+	end
+end
+
+function NPC:SetBackground(kit)
+	local backgroundFrame = self.TalkBox.BackgroundFrame;
+	local overlay = backgroundFrame.OverlayKit;
+
+	if kit and not L('disablebgtextures') then
+		local backgroundAtlas = GetFinalNameFromTextureKit('QuestBG-%s', kit)
+		local atlasInfo = C_Texture.GetAtlasInfo(backgroundAtlas)
+		if atlasInfo then
+			overlay:Show()
+			overlay:SetGradientAlpha('HORIZONTAL', 1, 1, 1, 0, 1, 1, 1, 0.5)
+
+			overlay:SetSize(atlasInfo.width, atlasInfo.height)
+			overlay:SetTexture(atlasInfo.file)
+			overlay:SetTexCoord(
+				atlasInfo.leftTexCoord, atlasInfo.rightTexCoord,-- + 0.035,
+				atlasInfo.topTexCoord, atlasInfo.bottomTexCoord)-- + 0.035)
+			return
+		end
+	end
+end
+
+function NPC:UpdateBackground()
+	local theme = API:GetQuestDetailsTheme(GetQuestID())
+	local kit = theme and theme.background and theme.background:gsub('QuestBG%-', '')
+	if kit then
+		self:SetBackground(kit)
 	end
 end
 
@@ -141,6 +189,7 @@ function NPC:ResetElements(event)
 	
 	self.Inspector:Hide()
 	self.TalkBox.Elements:Reset()
+	self:SetBackground(nil)
 end
 
 function NPC:UpdateTalkingHead(title, text, npcType, explicitUnit, isToastPlayback)
@@ -347,9 +396,9 @@ function NPC:PlayOutro(optionFrameOpen)
 end
 
 function NPC:ForceClose(optionFrameOpen)
-	CloseGossip()
-	CloseQuest()
-	CloseItemText()
+	API:CloseGossip()
+	API:CloseQuest()
+	API:CloseItemText()
 	self:PlayOutro(optionFrameOpen)
 end
 
@@ -363,9 +412,9 @@ local inputs = {
 		if ( not self:IsModifierDown() and text:GetNumRemaining() > 1 and text:IsSequence() ) then
 			text:ForceNext()
 		elseif ( self.lastEvent == 'GOSSIP_SHOW' and numActive < 1 ) then
-			CloseGossip()
+			API:CloseGossip()
 		elseif ( self.lastEvent == 'GOSSIP_SHOW' and numActive == 1 ) then
-			SelectGossipOption(1)
+			API:SelectGossipOption(1)
 		elseif ( numActive > 1 ) then
 			self:SelectBestOption()
 		else
@@ -376,8 +425,8 @@ local inputs = {
 		self.TalkBox.TextFrame.Text:RepeatTexts()
 	end,
 	goodbye = function(self)
-		CloseGossip()
-		CloseQuest()
+		API:CloseGossip()
+		API:CloseQuest()
 	end,
 	number = function(self, id)
 		if self.hasItems then
@@ -419,7 +468,7 @@ function NPC:IsModifierDown(modifier)
 end
 
 function NPC:OnKeyDown(button)
-	if button == 'ESCAPE' then
+	if (button == 'ESCAPE' or GetBindingAction(button) == 'TOGGLEGAMEMENU') then
 		self:ForceClose()
 		return
 	elseif self:ParseControllerCommand(button) then
@@ -457,6 +506,9 @@ function NPC:OnKeyUp(button)
 		inspector:Hide()
 	end
 end
+
+NPC.OnGamePadButtonDown = NPC.OnKeyDown;
+NPC.OnGamePadButtonUp   = NPC.OnKeyUp;
 
 ----------------------------------
 -- TalkBox "button"
@@ -562,24 +614,21 @@ function TalkBox:OnDragStop()
 
 	point = point:sub(1,1) .. point:sub(2):lower()
 
+	-- convert center point to bottom
 	if ( point == 'Center' ) then
 		point = 'Bottom'
-
-		local cX = self:GetCenter()
-
-		x = ( cX * self:GetScale() ) - ( GetScreenWidth() / 2 ) 
+		-- calculate the horz offset from the center of the screen
+		x = ( self:GetCenter() * ImmersionFrame:GetScale() ) - ( GetScreenWidth() / 2 )
 		y = self:GetBottom()
-
 	end
+	
 	local isBottom = point == 'Bottom'
-
 	if isBottom then
 		y = y - (self.extraY or 0)
 	end
 
 	self:ClearAllPoints()
-	self.offsetX = x
-	self.offsetY = y
+	self.offsetX, self.offsetY = x, y
 
 	L.Set('boxpoint', point)
 	L.Set('boxoffsetX', x)
@@ -599,7 +648,7 @@ function TalkBox:OnLeftClick()
 		if text:GetNumRemaining() > 1 and text:IsSequence() then
 			text:ForceNext()
 		else
-			CloseItemText()
+			API:CloseItemText()
 		end
 	-- Progress quest to completion
 	elseif self.lastEvent == 'QUEST_PROGRESS' then
@@ -608,6 +657,8 @@ function TalkBox:OnLeftClick()
 		else
 			ImmersionFrame:ForceClose()
 		end
+	else
+		ImmersionFrame:ForceClose()
 	end
 end
 

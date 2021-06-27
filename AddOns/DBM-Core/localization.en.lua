@@ -22,7 +22,7 @@ L.LOAD_GUI_COMBAT					= "GUI cannot be initially loaded in combat. GUI will be l
 L.BAD_LOAD							= L.DBM .. " has detected your mod for this instance failed to fully load correctly because of combat. As soon as you are out of combat, please do /console reloadui as soon as possible."
 L.LOAD_MOD_VER_MISMATCH				= "%s could not be loaded because your " .. L.DBM .. "-Core does not meet requirements. An updated version is required"
 L.LOAD_MOD_EXP_MISMATCH				= "%s could not be loaded because it is designed for a WoW expansion that's not currently available. When expansion becomes available, this mod will automatically work."
-L.LOAD_MOD_TOC_MISMATCH				= "%s could not be loaded because it is not designed for Classic WoW. You likely installed a retail version of a module. Remove this module and use only addons designed for Classic World of Warcraft"
+L.LOAD_MOD_TOC_MISMATCH				= "%s could not be loaded because it is not designed for Burning Crusade Classic WoW. You likely installed a retail or Classic Era version of a module. Remove this module and use only addons designed for Burning Crusade Classic WoW."
 L.LOAD_MOD_DISABLED					= "%s is installed but currently disabled. This mod will not be loaded unless you enable it."
 L.LOAD_MOD_DISABLED_PLURAL			= "%s are installed but currently disabled. These mods will not be loaded unless you enable them."
 
@@ -41,7 +41,7 @@ L.LOOT_SPEC_REMINDER				= "Your current spec is %s. Your current loot choice is 
 
 L.BIGWIGS_ICON_CONFLICT				= L.DBM .. " has detected that you have raid icons turned on in both BigWigs and " .. L.DBM .. ". Please disable icons in one of them to avoid conflicts"
 
-L.MOD_AVAILABLE						= "%s is available for this zone. You can find download on Curse/Twitch or WoWI"
+L.MOD_AVAILABLE						= "%s is available for this zone. You can find download on Curse or WoWI"
 
 L.COMBAT_STARTED					= "%s engaged. Good luck and have fun! :)"
 L.COMBAT_STARTED_IN_PROGRESS		= "Engaged an in progress fight against %s. Good luck and have fun! :)"
@@ -55,7 +55,7 @@ L.RAID_DOWN_L						= "%s cleared after %s! Your fastest clear took %s."
 L.RAID_DOWN_NR						= "%s cleared after %s! This is a new record! (Old record was %s)."
 L.GUILD_BOSS_DOWN					= "%s has been defeated by guild after %s!"
 L.COMBAT_ENDED_AT					= "Combat against %s (%s) ended after %s."
-L.COMBAT_ENDED_AT_LONG				= "Combat against %s (%s) ended after %s. You have %d total wipes on this difficulty."
+L.COMBAT_ENDED_AT_LONG				= "Combat against %s (%s) ended after %s. You have %d total wipe(s) on this difficulty."
 L.GUILD_COMBAT_ENDED_AT				= "Guild has wiped on %s (%s) after %s."
 L.COMBAT_STATE_RECOVERED			= "%s was engaged %s ago, recovering timers..."
 L.TRANSCRIPTOR_LOG_START			= "Transcriptor logging started."
@@ -90,6 +90,7 @@ L.MPROFILE_DELETE_SELF_ERROR		= "Cannot delete mod settings currently in use."
 L.MPROFILE_DELETE_S_ERROR			= "Source is corrupted. Settings not deleted or partly deleted. Delete failed."
 
 L.NOTE_SHARE_SUCCESS				= "%s has shared their note for %s"
+L.NOTE_SHARE_LINK					= "Click Here to Open Note"
 L.NOTE_SHARE_FAIL					= "%s attempted to share note text with you for %s. However, mod associated with this ability is not uninstalled or is not loaded. If you need this note, make sure you load the mod they are sharing notes for and ask them to share again"
 
 L.NOTEHEADER						= "Enter your note text here for %s. Enclosing a players name with >< class colors it. For alerts with multiple counts, separate notes with '/'"
@@ -157,38 +158,35 @@ L.VERSIONCHECK_ENTRY_TWO			= "%s: %s (%s) & %s (%s)"--Two Boss mods
 L.VERSIONCHECK_ENTRY_NO_DBM			= "%s: No boss mod installed"
 L.VERSIONCHECK_FOOTER				= "Found %d player(s) with " .. L.DBM .. " & %d player(s) with Bigwigs"
 L.VERSIONCHECK_OUTDATED				= "Following %d player(s) have outdated boss mod version: %s"
-L.YOUR_VERSION_OUTDATED     		= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date. Please download the latest version through Curse/Twitch, WoWI, or from the GitHub Releases page."
+L.YOUR_VERSION_OUTDATED     		= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date. Please download the latest version through Curse, WoWI, or from the GitHub Releases page."
 L.VOICE_PACK_OUTDATED				= "Your selected " .. L.DBM .. " voice pack is missing some sounds supported by " .. L.DBM .. ". Some warning sounds will still play default sounds. Please download a newer version of voice pack or pack contact author for an update that contains missing audio"
 L.VOICE_MISSING						= "You have a " .. L.DBM .. " voice pack selected that could not be found. If this is an error, make sure your voice pack is properly installed and enabled in addons."
 L.VOICE_DISABLED					= "You currently have at least one " .. L.DBM .. " voice pack installed but none enabled. If you intend to use a voice pack, make sure it's chosen in 'Spoken Alerts', else uninstall unused voice packs to hide this message"
 L.VOICE_COUNT_MISSING				= "Countdown voice %d is set to a voice/count pack that could not be found. It has be reset to default setting: %s."
 L.BIG_WIGS							= "BigWigs"
 
-L.UPDATEREMINDER_HEADER				= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n Version %s (%s) is available for download through Curse/Twitch, WoWI, or from the GitHub Releases page"
-L.UPDATEREMINDER_HEADER_ALPHA		= "Your ALPHA version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n You are at least %s test versions behind. It is recommended that DBM users that choose ALPHA versions run the latest ALPHA. Otherwise, they should run latest RELEASE version. Out of date ALPHAs have a stricter version check because they are development versions of " .. L.DBM .. "."
+L.UPDATEREMINDER_HEADER				= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date.\n Version %s (%s) is available for download through Curse, WoWI, or from the GitHub Releases page"
 L.UPDATEREMINDER_FOOTER				= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the download link to your clipboard."
 L.UPDATEREMINDER_FOOTER_GENERIC		= "Press " .. (IsMacClient() and "Cmd-C" or "Ctrl-C")  ..  " to copy the link to your clipboard."
 L.UPDATEREMINDER_DISABLE			= "WARNING: Due to your " .. L.DEADLY_BOSS_MODS .. " being too out of date it has been force disabled and cannot be used until updated. This is to ensure outdated or incompatible mods do not cause poor play experience for yourself or fellow group members."
---L.UPDATEREMINDER_NODISABLE		= "WARNING: Your " .. L.DEADLY_BOSS_MODS .. " install is very out of date. While you may have disabled update notification, this message starts to appear after a certain threshold and cannot be disabled. Updating is HIGHLY recommended."
 L.UPDATEREMINDER_HOTFIX				= L.DBM .. " version you are on has known issues during this boss encounter that are corrected if you update to latest release"
 L.UPDATEREMINDER_HOTFIX_ALPHA		= L.DBM .. " version you are on has known issues during this boss encounter that are corrected in an upcoming release (or latest alpha version)"
 L.UPDATEREMINDER_MAJORPATCH			= "WARNING: Do to your " .. L.DEADLY_BOSS_MODS .. " being out of date, " .. L.DBM .. " has been disabled until updated, since this is a major game patch. This is to ensure old and incompatible code doesn't cause poor play experience for yourself or fellow group members. Make sure you download a newer version from deadlybossmods.com or curse as soon as possible."
-L.UPDATEREMINDER_TESTVERSION		= "WARNING: You are using a version of " .. L.DEADLY_BOSS_MODS .. " not intended to be used with this game version. Please make sure you download the appropriate version for your game client from deadlybossmods.com or curse."
 L.VEM								= "WARNING: You are running both " .. L.DEADLY_BOSS_MODS .. " and Voice Encounter Mods. " .. L.DBM .. " will not run in this configuration and therefore will not be loaded."
 L.OUTDATEDPROFILES					= "WARNING: DBM-Profiles not compatible with this version of " .. L.DBM .. ". It must be removed before " .. L.DBM .. " can proceed, to avoid conflict."
-L.OUTDATEDSPELLTIMERS				= "WARNING: DBM-SpellTimers breaks " .. L.DBM .. "and must be disabled for " .. L.DBM .. " to function properly."
+L.OUTDATEDSPELLTIMERS				= "WARNING: DBM-SpellTimers breaks " .. L.DBM .. " and must be disabled for " .. L.DBM .. " to function properly."
 L.OUTDATEDRLT						= "WARNING: DBM-RaidLeadTools breaks " .. L.DBM .. ". DBM-RaidLeadTools is no longer supported and must be removed for " .. L.DBM .. " to function properly."
 L.VICTORYSOUND						= "WARNING: DBM-VictorySound not compatible with this version of " .. L.DBM .. ". It must be removed before " .. L.DBM .. " can proceed, to avoid conflict."
 L.DPMCORE							= "WARNING: Deadly PvP mods is discontinued and not compatible with this version of " .. L.DBM .. ". It must be removed before " .. L.DBM .. " can proceed, to avoid conflict."
 L.DBMLDB							= "WARNING: DBM-LDB is now built into DBM-Core. While it won't do any harm, it's recommended to remove 'DBM-LDB' from your addons folder"
 L.UPDATE_REQUIRES_RELAUNCH			= "WARNING: This " .. L.DBM .. " update will not work correctly if you don't fully restart your game client. This update contains new files or .toc file changes that cannot be loaded via ReloadUI. You may encounter broken functionality or errors if you continue without a client restart."
-L.OUT_OF_DATE_NAG					= "Your version of " .. L.DEADLY_BOSS_MODS .. " is out-of-date. It is recommended you update for this fight so you are not missing an important alert or timer or a yell rest of raid is expecting to see from you."
-L.CLASSIC_ONLY						= "WARNING: This version of " .. L.DBM .. " is only meant to be used with World of Warcraft: Classic. Uninstall this version and install correct version of " .. L.DBM .. " for Retail WoW."
+L.OUT_OF_DATE_NAG					= "Your version of " .. L.DBM.. " is out-of-date and this specific fight mod has newer features or bug fixes. It is recommended you update for this fight to improve your experience."
+L.CLASSIC_ONLY						= "WARNING: This version of " .. L.DBM .. " is only meant to be used with WoW Burning Crusade Classic. Uninstall this version and install correct version of " .. L.DBM .. " for your WoW version."
 
 L.MOVABLE_BAR						= "Drag me!"
 
---L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h sent you a " .. L.DBM .. " timer: '%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[Cancel this timer]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[Ignore timers from %1$s]|r|h"
-L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h sent you a " .. L.DBM .. " timer"
+L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h sent you a " .. L.DBM .. " timer: '%2$s'\n|HDBM:cancel:%2$s:nil|h|cff3588ff[Cancel this timer]|r|h  |HDBM:ignore:%2$s:%1$s|h|cff3588ff[Ignore timers from %1$s]|r|h"
+--L.PIZZA_SYNC_INFO					= "|Hplayer:%1$s|h[%1$s]|h sent you a " .. L.DBM .. " timer"
 L.PIZZA_CONFIRM_IGNORE				= "Do you really want to ignore " .. L.DBM .. " timers from %s for this session?"
 L.PIZZA_ERROR_USAGE					= "Usage: /dbm [broadcast] timer <time> <text>. <time> must be greater than 1."
 
@@ -263,8 +261,11 @@ L.TIMER_USAGE	= {
 }
 
 L.ERROR_NO_PERMISSION				= "You don't have the required permission to do this."
+L.TIME_TOO_SHORT					= "Pull timer must be longer than 3 seconds."
 
 --Common Locals
+L.NONE								= "None"
+L.RANDOM							= "Random"
 L.NEXT								= "Next %s"
 L.COOLDOWN							= "%s CD"
 L.UNKNOWN							= "Unknown"--UNKNOWN which is "Unknown" (does u vs U matter?)
@@ -284,20 +285,26 @@ L.NORTH								= "North"
 L.SOUTH								= "South"
 L.INTERMISSION						= "Intermission"--No blizz global for this, and will probably be used in most end tier fights with intermission phases
 L.ORB								= "Orb"
+L.ORBS								= "Orbs"
 L.CHEST								= "Chest"--As in Treasure 'Chest'. Not Chest as in body part.
 L.NO_DEBUFF							= "Not %s"--For use in places like info frame where you put "Not Spellname"
 L.ALLY								= "Ally"--Such as "Move to Ally"
+L.ALLIES							= "Allies"--Such as "Move to Allies"
 L.ADD								= "Add"--A fight Add as in "boss spawned extra adds"
 L.ADDS								= "Adds"
 L.BIG_ADD							= "Big Add"
 L.BOSS								= "Boss"
-L.ROOM_EDGE							= "Room Edge"
+L.EDGE								= "Room Edge"
 L.FAR_AWAY							= "Far Away"
 L.BREAK_LOS							= "Break LOS"
+L.RESTORE_LOS						= "Restore/Maintain LOS"
 L.SAFE								= "Safe"
+L.NOTSAFE							= "Not Safe"
 L.SHIELD							= "Shield"
 L.PILLAR							= "Pillar"
 L.INCOMING							= "%s Incoming"
+L.BOSSTOGETHER						= "Bosses Together"
+L.BOSSAPART							= "Bosses Apart"
 --Common Locals end
 
 L.BREAK_USAGE						= "Break timer cannot be longer than 60 minutes. Make sure you're inputting time in minutes and not seconds."
@@ -405,7 +412,7 @@ L.AUTO_SPEC_WARN_TEXTS = {
 	stack							= "%%d stacks of %s on you",
 	switch							= "%s - switch targets",
 	switchcount						= "%s - switch targets (%%s)",
-	gtfo							= "%%s under you - move away",
+	gtfo							= "%%s damage - move away",
 	adds							= "Incoming Adds - switch targets",
 	addscustom						= "Incoming Adds - %%s",
 	targetchange					= "Target Change - switch to %%s"
@@ -538,7 +545,8 @@ L.AUTO_YELL_OPTION_TEXT = {
 	fade							= "Yell (with countdown and spell name) when $spell:%s is fading",
 	shortfade						= "Yell (with countdown) when $spell:%s is fading",
 	iconfade						= "Yell (with countdown and icon) when $spell:%s is fading",
-	position						= "Yell (with position) when you are affected by $spell:%s",
+	position						= "Yell (with position and player name) when you are affected by $spell:%s",
+	shortposition					= "Yell (with position) when you are affected by $spell:%s",
 	combo							= "Yell (with custom text) when you are affected by $spell:%s and other spells at same time"
 }
 L.AUTO_YELL_ANNOUNCE_TEXT = {
@@ -549,6 +557,7 @@ L.AUTO_YELL_ANNOUNCE_TEXT = {
 	shortfade						= "%%d",
 	iconfade						= "{rt%%2$d}%%1$d",
 	position 						= "%s %%s on {rt%%d}"..UnitName("player").."{rt%%d}",
+	shortposition 					= "{rt%%1$d}%s %%2$d",--Icon, Spellname, number
 	combo							= "%s and %%s"--Spell name (from option, plus spellname given in arg)
 }
 L.AUTO_YELL_CUSTOM_POSITION			= "{rt%d}%s{"--Doesn't need translating. Has no strings
@@ -620,8 +629,8 @@ L.INSTANCE_INFO_STATS_DENIED		= "Denied the request: %s"
 L.INSTANCE_INFO_STATS_AWAY			= "Away: %s"
 L.INSTANCE_INFO_STATS_NO_RESPONSE	= "No recent " .. L.DBM .. " version installed: %s"
 L.INSTANCE_INFO_RESULTS				= "Instance ID scan results. Note that instances might show up more than once if there are players with localized WoW clients in your raid."
---L.INSTANCE_INFO_SHOW_RESULTS		= "Players yet to respond: %s\n|HDBM:showRaidIdResults|h|cff3588ff[Show results now]|r|h"
-L.INSTANCE_INFO_SHOW_RESULTS		= "Players yet to respond: %s"
+L.INSTANCE_INFO_SHOW_RESULTS		= "Players yet to respond: %s\n|HDBM:showRaidIdResults|h|cff3588ff[Show results now]|r|h"
+--L.INSTANCE_INFO_SHOW_RESULTS		= "Players yet to respond: %s"
 
 L.LAG_CHECKING						= "Checking raid Latency..."
 L.LAG_HEADER						= L.DEADLY_BOSS_MODS .. " - Latency Results"
@@ -657,6 +666,7 @@ L.CURSE_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:20
 L.POISON_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:20:20:0:0:255:66:39:55:40:58|t"
 L.DISEASE_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:20:20:0:0:255:66:70:86:40:58|t"
 L.ENRAGE_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:20:20:0:0:255:66:102:118:40:58|t"
+L.BLEED_ICON						= "|TInterface\\AddOns\\DBM-Core\\textures\\UI-EJ-Icons.blp:20:20:0:0:255:66:168:182:40:58|t"
 
 --LDB
 L.LDB_TOOLTIP_HELP1					= "Click to open " .. L.DBM
@@ -665,17 +675,6 @@ L.SILENTMODE_IS                     = "SilentMode is "
 
 L.LDB_LOAD_MODS						= "Load boss mods"
 
-L.LDB_CAT_BFA						= "Battle for Azeroth"
-L.LDB_CAT_LEG						= "Legion"
-L.LDB_CAT_WOD						= "Warlords of Draenor"
-L.LDB_CAT_MOP						= "Mists of Pandaria"
-L.LDB_CAT_CATA						= "Cataclysm"
-L.LDB_CAT_WOTLK						= "Wrath of the Lich King"
-L.LDB_CAT_BC						= "Burning Crusade"
-L.LDB_CAT_CLASSIC 					= EXPANSION_NAME0
-L.LDB_CAT_OTHER						= "Other Boss Mods"
-
-L.LDB_CAT_GENERAL					= "General"
 L.LDB_ENABLE_BOSS_MOD				= "Enable boss mod"
 
 --Localizers, do not copy entire table, follow same guidelines as other tables, overwrite each entry with L.WORLD_BUFFS.hordeOny = "stuff" for example.

@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("TalonGuards", "DBM-BWL", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403075439")
 mod:SetCreatureID(12460, 12461, 99999)--99999 to prevent mod from ending combat after one of each talon guard type die. Mod will effectively ALWAYS wipe, but it has disabled stats/reporting so irrelevant
 mod:SetModelID(12460)
 mod:RegisterCombat("combat")
@@ -14,7 +14,7 @@ mod:AddNamePlateOption("NPAuraOnVulnerable", 22277)
 local vulnerabilities = {
 	-- [guid] = school
 }
---redudnant, but fuck it, thie code in this mod is already shit
+--redudnant, but fuck it, the code in this mod is already shit
 local lastAnnounce = {
 	-- [guid] = school
 }

@@ -1,14 +1,16 @@
 local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local S = E:GetModule('Skins')
 
---Cache global variables
---Lua functions
 local _G = _G
-local unpack = unpack
---WoW API / Variables
+local unpack, select = unpack, select
+
 local GetItemInfo = GetItemInfo
 local GetItemQualityColor = GetItemQualityColor
+local GetBuybackItemInfo = GetBuybackItemInfo
+local GetNumBuybackItems = GetNumBuybackItems
+local GetMerchantNumItems = GetMerchantNumItems
 local hooksecurefunc = hooksecurefunc
+local CreateFrame = CreateFrame
 
 function S:MerchantFrame()
 	if not (E.private.skins.blizzard.enable and E.private.skins.blizzard.merchant) then return end
@@ -48,19 +50,6 @@ function S:MerchantFrame()
 
 		money:ClearAllPoints()
 		money:Point('BOTTOMLEFT', button, 'BOTTOMRIGHT', 3, 0)
-
-		for j = 1, 2 do
-			local currencyItem = _G['MerchantItem'..i..'AltCurrencyFrameItem'..j]
-			local currencyIcon = _G['MerchantItem'..i..'AltCurrencyFrameItem'..j..'Texture']
-
-			currencyIcon.backdrop = CreateFrame('Frame', nil, currencyItem)
-			currencyIcon.backdrop:SetTemplate('Default')
-			currencyIcon.backdrop:SetFrameLevel(currencyItem:GetFrameLevel())
-			currencyIcon.backdrop:SetOutside(currencyIcon)
-
-			currencyIcon:SetTexCoord(unpack(E.TexCoords))
-			currencyIcon:SetParent(currencyIcon.backdrop)
-		end
 	end
 
 	_G.MerchantNameText:SetTextColor(1, 1, 1)
@@ -135,7 +124,7 @@ function S:MerchantFrame()
 
 	hooksecurefunc('MerchantFrame_UpdateMerchantInfo', function()
 		local numMerchantItems = GetMerchantNumItems()
-		local index = (MerchantFrame.page - 1) * MERCHANT_ITEMS_PER_PAGE
+		local index = (MerchantFrame.page - 1) * _G.MERCHANT_ITEMS_PER_PAGE
 		local button, name, quality
 
 		for i = 1, _G.BUYBACK_ITEMS_PER_PAGE do
@@ -168,14 +157,14 @@ function S:MerchantFrame()
 
 				if quality and quality > 1 then
 					local r, g, b = GetItemQualityColor(quality)
-					MerchantBuyBackItemItemButton:SetBackdropBorderColor(r, g, b)
-					MerchantBuyBackItemName:SetTextColor(r, g, b)
+					_G.MerchantBuyBackItemItemButton:SetBackdropBorderColor(r, g, b)
+					_G.MerchantBuyBackItemName:SetTextColor(r, g, b)
 				else
-					MerchantBuyBackItemItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
-					MerchantBuyBackItemName:SetTextColor(1, 1, 1)
+					_G.MerchantBuyBackItemItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
+					_G.MerchantBuyBackItemName:SetTextColor(1, 1, 1)
 				end
 			else
-				MerchantBuyBackItemItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
+				_G.MerchantBuyBackItemItemButton:SetBackdropBorderColor(unpack(E.media.bordercolor))
 			end
 		end
 

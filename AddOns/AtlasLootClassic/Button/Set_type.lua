@@ -4,7 +4,7 @@ local Set = AtlasLoot.Button:AddType("Set", "set")
 local AL = AtlasLoot.Locales
 local ALIL = AtlasLoot.IngameLocales
 local ClickHandler = AtlasLoot.ClickHandler
-local Sets
+local ItemSet
 
 --local db
 
@@ -18,7 +18,6 @@ local GetAlTooltip = AtlasLoot.Tooltip.GetTooltip
 local SetClickHandler = nil
 
 local CLASS_COLOR_FORMAT = "|c%s%s|r"
-local CLASS_NAMES_WITH_COLORS = {}
 
 ClickHandler:Add(
 	"Set",
@@ -46,29 +45,29 @@ function Set.OnSet(button, second)
 	if not SetClickHandler then
 		SetClickHandler = ClickHandler:GetHandler("Set")
 
-		CLASS_NAMES_WITH_COLORS = AtlasLoot:GetColoredClassNames()
-
-		Sets = AtlasLoot.Data.Sets
+		ItemSet = AtlasLoot.Data.ItemSet
 	end
 	if not button then return end
 	if second and button.__atlaslootinfo.secType then
 		button.secButton.SetID = button.__atlaslootinfo.secType[2]
 
-		local name, items, icon, classID, className = Sets:GetItemSetData(button.secButton.SetID)
-		button.secButton.SetName = name
-		button.secButton.Items = items
-		button.secButton.SetIcon = icon
-		button.secButton.SetClassName = className
+		button.secButton.SetName = ItemSet.GetSetName(button.secButton.SetID, true)
+		button.secButton.Items = ItemSet.GetSetItems(button.secButton.SetID)
+		button.secButton.ExtraFrameData = ItemSet.GetSetDataForExtraFrame(button.secButton.SetID)
+		button.secButton.SetIcon = ItemSet.GetSetIcon(button.secButton.SetID, true)
+		button.secButton.SetDescription = ItemSet.GetSetDescriptionString(button.secButton.SetID)
+		button.secButton.SetBonusData = ItemSet.GetSetBonusString(button.secButton.SetID)
 
 		Set.Refresh(button.secButton)
 	else
 		button.SetID = button.__atlaslootinfo.type[2]
 
-		local name, items, icon, classID, className = Sets:GetItemSetData(button.SetID)
-		button.SetName = name
-		button.Items = items
-		button.SetIcon = icon
-		button.SetClassName = className
+		button.SetName = ItemSet.GetSetName(button.SetID, true)
+		button.Items = ItemSet.GetSetItems(button.SetID)
+		button.ExtraFrameData = ItemSet.GetSetDataForExtraFrame(button.SetID)
+		button.SetIcon = ItemSet.GetSetIcon(button.SetID, true)
+		button.SetDescription = ItemSet.GetSetDescriptionString(button.SetID)
+		button.SetBonusData = ItemSet.GetSetBonusString(button.SetID)
 
 		Set.Refresh(button)
 	end
@@ -84,8 +83,10 @@ function Set.OnMouseAction(button, mouseButton)
 	elseif mouseButton == "WoWHeadLink" then
 		AtlasLoot.Button:OpenWoWHeadLink(button, "item-set", button.SetID)
 	elseif mouseButton == "DressUp" then
-		for i = 1, #button.Items do
-			DressUpItemLink(type(button.Items[i]) == "string" and button.Items[i] or "item:"..button.Items[i])
+		if button.Items then
+			for i = 1, #button.Items do
+				DressUpItemLink(type(button.Items[i]) == "string" and button.Items[i] or "item:"..button.Items[i])
+			end
 		end
 	elseif mouseButton == "OpenSet" then
 		Set.OnClickItemList(button)
@@ -121,16 +122,23 @@ end
 function Set.OnClear(button)
 	button.SetName = nil
 	button.Items = nil
+	button.ExtraFrameData = nil
 	button.SetIcon = nil
-	button.SetClassName = nil
+	button.SetDescription = nil
 	button.SetID = nil
+	button.SetBonusData = nil
 
 	button.secButton.SetName = nil
 	button.secButton.Items = nil
+	button.secButton.ExtraFrameData = nil
 	button.secButton.SetIcon = nil
-	button.secButton.SetClassName = nil
+	button.secButton.SetDescription = nil
 	button.secButton.SetID = nil
-	AtlasLoot.Button:ExtraItemFrame_ClearFrame()
+	button.secButton.SetBonusData = nil
+	if button.ExtraFrameShown then
+		AtlasLoot.Button:ExtraItemFrame_ClearFrame()
+		button.ExtraFrameShown = false
+	end
 end
 
 function Set.Refresh(button)
@@ -138,13 +146,13 @@ function Set.Refresh(button)
 		button:SetNormalTexture(button.SetIcon)
 	else
 		button.icon:SetTexture(button.SetIcon)
-		button.name:SetText(Sets:GetSetColor(button.SetID)..button.SetName)
-		if button.SetClassName then
-			button.extra:SetText(CLASS_NAMES_WITH_COLORS[button.SetClassName])
+		button.name:SetText(button.SetName)
+		if button.SetDescription then
+			button.extra:SetText(button.SetDescription)
 		end
 	end
 	if AtlasLoot.db.ContentPhase.enableOnSets then
-		local phaseT, active = Sets:GetPhaseTextureForSetID(button.SetID)
+		local phaseT, active = ItemSet.GetPhaseTextureForSetID(button.SetID)
 		if phaseT and not active then
 			button.phaseIndicator:SetTexture(phaseT)
 			button.phaseIndicator:Show()
@@ -163,8 +171,9 @@ end
 -- #########
 
 function Set.OnClickItemList(button)
-	if not button.Items then return end
-	AtlasLoot.Button:ExtraItemFrame_GetFrame(button, button.Items)
+	if not button.ExtraFrameData then return end
+	button.ExtraFrameShown = true
+	AtlasLoot.Button:ExtraItemFrame_GetFrame(button, button.ExtraFrameData)
 end
 
 function Set.ShowToolTipFrame(button)
@@ -175,7 +184,7 @@ function Set.ShowToolTipFrame(button)
 		frame:SetClampedToScreen(true)
 		frame:SetSize(230, 280)
 
-		frame.modelFrame = CreateFrame("DressUpModel", name.."-ModelFrame", frame)
+		frame.modelFrame = CreateFrame("DressUpModel", name.."-ModelFrame", frame, _G.BackdropTemplateMixin and "BackdropTemplate" or nil)
 		frame.modelFrame:ClearAllPoints()
 		frame.modelFrame:SetParent(frame)
 		frame.modelFrame:SetAllPoints(frame)
@@ -191,6 +200,19 @@ function Set.ShowToolTipFrame(button)
 		frame.modelFrame.zoomLevelNew = frame.modelFrame.zoomLevel
 		frame.modelFrame:SetPortraitZoom(frame.modelFrame.zoomLevel)
 		frame.modelFrame.Reset = _G.Model_Reset
+
+		frame.bonusDataFrame = CreateFrame("Frame", name.."-bonus", frame, _G.BackdropTemplateMixin and "BackdropTemplate" or nil)
+		frame.bonusDataFrame:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, -2)
+		frame.bonusDataFrame:SetSize(230, 50)
+		frame.bonusDataFrame:SetBackdrop(ALPrivate.BOX_BORDER_BACKDROP)
+		frame.bonusDataFrame:SetBackdropColor(0,0,0,1)
+
+		frame.bonusDataFrame.text = frame.bonusDataFrame:CreateFontString(name.."-bonusText", "ARTWORK", "GameFontNormalSmall")
+		frame.bonusDataFrame.text:SetPoint("TOPLEFT", frame.bonusDataFrame, 5, -5)
+		frame.bonusDataFrame.text:SetPoint("TOPRIGHT", frame.bonusDataFrame, -5, -5)
+		frame.bonusDataFrame.text:SetPoint("BOTTOM", frame.bonusDataFrame, 0, 5)
+		frame.bonusDataFrame.text:SetJustifyH("LEFT")
+		frame.bonusDataFrame.text:SetText("")
 
 		Set.tooltipFrame = frame
 		frame:Hide()
@@ -214,4 +236,16 @@ function Set.ShowToolTipFrame(button)
 		frame:TryOn(type(button.Items[i]) == "string" and button.Items[i] or "item:"..button.Items[i])
 	end
 
+	if not button.SetBonusData then
+		button.SetBonusData = ItemSet.GetSetBonusString(button.SetID)
+	end
+
+	if button.SetBonusData then
+		Set.tooltipFrame.bonusDataFrame:Show()
+		Set.tooltipFrame.bonusDataFrame.text:SetText(button.SetBonusData)
+		Set.tooltipFrame.bonusDataFrame:SetHeight(Set.tooltipFrame.bonusDataFrame.text:GetStringHeight()+14)
+		Set.tooltipFrame:SetPoint("BOTTOMLEFT", button, "TOPLEFT", (button:GetWidth() * 0.5), 5 + Set.tooltipFrame.bonusDataFrame:GetHeight())
+	else
+		Set.tooltipFrame.bonusDataFrame:Hide()
+	end
 end

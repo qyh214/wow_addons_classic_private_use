@@ -1,37 +1,36 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
-local UF = E:GetModule('UnitFrames');
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local UF = E:GetModule('UnitFrames')
+
 local _, ns = ...
 local ElvUF = ns.oUF
-assert(ElvUF, "ElvUI was unable to locate oUF.")
+assert(ElvUF, 'ElvUI was unable to locate oUF.')
 
---Lua functions
 local _G = _G
 local tinsert = tinsert
 
 function UF:Construct_TargetTargetFrame(frame)
-	frame.Health = self:Construct_HealthBar(frame, true, true, 'RIGHT')
-	frame.Power = self:Construct_PowerBar(frame, true, true, 'LEFT')
-	frame.InfoPanel = self:Construct_InfoPanel(frame)
-	frame.Name = self:Construct_NameText(frame)
-	frame.Buffs = self:Construct_Buffs(frame)
-	frame.Debuffs = self:Construct_Debuffs(frame)
-
-	frame.Portrait3D = self:Construct_Portrait(frame, 'model')
-	frame.Portrait2D = self:Construct_Portrait(frame, 'texture')
-
+	frame.Health = UF:Construct_HealthBar(frame, true, true, 'RIGHT')
+	frame.Power = UF:Construct_PowerBar(frame, true, true, 'LEFT')
+	frame.PowerPrediction = UF:Construct_PowerPrediction(frame)
+	frame.Name = UF:Construct_NameText(frame)
+	frame.Portrait3D = UF:Construct_Portrait(frame, 'model')
+	frame.Portrait2D = UF:Construct_Portrait(frame, 'texture')
+	frame.Buffs = UF:Construct_Buffs(frame)
+	frame.RaidTargetIndicator = UF:Construct_RaidIcon(frame)
+	frame.Debuffs = UF:Construct_Debuffs(frame)
+	frame.ThreatIndicator = UF:Construct_Threat(frame)
+	frame.InfoPanel = UF:Construct_InfoPanel(frame)
+	frame.MouseGlow = UF:Construct_MouseGlow(frame)
+	frame.TargetGlow = UF:Construct_TargetGlow(frame)
+	frame.FocusGlow = UF:Construct_FocusGlow(frame)
+	frame.Fader = UF:Construct_Fader()
+	frame.Cutaway = UF:Construct_Cutaway(frame)
 	frame.customTexts = {}
-	frame.Cutaway = self:Construct_Cutaway(frame)
-	frame.Fader = self:Construct_Fader()
-	frame.MouseGlow = self:Construct_MouseGlow(frame)
-	frame.PowerPrediction = self:Construct_PowerPrediction(frame)
-	frame.RaidTargetIndicator = self:Construct_RaidIcon(frame)
-	frame.TargetGlow = self:Construct_TargetGlow(frame)
-	frame.ThreatIndicator = self:Construct_Threat(frame)
 
 	frame:Point('BOTTOM', E.UIParent, 'BOTTOM', 342, 100) --Set to default position
 	E:CreateMover(frame, frame:GetName()..'Mover', L["TargetTarget Frame"], nil, nil, nil, 'ALL,SOLO', nil, 'unitframe,individualUnits,targettarget,generalGroup')
 
-	frame.unitframeType = "targettarget"
+	frame.unitframeType = 'targettarget'
 end
 
 function UF:Update_TargetTargetFrame(frame, db)
@@ -48,9 +47,9 @@ function UF:Update_TargetTargetFrame(frame, db)
 		frame.USE_POWERBAR_OFFSET = (db.power.width == 'offset' and db.power.offset ~= 0) and frame.USE_POWERBAR and not frame.POWERBAR_DETACHED
 		frame.POWERBAR_OFFSET = frame.USE_POWERBAR_OFFSET and db.power.offset or 0
 		frame.POWERBAR_HEIGHT = not frame.USE_POWERBAR and 0 or db.power.height
-		frame.POWERBAR_WIDTH = frame.USE_MINI_POWERBAR and (frame.UNIT_WIDTH - (frame.BORDER*2))/2 or (frame.POWERBAR_DETACHED and db.power.detachedWidth or (frame.UNIT_WIDTH - ((frame.BORDER+frame.SPACING)*2)))
+		frame.POWERBAR_WIDTH = frame.USE_MINI_POWERBAR and (frame.UNIT_WIDTH - (UF.BORDER*2))/2 or (frame.POWERBAR_DETACHED and db.power.detachedWidth or (frame.UNIT_WIDTH - ((UF.BORDER+UF.SPACING)*2)))
 		frame.USE_PORTRAIT = db.portrait and db.portrait.enable
-		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == "MIDDLE")
+		frame.USE_PORTRAIT_OVERLAY = frame.USE_PORTRAIT and (db.portrait.overlay or frame.ORIENTATION == 'MIDDLE')
 		frame.PORTRAIT_WIDTH = (frame.USE_PORTRAIT_OVERLAY or not frame.USE_PORTRAIT) and 0 or db.portrait.width
 		frame.USE_INFO_PANEL = not frame.USE_MINI_POWERBAR and not frame.USE_POWERBAR_OFFSET and db.infoPanel.enable
 		frame.INFO_PANEL_HEIGHT = frame.USE_INFO_PANEL and db.infoPanel.height or 0
@@ -70,23 +69,22 @@ function UF:Update_TargetTargetFrame(frame, db)
 	frame:Size(frame.UNIT_WIDTH, frame.UNIT_HEIGHT)
 	_G[frame:GetName()..'Mover']:Size(frame:GetSize())
 
-	UF:Configure_HealthBar(frame)
-	UF:Configure_Power(frame)
 	UF:Configure_InfoPanel(frame)
+	UF:Configure_HealthBar(frame)
 	UF:UpdateNameSettings(frame)
+	UF:Configure_Power(frame)
+	UF:Configure_PowerPrediction(frame)
+	UF:Configure_Portrait(frame)
+	UF:Configure_Threat(frame)
 	UF:EnableDisable_Auras(frame)
 	UF:Configure_AllAuras(frame)
-
-	UF:Configure_CustomTexts(frame)
-	UF:Configure_Cutaway(frame)
 	UF:Configure_Fader(frame)
-	UF:Configure_Portrait(frame)
-	UF:Configure_PowerPrediction(frame)
 	UF:Configure_RaidIcon(frame)
-	UF:Configure_Threat(frame)
+	UF:Configure_Cutaway(frame)
+	UF:Configure_CustomTexts(frame)
 
 	E:SetMoverSnapOffset(frame:GetName()..'Mover', -(12 + self.db.units.player.castbar.height))
-	frame:UpdateAllElements("ElvUI_UpdateAllElements")
+	frame:UpdateAllElements('ElvUI_UpdateAllElements')
 end
 
 tinsert(UF.unitstoload, 'targettarget')

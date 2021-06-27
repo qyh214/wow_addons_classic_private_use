@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("BaronSilverlaine", "DBM-Party-Classic", 14)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(3887)
 
 mod:RegisterCombat("combat")
@@ -19,19 +19,14 @@ function mod:OnCombatStart(delay)
 	timerVeilofShadowCD:Start(1-delay)
 end
 
-do
-	local VeilofShadow = DBM:GetSpellInfo(7068)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 7068 then
-		if args.spellName == VeilofShadow then
-			timerVeilofShadowCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 7068 then
+		timerVeilofShadowCD:Start()
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 7068 then
-		if args.spellName == VeilofShadow then
-			warningVeilofShadow:Show(args.destName)
-		end
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 7068 then
+		warningVeilofShadow:Show(args.destName)
 	end
 end

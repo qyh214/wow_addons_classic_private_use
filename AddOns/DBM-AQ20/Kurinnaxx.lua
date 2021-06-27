@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Kurinnaxx", "DBM-AQ20", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200817152042")
+mod:SetRevision("20210402014659")
 mod:SetCreatureID(15348)
 mod:SetEncounterID(718)
 mod:SetModelID(15742)
@@ -36,56 +36,50 @@ function mod:OnCombatStart(delay)
 		self.vb.firstEngageTime = GetServerTime()
 		if self.Options.FastestClear and self.Options.SpeedClearTimer then
 			--Custom bar creation that's bound to core, not mod, so timer doesn't stop when mod stops it's own timers
-			DBM.Bars:CreateBar(self.Options.FastestClear, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
+			DBT:CreateBar(self.Options.FastestClear, DBM_CORE_L.SPEED_CLEAR_TIMER_TEXT, 136106)
 		end
 	end--]]
 end
 
-do
-	local MortalWound, SandTrap, Frenzy = DBM:GetSpellInfo(25646), DBM:GetSpellInfo(25656), DBM:GetSpellInfo(26527)
-	function mod:SPELL_CREATE(args)
-		--if args.spellId == 25648 then
-		if args.spellName == SandTrap then
-			timerSandTrapCD:Start()
-			if args:IsPlayerSource() then
-				specWarnSandTrap:Show()
-				specWarnSandTrap:Play("targetyou")
-				yellSandTrap:Yell()
-			else
-				warnSandTrap:Show(args.sourceName)
-			end
+function mod:SPELL_CREATE(args)
+	if args.spellId == 25648 then
+		timerSandTrapCD:Start()
+		if args:IsPlayerSource() then
+			specWarnSandTrap:Show()
+			specWarnSandTrap:Play("targetyou")
+			yellSandTrap:Yell()
+		else
+			warnSandTrap:Show(args.sourceName)
 		end
 	end
+end
 
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args.spellId == 25646 and not self:IsTrivial(80) then
-		if args.spellName == MortalWound then
-			local amount = args.amount or 1
-			timerWound:Start(args.destName)
-			if amount >= 5 then
-				if args:IsPlayer() then
-					specWarnWound:Show(amount)
-					specWarnWound:Play("stackhigh")
-				elseif not DBM:UnitDebuff("player", args.spellName) and not UnitIsDeadOrGhost("player") then
-					specWarnWoundTaunt:Show(args.destName)
-					specWarnWoundTaunt:Play("tauntboss")
-				else
-					warnWound:Show(args.destName, amount)
-				end
+function mod:SPELL_AURA_APPLIED(args)
+	--if args.spellId == 25646 and not self:IsTrivial(80) then
+	if args.spellID == 25646 then
+		local amount = args.amount or 1
+		timerWound:Start(args.destName)
+		if amount >= 5 then
+			if args:IsPlayer() then
+				specWarnWound:Show(amount)
+				specWarnWound:Play("stackhigh")
+			elseif not DBM:UnitDebuff("player", args.spellName) and not UnitIsDeadOrGhost("player") then
+				specWarnWoundTaunt:Show(args.destName)
+				specWarnWoundTaunt:Play("tauntboss")
 			else
 				warnWound:Show(args.destName, amount)
 			end
-		--elseif args.spellId == 26527 then
-		elseif args.spellName == Frenzy and args:IsDestTypeHostile() then
-			warnFrenzy:Show(args.destName)
+		else
+			warnWound:Show(args.destName, amount)
 		end
+	elseif args.spellId == 26527 and args:IsDestTypeHostile() then
+		warnFrenzy:Show(args.destName)
 	end
-	mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
+end
+mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
 
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 25646 then
-		if args.spellName == MortalWound then
-			timerWound:Stop(args.destName)
-		end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 25646 then
+		timerWound:Stop(args.destName)
 	end
 end

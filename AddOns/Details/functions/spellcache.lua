@@ -14,10 +14,51 @@ do
 	local _GetSpellInfo =	GetSpellInfo
 	local _unpack	=	unpack
 
+	--> is this a timewalking exp?
+	local is_classic_exp = DetailsFramework.IsClassicWow()
+
 	--> default container
 	_detalhes.spellcache =	{}
 	local unknowSpell = {Loc ["STRING_UNKNOWSPELL"], _, "Interface\\Icons\\Ability_Druid_Eclipse"} --> localize-me
 	
+	local AllSpellNames
+	if (is_classic_exp) then
+		AllSpellNames = {}
+		local GetSpellInfo = GetSpellInfo
+		for i = 1, 60000 do
+			local name, _, icon = GetSpellInfo(i)
+			if name and icon and icon ~= 136235 and not AllSpellNames[name] then
+				AllSpellNames[name] = icon
+			end
+		end
+	end
+
+	local GetSpellInfoClassic = function(spell)
+		local spellName, _, spellIcon
+
+		if (spell == 0) then
+			spellName = ATTACK or "It's Blizzard Fault!"
+			spellIcon = [[Interface\ICONS\INV_Sword_04]]
+
+		elseif (spell == "!Melee" or spell == 1) then
+			spellName = ATTACK or "It's Blizzard Fault!"
+			spellIcon = [[Interface\ICONS\INV_Sword_04]]
+
+		elseif (spell == "!Autoshot" or spell == 2) then
+			spellName = Loc ["STRING_AUTOSHOT"]
+			spellIcon = [[Interface\ICONS\INV_Weapon_Bow_07]]
+
+		else
+			spellName, _, spellIcon = GetSpellInfo (spell)
+		end
+		
+		if (not spellName) then
+			return spell, _, AllSpellNames [spell] or defaultSpellIcon
+		end
+		
+		return spellName, _, AllSpellNames [spell] or spellIcon
+	end
+
 	--> reset spell cache
 	function _detalhes:ClearSpellCache()
 		_detalhes.spellcache = _setmetatable ({}, 
@@ -29,7 +70,12 @@ do
 
 					--> should save only icon and name, other values are not used
 					if (valor) then --> check if spell is valid before
-						local cache = {_GetSpellInfo (valor)}
+						local cache
+						if (is_classic_exp) then
+							cache = {GetSpellInfoClassic(valor)}
+						else
+							cache = {_GetSpellInfo (valor)}
+						end
 						tabela [valor] = cache
 						return cache
 					else
@@ -72,6 +118,19 @@ do
 			[7] = {name = Loc ["STRING_ENVIRONMENTAL_LAVA"], icon = [[Interface\ICONS\Ability_Rhyolith_Volcano]]},
 			[8] = {name = Loc ["STRING_ENVIRONMENTAL_SLIME"], icon = [[Interface\ICONS\Ability_Creature_Poison_02]]},
 		}
+
+	elseif (DetailsFramework.IsTBCWow()) then
+		default_user_spells = {
+			[1] = {name = _G["MELEE"], icon = [[Interface\ICONS\INV_Sword_04]]},
+			[2] = {name = Loc ["STRING_AUTOSHOT"], icon = [[Interface\ICONS\INV_Weapon_Bow_07]]},
+			[3] = {name = Loc ["STRING_ENVIRONMENTAL_FALLING"], icon = [[Interface\ICONS\Spell_Magic_FeatherFall]]},
+			[4] = {name = Loc ["STRING_ENVIRONMENTAL_DROWNING"], icon = [[Interface\ICONS\Ability_Suffocate]]},
+			[5] = {name = Loc ["STRING_ENVIRONMENTAL_FATIGUE"], icon = [[Interface\ICONS\Spell_Arcane_MindMastery]]},
+			[6] = {name = Loc ["STRING_ENVIRONMENTAL_FIRE"], icon = [[Interface\ICONS\INV_SummerFest_FireSpirit]]},
+			[7] = {name = Loc ["STRING_ENVIRONMENTAL_LAVA"], icon = [[Interface\ICONS\Ability_Rhyolith_Volcano]]},
+			[8] = {name = Loc ["STRING_ENVIRONMENTAL_SLIME"], icon = [[Interface\ICONS\Ability_Creature_Poison_02]]},
+		}
+
 	else
 		default_user_spells = {
 			[1] = {name = Loc ["STRING_MELEE"], icon = [[Interface\ICONS\INV_Sword_04]]},
@@ -110,6 +169,13 @@ do
 			
 			[228649] = {name = GetSpellInfo (228649) .. " (Passive)"}, --Monk Mistweaver Blackout kick - Passive Teachings of the Monastery
 			
+			[339538] = {name = GetSpellInfo (224266) .. " (Templar's Vindication)"}, --
+
+			[108271] = {name = GetSpellInfo (108271), icon = "Interface\\Addons\\Details\\images\\icon_astral_shift"}, --
+
+			--> shadowlands trinkets
+			[345020] = {name = GetSpellInfo (345020) .. " (Trinket)"},
+
 			--> bfa trinkets
 			[278155] = {name = GetSpellInfo (278155) .. " (Trinket)"}, --[Twitching Tentacle of Xalzaix]
 			[279664] = {name = GetSpellInfo (279664) .. " (Trinket)"}, --[Vanquished Tendril of G'huun]
@@ -190,12 +256,12 @@ do
 		for i = #_detalhes.savedCustomSpells, 1, -1 do
 			local spelltable = _detalhes.savedCustomSpells [i]
 			local spellid = spelltable [1]
-			
+			if (spellid > 10) then
 				local exists = _GetSpellInfo (spellid)
 				if (not exists) then
 					tremove (_detalhes.savedCustomSpells, i)
 				end
-			
+			end
 		end
 	end
 	
@@ -229,8 +295,9 @@ do
 		return false
 	end
 	
-	--> overwrite for API GetSpellInfo function 
-	_detalhes.getspellinfo = function (spellid) return _unpack (_detalhes.spellcache[spellid]) end 
+	--> overwrite for API GetSpellInfo function
+	
+	_detalhes.getspellinfo = function (spellid) return _unpack (_detalhes.spellcache[spellid]) end
 	_detalhes.GetSpellInfo = _detalhes.getspellinfo
 
 	--> overwrite SpellInfo if the spell is a DoT, so Details.GetSpellInfo will return the name modified
@@ -342,22 +409,3 @@ do
 
 	
 end
-
-
---[=[
-function (...)
-    
-    local F = CreateFrame ("frame", UIParent)
-    F:SetSize (64, 64)
-    F:SetPoint ("center")
-    
-    local T = F:CreateTexture (nil, "overlay")
-    T:SetPoint ("center")
-    T:SetSize (224, 224)
-    
-    local _, _, icon = GetSpellInfo (1)
-    T:SetTexture ([[Interface\ICONS\INV_Sword_04]])
-    T:SetTexture (    [[Interface\ICONS\INV_Weapon_Bow_07]])
-    
-end
---]=]

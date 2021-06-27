@@ -1,4 +1,4 @@
-## Interface: 30300
+## Interface: 20501
 ## Title: oUF RaidDebuffs
 ## Notes: Raid debuff mod for oUF
 ## Version: 1.2

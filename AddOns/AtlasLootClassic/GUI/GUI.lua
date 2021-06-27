@@ -15,6 +15,9 @@ local type, tonumber, tostring = type, tonumber, tostring
 local tab_insert = table.insert
 local str_format = string.format
 
+local CLASS_ICON_PATH = ALPrivate.CLASS_ICON_PATH
+local CLASS_SORT = ALPrivate.CLASS_SORT
+
 -- AL functions
 local GetAlTooltip = AtlasLoot.Tooltip.GetTooltip
 local IsMapsModuleAviable = AtlasLoot.Loader.IsMapsModuleAviable
@@ -67,16 +70,20 @@ local function UpdateFrames(noPageUpdate, forceContentUpdate)
 		GUI.frame.contentFrame.mapButton:Hide()
 	end
 	]]--
-	if IsMapsModuleAviable() then
-		if moduleData[dataID] and moduleData[dataID].AtlasMapFile then
-			GUI.frame.contentFrame.mapButton.atlasMapFile = moduleData[dataID].items[bossID].AtlasMapFile or moduleData[dataID].AtlasMapFile
-			GUI.frame.contentFrame.mapButton:Show()
+	if moduleData[dataID] and moduleData[dataID].AtlasMapFile and IsMapsModuleAviable(moduleData[dataID].items[bossID].AtlasModule or moduleData[dataID].AtlasModule) then
+		GUI.frame.contentFrame.map.atlasMapModule = moduleData[dataID].items[bossID].AtlasModule or moduleData[dataID].AtlasModule
+		if GUI.frame.contentFrame.map.atlasMapModule then
+			GUI.frame.contentFrame.map.atlasMapFile = moduleData[dataID].items[bossID].AtlasMapFile or moduleData[dataID].AtlasMapFile
 		else
-			GUI.frame.contentFrame.mapButton.atlasMapFile = nil
-			GUI.frame.contentFrame.mapButton:Hide()
+			GUI.frame.contentFrame.map.atlasMapFile = moduleData[dataID].items[bossID].AtlasMapFile_AL or moduleData[dataID].AtlasMapFile_AL or moduleData[dataID].items[bossID].AtlasMapFile or moduleData[dataID].AtlasMapFile
 		end
-		contentFrame.map:SetMap(GUI.frame.contentFrame.mapButton.atlasMapFile)
+		GUI.frame.contentFrame.mapButton:Show()
+	else
+		GUI.frame.contentFrame.map.atlasMapFile = nil
+		GUI.frame.contentFrame.map.atlasMapModule = nil
+		GUI.frame.contentFrame.mapButton:Hide()
 	end
+	contentFrame.map:SetMap(GUI.frame.contentFrame.map.atlasMapFile)
 
 	-- MODEL
 	if moduleData[dataID].items[bossID].DisplayIDs then
@@ -293,34 +300,15 @@ end
 local function ClassFilterButton_Refresh(self)
 	-- insert class selection?
 	self.texture:SetDesaturated(not db.classFilter)
+
+	self.selectedClassName = self.selectedClassName or PLAYER_CLASS_FN
+
+	self.texture:SetTexture(CLASS_ICON_PATH[self.selectedClassName])
+
 	if self.selectionFrame and self.selectionFrame:IsShown() then self.selectionFrame:Hide() end
 
-	self.selectedPlayerSpecID = self.selectedPlayerSpecID or GetSpecialization() and ( GetLootSpecialization() == 0 and GetSpecializationInfo(GetSpecialization()) or GetLootSpecialization() ) or 0
-
-	if self.selectedPlayerSpecID == 0 then
-		self.specName = PLAYER_CLASS
-		self.specDesc = str_format(AL["Shows items for all %s specializations."], PLAYER_CLASS)
-		self.texture:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes")
-		self.texture:SetTexCoord(CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][1], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][2], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][3], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][4])
-	else
-		local id, name, description, icon, background, role = GetSpecializationInfoByID(self.selectedPlayerSpecID)
-		self.specName = name
-		self.specDesc = description
-		self.texture:SetTexture(icon)
-		self.texture:SetTexCoord(0, 1, 0, 1)
-	end
 	if GUI.frame.contentFrame.shownFrame and GUI.frame.contentFrame.shownFrame.OnClassFilterUpdate then
 		GUI.frame.contentFrame.shownFrame.OnClassFilterUpdate()
-	end
-end
-
-local function ClassFilterButton_OnEvent(self, event)
-	if event == "PLAYER_LOOT_SPEC_UPDATED" then
-		local spec = GetLootSpecialization() == 0 and GetSpecializationInfo(GetSpecialization()) or GetLootSpecialization()
-		if spec ~= self.selectedPlayerSpecID then
-			self.selectedPlayerSpecID = spec
-			ClassFilterButton_Refresh(self)
-		end
 	end
 end
 
@@ -332,11 +320,9 @@ local function ClassFilterButton_OnEnter(self, owner)
 	else
 		tooltip:SetOwner(self, "ANCHOR_RIGHT", -(self:GetWidth() * 0.5), 5)
 	end
-	tooltip:AddLine(self.specName)
-	tooltip:AddLine(self.specDesc, 1, 1, 1, true)
+	tooltip:AddLine(self.className)
 	if self.mainButton then
-		tooltip:AddLine(" ")
-		tooltip:AddLine(AL["|cff00ff00Right-Click:|r Change Spec"])
+		tooltip:AddLine(AL["|cff00ff00Right-Click:|r Change Class"])
 	end
 	tooltip:Show()
 end
@@ -346,17 +332,12 @@ local function ClassFilterButton_OnLeave(self)
 end
 
 local function ClassFilterButton_OnShow(self)
-	self:RegisterEvent("PLAYER_LOOT_SPEC_UPDATED")
 	ClassFilterButton_Refresh(self)
-end
-
-local function ClassFilterButton_OnHide(self)
-	self:UnregisterEvent("PLAYER_LOOT_SPEC_UPDATED")
 end
 
 local function ClassFilterSpecButton_OnClick(self)
 	self.obj:Hide()
-	self.obj.obj.selectedPlayerSpecID = self.specID
+	self.obj.obj.selectedClassName = self.className
 	ClassFilterButton_Refresh(self.obj.obj)
 end
 
@@ -367,7 +348,7 @@ local function ClassFilterButton_OnClick(self, button)
 	else
 		-- show spec selection here
 		if not self.selectionFrame then
-			local frame = CreateFrame("FRAME", nil, self)
+			local frame = CreateFrame("FRAME", nil, self, _G.BackdropTemplateMixin and "BackdropTemplate" or nil)
 			frame:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 						edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 						tile = true, tileSize = 16, edgeSize = 16,
@@ -382,81 +363,46 @@ local function ClassFilterButton_OnClick(self, button)
 			local button_height = 20
 			local id, name, description, icon
 
-			local button = CreateFrame("BUTTON", nil, frame)
-			button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
-			button:SetPoint("TOPLEFT", frame, "TOPLEFT", 5, -5)
-			button:SetBackdrop(ALPrivate.BOX_BACKDROP)
-			button:SetBackdropColor(RAID_CLASS_COLORS[PLAYER_CLASS_FN].r, RAID_CLASS_COLORS[PLAYER_CLASS_FN].g, RAID_CLASS_COLORS[PLAYER_CLASS_FN].b, 1)
-			button.obj = frame
-			button.specID = 0
-			button.specName = PLAYER_CLASS
-			button.specDesc = str_format(AL["Shows items for all %s specializations."], PLAYER_CLASS)
+			for classSortID = 1, #CLASS_SORT do
+				local className = CLASS_SORT[classSortID]
 
-			button.icon = button:CreateTexture(nil, button)
-			button.icon:SetPoint("LEFT", button, "LEFT", 0, 0)
-			button.icon:SetSize(button_height, button_height)
-			button.icon:SetTexture("Interface\\Glues\\CharacterCreate\\UI-CharacterCreate-Classes")
-			button.icon:SetTexCoord(CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][1], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][2], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][3], CLASS_ICON_TCOORDS[PLAYER_CLASS_FN][4])
-
-			button.text = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-			button.text:SetPoint("LEFT", button.icon, "RIGHT", 2, 0)
-			button.text:SetJustifyH("LEFT")
-			button.text:SetText(PLAYER_CLASS)
-			button.text:SetSize(button.text:GetStringWidth(), button_height)
-
-			newWidth = button_height + 2 + button.text:GetWidth()
-			width = newWidth+10 > width and newWidth+10 or width
-			height = height + button_height + 1
-
-			button:SetScript("OnClick", ClassFilterSpecButton_OnClick)
-			button:SetScript("OnEnter", ClassFilterButton_OnEnter)
-			button:SetScript("OnLeave", ClassFilterButton_OnLeave)
-
-			frame.buttons[1] = button
-
-			for i=1,GetNumSpecializations() do
-				id, name, description, icon = GetSpecializationInfo(i)
-
-				button = CreateFrame("BUTTON", nil, frame)
+				local button = CreateFrame("BUTTON", nil, frame, _G.BackdropTemplateMixin and "BackdropTemplate" or nil)
 				button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
-				--button:SetAlpha(0.5)
-				--if i == 1 then
-				--	button:SetPoint("TOPLEFT", frame, "TOPLEFT", 5, -5)
-				--else
-					button:SetPoint("TOPLEFT", frame.buttons[#frame.buttons], "BOTTOMLEFT", 0, -1)
-				--end
+				if #frame.buttons == 0 then
+					button:SetPoint("TOPLEFT", frame, "TOPLEFT", 5, -5)
+				else
+					button:SetPoint("TOPLEFT", frame.buttons[classSortID - 1], "BOTTOMLEFT", 0, -2)
+				end
+				button:SetBackdrop(ALPrivate.BOX_BACKDROP)
+				button:SetBackdropColor(RAID_CLASS_COLORS[className].r, RAID_CLASS_COLORS[className].g, RAID_CLASS_COLORS[className].b, 1)
+				button:SetScript("OnClick", ClassFilterSpecButton_OnClick)
 				button.obj = frame
-				button.specID = id
-				button.specName = name
-				button.specDesc = description
+				button.className = className
 
 				button.icon = button:CreateTexture(nil, button)
 				button.icon:SetPoint("LEFT", button, "LEFT", 0, 0)
 				button.icon:SetSize(button_height, button_height)
-				button.icon:SetTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+				button.icon:SetTexture(CLASS_ICON_PATH[className])
 
 				button.text = button:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 				button.text:SetPoint("LEFT", button.icon, "RIGHT", 2, 0)
 				button.text:SetJustifyH("LEFT")
-				button.text:SetText(name)
+				button.text:SetText(ALPrivate.LOC_CLASSES[className] or PLAYER_CLASS)
 				button.text:SetSize(button.text:GetStringWidth(), button_height)
+
 
 				newWidth = button_height + 2 + button.text:GetWidth()
 				width = newWidth+10 > width and newWidth+10 or width
-				--button:SetSize(newWidth, button_height)
-				height = height + button_height + 1
+				height = height + button_height + 2
 
-				button:SetScript("OnClick", ClassFilterSpecButton_OnClick)
-				button:SetScript("OnEnter", ClassFilterButton_OnEnter)
-				button:SetScript("OnLeave", ClassFilterButton_OnLeave)
-
-				frame.buttons[i+1] = button
+				frame.buttons[#frame.buttons + 1] = button
 			end
+			-- resize
 			for i = 1, #frame.buttons do
 				frame.buttons[i]:SetSize(width-10, button_height)
 			end
 
-			frame:SetSize(width, height)
+			frame:SetSize(width, height - 2)
 			frame:Hide()
 
 			self.selectionFrame = frame
@@ -468,7 +414,7 @@ local function ClassFilterButton_OnClick(self, button)
 			local button
 			for i = 1, #self.selectionFrame.buttons do
 				button = self.selectionFrame.buttons[i]
-				if button.specID == self.selectedPlayerSpecID then
+				if button.className == self.selectedClassName then
 					button:SetAlpha(1.0)
 				else
 					button:SetAlpha(0.5)
@@ -477,6 +423,7 @@ local function ClassFilterButton_OnClick(self, button)
 			self.selectionFrame:Show()
 		end
 	end
+
 end
 
 -- Next / Prev buttons
@@ -521,22 +468,34 @@ local function SearchBoxOnTextChanged(self, pI)
 end
 
 -- AtlasMaps
-local ATLAS_MAPS_PATH = "Interface\\AddOns\\AtlasLootClassic_Maps\\"
+local ATLAS_MAPS_PATH = "Interface\\AddOns\\AtlasLootClassic_Maps\\%s"
+local ATLAS_MODULE_MAP_PATH_FORMAT = "Interface\\AddOns\\%s\\Images\\%s"
+local function AtlasMaps_GetMapPath(mapName, atlasModule)
+	if atlasModule then
+		return format(ATLAS_MODULE_MAP_PATH_FORMAT, atlasModule, mapName)
+	else
+		return format(ATLAS_MAPS_PATH, mapName)
+	end
+end
+
 local function AtlasMaps_SetMaps(self, map, entranceMap)
 	if map == self.map and self.entranceMap == entranceMap then
 		self:ShowOverlay(true)
 		return
 	end
-	if not map or not IsMapsModuleAviable() then
+	if not map or not IsMapsModuleAviable(self.atlasMapModule) then
 		self:Hide()
 		self.overlay:Hide()
 		return
+	else
+		self:Show()
 	end
 	if type(map) == "table" then
 		return AtlasMaps_SetMaps(self, unpack(map))
 	end
 
 	self.map = map
+	self.atlasModule = self.atlasMapModule
 	self.entranceMap = entranceMap
 
 	self:ShowEntranceMap(false, true, true)
@@ -544,10 +503,10 @@ end
 
 local function AtlasMaps_ShowEntranceMap(self, flag, showOverlay, force)
 	if (self.isEntranceMap and not flag) or (not flag and force) then
-		self:SetTexture(ATLAS_MAPS_PATH..self.map)
+		self:SetTexture(AtlasMaps_GetMapPath(self.map, self.atlasModule))
 		self.isEntranceMap = false
 	elseif (not self.isEntranceMap and flag and self.entranceMap) or (flag and self.entranceMap and force) then
-		self:SetTexture(ATLAS_MAPS_PATH..self.entranceMap)
+		self:SetTexture(AtlasMaps_GetMapPath(self.entranceMap, self.atlasModule))
 		self.isEntranceMap = true
 	end
 	self:Show()
@@ -615,35 +574,47 @@ end
 local function loadModule(addonName)
 	local moduleList = AtlasLoot.ItemDB:GetModuleList(db.selected[1])
 	local moduleData = AtlasLoot.ItemDB:Get(db.selected[1])
+	local gameVersion = moduleData:GetAviableGameVersion(db.selectedGameVersion)
 	local contentTypes = moduleData:GetContentTypes()
 	local data = {}
+	local loadedContent = {}
 	local _, contentIndex
 	local first
 	local foundDbValue
-	for i = 1, #contentTypes do
-		if not data[i] then
-			data[i] = {
-				info = {
-					name = contentTypes[i][1],
-					bgColor = contentTypes[i][2],
-				}
-			}
-		end
-	end
 	local content
 	for i = 1, #moduleList do
 		content = moduleList[i]
-		if not first then first = content end
-		if content == db.selected[2] then foundDbValue = true end
-		-- contentName, contentIndex, contentColor
-		_, contentIndex = moduleData[content]:GetContentType()
-		data[contentIndex][ #data[contentIndex]+1 ] = {
-			id			= content,
-			name		= moduleData[content]:GetName(),
-			tt_title	= moduleData[content]:GetName(),
-			tt_text		= moduleData[content]:GetInfo(),
-		}
+		if moduleData[content].gameVersion == gameVersion or moduleData[content].gameVersion == 0 then
+			if not first then first = content end
+			if content == db.selected[2] then foundDbValue = true end
+			-- contentName, contentIndex, contentColor
+			_, contentIndex = moduleData[content]:GetContentType()
+			-- add cat
+			if not loadedContent[contentIndex] then
+				loadedContent[contentIndex] = {
+					info = {
+						name = contentTypes[contentIndex][1],
+						bgColor = contentTypes[contentIndex][2],
+					}
+				}
+			end
+			-- add ini
+			loadedContent[contentIndex][ #loadedContent[contentIndex]+1 ] = {
+				id			= content,
+				name		= moduleData[content]:GetName(),
+				tt_title	= moduleData[content]:GetName(),
+				tt_text		= moduleData[content]:GetInfo(),
+			}
+		end
 	end
+
+	for i = 1, #contentTypes do
+		if loadedContent[i] then
+			data[#data+1] = loadedContent[i]
+		end
+	end
+	loadedContent = nil
+
 	if data[0] and #data[0] > 0 then
 		data[#data+1] = data[0]
 		data[0] = nil
@@ -810,6 +781,36 @@ local function DifficultySelectFunction(self, id, arg, start)
 	UpdateFrames()
 end
 
+local function UpdateGameVersionTexture()
+	if AtlasLoot:GetGameVersion() < 2 then return end
+	if not GUI.frame or not GUI.frame.gameVersionLogo then return end
+	local frame = GUI.frame.gameVersionLogo
+
+	local curGameVersion = db.selectedGameVersion
+
+	if curGameVersion == 2 then
+		frame:SetTexture(131194)
+	else
+		frame:SetTexture(538639)
+	end
+end
+
+local function GameVersionSwitch_OnClick(self)
+	if AtlasLoot:GetGameVersion() < 2 then return end
+	local curGameVersion = db.selectedGameVersion
+
+	if curGameVersion == 2 then
+		db.selectedGameVersion = 1
+	else
+		db.selectedGameVersion = 2
+	end
+
+	db.selected[2] = AtlasLoot.ItemDB:GetCorrespondingField(db.selected[1], db.selected[2], db.selectedGameVersion)
+
+	UpdateGameVersionTexture()
+	loadModule()
+end
+
 -- ################################
 -- GUI functions
 -- ################################
@@ -919,7 +920,7 @@ function GUI:Create()
 	GUI_CREATED = true
 	local frameName = "AtlasLoot_GUI-Frame"
 
-	local frame = CreateFrame("Frame", frameName)
+	local frame = CreateFrame("Frame", frameName, nil, _G.BackdropTemplateMixin and "BackdropTemplate" or nil)
 	frame:ClearAllPoints()
 	frame:SetParent(UIParent)
 	frame:SetPoint(db.point[1], db.point[2], db.point[3], db.point[4], db.point[5])
@@ -964,16 +965,63 @@ function GUI:Create()
 	frame.titleFrame.version:SetJustifyV("BOTTOM")
 	frame.titleFrame.version:SetText(AtlasLoot.__addonversion)
 
+	frame.titleFrame.newVersion = frame.titleFrame:CreateFontString(nil, "ARTWORK")
+	frame.titleFrame.newVersion:SetPoint("LEFT", frame.titleFrame, "LEFT", 5, 1)
+	frame.titleFrame.newVersion:SetTextColor(0, 1, 0, 1)
+	frame.titleFrame.newVersion:SetFont(_G["SystemFont_Tiny"]:GetFont(), 10)
+	frame.titleFrame.newVersion:SetJustifyH("LEFT")
+	frame.titleFrame.newVersion:SetJustifyV("MIDDLE")
+	frame.titleFrame.newVersion:SetText(AL["New version available!"])
+
+	frame.gameVersionButton = CreateFrame("Button", frameName.."-gameVersionButton", frame)
+	frame.gameVersionButton:SetPoint("TOPLEFT", frame, "TOPLEFT", 258, -33)
+	frame.gameVersionButton:SetWidth(64)
+	frame.gameVersionButton:SetHeight(32)
+	frame.gameVersionButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+	frame.gameVersionButton:SetScript("OnClick", GameVersionSwitch_OnClick)
+
+	frame.gameVersionButton.Box = {}
+
+	local function CreateLineForGameVersion()
+		local l = frame.gameVersionButton:CreateLine()
+		l:SetThickness(1)
+		l:SetColorTexture(1,0.82,0,0.4)
+		frame.gameVersionButton.Box[#frame.gameVersionButton.Box+1] = l
+		return l
+	end
+
+	local lineGap = 1
+	local l = CreateLineForGameVersion()
+	l:SetStartPoint("TOPLEFT",-lineGap,lineGap)
+	l:SetEndPoint("TOPRIGHT",lineGap,lineGap)
+
+	l = CreateLineForGameVersion()
+	l:SetStartPoint("TOPRIGHT",lineGap,lineGap)
+	l:SetEndPoint("BOTTOMRIGHT",lineGap,-lineGap)
+
+	l = CreateLineForGameVersion()
+	l:SetStartPoint("BOTTOMRIGHT",lineGap,-lineGap)
+	l:SetEndPoint("BOTTOMLEFT",-lineGap,-lineGap)
+
+	l = CreateLineForGameVersion()
+	l:SetStartPoint("BOTTOMLEFT",-lineGap,-lineGap)
+	l:SetEndPoint("TOPLEFT",-lineGap,lineGap)
+
+	frame.gameVersionLogo = frame:CreateTexture(frameName.."-downBG", "ARTWORK")
+	frame.gameVersionLogo:SetTexture(538639)
+	frame.gameVersionLogo:SetAllPoints(frame.gameVersionButton)
+	frame.gameVersionButton.texture = frame.gameVersionLogo
+
 	frame.moduleSelect = GUI:CreateDropDown()
-	frame.moduleSelect:SetParPoint("TOPLEFT", frame, "TOPLEFT", 10, -40)
-	frame.moduleSelect:SetWidth(270)
+	frame.moduleSelect:SetParPoint("RIGHT", frame.gameVersionButton, "LEFT", -5, -4)
+	frame.moduleSelect:SetWidth(245)
 	frame.moduleSelect:SetTitle(AL["Select Module"])
 	frame.moduleSelect:SetText("Select Module")
 	frame.moduleSelect:SetButtonOnClick(ModuleSelectFunction)
 
 	frame.subCatSelect = GUI:CreateDropDown()
-	frame.subCatSelect:SetParPoint("TOPLEFT", frame.moduleSelect.frame, "TOPRIGHT", 20, 0)
-	frame.subCatSelect:SetWidth(270)
+	frame.subCatSelect:SetParPoint("LEFT", frame.gameVersionButton, "RIGHT", 5, -4)
+	frame.subCatSelect:SetWidth(245)
 	frame.subCatSelect:SetTitle(AL["Select Subcategory"])
 	frame.subCatSelect:SetText("Select Subcategory")
 	frame.subCatSelect:SetButtonOnClick(SubCatSelectFunction)
@@ -1039,7 +1087,7 @@ function GUI:Create()
 	frame.contentFrame.map.overlay = frame.contentFrame:CreateTexture(frameName.."-map3","BACKGROUND")
 	frame.contentFrame.map.overlay:SetAllPoints(frame.contentFrame.itemBG)
 	frame.contentFrame.map.overlay:SetDrawLayer(frame.contentFrame.itemBG:GetDrawLayer(), 4)
-	frame.contentFrame.map.overlay:SetColorTexture(0, 0, 0, 0.4)
+	frame.contentFrame.map.overlay:SetColorTexture(0, 0, 0, 0.7)
 	frame.contentFrame.map.overlay:Hide()
 
 	frame.contentFrame.map.maxWidth = frame.contentFrame.map:GetWidth()
@@ -1173,16 +1221,14 @@ function GUI:Create()
 	frame.contentFrame.clasFilterButton:SetPoint("LEFT", frame.contentFrame.itemsButton, "RIGHT", 5, 0)
 	frame.contentFrame.clasFilterButton:SetScript("OnClick", ClassFilterButton_OnClick)
 	frame.contentFrame.clasFilterButton:SetScript("OnShow", ClassFilterButton_OnShow)
-	frame.contentFrame.clasFilterButton:SetScript("OnHide", ClassFilterButton_OnHide)
-	frame.contentFrame.clasFilterButton:SetScript("OnEvent", ClassFilterButton_OnEvent)
 	frame.contentFrame.clasFilterButton:SetScript("OnEnter", ClassFilterButton_OnEnter)
 	frame.contentFrame.clasFilterButton:SetScript("OnLeave", ClassFilterButton_OnLeave)
 	frame.contentFrame.clasFilterButton.mainButton = true
-	frame.contentFrame.clasFilterButton:Hide()
+	--frame.contentFrame.clasFilterButton:Hide()
 
 	frame.contentFrame.clasFilterButton.texture = frame.contentFrame.clasFilterButton:CreateTexture(frameName.."-clasFilterButton-texture","ARTWORK")
 	frame.contentFrame.clasFilterButton.texture:SetAllPoints(frame.contentFrame.clasFilterButton)
-	frame.contentFrame.clasFilterButton.texture:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark")
+	--frame.contentFrame.clasFilterButton.texture:SetTexture(CLASS_ICON_PATH[PLAYER_CLASS_FN])
 
 	self.frame = frame
 
@@ -1192,6 +1238,8 @@ function GUI:Create()
 	-- Set itemframe as start frame
 	frame.contentFrame.shownFrame = GUI.ItemFrame.frame
 	--self.SoundFrame:Create()
+
+	GUI.RefreshVersionUpdate()
 end
 
 function GUI:ForceUpdate()
@@ -1252,6 +1300,15 @@ function GUI.Temp_SetParPoint(self, ...)
 	end
 end
 
+function GUI.RefreshVersionUpdate()
+	if not GUI.frame then return end
+	if AtlasLoot.IsAddonUpdateAviable() then
+		GUI.frame.titleFrame.newVersion:Show()
+	else
+		GUI.frame.titleFrame.newVersion:Hide()
+	end
+end
+
 -- ################################
 -- Option functions
 -- ################################
@@ -1296,6 +1353,7 @@ function GUI.RefreshMainFrame()
 	frame:SetBackdropColor(db.mainFrame.bgColor.r, db.mainFrame.bgColor.b, db.mainFrame.bgColor.g, db.mainFrame.bgColor.a)
 	frame.titleFrame:SetBackdropColor(db.mainFrame.title.bgColor.r, db.mainFrame.title.bgColor.g, db.mainFrame.title.bgColor.b, db.mainFrame.title.bgColor.a)
 	GUI.RefreshFonts("title")
+	UpdateGameVersionTexture()
 
 	frame:SetScale(db.mainFrame.scale)
 end

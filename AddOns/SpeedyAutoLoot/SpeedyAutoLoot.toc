@@ -1,8 +1,0 @@
-## Interface: 11305
-## Title: |cffEEE4AESpeedy AutoLoot|r
-## Notes: |cff58C6FALoot at ludicrous speed!|r|n|n|cffFFC700Slash command: /sal, /speedyautoloot|r
-## Author: Yuyuli
-## Version: 2.0.30
-## SavedVariables: SpeedyAutoLootDB
-
-SpeedyAutoLoot.lua

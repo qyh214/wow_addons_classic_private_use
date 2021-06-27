@@ -95,7 +95,7 @@
 				self.need_rolagem = false
 
 				self.baseframe:EnableMouseWheel (false)
-				gump:Fade (self, 1, nil, "barras") --> escondendo a janela da inst�ncia [inst�ncia [force hide [velocidade [hidar o que]]]]
+				Details.FadeHandler.Fader (self, 1, nil, "barras") --> escondendo a janela da inst�ncia [inst�ncia [force hide [velocidade [hidar o que]]]]
 				self.mostrando = "solo"
 			end
 			
@@ -161,8 +161,8 @@
 				_detalhes:CancelWaitForPlugin()
 			end
 
-			gump:Fade (self, 1, nil, "barras")
-			gump:Fade (self.scroll, 0)
+			Details.FadeHandler.Fader (self, 1, nil, "barras")
+			Details.FadeHandler.Fader (self.scroll, 0)
 			
 			if (self.need_rolagem) then
 				self:MostrarScrollBar (true)
@@ -177,7 +177,7 @@
 				if (self.rows_created < self.rows_fit_in_window) then
 					for i  = #self.barras+1, self.rows_fit_in_window do
 						local nova_barra = gump:CriaNovaBarra (self, i, 30) --> cria nova barra
-						nova_barra.texto_esquerdo:SetText (Loc ["STRING_NEWROW"])
+						nova_barra.lineText1:SetText (Loc ["STRING_NEWROW"])
 						nova_barra.statusbar:SetValue (100) 
 						self.barras [i] = nova_barra
 					end

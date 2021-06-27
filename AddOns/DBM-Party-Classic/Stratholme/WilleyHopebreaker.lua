@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(446, "DBM-Party-Classic", 16, 236)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(10997)
 mod:SetEncounterID(475)
 
@@ -20,13 +20,9 @@ function mod:OnCombatStart(delay)
 	timerSummonRisenRiflemanCD:Start(1-delay)
 end
 
-do
-	local SummonRisenRifleman = DBM:GetSpellInfo(17279)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 17279 then
-		if args.spellName == SummonRisenRifleman then
-			warningSummonRisenRifleman:Show()
-			timerSummonRisenRiflemanCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 17279 then
+		warningSummonRisenRifleman:Show()
+		timerSummonRisenRiflemanCD:Start()
 	end
 end

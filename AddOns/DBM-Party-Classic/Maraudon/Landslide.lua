@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(429, "DBM-Party-Classic", 8, 232)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(12203)
 mod:SetEncounterID(426)
 
@@ -21,7 +21,7 @@ local specWarnWrath					= mod:NewSpecialWarningInterrupt(21807, "HasInterrupt", 
 
 local timerLandslideCD				= mod:NewAITimer(180, 21808, 2, nil, nil, nil, 1)
 local timerKnockAwayCD				= mod:NewCDTimer(15.9, 11130, nil, nil, nil, 2)
-local timerTrampleCD				= mod:NewCDTimer(21.9, 5568, nil, nil, nil, 2)
+local timerTrampleCD				= mod:NewCDTimer(13.4, 5568, nil, nil, nil, 2)
 
 function mod:OnCombatStart(delay)
 	timerTrampleCD:Start(6-delay)--6
@@ -29,28 +29,19 @@ function mod:OnCombatStart(delay)
 	timerLandslideCD:Start(1-delay)
 end
 
-do
-	local Landslide = DBM:GetSpellInfo(21808)
-	function mod:SPELL_CAST_START(args)
-		--if args.spellId == 21808 then
-		if args.spellName == Landslide then
-			warningLandSlide:Show()
-			timerLandslideCD:Start()
-		end
+function mod:SPELL_CAST_START(args)
+	if args.spellId == 21808 then
+		warningLandSlide:Show()
+		timerLandslideCD:Start()
 	end
 end
 
-do
-	local KnockAway, Trample = DBM:GetSpellInfo(11130), DBM:GetSpellInfo(5568)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 110762 or args.spellId == 11130 then--Retail, Classic (not confirmed, no actual data yet)
-		if args.spellName == KnockAway then
-			warningKnockAway:Show()
-			timerKnockAwayCD:Start()
-		--elseif args.spellId == 5568 then
-		elseif args.spellName == Trample and args:IsSrcTypeHostile() then
-			warningTrample:Show()
-			timerTrampleCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 11130 then
+		warningKnockAway:Show()
+		timerKnockAwayCD:Start()
+	elseif args.spellId == 5568 and args:IsSrcTypeHostile() then
+		warningTrample:Show()
+		timerTrampleCD:Start()
 	end
 end

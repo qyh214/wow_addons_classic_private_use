@@ -23,7 +23,6 @@ If the sub-widgets are StatusBars, their minimum and maximum values will be set 
 Supported class powers:
   - All     - Combo Points
   - Mage    - Arcane Charges
-  - Monk    - Chi Orbs
   - Paladin - Holy Power
   - Warlock - Soul Shards
 

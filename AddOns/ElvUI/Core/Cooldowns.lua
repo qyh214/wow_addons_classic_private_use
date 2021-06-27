@@ -1,10 +1,10 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local AB = E:GetModule('ActionBars')
+local LSM = E.Libs.LSM
 
---Lua functions
 local next, ipairs, pairs = next, ipairs, pairs
 local floor, tinsert = floor, tinsert
---WoW API / Variables
+
 local GetTime = GetTime
 local CreateFrame = CreateFrame
 local hooksecurefunc = hooksecurefunc
@@ -70,10 +70,8 @@ function E:Cooldown_OnUpdate(elapsed)
 				end
 			end
 
-			local color = self.timeColors[id]
-			if color then
-				self.text:SetTextColor(color.r, color.g, color.b)
-			end
+			local color = not self.skipTextColor and self.timeColors[id]
+			if color then self.text:SetTextColor(color.r, color.g, color.b) end
 		end
 	end
 end
@@ -153,7 +151,7 @@ function E:Cooldown_Options(timer, db, parent)
 		end
 
 		if fonts and fonts.enable then
-			timer.customFont = E.Libs.LSM:Fetch('font', fonts.font)
+			timer.customFont = LSM:Fetch('font', fonts.font)
 			timer.customFontSize = fonts.fontSize
 			timer.customFontOutline = fonts.fontOutline
 		else
@@ -208,7 +206,7 @@ end
 
 E.RegisteredCooldowns = {}
 function E:OnSetCooldown(start, duration)
-	if (not self.forceDisabled) and (start and duration) and (duration > MIN_DURATION) then
+	if not self.forceDisabled and (start and duration) and (duration > MIN_DURATION) then
 		local timer = self.timer or E:CreateCooldownTimer(self)
 		timer.start = start
 		timer.duration = duration
@@ -268,7 +266,7 @@ end
 
 function E:UpdateCooldownOverride(module)
 	local cooldowns = (module and E.RegisteredCooldowns[module])
-	if (not cooldowns) or not next(cooldowns) then return end
+	if not cooldowns or not next(cooldowns) then return end
 
 	local blizzText
 	for _, parent in ipairs(cooldowns) do
@@ -293,12 +291,9 @@ function E:UpdateCooldownOverride(module)
 					cd.text:FontTemplate(cd.customFont, cd.customFontSize, cd.customFontOutline)
 				elseif parent.CooldownOverride == 'auras' then
 					-- parent.auraType defined in `A:UpdateHeader` and `A:CreateIcon`
-					local font = E.Libs.LSM:Fetch('font', db.font)
-					if font and parent.auraType then
-						local fontSize = db[parent.auraType] and db[parent.auraType].durationFontSize
-						if fontSize then
-							cd.text:FontTemplate(font , fontSize, db.fontOutline)
-						end
+					local fontDB = parent.auraType and db[parent.auraType]
+					if fontDB and fontDB.timeFont then
+						cd.text:FontTemplate(LSM:Fetch('font', fontDB.timeFont), fontDB.timeFontSize, fontDB.timeFontOutline)
 					end
 				end
 

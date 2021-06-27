@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(427, "DBM-Party-Classic", 8, 232)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision("20200811024007")
+mod:SetRevision("20210403094344")
 mod:SetCreatureID(12236)
 mod:SetEncounterID(424)
 
@@ -20,13 +20,9 @@ function mod:OnCombatStart(delay)
 --	timerSmokeBombCD:Start(1-delay)--Used near instant on pull
 end
 
-do
-	local SmokeBomb = DBM:GetSpellInfo(7964)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args.spellId == 7964 then
-		if args.spellName == SmokeBomb and args:IsSrcTypeHostile() then
-			warningSmokeBomb:Show()
-			timerSmokeBombCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 7964 and args:IsSrcTypeHostile() then
+		warningSmokeBomb:Show()
+		timerSmokeBombCD:Start()
 	end
 end

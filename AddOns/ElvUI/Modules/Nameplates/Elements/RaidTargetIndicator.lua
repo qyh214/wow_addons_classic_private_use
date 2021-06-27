@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local NP = E:GetModule('NamePlates')
 
 local GetRaidTargetIndex = GetRaidTargetIndex
@@ -35,7 +35,7 @@ function NP:Update_RaidTargetIndicator(nameplate)
 
 		nameplate.RaidTargetIndicator:ClearAllPoints()
 		nameplate.RaidTargetIndicator:Point(E.InversePoints[db.raidTargetIndicator.position], nameplate, db.raidTargetIndicator.position, db.raidTargetIndicator.xOffset, db.raidTargetIndicator.yOffset)
-		nameplate.RaidTargetIndicator:Size(db.raidTargetIndicator.size, db.raidTargetIndicator.size)
+		nameplate.RaidTargetIndicator:Size(db.raidTargetIndicator.size)
 	elseif nameplate:IsElementEnabled('RaidTargetIndicator') then
 		nameplate:DisableElement('RaidTargetIndicator')
 	end

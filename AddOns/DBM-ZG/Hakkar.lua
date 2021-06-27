@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Hakkar", "DBM-ZG", 1)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision$"):sub(12, -3))
+mod:SetRevision("20210403082144")
 mod:SetCreatureID(14834)
 mod:SetEncounterID(793)
 mod:SetHotfixNoticeRev(20200419000000)--2020, 04, 19
@@ -110,89 +110,67 @@ function mod:OnCombatEnd()
 	end
 end
 
-do
-	local BloodSiphon = DBM:GetSpellInfo(24324)
-	local AspectOfMarli, AspectOfJeklik, AspectOfVenoxis, AspectOfThekal, AspectOfArlokk = DBM:GetSpellInfo(24686), DBM:GetSpellInfo(24687), DBM:GetSpellInfo(24688), DBM:GetSpellInfo(24689), DBM:GetSpellInfo(24690)
-	function mod:SPELL_CAST_SUCCESS(args)
-		--if args:IsSpellID(24324) then
-		if args.spellName == BloodSiphon then
-			warnSiphonSoon:Cancel()
-			warnSiphonSoon:Schedule(80)
-			timerSiphon:Start()
-		--elseif args:IsSpellID(24686) then
-		elseif args.spellName == AspectOfMarli then
-			timerAspectOfMarliCD:Start()
-		--elseif args:IsSpellID(24687) then
-		elseif args.spellName == AspectOfJeklik then
-			timerAspectOfJeklikCD:Start()
-		--elseif args:IsSpellID(24688) then
-		elseif args.spellName == AspectOfVenoxis then
-			timerAspectOfVenoxisCD:Start()
-		--elseif args:IsSpellID(24689) then
-		elseif args.spellName == AspectOfThekal then
-			timerAspectOfThekalCD:Start()
-		--elseif args:IsSpellID(24690) then
-		elseif args.spellName == AspectOfArlokk then
-			timerAspectOfArlokkCD:Start()
-		end
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 24324 then
+		warnSiphonSoon:Cancel()
+		warnSiphonSoon:Schedule(80)
+		timerSiphon:Start()
+	elseif args.spellId == 24686 then
+		timerAspectOfMarliCD:Start()
+	elseif args.spellId == 24687 then
+		timerAspectOfJeklikCD:Start()
+	elseif args.spellId == 24688 then
+		timerAspectOfVenoxisCD:Start()
+	elseif args.spellId == 24689 then
+		timerAspectOfThekalCD:Start()
+	elseif args.spellId == 24690 then
+		timerAspectOfArlokkCD:Start()
 	end
 end
 
-do
-	local CauseInsanity, CorruptedBlood = DBM:GetSpellInfo(24327), DBM:GetSpellInfo(24328)
-	local AspectOfMarli, AspectOfJeklik, AspectOfVenoxis, AspectOfThekal, AspectOfArlokk = DBM:GetSpellInfo(24686), DBM:GetSpellInfo(24687), DBM:GetSpellInfo(24688), DBM:GetSpellInfo(24689), DBM:GetSpellInfo(24690)
-	function mod:SPELL_AURA_APPLIED(args)
-		--if args:IsSpellID(24327) then
-		if args.spellName == CauseInsanity then
-			warnInsanity:Show(args.destName)
-			timerInsanity:Start(args.destName)
-			timerInsanityCD:Start()
-		--elseif args:IsSpellID(24328) then
-		elseif args.spellName == CorruptedBlood then
-			if args:IsPlayer() then
-				specWarnBlood:Show()
-				specWarnBlood:Play("runout")
-				yellBlood:Yell()
-				if self.Options.RangeFrame then
-					DBM.RangeCheck:Show(10)
-				end
-			else
-				warnBlood:Show(args.destName)
+function mod:SPELL_AURA_APPLIED(args)
+	if args.spellId == 24327 then
+		warnInsanity:Show(args.destName)
+		timerInsanity:Start(args.destName)
+		timerInsanityCD:Start()
+	elseif args.spellId == 24328 then
+		if args:IsPlayer() then
+			specWarnBlood:Show()
+			specWarnBlood:Play("runout")
+			yellBlood:Yell()
+			if self.Options.RangeFrame then
+				DBM.RangeCheck:Show(10)
 			end
-		--elseif args:IsSpellID(24686) then
-		elseif args.spellName == AspectOfMarli then
-			warnAspectOfMarli:Show(args.destName)
-			timerAspectOfMarli:Start(args.destName)
-		--elseif args:IsSpellID(24687) then
-		elseif args.spellName == AspectOfJeklik then
-			timerAspectOfJeklik:Start(args.destName)
-		--elseif args:IsSpellID(24689) then
-		elseif args.spellName == AspectOfThekal and args:IsDestTypeHostile() then
-			if self.Options.SpecWarn24689dispel then
-				specWarnAspectOfThekal:Show()
-				specWarnAspectOfThekal:Play("enrage")
-			else
-				warnAspectOfThekal:Show()
-			end
-			timerAspectOfThekal:Start()
-		--elseif args:IsSpellID(24690) then
-		elseif args.spellName == AspectOfArlokk then
-			warnAspectOfArlokk:Show(args.destName)
-			timerAspectOfArlokk:Start(args.destName)
+		else
+			warnBlood:Show(args.destName)
 		end
+	elseif args.spellId == 24686 then
+		warnAspectOfMarli:Show(args.destName)
+		timerAspectOfMarli:Start(args.destName)
+	elseif args.spellId == 24687 then
+		timerAspectOfJeklik:Start(args.destName)
+	elseif args.spellId == 24689 and args:IsDestTypeHostile() then
+		if self.Options.SpecWarn24689dispel then
+			specWarnAspectOfThekal:Show()
+			specWarnAspectOfThekal:Play("enrage")
+		else
+			warnAspectOfThekal:Show()
+		end
+		timerAspectOfThekal:Start()
+	elseif args.spellId == 24690 then
+		warnAspectOfArlokk:Show(args.destName)
+		timerAspectOfArlokk:Start(args.destName)
 	end
+end
 
-	function mod:SPELL_AURA_REMOVED(args)
-		--if args.spellId == 20475 then
-		if args.spellName == CorruptedBlood then
-			if args:IsPlayer() then
-				if self.Options.RangeFrame then
-					DBM.RangeCheck:Hide()
-				end
+function mod:SPELL_AURA_REMOVED(args)
+	if args.spellId == 20475 then
+		if args:IsPlayer() then
+			if self.Options.RangeFrame then
+				DBM.RangeCheck:Hide()
 			end
-		--elseif args:IsSpellID(24689) then
-		elseif args.spellName == AspectOfThekal and args:IsDestTypeHostile() then
-			timerAspectOfThekal:Stop()
 		end
+	elseif args:IsSpellID(24689) and args:IsDestTypeHostile() then
+		timerAspectOfThekal:Stop()
 	end
 end

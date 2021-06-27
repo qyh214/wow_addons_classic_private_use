@@ -2,19 +2,20 @@ local addonName, addon = ...
 local _G = _G
 local E = addon:Eve()
 
-function addon:CVarExists(cvar)
-	return pcall(function() return GetCVarDefault(cvar) end)
-end
-
--- Go through list of cvars and remove any that don't currently exist
+-- C_Console.GetAllCommands() does not return the complete list of CVars on login
+-- Repopulate the list using UpdateCVarList() when the CVar browser is opened
 local CVarList = {}
-for cvar in pairs(addon.hiddenOptions) do
-	local cvar_exists = addon:CVarExists(cvar) -- pcall(function() return GetCVarDefault(cvar) end)
-	if cvar_exists then
-		CVarList[cvar] = addon.hiddenOptions[cvar]
-	else
-		-- addon.hiddenOptions[cvar] = nil -- can't do this because we have exceptions for some settings that aren't cvars, should probably restructure the database
-		-- print("Warning, CVar doesn't exist:", cvar)
+
+local function UpdateCVarList()
+	for i, info in pairs(addon:GetCVars()) do
+		local cvar = info.command
+		if addon.hiddenOptions[cvar] then
+			CVarList[cvar] = addon.hiddenOptions[cvar]
+		else
+			CVarList[cvar] = {
+				description = info.help,
+			}
+		end
 	end
 end
 
@@ -40,7 +41,7 @@ end
 local function TraceCVar(cvar, value, ...)
 	if not addon:CVarExists(cvar) then return end
 	local trace = debugstack(2)
-	local func, source, lineNum = trace:match("in function `([^']+)'%s*([^:%[]+):(%d+)")
+	local source, lineNum = trace:match("in function <([^:%[>]+):(%d+)>")
 	if source then
 		local realValue = GetCVar(cvar) -- the client does some conversions to the original value
 		if SVLoaded then
@@ -57,6 +58,9 @@ local function TraceCVar(cvar, value, ...)
 end
 
 hooksecurefunc('SetCVar', TraceCVar) -- /script SetCVar(cvar, value)
+if C_CVar then
+	hooksecurefunc(C_CVar, 'SetCVar', TraceCVar) -- C_CVar.SetCVar(cvar, value)
+end
 hooksecurefunc('ConsoleExec', function(msg)
 	local cmd, cvar, value = msg:match('^(%S+)%s+(%S+)%s*(%S*)')
 	if cmd then
@@ -191,6 +195,7 @@ end
 -- Update CVarTable to reflect current values
 local function RefreshCVarList()
 	wipe(CVarTable)
+	UpdateCVarList()
 	-- todo: this needs to be updated every time a cvar changes while the table is visible
 	for cvar, tbl in pairs(CVarList) do
 		local value, default, isDefault = GetPrettyCVar(cvar)

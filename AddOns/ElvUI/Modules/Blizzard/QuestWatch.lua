@@ -1,31 +1,17 @@
-local E, L, V, P, G = unpack(select(2, ...)); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
+local E, L, V, P, G = unpack(select(2, ...)) --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 local B = E:GetModule('Blizzard')
 
 local _G = _G
---Lua functions
-local min = math.min
---WoW API / Variables
 local CreateFrame = CreateFrame
 local GetNumQuestWatches = GetNumQuestWatches
 local GetQuestIndexForWatch = GetQuestIndexForWatch
 local GetNumQuestLeaderBoards = GetNumQuestLeaderBoards
-local GetScreenHeight = GetScreenHeight
 local ShowUIPanel = ShowUIPanel
 local QuestLog_SetSelection = QuestLog_SetSelection
 local QuestLog_Update = QuestLog_Update
 local hooksecurefunc = hooksecurefunc
 
 local ClickFrames = {}
-
-function B:SetQuestWatchFrameHeight()
-	local top = _G.QuestWatchFrame:GetTop() or 0
-	local screenHeight = GetScreenHeight()
-	local gapFromTop = screenHeight - top
-	local maxHeight = screenHeight - gapFromTop
-	local objectiveFrameHeight = min(maxHeight, E.db.general.objectiveFrameHeight)
-
-	_G.QuestWatchFrame:SetHeight(objectiveFrameHeight)
-end
 
 function B:MoveQuestWatchFrame()
 	local QuestWatchFrameHolder = CreateFrame("Frame", nil, E.UIParent)
@@ -55,7 +41,6 @@ function B:MoveQuestWatchFrame()
 	QuestTimerFrame:ClearAllPoints()
 	QuestTimerFrame:SetAllPoints(QuestTimerFrameHolder)
 
-	B:SetQuestWatchFrameHeight()
 end
 
 function B:OnQuestClick()
